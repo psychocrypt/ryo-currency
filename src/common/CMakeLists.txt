@@ -54,7 +54,8 @@ set(common_sources
   password.cpp
   perf_timer.cpp
   threadpool.cpp
-  updates.cpp)
+  updates.cpp
+  string.cpp)
 
 if (STACK_TRACE)
   list(APPEND common_sources stack_trace.cpp)
@@ -63,6 +64,8 @@ endif()
 set(common_headers)
 
 set(common_private_headers
+  gulps.hpp
+  string.hpp
   apply_permutation.h
   base58.h
   boost_serialization_helper.h
@@ -104,9 +107,13 @@ target_link_libraries(common
     ${Boost_THREAD_LIBRARY}
     ${Boost_REGEX_LIBRARY}
     ${Boost_CHRONO_LIBRARY}
+    fmt::fmt-header-only
   PRIVATE
     ${OPENSSL_LIBRARIES}
     ${EXTRA_LIBRARIES})
+
+# activate extended color output for fmt
+target_compile_definitions(common PUBLIC -DFMT_EXTENDED_COLORS)
 
 #monero_install_headers(common
 #  ${common_headers})
