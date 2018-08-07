@@ -107,10 +107,13 @@ target_link_libraries(common
     ${Boost_THREAD_LIBRARY}
     ${Boost_REGEX_LIBRARY}
     ${Boost_CHRONO_LIBRARY}
+    fmt::fmt-header-only
   PRIVATE
     ${OPENSSL_LIBRARIES}
-    ${EXTRA_LIBRARIES}
-    fmt::fmt-header-only)
+    ${EXTRA_LIBRARIES})
+
+# activate extended color output for fmt
+target_compile_definitions(common PUBLIC -DFMT_EXTENDED_COLORS)
 
 #monero_install_headers(common
 #  ${common_headers})
