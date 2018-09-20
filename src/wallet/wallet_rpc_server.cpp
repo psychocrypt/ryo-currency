@@ -112,28 +112,34 @@ wallet_rpc_server::~wallet_rpc_server()
 bool wallet_rpc_server::run()
 {
 	m_stop = false;
-	m_net_server.add_idle_handler([this]() {
-		try
+	m_net_server.add_idle_handler(
+		[this]()
 		{
-			if(m_wallet)
-				m_wallet->refresh();
-		}
-		catch(const std::exception &ex)
+			try
+			{
+				if(m_wallet)
+					m_wallet->refresh();
+			}
+			catch(const std::exception &ex)
+			{
+				LOG_ERROR("Exception at while refreshing, what=" << ex.what());
+				return false;
+			}
+			return true;
+		},
+		20000);
+
+	m_net_server.add_idle_handler(
+		[this]()
 		{
-			LOG_ERROR("Exception at while refreshing, what=" << ex.what());
-		}
-		return true;
-	},
-								  20000);
-	m_net_server.add_idle_handler([this]() {
-		if(m_stop.load(std::memory_order_relaxed))
-		{
-			send_stop_signal();
-			return false;
-		}
-		return true;
-	},
-								  500);
+			if(m_stop.load(std::memory_order_relaxed))
+			{
+				send_stop_signal();
+				return false;
+			}
+			return true;
+		},
+		500);
 
 	//DO NOT START THIS SERVER IN MORE THEN 1 THREADS WITHOUT REFACTORING
 	return epee::http_server_impl_base<wallet_rpc_server, connection_context>::run(1, true);
@@ -2803,6 +2809,7 @@ bool wallet_rpc_server::on_import_multisig(const wallet_rpc::COMMAND_RPC_IMPORT_
 		catch(const std::exception &e)
 		{
 			er.message = std::string("Success, but failed to update spent status after import multisig info: ") + e.what();
+			return false;
 		}
 	}
 	else
