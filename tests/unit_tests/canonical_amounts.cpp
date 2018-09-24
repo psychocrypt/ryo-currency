@@ -1,21 +1,21 @@
 // Copyright (c) 2014-2018, The Monero Project
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,8 +28,8 @@
 //
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
-#include "gtest/gtest.h"
 #include "cryptonote_basic/cryptonote_format_utils.h"
+#include "gtest/gtest.h"
 
 static const uint64_t valid_decomposed_outputs[] = {
   (uint64_t)1, (uint64_t)2, (uint64_t)3, (uint64_t)4, (uint64_t)5, (uint64_t)6, (uint64_t)7, (uint64_t)8, (uint64_t)9, // 1 piconero
@@ -44,19 +44,18 @@ static const uint64_t valid_decomposed_outputs[] = {
   (uint64_t)1000000000, (uint64_t)2000000000, (uint64_t)3000000000, (uint64_t)4000000000, (uint64_t)5000000000, (uint64_t)6000000000, (uint64_t)7000000000, (uint64_t)8000000000, (uint64_t)9000000000,
   (uint64_t)10000000000, (uint64_t)20000000000, (uint64_t)30000000000, (uint64_t)40000000000, (uint64_t)50000000000, (uint64_t)60000000000, (uint64_t)70000000000, (uint64_t)80000000000, (uint64_t)90000000000,
   (uint64_t)100000000000, (uint64_t)200000000000, (uint64_t)300000000000, (uint64_t)400000000000, (uint64_t)500000000000, (uint64_t)600000000000, (uint64_t)700000000000, (uint64_t)800000000000, (uint64_t)900000000000,
-  (uint64_t)1000000000000, (uint64_t)2000000000000, (uint64_t)3000000000000, (uint64_t)4000000000000, (uint64_t)5000000000000, (uint64_t)6000000000000, (uint64_t)7000000000000, (uint64_t)8000000000000, (uint64_t)9000000000000, // 1 monero
+  (uint64_t)1000000000000, (uint64_t)2000000000000, (uint64_t)3000000000000, (uint64_t)4000000000000, (uint64_t)5000000000000, (uint64_t)6000000000000, (uint64_t)7000000000000, (uint64_t)8000000000000, (uint64_t)9000000000000, // 1 ryo
   (uint64_t)10000000000000, (uint64_t)20000000000000, (uint64_t)30000000000000, (uint64_t)40000000000000, (uint64_t)50000000000000, (uint64_t)60000000000000, (uint64_t)70000000000000, (uint64_t)80000000000000, (uint64_t)90000000000000,
   (uint64_t)100000000000000, (uint64_t)200000000000000, (uint64_t)300000000000000, (uint64_t)400000000000000, (uint64_t)500000000000000, (uint64_t)600000000000000, (uint64_t)700000000000000, (uint64_t)800000000000000, (uint64_t)900000000000000,
   (uint64_t)1000000000000000, (uint64_t)2000000000000000, (uint64_t)3000000000000000, (uint64_t)4000000000000000, (uint64_t)5000000000000000, (uint64_t)6000000000000000, (uint64_t)7000000000000000, (uint64_t)8000000000000000, (uint64_t)9000000000000000,
   (uint64_t)10000000000000000, (uint64_t)20000000000000000, (uint64_t)30000000000000000, (uint64_t)40000000000000000, (uint64_t)50000000000000000, (uint64_t)60000000000000000, (uint64_t)70000000000000000, (uint64_t)80000000000000000, (uint64_t)90000000000000000,
   (uint64_t)100000000000000000, (uint64_t)200000000000000000, (uint64_t)300000000000000000, (uint64_t)400000000000000000, (uint64_t)500000000000000000, (uint64_t)600000000000000000, (uint64_t)700000000000000000, (uint64_t)800000000000000000, (uint64_t)900000000000000000,
   (uint64_t)1000000000000000000, (uint64_t)2000000000000000000, (uint64_t)3000000000000000000, (uint64_t)4000000000000000000, (uint64_t)5000000000000000000, (uint64_t)6000000000000000000, (uint64_t)7000000000000000000, (uint64_t)8000000000000000000, (uint64_t)9000000000000000000, // 1 meganero
-  (uint64_t)10000000000000000000ull
-};
+  (uint64_t)10000000000000000000ull};
 
 TEST(canonical_amounts, valid)
 {
-  for (size_t n = 0; n < sizeof(valid_decomposed_outputs) / sizeof(valid_decomposed_outputs[0]); ++n)
+  for(size_t n = 0; n < sizeof(valid_decomposed_outputs) / sizeof(valid_decomposed_outputs[0]); ++n)
   {
     ASSERT_TRUE(cryptonote::is_valid_decomposed_amount(valid_decomposed_outputs[n]));
   }
@@ -64,13 +63,13 @@ TEST(canonical_amounts, valid)
 
 TEST(canonical_amounts, invalid)
 {
-  for (size_t n = 0; n < sizeof(valid_decomposed_outputs) / sizeof(valid_decomposed_outputs[0]); ++n)
+  for(size_t n = 0; n < sizeof(valid_decomposed_outputs) / sizeof(valid_decomposed_outputs[0]); ++n)
   {
     // 10 and below have adjacent valid decomposed amounts
-    if (valid_decomposed_outputs[n] > 10)
+    if(valid_decomposed_outputs[n] > 10)
     {
-      ASSERT_FALSE(cryptonote::is_valid_decomposed_amount(valid_decomposed_outputs[n]+1));
-      ASSERT_FALSE(cryptonote::is_valid_decomposed_amount(valid_decomposed_outputs[n]-1));
+      ASSERT_FALSE(cryptonote::is_valid_decomposed_amount(valid_decomposed_outputs[n] + 1));
+      ASSERT_FALSE(cryptonote::is_valid_decomposed_amount(valid_decomposed_outputs[n] - 1));
     }
   }
 
@@ -80,4 +79,3 @@ TEST(canonical_amounts, invalid)
   ASSERT_FALSE(cryptonote::is_valid_decomposed_amount(10000000000001ul));
   ASSERT_FALSE(cryptonote::is_valid_decomposed_amount(11000000000000ul));
 }
-

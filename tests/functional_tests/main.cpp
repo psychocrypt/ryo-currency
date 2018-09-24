@@ -1,21 +1,21 @@
 // Copyright (c) 2014-2018, The Monero Project
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -25,7 +25,7 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #include <boost/program_options.hpp>
@@ -42,22 +42,22 @@ namespace po = boost::program_options;
 
 namespace
 {
-  const command_line::arg_descriptor<bool> arg_test_transactions_flow = {"test_transactions_flow", ""};
+const command_line::arg_descriptor<bool> arg_test_transactions_flow = {"test_transactions_flow", ""};
 
-  const command_line::arg_descriptor<std::string> arg_working_folder  = {"working-folder", "", "."};
-  const command_line::arg_descriptor<std::string> arg_source_wallet   = {"source-wallet",  "", "", true};
-  const command_line::arg_descriptor<std::string> arg_dest_wallet     = {"dest-wallet",    "", "", true};
-  const command_line::arg_descriptor<std::string> arg_daemon_addr_a   = {"daemon-addr-a",  "", "127.0.0.1:8080"};
-  const command_line::arg_descriptor<std::string> arg_daemon_addr_b   = {"daemon-addr-b",  "", "127.0.0.1:8082"};
+const command_line::arg_descriptor<std::string> arg_working_folder = {"working-folder", "", "."};
+const command_line::arg_descriptor<std::string> arg_source_wallet = {"source-wallet", "", "", true};
+const command_line::arg_descriptor<std::string> arg_dest_wallet = {"dest-wallet", "", "", true};
+const command_line::arg_descriptor<std::string> arg_daemon_addr_a = {"daemon-addr-a", "", "127.0.0.1:8080"};
+const command_line::arg_descriptor<std::string> arg_daemon_addr_b = {"daemon-addr-b", "", "127.0.0.1:8082"};
 
-  const command_line::arg_descriptor<uint64_t> arg_transfer_amount = {"transfer_amount",   "", 60000000000000};
-  const command_line::arg_descriptor<size_t> arg_mix_in_factor     = {"mix-in-factor",     "", 10};
-  const command_line::arg_descriptor<size_t> arg_tx_count          = {"tx-count",          "", 100};
-  const command_line::arg_descriptor<size_t> arg_tx_per_second     = {"tx-per-second",     "", 20};
-  const command_line::arg_descriptor<size_t> arg_test_repeat_count = {"test_repeat_count", "", 1};
+const command_line::arg_descriptor<uint64_t> arg_transfer_amount = {"transfer_amount", "", 60000000000000};
+const command_line::arg_descriptor<size_t> arg_mix_in_factor = {"mix-in-factor", "", 10};
+const command_line::arg_descriptor<size_t> arg_tx_count = {"tx-count", "", 100};
+const command_line::arg_descriptor<size_t> arg_tx_per_second = {"tx-per-second", "", 20};
+const command_line::arg_descriptor<size_t> arg_test_repeat_count = {"test_repeat_count", "", 1};
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
   TRY_ENTRY();
   tools::on_startup();
@@ -85,24 +85,23 @@ int main(int argc, char* argv[])
   command_line::add_arg(desc_options, arg_test_repeat_count);
 
   po::variables_map vm;
-  bool r = command_line::handle_error_helper(desc_options, [&]()
-  {
+  bool r = command_line::handle_error_helper(desc_options, [&]() {
     po::store(po::parse_command_line(argc, argv, desc_options), vm);
     po::notify(vm);
     return true;
   });
-  if (!r)
+  if(!r)
     return 1;
 
-  if (command_line::get_arg(vm, command_line::arg_help))
+  if(command_line::get_arg(vm, command_line::arg_help))
   {
     std::cout << desc_options << std::endl;
     return 0;
   }
 
-  if (command_line::get_arg(vm, arg_test_transactions_flow))
+  if(command_line::get_arg(vm, arg_test_transactions_flow))
   {
-    std::string working_folder     = command_line::get_arg(vm, arg_working_folder);
+    std::string working_folder = command_line::get_arg(vm, arg_working_folder);
     std::string path_source_wallet, path_target_wallet;
     if(command_line::has_arg(vm, arg_source_wallet))
       path_source_wallet = command_line::get_arg(vm, arg_source_wallet);
@@ -123,7 +122,7 @@ int main(int argc, char* argv[])
 
     std::string s;
     std::cin >> s;
-    
+
     return 1;
   }
   else

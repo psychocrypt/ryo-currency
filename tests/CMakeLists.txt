@@ -38,7 +38,7 @@ if (WIN32 AND STATIC)
   add_definitions(-DMINIUPNP_STATICLIB)
 endif ()
 
-find_package(GTest)
+# find_package(GTest) This seems to break the build
 
 if (GTest_FOUND)
   include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
@@ -73,8 +73,8 @@ file(COPY
   data/wallet_9svHk1.keys
   data/wallet_9svHk1
   data/outputs
-  data/unsigned_monero_tx
-  data/signed_monero_tx
+  data/unsigned_ryo_tx
+  data/signed_ryo_tx
   DESTINATION data)
 
 add_subdirectory(core_tests)

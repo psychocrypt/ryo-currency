@@ -1,10 +1,10 @@
 #include "readline_buffer.h"
-#include <readline/readline.h>
-#include <readline/history.h>
-#include <unistd.h>
-#include <iostream>
-#include <boost/thread.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/thread.hpp>
+#include <iostream>
+#include <readline/history.h>
+#include <readline/readline.h>
+#include <unistd.h>
 
 static void install_line_handler();
 static void remove_line_handler();
@@ -15,11 +15,11 @@ static char *the_line;
 
 namespace
 {
-  rdln::readline_buffer* current = NULL;
+rdln::readline_buffer *current = NULL;
 }
 
 rdln::suspend_readline::suspend_readline()
-: m_buffer(NULL), m_restart(false)
+  : m_buffer(NULL), m_restart(false)
 {
   m_buffer = current;
   if(!m_buffer)
@@ -37,14 +37,14 @@ rdln::suspend_readline::~suspend_readline()
     m_buffer->start();
 }
 
-std::vector<std::string>& rdln::readline_buffer::completion_commands()
+std::vector<std::string> &rdln::readline_buffer::completion_commands()
 {
   static std::vector<std::string> commands = {"exit"};
   return commands;
 }
 
 rdln::readline_buffer::readline_buffer()
-: std::stringbuf(), m_cout_buf(NULL)
+  : std::stringbuf(), m_cout_buf(NULL)
 {
   current = this;
 }
@@ -67,12 +67,12 @@ void rdln::readline_buffer::stop()
   remove_line_handler();
 }
 
-rdln::linestatus rdln::readline_buffer::get_line(std::string& line) const
+rdln::linestatus rdln::readline_buffer::get_line(std::string &line) const
 {
   boost::lock_guard<boost::mutex> lock(sync_mutex);
   line_stat = rdln::partial;
   rl_callback_read_char();
-  if (line_stat == rdln::full)
+  if(line_stat == rdln::full)
   {
     line = the_line;
     free(the_line);
@@ -81,7 +81,7 @@ rdln::linestatus rdln::readline_buffer::get_line(std::string& line) const
   return line_stat;
 }
 
-void rdln::readline_buffer::set_prompt(const std::string& prompt)
+void rdln::readline_buffer::set_prompt(const std::string &prompt)
 {
   if(m_cout_buf == NULL)
     return;
@@ -90,14 +90,14 @@ void rdln::readline_buffer::set_prompt(const std::string& prompt)
   rl_redisplay();
 }
 
-void rdln::readline_buffer::add_completion(const std::string& command)
+void rdln::readline_buffer::add_completion(const std::string &command)
 {
   if(std::find(completion_commands().begin(), completion_commands().end(), command) != completion_commands().end())
     return;
   completion_commands().push_back(command);
 }
 
-const std::vector<std::string>& rdln::readline_buffer::get_completions()
+const std::vector<std::string> &rdln::readline_buffer::get_completions()
 {
   return completion_commands();
 }
@@ -106,12 +106,12 @@ int rdln::readline_buffer::sync()
 {
   boost::lock_guard<boost::mutex> lock(sync_mutex);
 #if RL_READLINE_VERSION < 0x0700
-  char lbuf[2] = {0,0};
+  char lbuf[2] = {0, 0};
   char *line = NULL;
   int end = 0, point = 0;
 #endif
 
-  if (rl_end || *rl_prompt)
+  if(rl_end || *rl_prompt)
   {
 #if RL_READLINE_VERSION >= 0x0700
     rl_clear_visible_line();
@@ -129,12 +129,11 @@ int rdln::readline_buffer::sync()
 
   do
   {
-    m_cout_buf->sputc( this->sgetc() );
-  }
-  while ( this->snextc() != EOF );
+    m_cout_buf->sputc(this->sgetc());
+  } while(this->snextc() != EOF);
 
 #if RL_READLINE_VERSION < 0x0700
-  if (end || *rl_prompt)
+  if(end || *rl_prompt)
   {
     rl_restore_prompt();
     rl_line_buffer = line;
@@ -148,10 +147,10 @@ int rdln::readline_buffer::sync()
   return 0;
 }
 
-static void handle_line(char* line)
+static void handle_line(char *line)
 {
   bool exit = false;
-  if (line)
+  if(line)
   {
     line_stat = rdln::full;
     the_line = line;
@@ -161,22 +160,23 @@ static void handle_line(char* line)
     {
       add_history(test_line.c_str());
       history_set_pos(history_length);
-      if (test_line == "exit" || test_line == "q")
+      if(test_line == "exit" || test_line == "q")
         exit = true;
     }
-  } else
+  }
+  else
   /* EOF */
   {
     line_stat = rdln::empty;
     exit = true;
   }
   rl_done = 1;
-  if (exit)
+  if(exit)
     rl_set_prompt("");
   return;
 }
 
-static char* completion_matches(const char* text, int state)
+static char *completion_matches(const char *text, int state)
 {
   static size_t list_index;
   static size_t len;
@@ -187,10 +187,10 @@ static char* completion_matches(const char* text, int state)
     len = strlen(text);
   }
 
-  const std::vector<std::string>& completions = rdln::readline_buffer::get_completions();
-  for(; list_index<completions.size(); )
+  const std::vector<std::string> &completions = rdln::readline_buffer::get_completions();
+  for(; list_index < completions.size();)
   {
-    const std::string& cmd = completions[list_index++];
+    const std::string &cmd = completions[list_index++];
     if(cmd.compare(0, len, text) == 0)
     {
       return strdup(cmd.c_str());
@@ -200,7 +200,7 @@ static char* completion_matches(const char* text, int state)
   return NULL;
 }
 
-static char** attempted_completion(const char* text, int start, int end)
+static char **attempted_completion(const char *text, int start, int end)
 {
   rl_attempted_completion_over = 1;
   return rl_completion_matches(text, completion_matches);
@@ -220,4 +220,3 @@ static void remove_line_handler()
   rl_redisplay();
   rl_callback_handler_remove();
 }
-

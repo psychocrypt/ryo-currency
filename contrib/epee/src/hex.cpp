@@ -35,52 +35,48 @@
 
 namespace epee
 {
-  namespace
+namespace
+{
+template <typename T>
+void write_hex(T &&out, const span<const std::uint8_t> src)
+{
+  static constexpr const char hex[] = u8"0123456789abcdef";
+  static_assert(sizeof(hex) == 17, "bad string size");
+  for(const std::uint8_t byte : src)
   {
-    template<typename T>
-    void write_hex(T&& out, const span<const std::uint8_t> src)
-    {
-      static constexpr const char hex[] = u8"0123456789abcdef";
-      static_assert(sizeof(hex) == 17, "bad string size");
-      for (const std::uint8_t byte : src)
-      {
-        *out = hex[byte >> 4];
-        ++out;
-        *out = hex[byte & 0x0F];
-        ++out;
-      }
-    }
+    *out = hex[byte >> 4];
+    ++out;
+    *out = hex[byte & 0x0F];
+    ++out;
   }
+}
+}
 
-  template<typename T>
-  T to_hex::convert(const span<const std::uint8_t> src)
-  {
-    if (std::numeric_limits<std::size_t>::max() / 2 < src.size())
-      throw std::range_error("hex_view::to_string exceeded maximum size");
+std::string to_hex::string(const span<const std::uint8_t> src)
+{
+  if(std::numeric_limits<std::size_t>::max() / 2 < src.size())
+    throw std::range_error("hex_view::to_string exceeded maximum size");
 
-    T out{};
-    out.resize(src.size() * 2);
-    to_hex::buffer_unchecked((char*)out.data(), src); // can't see the non const version in wipeable_string??
-    return out;
-  }
+  std::string out{};
+  out.resize(src.size() * 2);
+  buffer_unchecked(std::addressof(out[0]), src);
+  return out;
+}
 
-  std::string to_hex::string(const span<const std::uint8_t> src) { return convert<std::string>(src); }
-  epee::wipeable_string to_hex::wipeable_string(const span<const std::uint8_t> src) { return convert<epee::wipeable_string>(src); }
+void to_hex::buffer(std::ostream &out, const span<const std::uint8_t> src)
+{
+  write_hex(std::ostreambuf_iterator<char>{out}, src);
+}
 
-  void to_hex::buffer(std::ostream& out, const span<const std::uint8_t> src)
-  {
-    write_hex(std::ostreambuf_iterator<char>{out}, src);
-  }
+void to_hex::formatted(std::ostream &out, const span<const std::uint8_t> src)
+{
+  out.put('<');
+  buffer(out, src);
+  out.put('>');
+}
 
-  void to_hex::formatted(std::ostream& out, const span<const std::uint8_t> src)
-  {
-    out.put('<');
-    buffer(out, src);
-    out.put('>');
-  }
-
-  void to_hex::buffer_unchecked(char* out, const span<const std::uint8_t> src) noexcept
-  {
-    return write_hex(out, src);
-  }
+void to_hex::buffer_unchecked(char *out, const span<const std::uint8_t> src) noexcept
+{
+  return write_hex(out, src);
+}
 }

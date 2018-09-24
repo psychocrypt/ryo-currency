@@ -1,21 +1,37 @@
-// Copyright (c) 2016-2018, The Monero Project
-// 
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
+//
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
-// 
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
-// 
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
-// 
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+//
+// Authors and copyright holders give permission for following:
+//
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
+//
+// 2. Modification of the source form for your own personal use.
+//
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -29,9 +45,9 @@
 #pragma once
 
 #include <boost/thread/thread.hpp>
-#include <zmq.hpp>
-#include <string>
 #include <memory>
+#include <string>
+#include <zmq.hpp>
 
 #include "common/command_line.h"
 
@@ -49,35 +65,33 @@ static constexpr int DEFAULT_RPC_RECV_TIMEOUT_MS = 1000;
 class ZmqServer
 {
   public:
+  ZmqServer(RpcHandler &h);
 
-    ZmqServer(RpcHandler& h);
+  ~ZmqServer();
 
-    ~ZmqServer();
+  static void init_options(boost::program_options::options_description &desc);
 
-    static void init_options(boost::program_options::options_description& desc);
+  void serve();
 
-    void serve();
+  bool addIPCSocket(std::string address, std::string port);
+  bool addTCPSocket(std::string address, std::string port);
 
-    bool addIPCSocket(std::string address, std::string port);
-    bool addTCPSocket(std::string address, std::string port);
-
-    void run();
-    void stop();
+  void run();
+  void stop();
 
   private:
-    RpcHandler& handler;
+  RpcHandler &handler;
 
-    volatile bool stop_signal;
-    volatile bool running;
+  volatile bool stop_signal;
+  volatile bool running;
 
-    zmq::context_t context;
+  zmq::context_t context;
 
-    boost::thread run_thread;
+  boost::thread run_thread;
 
-    std::unique_ptr<zmq::socket_t> rep_socket;
+  std::unique_ptr<zmq::socket_t> rep_socket;
 };
 
+} // namespace cryptonote
 
-}  // namespace cryptonote
-
-}  // namespace rpc
+} // namespace rpc

@@ -1,21 +1,37 @@
-// Copyright (c) 2016-2018, The Monero Project
-// 
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
+//
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
-// 
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
-// 
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
-// 
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+//
+// Authors and copyright holders give permission for following:
+//
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
+//
+// 2. Modification of the source form for your own personal use.
+//
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -35,11 +51,10 @@ namespace cryptonote
 namespace rpc
 {
 
-ZmqServer::ZmqServer(RpcHandler& h) :
-    handler(h),
-    stop_signal(false),
-    running(false),
-    context(DEFAULT_NUM_ZMQ_THREADS) // TODO: make this configurable
+ZmqServer::ZmqServer(RpcHandler &h) : handler(h),
+                    stop_signal(false),
+                    running(false),
+                    context(DEFAULT_NUM_ZMQ_THREADS) // TODO: make this configurable
 {
 }
 
@@ -50,17 +65,17 @@ ZmqServer::~ZmqServer()
 void ZmqServer::serve()
 {
 
-  while (1)
+  while(1)
   {
     try
     {
       zmq::message_t message;
 
-      if (!rep_socket)
+      if(!rep_socket)
       {
         throw std::runtime_error("ZMQ RPC server reply socket is null");
       }
-      while (rep_socket->recv(&message))
+      while(rep_socket->recv(&message))
       {
         std::string message_string(reinterpret_cast<const char *>(message.data()), message.size());
 
@@ -69,18 +84,17 @@ void ZmqServer::serve()
         std::string response = handler.handle(message_string);
 
         zmq::message_t reply(response.size());
-        memcpy((void *) reply.data(), response.c_str(), response.size());
+        memcpy((void *)reply.data(), response.c_str(), response.size());
 
         rep_socket->send(reply);
         MDEBUG(std::string("Sent RPC reply: \"") + response + "\"");
-
       }
     }
-    catch (const boost::thread_interrupted& e)
+    catch(const boost::thread_interrupted &e)
     {
       MDEBUG("ZMQ Server thread interrupted.");
     }
-    catch (const zmq::error_t& e)
+    catch(const zmq::error_t &e)
     {
       MERROR(std::string("ZMQ error: ") + e.what());
     }
@@ -104,14 +118,10 @@ bool ZmqServer::addTCPSocket(std::string address, std::string port)
 
     rep_socket->setsockopt(ZMQ_RCVTIMEO, &DEFAULT_RPC_RECV_TIMEOUT_MS, sizeof(DEFAULT_RPC_RECV_TIMEOUT_MS));
 
-    if (address.empty())
-      address = "*";
-    if (port.empty())
-      port = "*";
     std::string bind_address = addr_prefix + address + std::string(":") + port;
     rep_socket->bind(bind_address.c_str());
   }
-  catch (const std::exception& e)
+  catch(const std::exception &e)
   {
     MERROR(std::string("Error creating ZMQ Socket: ") + e.what());
     return false;
@@ -127,7 +137,8 @@ void ZmqServer::run()
 
 void ZmqServer::stop()
 {
-  if (!running) return;
+  if(!running)
+    return;
 
   stop_signal = true;
 
@@ -139,7 +150,6 @@ void ZmqServer::stop()
   return;
 }
 
+} // namespace cryptonote
 
-}  // namespace cryptonote
-
-}  // namespace rpc
+} // namespace rpc

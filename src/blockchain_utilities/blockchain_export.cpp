@@ -1,20 +1,36 @@
-// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
 //
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
 //
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
+// Authors and copyright holders give permission for following:
 //
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
 //
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
+// 2. Modification of the source form for your own personal use.
 //
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -26,23 +42,33 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "bootstrap_file.h"
-#include "blocksdat_file.h"
-#include "common/command_line.h"
-#include "cryptonote_core/tx_pool.h"
-#include "cryptonote_core/cryptonote_core.h"
 #include "blockchain_db/blockchain_db.h"
 #include "blockchain_db/db_types.h"
+#include "blocksdat_file.h"
+#include "bootstrap_file.h"
+#include "common/command_line.h"
+#include "cryptonote_core/cryptonote_core.h"
+#include "cryptonote_core/tx_pool.h"
 #include "version.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "bcutil"
+//#undef RYO_DEFAULT_LOG_CATEGORY
+//#define RYO_DEFAULT_LOG_CATEGORY "bcutil"
 
 namespace po = boost::program_options;
 using namespace epee;
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
+#ifdef WIN32
+  std::vector<char*> argptrs;
+  command_line::set_console_utf8();
+  if(command_line::get_windows_args(argptrs))
+  {
+    argc = argptrs.size();
+    argv = argptrs.data();
+  }
+#endif
+
   TRY_ENTRY();
 
   epee::string_tools::set_module_name_and_folder(argv[0]);
@@ -63,13 +89,11 @@ int main(int argc, char* argv[])
   po::options_description desc_cmd_only("Command line options");
   po::options_description desc_cmd_sett("Command line options and settings options");
   const command_line::arg_descriptor<std::string> arg_output_file = {"output-file", "Specify output file", "", true};
-  const command_line::arg_descriptor<std::string> arg_log_level  = {"log-level",  "0-4 or categories", ""};
+  const command_line::arg_descriptor<std::string> arg_log_level = {"log-level", "0-4 or categories", ""};
   const command_line::arg_descriptor<uint64_t> arg_block_stop = {"block-stop", "Stop at block number", block_stop};
   const command_line::arg_descriptor<std::string> arg_database = {
-    "database", available_dbs.c_str(), default_db_type
-  };
+    "database", available_dbs.c_str(), default_db_type};
   const command_line::arg_descriptor<bool> arg_blocks_dat = {"blocksdat", "Output in blocks.dat format", blocks_dat};
-
 
   command_line::add_arg(desc_cmd_sett, cryptonote::arg_data_dir);
   command_line::add_arg(desc_cmd_sett, arg_output_file);
@@ -86,24 +110,23 @@ int main(int argc, char* argv[])
   desc_options.add(desc_cmd_only).add(desc_cmd_sett);
 
   po::variables_map vm;
-  bool r = command_line::handle_error_helper(desc_options, [&]()
-  {
+  bool r = command_line::handle_error_helper(desc_options, [&]() {
     po::store(po::parse_command_line(argc, argv, desc_options), vm);
     po::notify(vm);
     return true;
   });
-  if (! r)
+  if(!r)
     return 1;
 
-  if (command_line::get_arg(vm, command_line::arg_help))
+  if(command_line::get_arg(vm, command_line::arg_help))
   {
-    std::cout << "Monero '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL << ENDL;
+    std::cout << "Ryo '" << RYO_RELEASE_NAME << "' (" << RYO_VERSION_FULL << ")" << ENDL << ENDL;
     std::cout << desc_options << std::endl;
-    return 1;
+    return 0;
   }
 
-  mlog_configure(mlog_get_default_log_path("monero-blockchain-export.log"), true);
-  if (!command_line::is_arg_defaulted(vm, arg_log_level))
+  mlog_configure(mlog_get_default_log_path("ryo-blockchain-export.log"), true);
+  if(!command_line::is_arg_defaulted(vm, arg_log_level))
     mlog_set_log(command_line::get_arg(vm, arg_log_level).c_str());
   else
     mlog_set_log(std::string(std::to_string(log_level) + ",bcutil:INFO").c_str());
@@ -113,7 +136,7 @@ int main(int argc, char* argv[])
 
   bool opt_testnet = command_line::get_arg(vm, cryptonote::arg_testnet_on);
   bool opt_stagenet = command_line::get_arg(vm, cryptonote::arg_stagenet_on);
-  if (opt_testnet && opt_stagenet)
+  if(opt_testnet && opt_stagenet)
   {
     std::cerr << "Can't specify more than one of --testnet and --stagenet" << std::endl;
     return 1;
@@ -125,13 +148,13 @@ int main(int argc, char* argv[])
   m_config_folder = command_line::get_arg(vm, cryptonote::arg_data_dir);
 
   std::string db_type = command_line::get_arg(vm, arg_database);
-  if (!cryptonote::blockchain_valid_db_type(db_type))
+  if(!cryptonote::blockchain_valid_db_type(db_type))
   {
     std::cerr << "Invalid database type: " << db_type << std::endl;
     return 1;
   }
 
-  if (command_line::has_arg(vm, arg_output_file))
+  if(command_line::has_arg(vm, arg_output_file))
     output_file_path = boost::filesystem::path(command_line::get_arg(vm, arg_output_file));
   else
     output_file_path = boost::filesystem::path(m_config_folder) / "export" / BLOCKCHAIN_RAW;
@@ -149,12 +172,12 @@ int main(int argc, char* argv[])
   // because unlike blockchain_storage constructor, which takes a pointer to
   // tx_memory_pool, Blockchain's constructor takes tx_memory_pool object.
   LOG_PRINT_L0("Initializing source blockchain (BlockchainDB)");
-  Blockchain* core_storage = NULL;
+  Blockchain *core_storage = NULL;
   tx_memory_pool m_mempool(*core_storage);
   core_storage = new Blockchain(m_mempool);
 
-  BlockchainDB* db = new_db(db_type);
-  if (db == NULL)
+  BlockchainDB *db = new_db(db_type);
+  if(db == NULL)
   {
     LOG_ERROR("Attempted to use non-existent database type: " << db_type);
     throw std::runtime_error("Attempting to use non-existent database type");
@@ -170,7 +193,7 @@ int main(int argc, char* argv[])
   {
     db->open(filename, DBF_RDONLY);
   }
-  catch (const std::exception& e)
+  catch(const std::exception &e)
   {
     LOG_PRINT_L0("Error opening database: " << e.what());
     return 1;
@@ -181,7 +204,7 @@ int main(int argc, char* argv[])
   LOG_PRINT_L0("Source blockchain storage initialized OK");
   LOG_PRINT_L0("Exporting blockchain raw data...");
 
-  if (opt_blocks_dat)
+  if(opt_blocks_dat)
   {
     BlocksdatFile blocksdat;
     r = blocksdat.store_blockchain_raw(core_storage, NULL, output_file_path, block_stop);

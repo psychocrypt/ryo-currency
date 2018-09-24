@@ -1,21 +1,21 @@
 // Copyright (c) 2014-2018, The Monero Project
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -25,19 +25,19 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #include "gtest/gtest.h"
 
-#include <cstdint>
 #include <algorithm>
+#include <cstdint>
 #include <sstream>
 
-#include "ringct/rctTypes.h"
-#include "ringct/rctSigs.h"
-#include "ringct/rctOps.h"
 #include "device/device.hpp"
+#include "ringct/rctOps.h"
+#include "ringct/rctSigs.h"
+#include "ringct/rctTypes.h"
 
 using namespace std;
 using namespace crypto;
@@ -45,365 +45,377 @@ using namespace rct;
 
 TEST(ringct, Borromean)
 {
-    int j = 0;
+  int j = 0;
 
-        //Tests for Borromean signatures
-        //#boro true one, false one, C != sum Ci, and one out of the range..
-        int N = 64;
-        key64 xv;
-        key64 P1v;
-        key64 P2v;
-        bits indi;
+  //Tests for Borromean signatures
+  //#boro true one, false one, C != sum Ci, and one out of the range..
+  int N = 64;
+  key64 xv;
+  key64 P1v;
+  key64 P2v;
+  bits indi;
 
-        for (j = 0 ; j < N ; j++) {
-            indi[j] = (int)randXmrAmount(2);
+  for(j = 0; j < N; j++)
+  {
+    indi[j] = (int)randXmrAmount(2);
 
-            xv[j] = skGen();
-            if ( (int)indi[j] == 0 ) {
-                scalarmultBase(P1v[j], xv[j]);
-            } else {
-                addKeys1(P1v[j], xv[j], H2[j]);
-            }
-            subKeys(P2v[j], P1v[j], H2[j]);
-        }
+    xv[j] = skGen();
+    if((int)indi[j] == 0)
+    {
+      scalarmultBase(P1v[j], xv[j]);
+    }
+    else
+    {
+      addKeys1(P1v[j], xv[j], H2[j]);
+    }
+    subKeys(P2v[j], P1v[j], H2[j]);
+  }
 
-        //#true one
-        boroSig bb = genBorromean(xv, P1v, P2v, indi);
-        ASSERT_TRUE(verifyBorromean(bb, P1v, P2v));
+  //#true one
+  boroSig bb = genBorromean(xv, P1v, P2v, indi);
+  ASSERT_TRUE(verifyBorromean(bb, P1v, P2v));
 
-        //#false one
-        indi[3] = (indi[3] + 1) % 2;
-        bb = genBorromean(xv, P1v, P2v, indi);
-        ASSERT_FALSE(verifyBorromean(bb, P1v, P2v));
+  //#false one
+  indi[3] = (indi[3] + 1) % 2;
+  bb = genBorromean(xv, P1v, P2v, indi);
+  ASSERT_FALSE(verifyBorromean(bb, P1v, P2v));
 
-        //#true one again
-        indi[3] = (indi[3] + 1) % 2;
-        bb = genBorromean(xv, P1v, P2v, indi);
-        ASSERT_TRUE(verifyBorromean(bb, P1v, P2v));
+  //#true one again
+  indi[3] = (indi[3] + 1) % 2;
+  bb = genBorromean(xv, P1v, P2v, indi);
+  ASSERT_TRUE(verifyBorromean(bb, P1v, P2v));
 
-        //#false one
-        bb = genBorromean(xv, P2v, P1v, indi);
-        ASSERT_FALSE(verifyBorromean(bb, P1v, P2v));
+  //#false one
+  bb = genBorromean(xv, P2v, P1v, indi);
+  ASSERT_FALSE(verifyBorromean(bb, P1v, P2v));
 }
 
 TEST(ringct, MG_sigs)
 {
-    int j = 0;
-    int N = 0;
+  int j = 0;
+  int N = 0;
 
-        //Tests for MG Sigs
-        //#MG sig: true one
-        N = 3;// #cols
-        int   R = 3;// #rows
-        keyV xtmp = skvGen(R);
-        keyM xm = keyMInit(R, N);// = [[None]*N] #just used to generate test public keys
-        keyV sk = skvGen(R);
-        keyM P  = keyMInit(R, N);// = keyM[[None]*N] #stores the public keys;
-        int ind = 2;
-        int i = 0;
-        for (j = 0 ; j < R ; j++) {
-            for (i = 0 ; i < N ; i++)
-            {
-                xm[i][j] = skGen();
-                P[i][j] = scalarmultBase(xm[i][j]);
-            }
-        }
-        for (j = 0 ; j < R ; j++) {
-            sk[j] = xm[ind][j];
-        }
-        key message = identity();
-        mgSig IIccss = MLSAG_Gen(message, P, sk, NULL, NULL, ind, R, hw::get_device("default"));
-        ASSERT_TRUE(MLSAG_Ver(message, P, IIccss, R));
+  //Tests for MG Sigs
+  //#MG sig: true one
+  N = 3;   // #cols
+  int R = 3; // #rows
+  keyV xtmp = skvGen(R);
+  keyM xm = keyMInit(R, N); // = [[None]*N] #just used to generate test public keys
+  keyV sk = skvGen(R);
+  keyM P = keyMInit(R, N); // = keyM[[None]*N] #stores the public keys;
+  int ind = 2;
+  int i = 0;
+  for(j = 0; j < R; j++)
+  {
+    for(i = 0; i < N; i++)
+    {
+      xm[i][j] = skGen();
+      P[i][j] = scalarmultBase(xm[i][j]);
+    }
+  }
+  for(j = 0; j < R; j++)
+  {
+    sk[j] = xm[ind][j];
+  }
+  key message = identity();
+  mgSig IIccss = MLSAG_Gen(message, P, sk, NULL, NULL, ind, R, hw::get_device("default"));
+  ASSERT_TRUE(MLSAG_Ver(message, P, IIccss, R));
 
-        //#MG sig: false one
-        N = 3;// #cols
-        R = 3;// #rows
-        xtmp = skvGen(R);
-        keyM xx(N, xtmp);// = [[None]*N] #just used to generate test public keys
-        sk = skvGen(R);
-        //P (N, xtmp);// = keyM[[None]*N] #stores the public keys;
+  //#MG sig: false one
+  N = 3; // #cols
+  R = 3; // #rows
+  xtmp = skvGen(R);
+  keyM xx(N, xtmp); // = [[None]*N] #just used to generate test public keys
+  sk = skvGen(R);
+  //P (N, xtmp);// = keyM[[None]*N] #stores the public keys;
 
-        ind = 2;
-        for (j = 0 ; j < R ; j++) {
-            for (i = 0 ; i < N ; i++)
-            {
-                xx[i][j] = skGen();
-                P[i][j] = scalarmultBase(xx[i][j]);
-            }
-            sk[j] = xx[ind][j];
-        }
-        sk[2] = skGen();//assume we don't know one of the private keys..
-        IIccss = MLSAG_Gen(message, P, sk, NULL, NULL, ind, R, hw::get_device("default"));
-        ASSERT_FALSE(MLSAG_Ver(message, P, IIccss, R));
+  ind = 2;
+  for(j = 0; j < R; j++)
+  {
+    for(i = 0; i < N; i++)
+    {
+      xx[i][j] = skGen();
+      P[i][j] = scalarmultBase(xx[i][j]);
+    }
+    sk[j] = xx[ind][j];
+  }
+  sk[2] = skGen(); //assume we don't know one of the private keys..
+  IIccss = MLSAG_Gen(message, P, sk, NULL, NULL, ind, R, hw::get_device("default"));
+  ASSERT_FALSE(MLSAG_Ver(message, P, IIccss, R));
 }
 
 TEST(ringct, range_proofs)
 {
-        //Ring CT Stuff
-        //ct range proofs
-        ctkeyV sc, pc;
-        ctkey sctmp, pctmp;
-        //add fake input 5000
-        tie(sctmp, pctmp) = ctskpkGen(6000);
-        sc.push_back(sctmp);
-        pc.push_back(pctmp);
+  //Ring CT Stuff
+  //ct range proofs
+  ctkeyV sc, pc;
+  ctkey sctmp, pctmp;
+  //add fake input 5000
+  tie(sctmp, pctmp) = ctskpkGen(6000);
+  sc.push_back(sctmp);
+  pc.push_back(pctmp);
 
+  tie(sctmp, pctmp) = ctskpkGen(7000);
+  sc.push_back(sctmp);
+  pc.push_back(pctmp);
+  vector<xmr_amount> amounts;
+  rct::keyV amount_keys;
+  key mask;
 
-        tie(sctmp, pctmp) = ctskpkGen(7000);
-        sc.push_back(sctmp);
-        pc.push_back(pctmp);
-        vector<xmr_amount >amounts;
-        rct::keyV amount_keys;
-        key mask;
+  //add output 500
+  amounts.push_back(500);
+  amount_keys.push_back(rct::hash_to_scalar(rct::zero()));
+  keyV destinations;
+  key Sk, Pk;
+  skpkGen(Sk, Pk);
+  destinations.push_back(Pk);
 
-        //add output 500
-        amounts.push_back(500);
-        amount_keys.push_back(rct::hash_to_scalar(rct::zero()));
-        keyV destinations;
-        key Sk, Pk;
-        skpkGen(Sk, Pk);
-        destinations.push_back(Pk);
+  //add output for 12500
+  amounts.push_back(12500);
+  amount_keys.push_back(rct::hash_to_scalar(rct::zero()));
+  skpkGen(Sk, Pk);
+  destinations.push_back(Pk);
 
+  //compute rct data with mixin 500
+  rctSig s = genRct(rct::zero(), sc, pc, destinations, amounts, amount_keys, NULL, NULL, 3, hw::get_device("default"));
 
-        //add output for 12500
-        amounts.push_back(12500);
-        amount_keys.push_back(rct::hash_to_scalar(rct::zero()));
-        skpkGen(Sk, Pk);
-        destinations.push_back(Pk);
+  //verify rct data
+  ASSERT_TRUE(verRct(s));
 
-        //compute rct data with mixin 500
-        rctSig s = genRct(rct::zero(), sc, pc, destinations, amounts, amount_keys, NULL, NULL, 3, hw::get_device("default"));
+  //decode received amount
+  decodeRct(s, amount_keys[1], 1, mask, hw::get_device("default"));
 
-        //verify rct data
-        ASSERT_TRUE(verRct(s));
+  // Ring CT with failing MG sig part should not verify!
+  // Since sum of inputs != outputs
 
-        //decode received amount
-        decodeRct(s, amount_keys[1], 1, mask, hw::get_device("default"));
+  amounts[1] = 12501;
+  skpkGen(Sk, Pk);
+  destinations[1] = Pk;
 
-        // Ring CT with failing MG sig part should not verify!
-        // Since sum of inputs != outputs
+  //compute rct data with mixin 500
+  s = genRct(rct::zero(), sc, pc, destinations, amounts, amount_keys, NULL, NULL, 3, hw::get_device("default"));
 
-        amounts[1] = 12501;
-        skpkGen(Sk, Pk);
-        destinations[1] = Pk;
+  //verify rct data
+  ASSERT_FALSE(verRct(s));
 
-
-        //compute rct data with mixin 500
-        s = genRct(rct::zero(), sc, pc, destinations, amounts, amount_keys, NULL, NULL, 3, hw::get_device("default"));
-
-        //verify rct data
-        ASSERT_FALSE(verRct(s));
-
-        //decode received amount
-        decodeRct(s, amount_keys[1], 1, mask, hw::get_device("default"));
+  //decode received amount
+  decodeRct(s, amount_keys[1], 1, mask, hw::get_device("default"));
 }
 
 TEST(ringct, range_proofs_with_fee)
 {
-        //Ring CT Stuff
-        //ct range proofs
-        ctkeyV sc, pc;
-        ctkey sctmp, pctmp;
-        //add fake input 5000
-        tie(sctmp, pctmp) = ctskpkGen(6001);
-        sc.push_back(sctmp);
-        pc.push_back(pctmp);
+  //Ring CT Stuff
+  //ct range proofs
+  ctkeyV sc, pc;
+  ctkey sctmp, pctmp;
+  //add fake input 5000
+  tie(sctmp, pctmp) = ctskpkGen(6001);
+  sc.push_back(sctmp);
+  pc.push_back(pctmp);
 
+  tie(sctmp, pctmp) = ctskpkGen(7000);
+  sc.push_back(sctmp);
+  pc.push_back(pctmp);
+  vector<xmr_amount> amounts;
+  keyV amount_keys;
+  key mask;
 
-        tie(sctmp, pctmp) = ctskpkGen(7000);
-        sc.push_back(sctmp);
-        pc.push_back(pctmp);
-        vector<xmr_amount >amounts;
-        keyV amount_keys;
-        key mask;
+  //add output 500
+  amounts.push_back(500);
+  amount_keys.push_back(rct::hash_to_scalar(rct::zero()));
+  keyV destinations;
+  key Sk, Pk;
+  skpkGen(Sk, Pk);
+  destinations.push_back(Pk);
 
-        //add output 500
-        amounts.push_back(500);
-        amount_keys.push_back(rct::hash_to_scalar(rct::zero()));
-        keyV destinations;
-        key Sk, Pk;
-        skpkGen(Sk, Pk);
-        destinations.push_back(Pk);
+  //add txn fee for 1
+  //has no corresponding destination..
+  amounts.push_back(1);
 
-        //add txn fee for 1
-        //has no corresponding destination..
-        amounts.push_back(1);
+  //add output for 12500
+  amounts.push_back(12500);
+  amount_keys.push_back(hash_to_scalar(zero()));
+  skpkGen(Sk, Pk);
+  destinations.push_back(Pk);
 
-        //add output for 12500
-        amounts.push_back(12500);
-        amount_keys.push_back(hash_to_scalar(zero()));
-        skpkGen(Sk, Pk);
-        destinations.push_back(Pk);
+  //compute rct data with mixin 500
+  rctSig s = genRct(rct::zero(), sc, pc, destinations, amounts, amount_keys, NULL, NULL, 3, hw::get_device("default"));
 
-        //compute rct data with mixin 500
-        rctSig s = genRct(rct::zero(), sc, pc, destinations, amounts, amount_keys, NULL, NULL, 3, hw::get_device("default"));
+  //verify rct data
+  ASSERT_TRUE(verRct(s));
 
-        //verify rct data
-        ASSERT_TRUE(verRct(s));
+  //decode received amount
+  decodeRct(s, amount_keys[1], 1, mask, hw::get_device("default"));
 
-        //decode received amount
-        decodeRct(s, amount_keys[1], 1, mask, hw::get_device("default"));
+  // Ring CT with failing MG sig part should not verify!
+  // Since sum of inputs != outputs
 
-        // Ring CT with failing MG sig part should not verify!
-        // Since sum of inputs != outputs
+  amounts[1] = 12501;
+  skpkGen(Sk, Pk);
+  destinations[1] = Pk;
 
-        amounts[1] = 12501;
-        skpkGen(Sk, Pk);
-        destinations[1] = Pk;
+  //compute rct data with mixin 500
+  s = genRct(rct::zero(), sc, pc, destinations, amounts, amount_keys, NULL, NULL, 3, hw::get_device("default"));
 
+  //verify rct data
+  ASSERT_FALSE(verRct(s));
 
-        //compute rct data with mixin 500
-        s = genRct(rct::zero(), sc, pc, destinations, amounts, amount_keys, NULL, NULL, 3, hw::get_device("default"));
-
-        //verify rct data
-        ASSERT_FALSE(verRct(s));
-
-        //decode received amount
-        decodeRct(s, amount_keys[1], 1, mask, hw::get_device("default"));
+  //decode received amount
+  decodeRct(s, amount_keys[1], 1, mask, hw::get_device("default"));
 }
 
 TEST(ringct, simple)
 {
-        ctkeyV sc, pc;
-        ctkey sctmp, pctmp;
-        //this vector corresponds to output amounts
-        vector<xmr_amount>outamounts;
-       //this vector corresponds to input amounts
-        vector<xmr_amount>inamounts;
-        //this keyV corresponds to destination pubkeys
-        keyV destinations;
-        keyV amount_keys;
-        key mask;
+  ctkeyV sc, pc;
+  ctkey sctmp, pctmp;
+  //this vector corresponds to output amounts
+  vector<xmr_amount> outamounts;
+  //this vector corresponds to input amounts
+  vector<xmr_amount> inamounts;
+  //this keyV corresponds to destination pubkeys
+  keyV destinations;
+  keyV amount_keys;
+  key mask;
 
-        //add fake input 3000
-        //the sc is secret data
-        //pc is public data
-        tie(sctmp, pctmp) = ctskpkGen(3000);
-        sc.push_back(sctmp);
-        pc.push_back(pctmp);
-        inamounts.push_back(3000);
+  //add fake input 3000
+  //the sc is secret data
+  //pc is public data
+  tie(sctmp, pctmp) = ctskpkGen(3000);
+  sc.push_back(sctmp);
+  pc.push_back(pctmp);
+  inamounts.push_back(3000);
 
-        //add fake input 3000
-        //the sc is secret data
-        //pc is public data
-        tie(sctmp, pctmp) = ctskpkGen(3000);
-        sc.push_back(sctmp);
-        pc.push_back(pctmp);
-        inamounts.push_back(3000);
+  //add fake input 3000
+  //the sc is secret data
+  //pc is public data
+  tie(sctmp, pctmp) = ctskpkGen(3000);
+  sc.push_back(sctmp);
+  pc.push_back(pctmp);
+  inamounts.push_back(3000);
 
-        //add output 5000
-        outamounts.push_back(5000);
-        amount_keys.push_back(rct::hash_to_scalar(rct::zero()));
-        //add the corresponding destination pubkey
-        key Sk, Pk;
-        skpkGen(Sk, Pk);
-        destinations.push_back(Pk);
+  //add output 5000
+  outamounts.push_back(5000);
+  amount_keys.push_back(rct::hash_to_scalar(rct::zero()));
+  //add the corresponding destination pubkey
+  key Sk, Pk;
+  skpkGen(Sk, Pk);
+  destinations.push_back(Pk);
 
-        //add output 999
-        outamounts.push_back(999);
-        amount_keys.push_back(rct::hash_to_scalar(rct::zero()));
-        //add the corresponding destination pubkey
-        skpkGen(Sk, Pk);
-        destinations.push_back(Pk);
+  //add output 999
+  outamounts.push_back(999);
+  amount_keys.push_back(rct::hash_to_scalar(rct::zero()));
+  //add the corresponding destination pubkey
+  skpkGen(Sk, Pk);
+  destinations.push_back(Pk);
 
-        key message = skGen(); //real message later (hash of txn..)
+  key message = skGen(); //real message later (hash of txn..)
 
-        //compute sig with mixin 2
-        xmr_amount txnfee = 1;
+  //compute sig with mixin 2
+  xmr_amount txnfee = 1;
 
-        rctSig s = genRctSimple(message, sc, pc, destinations,inamounts, outamounts, amount_keys, NULL, NULL, txnfee, 2, hw::get_device("default"));
+  rctSig s = genRctSimple(message, sc, pc, destinations, inamounts, outamounts, amount_keys, NULL, NULL, txnfee, 2, hw::get_device("default"));
 
-        //verify ring ct signature
-        ASSERT_TRUE(verRctSimple(s));
+  //verify ring ct signature
+  ASSERT_TRUE(verRctSimple(s));
 
-        //decode received amount corresponding to output pubkey index 1
-        decodeRctSimple(s, amount_keys[1], 1, mask,  hw::get_device("default"));
+  //decode received amount corresponding to output pubkey index 1
+  decodeRctSimple(s, amount_keys[1], 1, mask, hw::get_device("default"));
 }
 
 static rct::rctSig make_sample_rct_sig(int n_inputs, const uint64_t input_amounts[], int n_outputs, const uint64_t output_amounts[], bool last_is_fee)
 {
-    ctkeyV sc, pc;
-    ctkey sctmp, pctmp;
-    vector<xmr_amount >amounts;
-    keyV destinations;
-    keyV amount_keys;
-    key Sk, Pk;
+  ctkeyV sc, pc;
+  ctkey sctmp, pctmp;
+  vector<xmr_amount> amounts;
+  keyV destinations;
+  keyV amount_keys;
+  key Sk, Pk;
 
-    for (int n = 0; n < n_inputs; ++n) {
-        tie(sctmp, pctmp) = ctskpkGen(input_amounts[n]);
-        sc.push_back(sctmp);
-        pc.push_back(pctmp);
+  for(int n = 0; n < n_inputs; ++n)
+  {
+    tie(sctmp, pctmp) = ctskpkGen(input_amounts[n]);
+    sc.push_back(sctmp);
+    pc.push_back(pctmp);
+  }
+
+  for(int n = 0; n < n_outputs; ++n)
+  {
+    amounts.push_back(output_amounts[n]);
+    skpkGen(Sk, Pk);
+    if(n < n_outputs - 1 || !last_is_fee)
+    {
+      destinations.push_back(Pk);
+      amount_keys.push_back(rct::hash_to_scalar(rct::zero()));
     }
+  }
 
-    for (int n = 0; n < n_outputs; ++n) {
-        amounts.push_back(output_amounts[n]);
-        skpkGen(Sk, Pk);
-        if (n < n_outputs - 1 || !last_is_fee)
-        {
-          destinations.push_back(Pk);
-          amount_keys.push_back(rct::hash_to_scalar(rct::zero()));
-        }
-    }
-
-    return genRct(rct::zero(), sc, pc, destinations, amounts, amount_keys, NULL, NULL, 3, hw::get_device("default"));
+  return genRct(rct::zero(), sc, pc, destinations, amounts, amount_keys, NULL, NULL, 3, hw::get_device("default"));
 }
 
 static rct::rctSig make_sample_simple_rct_sig(int n_inputs, const uint64_t input_amounts[], int n_outputs, const uint64_t output_amounts[], uint64_t fee)
 {
-    ctkeyV sc, pc;
-    ctkey sctmp, pctmp;
-    vector<xmr_amount> inamounts, outamounts;
-    keyV destinations;
-    keyV amount_keys;
-    key Sk, Pk;
+  ctkeyV sc, pc;
+  ctkey sctmp, pctmp;
+  vector<xmr_amount> inamounts, outamounts;
+  keyV destinations;
+  keyV amount_keys;
+  key Sk, Pk;
 
-    for (int n = 0; n < n_inputs; ++n) {
-        inamounts.push_back(input_amounts[n]);
-        tie(sctmp, pctmp) = ctskpkGen(input_amounts[n]);
-        sc.push_back(sctmp);
-        pc.push_back(pctmp);
-    }
+  for(int n = 0; n < n_inputs; ++n)
+  {
+    inamounts.push_back(input_amounts[n]);
+    tie(sctmp, pctmp) = ctskpkGen(input_amounts[n]);
+    sc.push_back(sctmp);
+    pc.push_back(pctmp);
+  }
 
-    for (int n = 0; n < n_outputs; ++n) {
-        outamounts.push_back(output_amounts[n]);
-        amount_keys.push_back(hash_to_scalar(zero()));
-        skpkGen(Sk, Pk);
-        destinations.push_back(Pk);
-    }
+  for(int n = 0; n < n_outputs; ++n)
+  {
+    outamounts.push_back(output_amounts[n]);
+    amount_keys.push_back(hash_to_scalar(zero()));
+    skpkGen(Sk, Pk);
+    destinations.push_back(Pk);
+  }
 
-    return genRctSimple(rct::zero(), sc, pc, destinations, inamounts, outamounts, amount_keys, NULL, NULL, fee, 3, hw::get_device("default"));
+  return genRctSimple(rct::zero(), sc, pc, destinations, inamounts, outamounts, amount_keys, NULL, NULL, fee, 3, hw::get_device("default"));
 }
 
 static bool range_proof_test(bool expected_valid,
-    int n_inputs, const uint64_t input_amounts[], int n_outputs, const uint64_t output_amounts[], bool last_is_fee, bool simple)
+               int n_inputs, const uint64_t input_amounts[], int n_outputs, const uint64_t output_amounts[], bool last_is_fee, bool simple)
 {
-    //compute rct data
-    bool valid;
-    try {
-        rctSig s;
-        // simple takes fee as a parameter, non-simple takes it as an extra element to output amounts
-        if (simple) {
-          s = make_sample_simple_rct_sig(n_inputs, input_amounts, last_is_fee ? n_outputs - 1 : n_outputs, output_amounts, last_is_fee ? output_amounts[n_outputs - 1] : 0);
-          valid = verRctSimple(s);
-        }
-        else {
-          s = make_sample_rct_sig(n_inputs, input_amounts, n_outputs, output_amounts, last_is_fee);
-          valid = verRct(s);
-        }
+  //compute rct data
+  bool valid;
+  try
+  {
+    rctSig s;
+    // simple takes fee as a parameter, non-simple takes it as an extra element to output amounts
+    if(simple)
+    {
+      s = make_sample_simple_rct_sig(n_inputs, input_amounts, last_is_fee ? n_outputs - 1 : n_outputs, output_amounts, last_is_fee ? output_amounts[n_outputs - 1] : 0);
+      valid = verRctSimple(s);
     }
-    catch (const std::exception &e) {
-        valid = false;
+    else
+    {
+      s = make_sample_rct_sig(n_inputs, input_amounts, n_outputs, output_amounts, last_is_fee);
+      valid = verRct(s);
     }
+  }
+  catch(const std::exception &e)
+  {
+    valid = false;
+  }
 
-    if (valid == expected_valid) {
-        return testing::AssertionSuccess();
-    }
-    else {
-        return testing::AssertionFailure();
-    }
+  if(valid == expected_valid)
+  {
+    return testing::AssertionSuccess();
+  }
+  else
+  {
+    return testing::AssertionFailure();
+  }
 }
 
-#define NELTS(array) (sizeof(array)/sizeof(array[0]))
+#define NELTS(array) (sizeof(array) / sizeof(array[0]))
 
 TEST(ringct, range_proofs_reject_empty_outs)
 {
@@ -752,7 +764,7 @@ TEST(ringct, range_proofs_accept_1_to_N_simple)
 {
   const uint64_t inputs[] = {5000};
   const uint64_t outputs[] = {1000, 1000, 1000, 1000, 1000};
-  EXPECT_TRUE(range_proof_test(true, NELTS(inputs), inputs, NELTS(outputs), outputs, false,true));
+  EXPECT_TRUE(range_proof_test(true, NELTS(inputs), inputs, NELTS(outputs), outputs, false, true));
 }
 
 TEST(ringct, range_proofs_accept_N_to_1)
@@ -785,10 +797,11 @@ TEST(ringct, range_proofs_accept_N_to_N_simple)
 
 TEST(ringct, range_proofs_accept_very_long)
 {
-  const size_t N=12;
+  const size_t N = 12;
   uint64_t inputs[N];
   uint64_t outputs[N];
-  for (size_t n = 0; n < N; ++n) {
+  for(size_t n = 0; n < N; ++n)
+  {
     inputs[n] = n;
     outputs[n] = n;
   }
@@ -799,10 +812,11 @@ TEST(ringct, range_proofs_accept_very_long)
 
 TEST(ringct, range_proofs_accept_very_long_simple)
 {
-  const size_t N=12;
+  const size_t N = 12;
   uint64_t inputs[N];
   uint64_t outputs[N];
-  for (size_t n = 0; n < N; ++n) {
+  for(size_t n = 0; n < N; ++n)
+  {
     inputs[n] = n;
     outputs[n] = n;
   }
@@ -816,20 +830,22 @@ TEST(ringct, HPow2)
   key G = scalarmultBase(d2h(1));
 
   key H = hashToPointSimple(G);
-  for (int j = 0 ; j < ATOMS ; j++) {
+  for(int j = 0; j < ATOMS; j++)
+  {
     ASSERT_TRUE(equalKeys(H, H2[j]));
     addKeys(H, H, H);
   }
 }
 
-static const xmr_amount test_amounts[]={0, 1, 2, 3, 4, 5, 10000, 10000000000000000000ull, 10203040506070809000ull, 123456789123456789};
+static const xmr_amount test_amounts[] = {0, 1, 2, 3, 4, 5, 10000, 10000000000000000000ull, 10203040506070809000ull, 123456789123456789};
 
 TEST(ringct, ecdh_roundtrip)
 {
   key k;
   ecdhTuple t0, t1;
 
-  for (auto amount: test_amounts) {
+  for(auto amount : test_amounts)
+  {
     skGen(k);
 
     t0.mask = skGen();
@@ -849,7 +865,8 @@ TEST(ringct, d2h)
 {
   key k, P1;
   skpkGen(k, P1);
-  for (auto amount: test_amounts) {
+  for(auto amount : test_amounts)
+  {
     d2h(k, amount);
     ASSERT_TRUE(amount == h2d(k));
   }
@@ -857,7 +874,8 @@ TEST(ringct, d2h)
 
 TEST(ringct, d2b)
 {
-  for (auto amount: test_amounts) {
+  for(auto amount : test_amounts)
+  {
     bits b;
     d2b(b, amount);
     ASSERT_TRUE(amount == b2d(b));
@@ -867,7 +885,7 @@ TEST(ringct, d2b)
 TEST(ringct, prooveRange_is_non_deterministic)
 {
   key C[2], mask[2];
-  for (int n = 0; n < 2; ++n)
+  for(int n = 0; n < 2; ++n)
     proveRange(C[n], mask[n], 80);
   ASSERT_TRUE(memcmp(C[0].bytes, C[1].bytes, sizeof(C[0].bytes)));
   ASSERT_TRUE(memcmp(mask[0].bytes, mask[1].bytes, sizeof(mask[0].bytes)));
@@ -957,24 +975,16 @@ TEST(ringct, fee_burn_valid_zero_out_simple)
   EXPECT_TRUE(range_proof_test(true, NELTS(inputs), inputs, NELTS(outputs), outputs, true, true));
 }
 
-static rctSig make_sig()
-{
-  static const uint64_t inputs[] = {1000, 1000};
-  static const uint64_t outputs[] = {1000, 1000};
-  static rct::rctSig sig = make_sample_rct_sig(NELTS(inputs), inputs, NELTS(outputs), outputs, true);
-  return sig;
-}
-
-#define TEST_rctSig_elements(name, op) \
-TEST(ringct, rctSig_##name) \
-{ \
-  const uint64_t inputs[] = {1000, 1000}; \
-  const uint64_t outputs[] = {1000, 1000}; \
-  rct::rctSig sig = make_sig(); \
-  ASSERT_TRUE(rct::verRct(sig)); \
-  op; \
-  ASSERT_FALSE(rct::verRct(sig)); \
-}
+#define TEST_rctSig_elements(name, op)                                                               \
+  TEST(ringct, rctSig_##name)                                                                      \
+  {                                                                                                \
+    const uint64_t inputs[] = {1000, 1000};                                                      \
+    const uint64_t outputs[] = {1000, 1000};                                                     \
+    rct::rctSig sig = make_sample_rct_sig(NELTS(inputs), inputs, NELTS(outputs), outputs, true); \
+    ASSERT_TRUE(rct::verRct(sig));                                                               \
+    op;                                                                                          \
+    ASSERT_FALSE(rct::verRct(sig));                                                              \
+  }
 
 TEST_rctSig_elements(rangeSigs_empty, sig.p.rangeSigs.resize(0));
 TEST_rctSig_elements(rangeSigs_too_many, sig.p.rangeSigs.push_back(sig.p.rangeSigs.back()));
@@ -1002,22 +1012,16 @@ TEST_rctSig_elements(outPk_empty, sig.outPk.resize(0));
 TEST_rctSig_elements(outPk_too_many, sig.outPk.push_back(sig.outPk.back()));
 TEST_rctSig_elements(outPk_too_few, sig.outPk.pop_back());
 
-static rct::rctSig make_sig_simple()
-{
-  static const uint64_t inputs[] = {1000, 1000};
-  static const uint64_t outputs[] = {1000};
-  static rct::rctSig sig = make_sample_simple_rct_sig(NELTS(inputs), inputs, NELTS(outputs), outputs, 1000);
-  return sig;
-}
-
-#define TEST_rctSig_elements_simple(name, op) \
-TEST(ringct, rctSig_##name##_simple) \
-{ \
-  rct::rctSig sig = make_sig_simple(); \
-  ASSERT_TRUE(rct::verRctSimple(sig)); \
-  op; \
-  ASSERT_FALSE(rct::verRctSimple(sig)); \
-}
+#define TEST_rctSig_elements_simple(name, op)                                                               \
+  TEST(ringct, rctSig_##name##_simple)                                                                    \
+  {                                                                                                       \
+    const uint64_t inputs[] = {1000, 1000};                                                             \
+    const uint64_t outputs[] = {1000};                                                                  \
+    rct::rctSig sig = make_sample_simple_rct_sig(NELTS(inputs), inputs, NELTS(outputs), outputs, 1000); \
+    ASSERT_TRUE(rct::verRctSimple(sig));                                                                \
+    op;                                                                                                 \
+    ASSERT_FALSE(rct::verRctSimple(sig));                                                               \
+  }
 
 TEST_rctSig_elements_simple(rangeSigs_empty, sig.p.rangeSigs.resize(0));
 TEST_rctSig_elements_simple(rangeSigs_too_many, sig.p.rangeSigs.push_back(sig.p.rangeSigs.back()));
@@ -1072,47 +1076,5 @@ TEST(ringct, key_ostream)
   out << "BEGIN" << rct::H << "END";
   EXPECT_EQ(
     std::string{"BEGIN<8b655970153799af2aeadc9ff1add0ea6c7251d54154cfa92c173a0dd39c1f94>END"},
-    out.str()
-  );
-}
-
-TEST(ringct, zeroCommmit)
-{
-  static const uint64_t amount = crypto::rand<uint64_t>();
-  const rct::key z = rct::zeroCommit(amount);
-  const rct::key a = rct::scalarmultBase(rct::identity());
-  const rct::key b = rct::scalarmultH(rct::d2h(amount));
-  const rct::key manual = rct::addKeys(a, b);
-  ASSERT_EQ(z, manual);
-}
-
-TEST(ringct, H)
-{
-  ge_p3 p3;
-  ASSERT_EQ(ge_frombytes_vartime(&p3, rct::H.bytes), 0);
-  ASSERT_EQ(memcmp(&p3, &ge_p3_H, sizeof(ge_p3)), 0);
-}
-
-TEST(ringct, mul8)
-{
-  ASSERT_EQ(rct::scalarmult8(rct::identity()), rct::identity());
-  ASSERT_EQ(rct::scalarmult8(rct::H), rct::scalarmultKey(rct::H, rct::EIGHT));
-  ASSERT_EQ(rct::scalarmultKey(rct::scalarmultKey(rct::H, rct::INV_EIGHT), rct::EIGHT), rct::H);
-}
-
-TEST(ringct, aggregated)
-{
-  static const size_t N_PROOFS = 16;
-  std::vector<rctSig> s(N_PROOFS);
-  std::vector<const rctSig*> sp(N_PROOFS);
-
-  for (size_t n = 0; n < N_PROOFS; ++n)
-  {
-    static const uint64_t inputs[] = {1000, 1000};
-    static const uint64_t outputs[] = {500, 1500};
-    s[n] = make_sample_simple_rct_sig(NELTS(inputs), inputs, NELTS(outputs), outputs, 0);
-    sp[n] = &s[n];
-  }
-
-  ASSERT_TRUE(verRctSemanticsSimple(sp));
+    out.str());
 }

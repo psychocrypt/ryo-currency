@@ -1,21 +1,37 @@
-// Copyright (c) 2017-2018, The Monero Project
-// 
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
+//
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
-// 
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
-// 
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
-// 
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+//
+// Authors and copyright holders give permission for following:
+//
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
+//
+// 2. Modification of the source form for your own personal use.
+//
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -26,19 +42,21 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <boost/algorithm/string.hpp>
+#include "updates.h"
+#include "dns_utils.h"
 #include "misc_log_ex.h"
 #include "util.h"
-#include "dns_utils.h"
-#include "updates.h"
+#include <boost/algorithm/string.hpp>
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "updates"
+//#undef RYO_DEFAULT_LOG_CATEGORY
+//#define RYO_DEFAULT_LOG_CATEGORY "updates"
 
 namespace tools
 {
-  bool check_updates(const std::string &software, const std::string &buildtag, std::string &version, std::string &hash)
-  {
+bool check_updates(const std::string &software, const std::string &buildtag, std::string &version, std::string &hash)
+{
+  return false; //Temporarily disabled
+#if 0
     std::vector<std::string> records;
     bool found = false;
 
@@ -69,12 +87,12 @@ namespace tools
         continue;
 
       bool alnum = true;
-      for (auto c: fields[3])
+      for (auto c: hash)
         if (!isalnum(c))
           alnum = false;
-      if (fields[3].size() != 64 && !alnum)
+      if (hash.size() != 64 && !alnum)
       {
-        MWARNING("Invalid hash: " << fields[3]);
+        MWARNING("Invalid hash: " << hash);
         continue;
       }
 
@@ -95,10 +113,12 @@ namespace tools
       found = true;
     }
     return found;
-  }
+#endif
+}
 
-  std::string get_update_url(const std::string &software, const std::string &subdir, const std::string &buildtag, const std::string &version, bool user)
-  {
+std::string get_update_url(const std::string &software, const std::string &subdir, const std::string &buildtag, const std::string &version, bool user)
+{
+#if 0
     const char *base = user ? "https://downloads.getmonero.org/" : "https://updates.getmonero.org/";
 #ifdef _WIN32
     static const char *extension = strncmp(buildtag.c_str(), "install-", 8) ? ".zip" : ".exe";
@@ -113,5 +133,7 @@ namespace tools
       url += subdir + "/";
     url = url + software + "-" + buildtag + "-v" + version + extension;
     return url;
-  }
+#endif
+  return "";
+}
 }

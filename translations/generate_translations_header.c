@@ -11,13 +11,13 @@
 //      cc -o generate-translations-header generate-translations-header.c
 //
 //   2. Convert list of files into single header:
-//      ./generate-translations-header monero_fr.qm monero_it.qm > translations_files.h
+//      ./generate-translations-header ryo_fr.qm ryo_it.qm > translations_files.h
 //
 //   3. In your application code, include translations_files.h, then you can
 //      access the files using this function:
 //      static bool find_embedded_file(const std::string &file_name, std::string &data);
 //      std::string data;
-//      find_embedded_file("monero_fr.qm", data);
+//      find_embedded_file("ryo_fr.qm", data);
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,11 +34,13 @@ static const char *code =
   "  return false;\n"
   "}\n";
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   FILE *fp, *foutput;
   int i, j, ch;
 
-  if((foutput = fopen("translation_files.h", "w")) == NULL) {
+  if((foutput = fopen("translation_files.h", "w")) == NULL)
+  {
     exit(EXIT_FAILURE);
   }
 
@@ -46,15 +48,22 @@ int main(int argc, char *argv[]) {
   fprintf(foutput, "#define TRANSLATION_FILES_H\n\n");
   fprintf(foutput, "#include <string>\n\n");
 
-  for (i = 1; i < argc; i++) {
-    if ((fp = fopen(argv[i], "rb")) == NULL) {
+  for(i = 1; i < argc; i++)
+  {
+    if((fp = fopen(argv[i], "rb")) == NULL)
+    {
       exit(EXIT_FAILURE);
-    } else {
+    }
+    else
+    {
       fprintf(foutput, "static const std::string translation_file_name_%d = \"%s\";\n", i, argv[i]);
       fprintf(foutput, "static const std::string translation_file_data_%d = std::string(", i);
-      for (j = 0; (ch = fgetc(fp)) != EOF; j++) {
-        if ((j % 16) == 0) {
-          if (j > 0) {
+      for(j = 0; (ch = fgetc(fp)) != EOF; j++)
+      {
+        if((j % 16) == 0)
+        {
+          if(j > 0)
+          {
             fprintf(foutput, "%s", "\"");
           }
           fprintf(foutput, "%s", "\n  \"");
@@ -71,7 +80,8 @@ int main(int argc, char *argv[]) {
   fprintf(foutput, "%s", "  const std::string *data;\n");
   fprintf(foutput, "%s", "} embedded_files[] = {\n");
 
-  for (i = 1; i < argc; i++) {
+  for(i = 1; i < argc; i++)
+  {
     fprintf(foutput, "  {&translation_file_name_%d, &translation_file_data_%d},\n", i, i);
   }
   fprintf(foutput, "%s", "  {NULL, NULL}\n");

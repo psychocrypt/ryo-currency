@@ -1,20 +1,36 @@
-// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
 //
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
 //
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
+// Authors and copyright holders give permission for following:
 //
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
 //
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
+// 2. Modification of the source form for your own personal use.
 //
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -31,40 +47,37 @@
 #include "wallet/api/wallet2_api.h"
 #include "wallet/wallet2.h"
 
-namespace Monero {
+namespace Ryo
+{
 
 class WalletImpl;
 
 class AddressBookImpl : public AddressBook
 {
-public:
-    AddressBookImpl(WalletImpl * wallet);
-    ~AddressBookImpl();
-    
-    // Fetches addresses from Wallet2
-    void refresh() override;
-    std::vector<AddressBookRow*> getAll() const override;
-    bool addRow(const std::string &dst_addr , const std::string &payment_id, const std::string &description) override;
-    bool deleteRow(std::size_t rowId) override;
-     
-    // Error codes. See AddressBook:ErrorCode enum in wallet2_api.h
-    std::string errorString() const override {return m_errorString;}
-    int errorCode() const override {return m_errorCode;}
+  public:
+  AddressBookImpl(WalletImpl *wallet);
+  ~AddressBookImpl();
 
-    int lookupPaymentID(const std::string &payment_id) const override;
-    
-private:
-    void clearRows();
-    void clearStatus();
-    
-private:
-    WalletImpl *m_wallet;
-    std::vector<AddressBookRow*> m_rows;
-    std::string m_errorString;
-    int m_errorCode;
+  // Fetches addresses from Wallet2
+  void refresh();
+  std::vector<AddressBookRow *> getAll() const;
+  bool addRow(const std::string &dst_addr, const std::string &payment_id, const std::string &description);
+  bool deleteRow(std::size_t rowId);
+
+  // Error codes. See AddressBook:ErrorCode enum in wallet2_api.h
+  std::string errorString() const { return m_errorString; }
+  int errorCode() const { return m_errorCode; }
+
+  int lookupPaymentID(const std::string &payment_id) const;
+
+  private:
+  void clearRows();
+  void clearStatus();
+
+  private:
+  WalletImpl *m_wallet;
+  std::vector<AddressBookRow *> m_rows;
+  std::string m_errorString;
+  int m_errorCode;
 };
-
 }
-
-namespace Bitmonero = Monero;
-

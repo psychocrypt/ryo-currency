@@ -1,7 +1,7 @@
 // Copyright (c) 2014-2018, The Monero Project
 //
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
 //
@@ -26,17 +26,17 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "gtest/gtest.h"
 #include "net/http_auth.h"
+#include "gtest/gtest.h"
 
-#include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/fusion/adapted/std_pair.hpp>
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/iterator_range_core.hpp>
 #include <boost/spirit/include/karma_char.hpp>
-#include <boost/spirit/include/karma_list.hpp>
 #include <boost/spirit/include/karma_generate.hpp>
+#include <boost/spirit/include/karma_list.hpp>
 #include <boost/spirit/include/karma_right_alignment.hpp>
 #include <boost/spirit/include/karma_sequence.hpp>
 #include <boost/spirit/include/karma_string.hpp>
@@ -58,11 +58,12 @@
 #include <utility>
 #include <vector>
 
+#include "crypto/crypto.h"
 #include "md5_l.h"
 #include "string_tools.h"
-#include "crypto/crypto.h"
 
-namespace {
+namespace
+{
 namespace http = epee::net_utils::http;
 using fields = std::unordered_map<std::string, std::string>;
 using auth_responses = std::vector<fields>;
@@ -79,23 +80,23 @@ std::string quoted(std::string str)
   return str;
 }
 
-void write_fields(std::string& out, const fields& args)
+void write_fields(std::string &out, const fields &args)
 {
   namespace karma = boost::spirit::karma;
   karma::generate(
     std::back_inserter(out),
-    (karma::string << " = " << karma::string) % " , ", 
+    (karma::string << " = " << karma::string) % " , ",
     args);
 }
 
-std::string write_fields(const fields& args)
+std::string write_fields(const fields &args)
 {
   std::string out{};
   write_fields(out, args);
   return out;
 }
 
-http::http_request_info make_request(const fields& args)
+http::http_request_info make_request(const fields &args)
 {
   std::string out{"   DIGEST   "};
   write_fields(out, args);
@@ -103,61 +104,59 @@ http::http_request_info make_request(const fields& args)
   http::http_request_info request{};
   request.m_http_method_str = "NOP";
   request.m_header_info.m_etc_fields.push_back(
-    std::make_pair(u8"authorization", std::move(out))
-  );
+    std::make_pair(u8"authorization", std::move(out)));
   return request;
 }
 
-http::http_response_info make_response(const auth_responses& choices)
+http::http_response_info make_response(const auth_responses &choices)
 {
   http::http_response_info response{};
-  for (const auto& choice : choices)
+  for(const auto &choice : choices)
   {
     std::string out{"   DIGEST   "};
     write_fields(out, choice);
 
     response.m_header_info.m_etc_fields.push_back(
-      std::make_pair(u8"WWW-authenticate", std::move(out))
-    );
+      std::make_pair(u8"WWW-authenticate", std::move(out)));
   }
   return response;
 }
 
-bool has_same_fields(const auth_responses& in)
+bool has_same_fields(const auth_responses &in)
 {
   const std::vector<std::string> check{u8"nonce", u8"qop", u8"realm", u8"stale"};
-  
+
   auto current = in.begin();
   const auto end = in.end();
-  if (current == end)
+  if(current == end)
     return true;
 
   ++current;
-  for ( ; current != end; ++current )
+  for(; current != end; ++current)
   {
-    for (const auto& field : check)
+    for(const auto &field : check)
     {
-      const std::string& expected = in[0].at(field);
-      const std::string& actual = current->at(field);
+      const std::string &expected = in[0].at(field);
+      const std::string &actual = current->at(field);
       EXPECT_EQ(expected, actual);
-      if (expected != actual)
+      if(expected != actual)
         return false;
     }
   }
   return true;
 }
 
-bool is_unauthorized(const http::http_response_info& response)
+bool is_unauthorized(const http::http_response_info &response)
 {
   EXPECT_EQ(401, response.m_response_code);
   EXPECT_STREQ(u8"Unauthorized", response.m_response_comment.c_str());
   EXPECT_STREQ(u8"text/html", response.m_mime_tipe.c_str());
   return response.m_response_code == 401 &&
-    response.m_response_comment == u8"Unauthorized" &&
-    response.m_mime_tipe == u8"text/html";
+       response.m_response_comment == u8"Unauthorized" &&
+       response.m_mime_tipe == u8"text/html";
 }
 
-fields parse_fields(const std::string& value)
+fields parse_fields(const std::string &value)
 {
   namespace qi = boost::spirit::qi;
 
@@ -165,33 +164,30 @@ fields parse_fields(const std::string& value)
   const bool rc = qi::parse(
     value.begin(), value.end(),
     qi::lit(u8"Digest ") >> ((
-        +qi::ascii::alpha >>
-        qi::lit('=') >> (
-          (qi::lit('"') >> +(qi::ascii::char_ - '"') >> qi::lit('"')) |
-          +(qi::ascii::graph - qi::ascii::char_(u8"()<>@,;:\\\"/[]?={}"))
-        )
-      ) % ','
-    ) >> qi::eoi,
-    out
-  );
-  if (!rc)
+                   +qi::ascii::alpha >>
+                   qi::lit('=') >> ((qi::lit('"') >> +(qi::ascii::char_ - '"') >> qi::lit('"')) |
+                            +(qi::ascii::graph - qi::ascii::char_(u8"()<>@,;:\\\"/[]?={}")))) %
+                 ',') >>
+      qi::eoi,
+    out);
+  if(!rc)
     throw std::runtime_error{"Bad field given in HTTP header"};
 
   return out;
 }
 
-auth_responses parse_response(const http::http_response_info& response)
+auth_responses parse_response(const http::http_response_info &response)
 {
   auth_responses result{};
 
   const auto end = response.m_additional_fields.end();
-  for (auto current = response.m_additional_fields.begin();; ++current)
+  for(auto current = response.m_additional_fields.begin();; ++current)
   {
-    current = std::find_if(current, end, [] (const std::pair<std::string, std::string>& field) {
-        return boost::equals(u8"WWW-authenticate", field.first);
+    current = std::find_if(current, end, [](const std::pair<std::string, std::string> &field) {
+      return boost::equals(u8"WWW-authenticate", field.first);
     });
 
-    if (current == end)
+    if(current == end)
       return result;
 
     result.push_back(parse_fields(current->second));
@@ -199,43 +195,40 @@ auth_responses parse_response(const http::http_response_info& response)
   return result;
 }
 
-std::string md5_hex(const std::string& in)
+std::string md5_hex(const std::string &in)
 {
   md5::MD5_CTX ctx{};
   md5::MD5Init(std::addressof(ctx));
   md5::MD5Update(
     std::addressof(ctx),
-    reinterpret_cast<const std::uint8_t*>(in.data()),
-    in.size()
-  );
+    reinterpret_cast<const std::uint8_t *>(in.data()),
+    in.size());
 
   std::array<std::uint8_t, 16> digest{{}};
   md5::MD5Final(digest.data(), std::addressof(ctx));
   return epee::string_tools::pod_to_hex(digest);
 }
 
-std::string get_a1(const http::login& user, const fields& src)
+std::string get_a1(const http::login &user, const fields &src)
 {
-  const std::string& realm = src.at(u8"realm");
+  const std::string &realm = src.at(u8"realm");
   return boost::join(
-    std::vector<std::string>{user.username, realm, std::string(user.password.data(), user.password.size())}, u8":"
-  );
+    std::vector<std::string>{user.username, realm, std::string(user.password.data(), user.password.size())}, u8":");
 }
 
-std::string get_a1(const http::login& user, const auth_responses& responses)
+std::string get_a1(const http::login &user, const auth_responses &responses)
 {
   return get_a1(user, responses.at(0));
 }
 
-std::string get_a1_sess(const http::login& user, const std::string& cnonce, const auth_responses& responses)
+std::string get_a1_sess(const http::login &user, const std::string &cnonce, const auth_responses &responses)
 {
-  const std::string& nonce = responses.at(0).at(u8"nonce");
+  const std::string &nonce = responses.at(0).at(u8"nonce");
   return boost::join(
-    std::vector<std::string>{md5_hex(get_a1(user, responses)), nonce, cnonce}, u8":"
-  );
+    std::vector<std::string>{md5_hex(get_a1(user, responses)), nonce, cnonce}, u8":");
 }
 
-std::string get_a2(const std::string& uri)
+std::string get_a2(const std::string &uri)
 {
   return boost::join(std::vector<std::string>{"NOP", uri}, u8":");
 }
@@ -247,8 +240,7 @@ std::string get_nc(std::uint32_t count)
   karma::generate(
     std::back_inserter(out),
     karma::right_align(8, '0')[karma::uint_generator<std::uint32_t, 16>{}],
-    count
-  );
+    count);
 
   return out;
 }
@@ -293,7 +285,7 @@ TEST(HTTP_Server_Auth, MD5)
   ASSERT_LE(2u, fields.size());
   EXPECT_TRUE(has_same_fields(fields));
 
-  const std::string& nonce = fields[0].at(u8"nonce");
+  const std::string &nonce = fields[0].at(u8"nonce");
   EXPECT_EQ(24, nonce.size());
 
   const std::string uri{"/some_foo_thing"};
@@ -302,16 +294,13 @@ TEST(HTTP_Server_Auth, MD5)
   const std::string a2 = get_a2(uri);
 
   const std::string auth_code = md5_hex(
-    boost::join(std::vector<std::string>{md5_hex(a1), nonce, md5_hex(a2)}, u8":")
-  );
+    boost::join(std::vector<std::string>{md5_hex(a1), nonce, md5_hex(a2)}, u8":"));
 
-  const auto request = make_request({
-    {u8"nonce", quoted(nonce)},
-    {u8"realm", quoted(fields[0].at(u8"realm"))},
-    {u8"response", quoted(auth_code)},
-    {u8"uri", quoted(uri)},
-    {u8"username", quoted(user.username)}
-  });
+  const auto request = make_request({{u8"nonce", quoted(nonce)},
+                     {u8"realm", quoted(fields[0].at(u8"realm"))},
+                     {u8"response", quoted(auth_code)},
+                     {u8"uri", quoted(uri)},
+                     {u8"username", quoted(user.username)}});
 
   EXPECT_FALSE(bool(auth.get_response(request)));
 
@@ -342,7 +331,7 @@ TEST(HTTP_Server_Auth, MD5_sess)
   ASSERT_LE(2u, fields.size());
   EXPECT_TRUE(has_same_fields(fields));
 
-  const std::string& nonce = fields[0].at(u8"nonce");
+  const std::string &nonce = fields[0].at(u8"nonce");
   EXPECT_EQ(24, nonce.size());
 
   const std::string uri{"/some_foo_thing"};
@@ -351,18 +340,15 @@ TEST(HTTP_Server_Auth, MD5_sess)
   const std::string a2 = get_a2(uri);
 
   const std::string auth_code = md5_hex(
-    boost::join(std::vector<std::string>{md5_hex(a1), nonce, md5_hex(a2)}, u8":")
-  );
+    boost::join(std::vector<std::string>{md5_hex(a1), nonce, md5_hex(a2)}, u8":"));
 
-  const auto request = make_request({
-    {u8"algorithm", u8"md5-sess"},
-    {u8"cnonce", quoted(cnonce)},
-    {u8"nonce", quoted(nonce)},
-    {u8"realm", quoted(fields[0].at(u8"realm"))},
-    {u8"response", quoted(auth_code)},
-    {u8"uri", quoted(uri)},
-    {u8"username", quoted(user.username)}
-  });
+  const auto request = make_request({{u8"algorithm", u8"md5-sess"},
+                     {u8"cnonce", quoted(cnonce)},
+                     {u8"nonce", quoted(nonce)},
+                     {u8"realm", quoted(fields[0].at(u8"realm"))},
+                     {u8"response", quoted(auth_code)},
+                     {u8"uri", quoted(uri)},
+                     {u8"username", quoted(user.username)}});
 
   EXPECT_FALSE(bool(auth.get_response(request)));
 
@@ -394,7 +380,7 @@ TEST(HTTP_Server_Auth, MD5_auth)
   ASSERT_LE(2u, parsed.size());
   EXPECT_TRUE(has_same_fields(parsed));
 
-  const std::string& nonce = parsed[0].at(u8"nonce");
+  const std::string &nonce = parsed[0].at(u8"nonce");
   EXPECT_EQ(24, nonce.size());
 
   const std::string uri{"/some_foo_thing"};
@@ -406,9 +392,7 @@ TEST(HTTP_Server_Auth, MD5_auth)
   const auto generate_auth = [&] {
     return md5_hex(
       boost::join(
-        std::vector<std::string>{md5_hex(a1), nonce, nc, cnonce, qop, md5_hex(a2)}, u8":"
-      )
-    );
+        std::vector<std::string>{md5_hex(a1), nonce, nc, cnonce, qop, md5_hex(a2)}, u8":"));
   };
 
   fields args{
@@ -420,13 +404,12 @@ TEST(HTTP_Server_Auth, MD5_auth)
     {u8"realm", quoted(parsed[0].at(u8"realm"))},
     {u8"response", quoted(generate_auth())},
     {u8"uri", quoted(uri)},
-    {u8"username", quoted(user.username)}
-  };
+    {u8"username", quoted(user.username)}};
 
   const auto request = make_request(args);
   EXPECT_FALSE(bool(auth.get_response(request)));
 
-  for (unsigned i = 2; i < 20; ++i)
+  for(unsigned i = 2; i < 20; ++i)
   {
     nc = get_nc(i);
     args.at(u8"nc") = nc;
@@ -462,7 +445,7 @@ TEST(HTTP_Server_Auth, MD5_sess_auth)
   ASSERT_LE(2u, parsed.size());
   EXPECT_TRUE(has_same_fields(parsed));
 
-  const std::string& nonce = parsed[0].at(u8"nonce");
+  const std::string &nonce = parsed[0].at(u8"nonce");
   EXPECT_EQ(24, nonce.size());
 
   const std::string uri{"/some_foo_thing"};
@@ -474,9 +457,7 @@ TEST(HTTP_Server_Auth, MD5_sess_auth)
   const auto generate_auth = [&] {
     return md5_hex(
       boost::join(
-        std::vector<std::string>{md5_hex(a1), nonce, nc, cnonce, qop, md5_hex(a2)}, u8":"
-      )
-    );
+        std::vector<std::string>{md5_hex(a1), nonce, nc, cnonce, qop, md5_hex(a2)}, u8":"));
   };
 
   fields args{
@@ -488,13 +469,12 @@ TEST(HTTP_Server_Auth, MD5_sess_auth)
     {u8"realm", quoted(parsed[0].at(u8"realm"))},
     {u8"response", quoted(generate_auth())},
     {u8"uri", quoted(uri)},
-    {u8"username", quoted(user.username)}
-  };
+    {u8"username", quoted(user.username)}};
 
   const auto request = make_request(args);
   EXPECT_FALSE(bool(auth.get_response(request)));
 
-  for (unsigned i = 2; i < 20; ++i)
+  for(unsigned i = 2; i < 20; ++i)
   {
     nc = get_nc(i);
     args.at(u8"nc") = nc;
@@ -514,14 +494,12 @@ TEST(HTTP_Server_Auth, MD5_sess_auth)
   EXPECT_STREQ(u8"true", parsed_replay[0].at(u8"stale").c_str());
 }
 
-
 TEST(HTTP_Auth, DogFood)
 {
-  const auto add_auth_field = [] (http::http_request_info& request, http::http_client_auth& client)
-  {
+  const auto add_auth_field = [](http::http_request_info &request, http::http_client_auth &client) {
     auto field = client.get_auth_field(request.m_http_method_str, request.m_URI);
     EXPECT_TRUE(bool(field));
-    if (!field)
+    if(!field)
       return false;
     request.m_header_info.m_etc_fields.push_back(std::move(*field));
     return true;
@@ -546,7 +524,7 @@ TEST(HTTP_Auth, DogFood)
   EXPECT_TRUE(add_auth_field(request, client));
   EXPECT_FALSE(bool(server.get_response(request)));
 
-  for (unsigned i = 0; i < 1000; ++i)
+  for(unsigned i = 0; i < 1000; ++i)
   {
     request.m_http_method_str += std::to_string(i);
     request.m_header_info.m_etc_fields.clear();
@@ -623,17 +601,13 @@ TEST(HTTP_Client_Auth, MD5)
   http::http_client_auth auth{user};
 
   auto response = make_response({
-    {
-      {u8"domain", quoted("ignored")},
-      {u8"nonce", quoted(nonce)},
-      {u8"REALM", quoted(realm)}
-    },
-    {
-      {u8"algorithm", "null"},
-      {u8"domain", quoted("ignored")},
-      {u8"nonce", quoted(std::string{"e"} + nonce)},
-      {u8"realm", quoted(std::string{"e"} + realm)}
-    },
+    {{u8"domain", quoted("ignored")},
+     {u8"nonce", quoted(nonce)},
+     {u8"REALM", quoted(realm)}},
+    {{u8"algorithm", "null"},
+     {u8"domain", quoted("ignored")},
+     {u8"nonce", quoted(std::string{"e"} + nonce)},
+     {u8"realm", quoted(std::string{"e"} + realm)}},
   });
 
   EXPECT_EQ(http::http_client_auth::kSuccess, auth.handle_401(response));
@@ -654,15 +628,13 @@ TEST(HTTP_Client_Auth, MD5)
   const std::string a1 = get_a1(user, parsed);
   const std::string a2 = get_a2(uri);
   const std::string auth_code = md5_hex(
-    boost::join(std::vector<std::string>{md5_hex(a1), nonce, md5_hex(a2)}, u8":")
-  );
+    boost::join(std::vector<std::string>{md5_hex(a1), nonce, md5_hex(a2)}, u8":"));
   EXPECT_TRUE(boost::iequals(auth_code, parsed.at(u8"response")));
   {
     const auto auth_field_dup = auth.get_auth_field(method, uri);
     ASSERT_TRUE(bool(auth_field_dup));
     EXPECT_EQ(*auth_field, *auth_field_dup);
   }
-
 
   EXPECT_EQ(http::http_client_auth::kBadPassword, auth.handle_401(response));
   response.m_header_info.m_etc_fields.front().second.append(u8"," + write_fields({{u8"stale", u8"TRUE"}}));
@@ -682,27 +654,21 @@ TEST(HTTP_Client_Auth, MD5_auth)
   const http::login user{"foo", "bar"};
   http::http_client_auth auth{user};
 
-  auto response = make_response({
-    {
-      {u8"algorithm", u8"MD5"},
-      {u8"domain", quoted("ignored")},
-      {u8"nonce", quoted(std::string{"e"} + nonce)},
-      {u8"realm", quoted(std::string{"e"} + realm)},
-      {u8"qop", quoted("some,thing,to,ignore")}
-    },
-    {
-      {u8"algorIthm", quoted(u8"md5")},
-      {u8"domain", quoted("ignored")},
-      {u8"noNce", quoted(nonce)},
-      {u8"opaque", quoted(opaque)},
-      {u8"realm", quoted(realm)},
-      {u8"QoP", quoted(qop)}
-    }
-  });
+  auto response = make_response({{{u8"algorithm", u8"MD5"},
+                  {u8"domain", quoted("ignored")},
+                  {u8"nonce", quoted(std::string{"e"} + nonce)},
+                  {u8"realm", quoted(std::string{"e"} + realm)},
+                  {u8"qop", quoted("some,thing,to,ignore")}},
+                   {{u8"algorIthm", quoted(u8"md5")},
+                  {u8"domain", quoted("ignored")},
+                  {u8"noNce", quoted(nonce)},
+                  {u8"opaque", quoted(opaque)},
+                  {u8"realm", quoted(realm)},
+                  {u8"QoP", quoted(qop)}}});
 
   EXPECT_EQ(http::http_client_auth::kSuccess, auth.handle_401(response));
 
-  for (unsigned i = 1; i < 1000; ++i)
+  for(unsigned i = 1; i < 1000; ++i)
   {
     const std::string nc = get_nc(i);
 
@@ -723,8 +689,7 @@ TEST(HTTP_Client_Auth, MD5_auth)
     const std::string a1 = get_a1(user, parsed);
     const std::string a2 = get_a2(uri);
     const std::string auth_code = md5_hex(
-      boost::join(std::vector<std::string>{md5_hex(a1), nonce, nc, cnonce, u8"auth", md5_hex(a2)}, u8":")
-    );
+      boost::join(std::vector<std::string>{md5_hex(a1), nonce, nc, cnonce, u8"auth", md5_hex(a2)}, u8":"));
     EXPECT_TRUE(boost::iequals(auth_code, parsed.at(u8"response")));
   }
 
@@ -732,7 +697,6 @@ TEST(HTTP_Client_Auth, MD5_auth)
   response.m_header_info.m_etc_fields.back().second.append(u8"," + write_fields({{u8"stale", u8"trUe"}}));
   EXPECT_EQ(http::http_client_auth::kSuccess, auth.handle_401(response));
 }
-
 
 TEST(HTTP, Add_Field)
 {

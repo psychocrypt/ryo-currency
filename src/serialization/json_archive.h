@@ -1,21 +1,37 @@
-// Copyright (c) 2014-2018, The Monero Project
-// 
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
+//
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
-// 
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
-// 
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
-// 
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+//
+// Authors and copyright holders give permission for following:
+//
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
+//
+// 2. Modification of the source form for your own personal use.
+//
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -25,7 +41,7 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 /*! \file json_archive.h
@@ -37,8 +53,8 @@
 
 #include "serialization.h"
 #include <cassert>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 /*! \struct json_archive_base
  *
@@ -56,10 +72,11 @@ struct json_archive_base
   typedef const char *variant_tag_type;
 
   json_archive_base(stream_type &s, bool indent = false)
-  : stream_(s), indent_(indent), object_begin(false), depth_(0) { }
+    : stream_(s), indent_(indent), object_begin(false), depth_(0) {}
 
-  void tag(const char *tag) {
-    if (!object_begin)
+  void tag(const char *tag)
+  {
+    if(!object_begin)
       stream_ << ", ";
     make_indent();
     stream_ << '"' << tag << "\": ";
@@ -84,22 +101,22 @@ struct json_archive_base
   void end_variant() { end_object(); }
   Stream &stream() { return stream_; }
 
-protected:
+  protected:
   void make_indent()
   {
-    if (indent_)
+    if(indent_)
     {
-      stream_ << '\n' << std::string(2 * depth_, ' ');
+      stream_ << '\n'
+          << std::string(2 * depth_, ' ');
     }
   }
 
-protected:
+  protected:
   stream_type &stream_;
   bool indent_;
   bool object_begin;
   size_t depth_;
 };
-
 
 /*! \struct json_archive
  * 
@@ -113,9 +130,9 @@ struct json_archive;
 template <>
 struct json_archive<true> : public json_archive_base<std::ostream, true>
 {
-  json_archive(stream_type &s, bool indent = false) : base_type(s, indent) { }
+  json_archive(stream_type &s, bool indent = false) : base_type(s, indent) {}
 
-  template<typename T>
+  template <typename T>
   static auto promote_to_printable_integer_type(T v) -> decltype(+v)
   {
     // Unary operator '+' performs integral promotion on type T [expr.unary.op].
@@ -129,9 +146,11 @@ struct json_archive<true> : public json_archive_base<std::ostream, true>
     stream_ << std::dec << promote_to_printable_integer_type(v);
   }
 
-  void serialize_blob(void *buf, size_t len, const char *delimiter="\"") {
+  void serialize_blob(void *buf, size_t len, const char *delimiter = "\"")
+  {
     begin_string(delimiter);
-    for (size_t i = 0; i < len; i++) {
+    for(size_t i = 0; i < len; i++)
+    {
       unsigned char c = ((unsigned char *)buf)[i];
       stream_ << std::hex << std::setw(2) << std::setfill('0') << (int)c;
     }
@@ -144,17 +163,17 @@ struct json_archive<true> : public json_archive_base<std::ostream, true>
     stream_ << std::dec << promote_to_printable_integer_type(v);
   }
 
-  void begin_string(const char *delimiter="\"")
+  void begin_string(const char *delimiter = "\"")
   {
     stream_ << delimiter;
   }
 
-  void end_string(const char *delimiter="\"")
+  void end_string(const char *delimiter = "\"")
   {
     stream_ << delimiter;
   }
 
-  void begin_array(size_t s=0)
+  void begin_array(size_t s = 0)
   {
     inner_array_size_ = s;
     ++depth_;
@@ -169,7 +188,7 @@ struct json_archive<true> : public json_archive_base<std::ostream, true>
   void end_array()
   {
     --depth_;
-    if (0 < inner_array_size_)
+    if(0 < inner_array_size_)
     {
       make_indent();
     }
@@ -181,6 +200,6 @@ struct json_archive<true> : public json_archive_base<std::ostream, true>
     tag(t);
   }
 
-private:
+  private:
   size_t inner_array_size_;
 };

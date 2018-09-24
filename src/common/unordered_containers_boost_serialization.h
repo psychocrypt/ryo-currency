@@ -1,21 +1,37 @@
-// Copyright (c) 2014-2018, The Monero Project
-// 
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
+//
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
-// 
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
-// 
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
-// 
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+//
+// Authors and copyright holders give permission for following:
+//
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
+//
+// 2. Modification of the source form for your own personal use.
+//
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -25,7 +41,7 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #pragma once
@@ -36,108 +52,105 @@
 
 namespace boost
 {
-  namespace serialization
+namespace serialization
+{
+template <class Archive, class h_key, class hval>
+inline void save(Archive &a, const std::unordered_map<h_key, hval> &x, const boost::serialization::version_type ver)
+{
+  size_t s = x.size();
+  a << s;
+  for(auto &v : x)
   {
-    template <class Archive, class h_key, class hval>
-    inline void save(Archive &a, const std::unordered_map<h_key, hval> &x, const boost::serialization::version_type ver)
-    {
-      size_t s = x.size();
-      a << s;
-      for(auto& v: x)
-      {
-        a << v.first;
-        a << v.second;
-      }
-    }
-
-    template <class Archive, class h_key, class hval>
-    inline void load(Archive &a, std::unordered_map<h_key, hval> &x, const boost::serialization::version_type ver)
-    {
-      x.clear();
-      size_t s = 0;
-      a >> s;
-      for(size_t i = 0; i != s; i++)
-      {
-        h_key k;
-        hval v;
-        a >> k;
-        a >> v;
-        x.insert(std::pair<h_key, hval>(k, v));
-      }
-    }
-
-
-    template <class Archive, class h_key, class hval>
-    inline void save(Archive &a, const std::unordered_multimap<h_key, hval> &x, const boost::serialization::version_type ver)
-    {
-      size_t s = x.size();
-      a << s;
-      for(auto& v: x)
-      {
-        a << v.first;
-        a << v.second;
-      }
-    }
-
-    template <class Archive, class h_key, class hval>
-    inline void load(Archive &a, std::unordered_multimap<h_key, hval> &x, const boost::serialization::version_type ver)
-    {
-      x.clear();
-      size_t s = 0;
-      a >> s;
-      for(size_t i = 0; i != s; i++)
-      {
-        h_key k;
-        hval v;
-        a >> k;
-        a >> v;
-        x.emplace(k, v);
-      }
-    }
-
-
-    template <class Archive, class hval>
-    inline void save(Archive &a, const std::unordered_set<hval> &x, const boost::serialization::version_type ver)
-    {
-      size_t s = x.size();
-      a << s;
-      for(auto& v: x)
-      {
-        a << v;
-      }
-    }
-
-    template <class Archive, class hval>
-    inline void load(Archive &a, std::unordered_set<hval> &x, const boost::serialization::version_type ver)
-    {
-      x.clear();
-      size_t s = 0;
-      a >> s;
-      for(size_t i = 0; i != s; i++)
-      {
-        hval v;
-        a >> v;
-        x.insert(v);
-      }
-    }
-
-
-    template <class Archive, class h_key, class hval>
-    inline void serialize(Archive &a, std::unordered_map<h_key, hval> &x, const boost::serialization::version_type ver)
-    {
-      split_free(a, x, ver);
-    }
-
-    template <class Archive, class h_key, class hval>
-    inline void serialize(Archive &a, std::unordered_multimap<h_key, hval> &x, const boost::serialization::version_type ver)
-    {
-      split_free(a, x, ver);
-    }
-
-    template <class Archive, class hval>
-    inline void serialize(Archive &a, std::unordered_set<hval> &x, const boost::serialization::version_type ver)
-    {
-      split_free(a, x, ver);
-    }
+    a << v.first;
+    a << v.second;
   }
+}
+
+template <class Archive, class h_key, class hval>
+inline void load(Archive &a, std::unordered_map<h_key, hval> &x, const boost::serialization::version_type ver)
+{
+  x.clear();
+  size_t s = 0;
+  a >> s;
+  for(size_t i = 0; i != s; i++)
+  {
+    h_key k;
+    hval v;
+    a >> k;
+    a >> v;
+    x.insert(std::pair<h_key, hval>(k, v));
+  }
+}
+
+template <class Archive, class h_key, class hval>
+inline void save(Archive &a, const std::unordered_multimap<h_key, hval> &x, const boost::serialization::version_type ver)
+{
+  size_t s = x.size();
+  a << s;
+  for(auto &v : x)
+  {
+    a << v.first;
+    a << v.second;
+  }
+}
+
+template <class Archive, class h_key, class hval>
+inline void load(Archive &a, std::unordered_multimap<h_key, hval> &x, const boost::serialization::version_type ver)
+{
+  x.clear();
+  size_t s = 0;
+  a >> s;
+  for(size_t i = 0; i != s; i++)
+  {
+    h_key k;
+    hval v;
+    a >> k;
+    a >> v;
+    x.emplace(k, v);
+  }
+}
+
+template <class Archive, class hval>
+inline void save(Archive &a, const std::unordered_set<hval> &x, const boost::serialization::version_type ver)
+{
+  size_t s = x.size();
+  a << s;
+  for(auto &v : x)
+  {
+    a << v;
+  }
+}
+
+template <class Archive, class hval>
+inline void load(Archive &a, std::unordered_set<hval> &x, const boost::serialization::version_type ver)
+{
+  x.clear();
+  size_t s = 0;
+  a >> s;
+  for(size_t i = 0; i != s; i++)
+  {
+    hval v;
+    a >> v;
+    x.insert(v);
+  }
+}
+
+template <class Archive, class h_key, class hval>
+inline void serialize(Archive &a, std::unordered_map<h_key, hval> &x, const boost::serialization::version_type ver)
+{
+  split_free(a, x, ver);
+}
+
+template <class Archive, class h_key, class hval>
+inline void serialize(Archive &a, std::unordered_multimap<h_key, hval> &x, const boost::serialization::version_type ver)
+{
+  split_free(a, x, ver);
+}
+
+template <class Archive, class hval>
+inline void serialize(Archive &a, std::unordered_set<hval> &x, const boost::serialization::version_type ver)
+{
+  split_free(a, x, ver);
+}
+}
 }

@@ -1,21 +1,21 @@
 // Copyright (c) 2014-2018, The Monero Project
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -25,7 +25,7 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #include <boost/chrono/chrono.hpp>
@@ -35,51 +35,51 @@
 #include "gtest/gtest.h"
 
 #include "include_base_utils.h"
-#include "string_tools.h"
 #include "net/abstract_tcp_server2.h"
+#include "string_tools.h"
 
 namespace
 {
-  const uint32_t test_server_port = 5626;
-  const std::string test_server_host("127.0.0.1");
+const uint32_t test_server_port = 5626;
+const std::string test_server_host("127.0.0.1");
 
-  struct test_connection_context : public epee::net_utils::connection_context_base
+struct test_connection_context : public epee::net_utils::connection_context_base
+{
+};
+
+struct test_protocol_handler_config
+{
+};
+
+struct test_protocol_handler
+{
+  typedef test_connection_context connection_context;
+  typedef test_protocol_handler_config config_type;
+
+  test_protocol_handler(epee::net_utils::i_service_endpoint * /*psnd_hndlr*/, config_type & /*config*/, connection_context & /*conn_context*/)
   {
-  };
+  }
 
-  struct test_protocol_handler_config
+  void after_init_connection()
   {
-  };
+  }
 
-  struct test_protocol_handler
+  void handle_qued_callback()
   {
-    typedef test_connection_context connection_context;
-    typedef test_protocol_handler_config config_type;
+  }
 
-    test_protocol_handler(epee::net_utils::i_service_endpoint* /*psnd_hndlr*/, config_type& /*config*/, connection_context& /*conn_context*/)
-    {
-    }
+  bool release_protocol()
+  {
+    return true;
+  }
 
-    void after_init_connection()
-    {
-    }
+  bool handle_recv(const void * /*data*/, size_t /*size*/)
+  {
+    return false;
+  }
+};
 
-    void handle_qued_callback()
-    {
-    }
-
-    bool release_protocol()
-    {
-      return true;
-    }
-
-    bool handle_recv(const void* /*data*/, size_t /*size*/)
-    {
-      return false;
-    }
-  };
-
-  typedef epee::net_utils::boosted_tcp_server<test_protocol_handler> test_tcp_server;
+typedef epee::net_utils::boosted_tcp_server<test_protocol_handler> test_tcp_server;
 }
 
 TEST(boosted_tcp_server, worker_threads_are_exception_resistant)
@@ -91,11 +91,10 @@ TEST(boosted_tcp_server, worker_threads_are_exception_resistant)
   boost::condition_variable cond;
   int counter = 0;
 
-  auto counter_incrementer = [&counter, &cond, &mtx]()
-  {
+  auto counter_incrementer = [&counter, &cond, &mtx]() {
     boost::unique_lock<boost::mutex> lock(mtx);
     ++counter;
-    if (4 <= counter)
+    if(4 <= counter)
     {
       cond.notify_one();
     }

@@ -1,20 +1,36 @@
-// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
 //
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
 //
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
+// Authors and copyright holders give permission for following:
 //
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
 //
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
+// 2. Modification of the source form for your own personal use.
 //
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -29,35 +45,33 @@
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #pragma once
-#include <map>
-#include <vector>
-#include "misc_log_ex.h"
 #include "crypto/hash.h"
 #include "cryptonote_config.h"
+#include "misc_log_ex.h"
+#include <map>
+#include <vector>
 
-#define ADD_CHECKPOINT(h, hash)  CHECK_AND_ASSERT(add_checkpoint(h,  hash), false);
+#define ADD_CHECKPOINT(h, hash) CHECK_AND_ASSERT(add_checkpoint(h, hash), false);
 #define JSON_HASH_FILE_NAME "checkpoints.json"
-
 
 namespace cryptonote
 {
-  /**
+/**
    * @brief A container for blockchain checkpoints
    *
    * A checkpoint is a pre-defined hash for the block at a given height.
    * Some of these are compiled-in, while others can be loaded at runtime
    * either from a json file or via DNS from a checkpoint-hosting server.
    */
-  class checkpoints
-  {
+class checkpoints
+{
   public:
-
-    /**
+  /**
      * @brief default constructor
      */
-    checkpoints();
+  checkpoints();
 
-    /**
+  /**
      * @brief adds a checkpoint to the container
      *
      * @param height the height of the block the checkpoint is for
@@ -67,9 +81,9 @@ namespace cryptonote
      *         AND the existing checkpoint hash does not match the new one,
      *         otherwise returns true
      */
-    bool add_checkpoint(uint64_t height, const std::string& hash_str);
+  bool add_checkpoint(uint64_t height, const std::string &hash_str);
 
-    /**
+  /**
      * @brief checks if there is a checkpoint in the future
      *
      * This function checks if the height passed is lower than the highest
@@ -80,9 +94,9 @@ namespace cryptonote
      * @return false if no checkpoints, otherwise returns whether or not
      *         the height passed is lower than the highest checkpoint.
      */
-    bool is_in_checkpoint_zone(uint64_t height) const;
+  bool is_in_checkpoint_zone(uint64_t height) const;
 
-    /**
+  /**
      * @brief checks if the given height and hash agree with the checkpoints
      *
      * This function checks if the given height and hash exist in the
@@ -97,14 +111,14 @@ namespace cryptonote
      *         true if the passed parameters match the stored checkpoint,
      *         false otherwise
      */
-    bool check_block(uint64_t height, const crypto::hash& h, bool& is_a_checkpoint) const;
+  bool check_block(uint64_t height, const crypto::hash &h, bool &is_a_checkpoint) const;
 
-    /**
+  /**
      * @overload
      */
-    bool check_block(uint64_t height, const crypto::hash& h) const;
+  bool check_block(uint64_t height, const crypto::hash &h) const;
 
-    /**
+  /**
      * @brief checks if alternate chain blocks should be kept for a given height
      *
      * this basically says if the blockchain is smaller than the first
@@ -118,23 +132,23 @@ namespace cryptonote
      * @return true if alternate blocks are allowed given the parameters,
      *         otherwise false
      */
-    bool is_alternative_block_allowed(uint64_t blockchain_height, uint64_t block_height) const;
+  bool is_alternative_block_allowed(uint64_t blockchain_height, uint64_t block_height) const;
 
-    /**
+  /**
      * @brief gets the highest checkpoint height
      *
      * @return the height of the highest checkpoint
      */
-    uint64_t get_max_height() const;
+  uint64_t get_max_height() const;
 
-    /**
+  /**
      * @brief gets the checkpoints container
      *
      * @return a const reference to the checkpoints container
      */
-    const std::map<uint64_t, crypto::hash>& get_points() const;
+  const std::map<uint64_t, crypto::hash> &get_points() const;
 
-    /**
+  /**
      * @brief checks if our checkpoints container conflicts with another
      *
      * A conflict refers to a case where both checkpoint sets have a checkpoint
@@ -144,17 +158,17 @@ namespace cryptonote
      *
      * @return false if any conflict is found, otherwise true
      */
-    bool check_for_conflicts(const checkpoints& other) const;
+  bool check_for_conflicts(const checkpoints &other) const;
 
-    /**
+  /**
      * @brief loads the default main chain checkpoints
      * @param nettype network type
      *
      * @return true unless adding a checkpoint fails
      */
-    bool init_default_checkpoints(network_type nettype);
+  bool init_default_checkpoints(network_type nettype);
 
-    /**
+  /**
      * @brief load new checkpoints
      *
      * Loads new checkpoints from the specified json file, as well as
@@ -166,28 +180,27 @@ namespace cryptonote
      *
      * @return true if loading successful and no conflicts
      */
-    bool load_new_checkpoints(const std::string &json_hashfile_fullpath, network_type nettype=MAINNET, bool dns=true);
+  bool load_new_checkpoints(const std::string &json_hashfile_fullpath, network_type nettype = MAINNET, bool dns = true);
 
-    /**
+  /**
      * @brief load new checkpoints from json
      *
      * @param json_hashfile_fullpath path to the json checkpoints file
      *
      * @return true if loading successful and no conflicts
      */
-    bool load_checkpoints_from_json(const std::string &json_hashfile_fullpath);
+  bool load_checkpoints_from_json(const std::string &json_hashfile_fullpath);
 
-    /**
+  /**
      * @brief load new checkpoints from DNS
      *
      * @param nettype network type
      *
      * @return true if loading successful and no conflicts
      */
-    bool load_checkpoints_from_dns(network_type nettype = MAINNET);
+  bool load_checkpoints_from_dns(network_type nettype = MAINNET);
 
   private:
-    std::map<uint64_t, crypto::hash> m_points; //!< the checkpoints container
-  };
-
+  std::map<uint64_t, crypto::hash> m_points; //!< the checkpoints container
+};
 }

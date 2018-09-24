@@ -12,5 +12,4 @@ size_t get_blocks_dat_size(int testnet, int stagenet);
 }
 #endif
 
-
 #endif /* SRC_BLOCKS_BLOCKS_H_ */

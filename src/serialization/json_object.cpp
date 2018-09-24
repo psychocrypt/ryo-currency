@@ -1,21 +1,37 @@
-// Copyright (c) 2016-2018, The Monero Project
-// 
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
+//
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
-// 
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
-// 
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
-// 
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+//
+// Authors and copyright holders give permission for following:
+//
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
+//
+// 2. Modification of the source form for your own personal use.
+//
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,11 +44,9 @@
 
 #include "json_object.h"
 
-#include <boost/range/adaptor/transformed.hpp>
-#include <boost/variant/apply_visitor.hpp>
+#include "string_tools.h"
 #include <limits>
 #include <type_traits>
-#include "string_tools.h"
 
 namespace cryptonote
 {
@@ -42,81 +56,79 @@ namespace json
 
 namespace
 {
-  template<typename Source, typename Destination>
-  constexpr bool precision_loss()
-  {
-    return
-      std::numeric_limits<Destination>::is_signed != std::numeric_limits<Source>::is_signed ||
-      std::numeric_limits<Destination>::min() > std::numeric_limits<Source>::min() ||
-      std::numeric_limits<Destination>::max() < std::numeric_limits<Source>::max();
-  }
-
-  template<typename Source, typename Type>
-  void convert_numeric(Source source, Type& i)
-  {
-    static_assert(
-      (std::is_same<Type, char>() && std::is_same<Source, int>()) ||
-      std::numeric_limits<Source>::is_signed == std::numeric_limits<Type>::is_signed,
-      "comparisons below may have undefined behavior"
-    );
-    if (source < std::numeric_limits<Type>::min())
-    {
-      throw WRONG_TYPE{"numeric underflow"};
-    }
-    if (std::numeric_limits<Type>::max() < source)
-    {
-      throw WRONG_TYPE{"numeric overflow"};
-    }
-    i = Type(source);
-  }
-
-  template<typename Type>
-  void to_int(const rapidjson::Value& val, Type& i)
-  {
-    if (!val.IsInt())
-    {
-      throw WRONG_TYPE{"integer"};
-    }
-    convert_numeric(val.GetInt(), i);
-  }
-  template<typename Type>
-  void to_int64(const rapidjson::Value& val, Type& i)
-  {
-    if (!val.IsInt64())
-    {
-      throw WRONG_TYPE{"integer"};
-    }
-    convert_numeric(val.GetInt64(), i);
-  }
-
-  template<typename Type>
-  void to_uint(const rapidjson::Value& val, Type& i)
-  {
-    if (!val.IsUint())
-    {
-      throw WRONG_TYPE{"unsigned integer"};
-    }
-    convert_numeric(val.GetUint(), i);
-  }
-  template<typename Type>
-  void to_uint64(const rapidjson::Value& val, Type& i)
-  {
-    if (!val.IsUint64())
-    {
-      throw WRONG_TYPE{"unsigned integer"};
-    }
-    convert_numeric(val.GetUint64(), i);
-  }
+template <typename Source, typename Destination>
+constexpr bool precision_loss()
+{
+  return std::numeric_limits<Destination>::is_signed != std::numeric_limits<Source>::is_signed ||
+       std::numeric_limits<Destination>::min() > std::numeric_limits<Source>::min() ||
+       std::numeric_limits<Destination>::max() < std::numeric_limits<Source>::max();
 }
 
-void toJsonValue(rapidjson::Document& doc, const std::string& i, rapidjson::Value& val)
+template <typename Source, typename Type>
+void convert_numeric(Source source, Type &i)
+{
+  static_assert(
+    (std::is_same<Type, char>() && std::is_same<Source, int>()) ||
+      std::numeric_limits<Source>::is_signed == std::numeric_limits<Type>::is_signed,
+    "comparisons below may have undefined behavior");
+  if(source < std::numeric_limits<Type>::min())
+  {
+    throw WRONG_TYPE{"numeric underflow"};
+  }
+  if(std::numeric_limits<Type>::max() < source)
+  {
+    throw WRONG_TYPE{"numeric overflow"};
+  }
+  i = Type(source);
+}
+
+template <typename Type>
+void to_int(const rapidjson::Value &val, Type &i)
+{
+  if(!val.IsInt())
+  {
+    throw WRONG_TYPE{"integer"};
+  }
+  convert_numeric(val.GetInt(), i);
+}
+template <typename Type>
+void to_int64(const rapidjson::Value &val, Type &i)
+{
+  if(!val.IsInt64())
+  {
+    throw WRONG_TYPE{"integer"};
+  }
+  convert_numeric(val.GetInt64(), i);
+}
+
+template <typename Type>
+void to_uint(const rapidjson::Value &val, Type &i)
+{
+  if(!val.IsUint())
+  {
+    throw WRONG_TYPE{"unsigned integer"};
+  }
+  convert_numeric(val.GetUint(), i);
+}
+template <typename Type>
+void to_uint64(const rapidjson::Value &val, Type &i)
+{
+  if(!val.IsUint64())
+  {
+    throw WRONG_TYPE{"unsigned integer"};
+  }
+  convert_numeric(val.GetUint64(), i);
+}
+}
+
+void toJsonValue(rapidjson::Document &doc, const std::string &i, rapidjson::Value &val)
 {
   val = rapidjson::Value(i.c_str(), doc.GetAllocator());
 }
 
-void fromJsonValue(const rapidjson::Value& val, std::string& str)
+void fromJsonValue(const rapidjson::Value &val, std::string &str)
 {
-  if (!val.IsString())
+  if(!val.IsString())
   {
     throw WRONG_TYPE("string");
   }
@@ -124,128 +136,127 @@ void fromJsonValue(const rapidjson::Value& val, std::string& str)
   str = val.GetString();
 }
 
-void toJsonValue(rapidjson::Document& doc, bool i, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, bool i, rapidjson::Value &val)
 {
   val.SetBool(i);
 }
 
-void fromJsonValue(const rapidjson::Value& val, bool& b)
+void fromJsonValue(const rapidjson::Value &val, bool &b)
 {
-  if (!val.IsBool())
+  if(!val.IsBool())
   {
     throw WRONG_TYPE("boolean");
   }
   b = val.GetBool();
 }
 
-void fromJsonValue(const rapidjson::Value& val, unsigned char& i)
+void fromJsonValue(const rapidjson::Value &val, unsigned char &i)
 {
   to_uint(val, i);
 }
 
-void fromJsonValue(const rapidjson::Value& val, char& i)
+void fromJsonValue(const rapidjson::Value &val, char &i)
 {
   to_int(val, i);
 }
 
-void fromJsonValue(const rapidjson::Value& val, signed char& i)
+void fromJsonValue(const rapidjson::Value &val, signed char &i)
 {
   to_int(val, i);
 }
 
-void fromJsonValue(const rapidjson::Value& val, unsigned short& i)
+void fromJsonValue(const rapidjson::Value &val, unsigned short &i)
 {
   to_uint(val, i);
 }
 
-void fromJsonValue(const rapidjson::Value& val, short& i)
+void fromJsonValue(const rapidjson::Value &val, short &i)
 {
   to_int(val, i);
 }
 
-void toJsonValue(rapidjson::Document& doc, const unsigned int i, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const unsigned int i, rapidjson::Value &val)
 {
   val = rapidjson::Value(i);
 }
 
-void fromJsonValue(const rapidjson::Value& val, unsigned int& i)
+void fromJsonValue(const rapidjson::Value &val, unsigned int &i)
 {
   to_uint(val, i);
 }
 
-void toJsonValue(rapidjson::Document& doc, const int i, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const int i, rapidjson::Value &val)
 {
   val = rapidjson::Value(i);
 }
 
-void fromJsonValue(const rapidjson::Value& val, int& i)
+void fromJsonValue(const rapidjson::Value &val, int &i)
 {
   to_int(val, i);
 }
 
-void toJsonValue(rapidjson::Document& doc, const unsigned long long i, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const unsigned long long i, rapidjson::Value &val)
 {
   static_assert(!precision_loss<unsigned long long, std::uint64_t>(), "precision loss");
   val = rapidjson::Value(std::uint64_t(i));
 }
 
-void fromJsonValue(const rapidjson::Value& val, unsigned long long& i)
+void fromJsonValue(const rapidjson::Value &val, unsigned long long &i)
 {
   to_uint64(val, i);
 }
 
-void toJsonValue(rapidjson::Document& doc, const long long i, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const long long i, rapidjson::Value &val)
 {
   static_assert(!precision_loss<long long, std::int64_t>(), "precision loss");
   val = rapidjson::Value(std::int64_t(i));
 }
 
-void fromJsonValue(const rapidjson::Value& val, long long& i)
+void fromJsonValue(const rapidjson::Value &val, long long &i)
 {
   to_int64(val, i);
 }
 
-void fromJsonValue(const rapidjson::Value& val, unsigned long& i)
+void fromJsonValue(const rapidjson::Value &val, unsigned long &i)
 {
   to_uint64(val, i);
 }
 
-void fromJsonValue(const rapidjson::Value& val, long& i)
+void fromJsonValue(const rapidjson::Value &val, long &i)
 {
   to_int64(val, i);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::transaction& tx, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::transaction &tx, rapidjson::Value &val)
 {
   val.SetObject();
 
   INSERT_INTO_JSON_OBJECT(val, doc, version, tx.version);
   INSERT_INTO_JSON_OBJECT(val, doc, unlock_time, tx.unlock_time);
-  INSERT_INTO_JSON_OBJECT(val, doc, inputs, tx.vin);
-  INSERT_INTO_JSON_OBJECT(val, doc, outputs, tx.vout);
+  INSERT_INTO_JSON_OBJECT(val, doc, vin, tx.vin);
+  INSERT_INTO_JSON_OBJECT(val, doc, vout, tx.vout);
   INSERT_INTO_JSON_OBJECT(val, doc, extra, tx.extra);
   INSERT_INTO_JSON_OBJECT(val, doc, signatures, tx.signatures);
-  INSERT_INTO_JSON_OBJECT(val, doc, ringct, tx.rct_signatures);
+  INSERT_INTO_JSON_OBJECT(val, doc, rct_signatures, tx.rct_signatures);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::transaction& tx)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::transaction &tx)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
 
   GET_FROM_JSON_OBJECT(val, tx.version, version);
   GET_FROM_JSON_OBJECT(val, tx.unlock_time, unlock_time);
-  GET_FROM_JSON_OBJECT(val, tx.vin, inputs);
-  GET_FROM_JSON_OBJECT(val, tx.vout, outputs);
+  GET_FROM_JSON_OBJECT(val, tx.vin, vin);
+  GET_FROM_JSON_OBJECT(val, tx.vout, vout);
   GET_FROM_JSON_OBJECT(val, tx.extra, extra);
   GET_FROM_JSON_OBJECT(val, tx.signatures, signatures);
-  GET_FROM_JSON_OBJECT(val, tx.rct_signatures, ringct);
+  GET_FROM_JSON_OBJECT(val, tx.rct_signatures, rct_signatures);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::block& b, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::block &b, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -258,10 +269,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::block& b, rapidjson
   INSERT_INTO_JSON_OBJECT(val, doc, tx_hashes, b.tx_hashes);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::block& b)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::block &b)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -275,90 +285,77 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::block& b)
   GET_FROM_JSON_OBJECT(val, b.tx_hashes, tx_hashes);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::txin_v& txin, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_v &txin, rapidjson::Value &val)
 {
   val.SetObject();
 
-  struct add_input
+  if(txin.type() == typeid(cryptonote::txin_gen))
   {
-    using result_type = void;
-
-    rapidjson::Document& doc;
-    rapidjson::Value& val;
-
-    void operator()(cryptonote::txin_to_key const& input) const
-    {
-      INSERT_INTO_JSON_OBJECT(val, doc, to_key, input);
-    }
-    void operator()(cryptonote::txin_gen const& input) const
-    {
-      INSERT_INTO_JSON_OBJECT(val, doc, gen, input);
-    }
-    void operator()(cryptonote::txin_to_script const& input) const
-    {
-      INSERT_INTO_JSON_OBJECT(val, doc, to_script, input);
-    }
-    void operator()(cryptonote::txin_to_scripthash const& input) const
-    {
-      INSERT_INTO_JSON_OBJECT(val, doc, to_scripthash, input);
-    }
-  };
-  boost::apply_visitor(add_input{doc, val}, txin);
+    val.AddMember("type", "txin_gen", doc.GetAllocator());
+    INSERT_INTO_JSON_OBJECT(val, doc, value, boost::get<cryptonote::txin_gen>(txin));
+  }
+  else if(txin.type() == typeid(cryptonote::txin_to_script))
+  {
+    val.AddMember("type", "txin_to_script", doc.GetAllocator());
+    INSERT_INTO_JSON_OBJECT(val, doc, value, boost::get<cryptonote::txin_to_script>(txin));
+  }
+  else if(txin.type() == typeid(cryptonote::txin_to_scripthash))
+  {
+    val.AddMember("type", "txin_to_scripthash", doc.GetAllocator());
+    INSERT_INTO_JSON_OBJECT(val, doc, value, boost::get<cryptonote::txin_to_scripthash>(txin));
+  }
+  else if(txin.type() == typeid(cryptonote::txin_to_key))
+  {
+    val.AddMember("type", "txin_to_key", doc.GetAllocator());
+    INSERT_INTO_JSON_OBJECT(val, doc, value, boost::get<cryptonote::txin_to_key>(txin));
+  }
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::txin_v& txin)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_v &txin)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
 
-  if (val.MemberCount() != 1)
+  OBJECT_HAS_MEMBER_OR_THROW(val, "type")
+  OBJECT_HAS_MEMBER_OR_THROW(val, "value")
+  if(val["type"] == "txin_gen")
   {
-    throw MISSING_KEY("Invalid input object");
+    cryptonote::txin_gen tmpVal;
+    fromJsonValue(val["value"], tmpVal);
+    txin = tmpVal;
   }
-
-  for (auto const& elem : val.GetObject())
+  else if(val["type"] == "txin_to_script")
   {
-    if (elem.name == "to_key")
-    {
-      cryptonote::txin_to_key tmpVal;
-      fromJsonValue(elem.value, tmpVal);
-      txin = std::move(tmpVal);
-    }
-    else if (elem.name == "gen")
-    {
-      cryptonote::txin_gen tmpVal;
-      fromJsonValue(elem.value, tmpVal);
-      txin = std::move(tmpVal);
-    }
-    else if (elem.name == "to_script")
-    {
-      cryptonote::txin_to_script tmpVal;
-      fromJsonValue(elem.value, tmpVal);
-      txin = std::move(tmpVal);
-    }
-    else if (elem.name == "to_scripthash")
-    {
-      cryptonote::txin_to_scripthash tmpVal;
-      fromJsonValue(elem.value, tmpVal);
-      txin = std::move(tmpVal);
-    }
+    cryptonote::txin_to_script tmpVal;
+    fromJsonValue(val["value"], tmpVal);
+    txin = tmpVal;
+  }
+  else if(val["type"] == "txin_to_scripthash")
+  {
+    cryptonote::txin_to_scripthash tmpVal;
+    fromJsonValue(val["value"], tmpVal);
+    txin = tmpVal;
+  }
+  else if(val["type"] == "txin_to_key")
+  {
+    cryptonote::txin_to_key tmpVal;
+    fromJsonValue(val["value"], tmpVal);
+    txin = tmpVal;
   }
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::txin_gen& txin, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_gen &txin, rapidjson::Value &val)
 {
   val.SetObject();
 
   INSERT_INTO_JSON_OBJECT(val, doc, height, txin.height);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::txin_gen& txin)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_gen &txin)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -366,7 +363,7 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::txin_gen& txin)
   GET_FROM_JSON_OBJECT(val, txin.height, height);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::txin_to_script& txin, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_to_script &txin, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -375,10 +372,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::txin_to_script& txi
   INSERT_INTO_JSON_OBJECT(val, doc, sigset, txin.sigset);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::txin_to_script& txin)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_to_script &txin)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -388,7 +384,7 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::txin_to_script& txin
   GET_FROM_JSON_OBJECT(val, txin.sigset, sigset);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::txin_to_scripthash& txin, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_to_scripthash &txin, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -398,10 +394,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::txin_to_scripthash&
   INSERT_INTO_JSON_OBJECT(val, doc, sigset, txin.sigset);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::txin_to_scripthash& txin)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_to_scripthash &txin)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -412,29 +407,78 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::txin_to_scripthash& 
   GET_FROM_JSON_OBJECT(val, txin.sigset, sigset);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::txin_to_key& txin, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_to_key &txin, rapidjson::Value &val)
 {
   val.SetObject();
 
   INSERT_INTO_JSON_OBJECT(val, doc, amount, txin.amount);
   INSERT_INTO_JSON_OBJECT(val, doc, key_offsets, txin.key_offsets);
-  INSERT_INTO_JSON_OBJECT(val, doc, key_image, txin.k_image);
+  INSERT_INTO_JSON_OBJECT(val, doc, k_image, txin.k_image);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::txin_to_key& txin)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_to_key &txin)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
 
   GET_FROM_JSON_OBJECT(val, txin.amount, amount);
   GET_FROM_JSON_OBJECT(val, txin.key_offsets, key_offsets);
-  GET_FROM_JSON_OBJECT(val, txin.k_image, key_image);
+  GET_FROM_JSON_OBJECT(val, txin.k_image, k_image);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::txout_to_script& txout, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::txout_target_v &txout, rapidjson::Value &val)
+{
+  val.SetObject();
+
+  if(txout.type() == typeid(cryptonote::txout_to_script))
+  {
+    val.AddMember("type", "txout_to_script", doc.GetAllocator());
+    INSERT_INTO_JSON_OBJECT(val, doc, value, boost::get<cryptonote::txout_to_script>(txout));
+  }
+  else if(txout.type() == typeid(cryptonote::txout_to_scripthash))
+  {
+    val.AddMember("type", "txout_to_scripthash", doc.GetAllocator());
+    INSERT_INTO_JSON_OBJECT(val, doc, value, boost::get<cryptonote::txout_to_scripthash>(txout));
+  }
+  else if(txout.type() == typeid(cryptonote::txout_to_key))
+  {
+    val.AddMember("type", "txout_to_key", doc.GetAllocator());
+    INSERT_INTO_JSON_OBJECT(val, doc, value, boost::get<cryptonote::txout_to_key>(txout));
+  }
+}
+
+void fromJsonValue(const rapidjson::Value &val, cryptonote::txout_target_v &txout)
+{
+  if(!val.IsObject())
+  {
+    throw WRONG_TYPE("json object");
+  }
+
+  OBJECT_HAS_MEMBER_OR_THROW(val, "type")
+  OBJECT_HAS_MEMBER_OR_THROW(val, "value")
+  if(val["type"] == "txout_to_script")
+  {
+    cryptonote::txout_to_script tmpVal;
+    fromJsonValue(val["value"], tmpVal);
+    txout = tmpVal;
+  }
+  else if(val["type"] == "txout_to_scripthash")
+  {
+    cryptonote::txout_to_scripthash tmpVal;
+    fromJsonValue(val["value"], tmpVal);
+    txout = tmpVal;
+  }
+  else if(val["type"] == "txout_to_key")
+  {
+    cryptonote::txout_to_key tmpVal;
+    fromJsonValue(val["value"], tmpVal);
+    txout = tmpVal;
+  }
+}
+
+void toJsonValue(rapidjson::Document &doc, const cryptonote::txout_to_script &txout, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -442,10 +486,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::txout_to_script& tx
   INSERT_INTO_JSON_OBJECT(val, doc, script, txout.script);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::txout_to_script& txout)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::txout_to_script &txout)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -454,17 +497,16 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::txout_to_script& txo
   GET_FROM_JSON_OBJECT(val, txout.script, script);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::txout_to_scripthash& txout, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::txout_to_scripthash &txout, rapidjson::Value &val)
 {
   val.SetObject();
 
   INSERT_INTO_JSON_OBJECT(val, doc, hash, txout.hash);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::txout_to_scripthash& txout)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::txout_to_scripthash &txout)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -472,17 +514,16 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::txout_to_scripthash&
   GET_FROM_JSON_OBJECT(val, txout.hash, hash);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::txout_to_key& txout, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::txout_to_key &txout, rapidjson::Value &val)
 {
   val.SetObject();
 
   INSERT_INTO_JSON_OBJECT(val, doc, key, txout.key);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::txout_to_key& txout)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::txout_to_key &txout)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -490,80 +531,30 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::txout_to_key& txout)
   GET_FROM_JSON_OBJECT(val, txout.key, key);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::tx_out& txout, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::tx_out &txout, rapidjson::Value &val)
 {
   val.SetObject();
 
   INSERT_INTO_JSON_OBJECT(val, doc, amount, txout.amount);
-
-  struct add_output
-  {
-    using result_type = void;
-
-    rapidjson::Document& doc;
-    rapidjson::Value& val;
-
-    void operator()(cryptonote::txout_to_key const& output) const
-    {
-      INSERT_INTO_JSON_OBJECT(val, doc, to_key, output);
-    }
-    void operator()(cryptonote::txout_to_script const& output) const
-    {
-      INSERT_INTO_JSON_OBJECT(val, doc, to_script, output);
-    }
-    void operator()(cryptonote::txout_to_scripthash const& output) const
-    {
-      INSERT_INTO_JSON_OBJECT(val, doc, to_scripthash, output);
-    }
-  };
-  boost::apply_visitor(add_output{doc, val}, txout.target);
+  INSERT_INTO_JSON_OBJECT(val, doc, target, txout.target);
 }
 
-void fromJsonValue(const rapidjson::Value& val, cryptonote::tx_out& txout)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::tx_out &txout)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
 
-  if (val.MemberCount() != 2)
-  {
-    throw MISSING_KEY("Invalid input object");
-  }
-
-  for (auto const& elem : val.GetObject())
-  {
-    if (elem.name == "amount")
-    {
-      fromJsonValue(elem.value, txout.amount);
-    }
-
-    if (elem.name == "to_key")
-    {
-      cryptonote::txout_to_key tmpVal;
-      fromJsonValue(elem.value, tmpVal);
-      txout.target = std::move(tmpVal);
-    }
-    else if (elem.name == "to_script")
-    {
-      cryptonote::txout_to_script tmpVal;
-      fromJsonValue(elem.value, tmpVal);
-      txout.target = std::move(tmpVal);
-    }
-    else if (elem.name == "to_scripthash")
-    {
-      cryptonote::txout_to_scripthash tmpVal;
-      fromJsonValue(elem.value, tmpVal);
-      txout.target = std::move(tmpVal);
-    }
-  }
+  GET_FROM_JSON_OBJECT(val, txout.amount, amount);
+  GET_FROM_JSON_OBJECT(val, txout.target, target);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::connection_info& info, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::connection_info &info, rapidjson::Value &val)
 {
   val.SetObject();
 
-  auto& al = doc.GetAllocator();
+  auto &al = doc.GetAllocator();
   INSERT_INTO_JSON_OBJECT(val, doc, incoming, info.incoming);
   INSERT_INTO_JSON_OBJECT(val, doc, localhost, info.localhost);
   INSERT_INTO_JSON_OBJECT(val, doc, local_ip, info.local_ip);
@@ -590,10 +581,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::connection_info& in
   INSERT_INTO_JSON_OBJECT(val, doc, current_upload, info.current_upload);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::connection_info& info)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::connection_info &info)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -624,27 +614,26 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::connection_info& inf
   GET_FROM_JSON_OBJECT(val, info.current_upload, current_upload);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::block_complete_entry& blk, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::block_complete_entry &blk, rapidjson::Value &val)
 {
   val.SetObject();
 
   INSERT_INTO_JSON_OBJECT(val, doc, block, blk.block);
-  INSERT_INTO_JSON_OBJECT(val, doc, transactions, blk.txs);
+  INSERT_INTO_JSON_OBJECT(val, doc, txs, blk.txs);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::block_complete_entry& blk)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::block_complete_entry &blk)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
 
   GET_FROM_JSON_OBJECT(val, blk.block, block);
-  GET_FROM_JSON_OBJECT(val, blk.txs, transactions);
+  GET_FROM_JSON_OBJECT(val, blk.txs, txs);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::block_with_transactions& blk, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::block_with_transactions &blk, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -652,10 +641,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::block_with_tra
   INSERT_INTO_JSON_OBJECT(val, doc, transactions, blk.transactions);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::block_with_transactions& blk)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::block_with_transactions &blk)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -664,7 +652,7 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::block_with_tran
   GET_FROM_JSON_OBJECT(val, blk.transactions, transactions);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::transaction_info& tx_info, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::transaction_info &tx_info, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -673,10 +661,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::transaction_in
   INSERT_INTO_JSON_OBJECT(val, doc, transaction, tx_info.transaction);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::transaction_info& tx_info)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::transaction_info &tx_info)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -686,7 +673,7 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::transaction_inf
   GET_FROM_JSON_OBJECT(val, tx_info.transaction, transaction);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::output_key_and_amount_index& out, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::output_key_and_amount_index &out, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -694,10 +681,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::output_key_and
   INSERT_INTO_JSON_OBJECT(val, doc, key, out.key);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::output_key_and_amount_index& out)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::output_key_and_amount_index &out)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -706,7 +692,7 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::output_key_and_
   GET_FROM_JSON_OBJECT(val, out.key, key);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::amount_with_random_outputs& out, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::amount_with_random_outputs &out, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -714,10 +700,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::amount_with_ra
   INSERT_INTO_JSON_OBJECT(val, doc, outputs, out.outputs);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::amount_with_random_outputs& out)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::amount_with_random_outputs &out)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -726,7 +711,7 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::amount_with_ran
   GET_FROM_JSON_OBJECT(val, out.outputs, outputs);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::peer& peer, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::peer &peer, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -736,10 +721,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::peer& peer, ra
   INSERT_INTO_JSON_OBJECT(val, doc, last_seen, peer.last_seen);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::peer& peer)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::peer &peer)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -750,14 +734,13 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::peer& peer)
   GET_FROM_JSON_OBJECT(val, peer.last_seen, last_seen);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::tx_in_pool& tx, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::tx_in_pool &tx, rapidjson::Value &val)
 {
   val.SetObject();
 
   INSERT_INTO_JSON_OBJECT(val, doc, tx, tx.tx);
   INSERT_INTO_JSON_OBJECT(val, doc, tx_hash, tx.tx_hash);
   INSERT_INTO_JSON_OBJECT(val, doc, blob_size, tx.blob_size);
-  INSERT_INTO_JSON_OBJECT(val, doc, weight, tx.weight);
   INSERT_INTO_JSON_OBJECT(val, doc, fee, tx.fee);
   INSERT_INTO_JSON_OBJECT(val, doc, max_used_block_hash, tx.max_used_block_hash);
   INSERT_INTO_JSON_OBJECT(val, doc, max_used_block_height, tx.max_used_block_height);
@@ -771,17 +754,15 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::tx_in_pool& tx
   INSERT_INTO_JSON_OBJECT(val, doc, double_spend_seen, tx.double_spend_seen);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::tx_in_pool& tx)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::tx_in_pool &tx)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
 
   GET_FROM_JSON_OBJECT(val, tx.tx, tx);
   GET_FROM_JSON_OBJECT(val, tx.blob_size, blob_size);
-  GET_FROM_JSON_OBJECT(val, tx.weight, weight);
   GET_FROM_JSON_OBJECT(val, tx.fee, fee);
   GET_FROM_JSON_OBJECT(val, tx.max_used_block_hash, max_used_block_hash);
   GET_FROM_JSON_OBJECT(val, tx.max_used_block_height, max_used_block_height);
@@ -795,7 +776,7 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::tx_in_pool& tx)
   GET_FROM_JSON_OBJECT(val, tx.double_spend_seen, double_spend_seen);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::hard_fork_info& info, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::hard_fork_info &info, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -809,10 +790,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::hard_fork_info
   INSERT_INTO_JSON_OBJECT(val, doc, earliest_height, info.earliest_height);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::hard_fork_info& info)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::hard_fork_info &info)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -827,7 +807,7 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::hard_fork_info&
   GET_FROM_JSON_OBJECT(val, info.earliest_height, earliest_height);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::output_amount_count& out, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::output_amount_count &out, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -837,10 +817,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::output_amount_
   INSERT_INTO_JSON_OBJECT(val, doc, recent_count, out.recent_count);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::output_amount_count& out)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::output_amount_count &out)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -851,7 +830,7 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::output_amount_c
   GET_FROM_JSON_OBJECT(val, out.recent_count, recent_count);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::output_amount_and_index& out, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::output_amount_and_index &out, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -859,10 +838,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::output_amount_
   INSERT_INTO_JSON_OBJECT(val, doc, index, out.index);
 }
 
-
-void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::output_amount_and_index& out)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::output_amount_and_index &out)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -871,7 +849,7 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::output_amount_a
   GET_FROM_JSON_OBJECT(val, out.index, index);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::output_key_mask_unlocked& out, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::output_key_mask_unlocked &out, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -880,9 +858,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::output_key_mas
   INSERT_INTO_JSON_OBJECT(val, doc, unlocked, out.unlocked);
 }
 
-void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::output_key_mask_unlocked& out)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::output_key_mask_unlocked &out)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -892,7 +870,7 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::output_key_mask
   GET_FROM_JSON_OBJECT(val, out.unlocked, unlocked);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::error& err, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::error &err, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -901,9 +879,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::error& err, ra
   INSERT_INTO_JSON_OBJECT(val, doc, message, err.message);
 }
 
-void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::error& error)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::error &error)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -913,7 +891,7 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::error& error)
   GET_FROM_JSON_OBJECT(val, error.message, message);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::BlockHeaderResponse& response, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::BlockHeaderResponse &response, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -929,9 +907,9 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::BlockHeaderRes
   INSERT_INTO_JSON_OBJECT(val, doc, reward, response.reward);
 }
 
-void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::BlockHeaderResponse& response)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::BlockHeaderResponse &response)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -948,75 +926,56 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::BlockHeaderResp
   GET_FROM_JSON_OBJECT(val, response.reward, reward);
 }
 
-void toJsonValue(rapidjson::Document& doc, const rct::rctSig& sig, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const rct::rctSig &sig, rapidjson::Value &val)
 {
-  using boost::adaptors::transform;
-
   val.SetObject();
 
-  const auto just_mask = [] (rct::ctkey const& key) -> rct::key const&
-  {
-    return key.mask;
-  };
-
   INSERT_INTO_JSON_OBJECT(val, doc, type, sig.type);
-  INSERT_INTO_JSON_OBJECT(val, doc, encrypted, sig.ecdhInfo);
-  INSERT_INTO_JSON_OBJECT(val, doc, commitments, transform(sig.outPk, just_mask));
-  INSERT_INTO_JSON_OBJECT(val, doc, fee, sig.txnFee);
-
-  // prunable
-  {
-    rapidjson::Value prunable;
-    prunable.SetObject();
-
-    INSERT_INTO_JSON_OBJECT(prunable, doc, range_proofs, sig.p.rangeSigs);
-    INSERT_INTO_JSON_OBJECT(prunable, doc, bulletproofs, sig.p.bulletproofs);
-    INSERT_INTO_JSON_OBJECT(prunable, doc, mlsags, sig.p.MGs);
-    INSERT_INTO_JSON_OBJECT(prunable, doc, pseudo_outs, sig.get_pseudo_outs());
-
-    val.AddMember("prunable", prunable, doc.GetAllocator());
-  }
+  INSERT_INTO_JSON_OBJECT(val, doc, message, sig.message);
+  INSERT_INTO_JSON_OBJECT(val, doc, mixRing, sig.mixRing);
+  INSERT_INTO_JSON_OBJECT(val, doc, pseudoOuts, sig.pseudoOuts);
+  INSERT_INTO_JSON_OBJECT(val, doc, ecdhInfo, sig.ecdhInfo);
+  INSERT_INTO_JSON_OBJECT(val, doc, outPk, sig.outPk);
+  INSERT_INTO_JSON_OBJECT(val, doc, txnFee, sig.txnFee);
+  INSERT_INTO_JSON_OBJECT(val, doc, p, sig.p);
 }
 
-void fromJsonValue(const rapidjson::Value& val, rct::rctSig& sig)
+void fromJsonValue(const rapidjson::Value &val, rct::rctSig &sig)
 {
-  using boost::adaptors::transform;
-
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
 
-  std::vector<rct::key> commitments;
-
   GET_FROM_JSON_OBJECT(val, sig.type, type);
-  GET_FROM_JSON_OBJECT(val, sig.ecdhInfo, encrypted);
-  GET_FROM_JSON_OBJECT(val, commitments, commitments);
-  GET_FROM_JSON_OBJECT(val, sig.txnFee, fee);
-
-  // prunable
-  {
-    OBJECT_HAS_MEMBER_OR_THROW(val, "prunable");
-    const auto& prunable = val["prunable"];
-
-    rct::keyV pseudo_outs;
-
-    GET_FROM_JSON_OBJECT(prunable, sig.p.rangeSigs, range_proofs);
-    GET_FROM_JSON_OBJECT(prunable, sig.p.bulletproofs, bulletproofs);
-    GET_FROM_JSON_OBJECT(prunable, sig.p.MGs, mlsags);
-    GET_FROM_JSON_OBJECT(prunable, pseudo_outs, pseudo_outs);
-
-    sig.get_pseudo_outs() = std::move(pseudo_outs);
-  }
-
-  sig.outPk.reserve(commitments.size());
-  for (rct::key const& commitment : commitments)
-  {
-    sig.outPk.push_back({{}, commitment});
-  }
+  GET_FROM_JSON_OBJECT(val, sig.message, message);
+  GET_FROM_JSON_OBJECT(val, sig.mixRing, mixRing);
+  GET_FROM_JSON_OBJECT(val, sig.pseudoOuts, pseudoOuts);
+  GET_FROM_JSON_OBJECT(val, sig.ecdhInfo, ecdhInfo);
+  GET_FROM_JSON_OBJECT(val, sig.outPk, outPk);
+  GET_FROM_JSON_OBJECT(val, sig.txnFee, txnFee);
+  GET_FROM_JSON_OBJECT(val, sig.p, p);
 }
 
-void toJsonValue(rapidjson::Document& doc, const rct::ecdhTuple& tuple, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const rct::ctkey &key, rapidjson::Value &val)
+{
+  val.SetObject();
+
+  INSERT_INTO_JSON_OBJECT(val, doc, dest, key.dest);
+  INSERT_INTO_JSON_OBJECT(val, doc, mask, key.mask);
+}
+
+void fromJsonValue(const rapidjson::Value &val, rct::ctkey &key)
+{
+  if(!val.IsObject())
+  {
+    throw WRONG_TYPE("json object");
+  }
+  GET_FROM_JSON_OBJECT(val, key.dest, dest);
+  GET_FROM_JSON_OBJECT(val, key.mask, mask);
+}
+
+void toJsonValue(rapidjson::Document &doc, const rct::ecdhTuple &tuple, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -1024,9 +983,9 @@ void toJsonValue(rapidjson::Document& doc, const rct::ecdhTuple& tuple, rapidjso
   INSERT_INTO_JSON_OBJECT(val, doc, amount, tuple.amount);
 }
 
-void fromJsonValue(const rapidjson::Value& val, rct::ecdhTuple& tuple)
+void fromJsonValue(const rapidjson::Value &val, rct::ecdhTuple &tuple)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -1035,7 +994,28 @@ void fromJsonValue(const rapidjson::Value& val, rct::ecdhTuple& tuple)
   GET_FROM_JSON_OBJECT(val, tuple.amount, amount);
 }
 
-void toJsonValue(rapidjson::Document& doc, const rct::rangeSig& sig, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const rct::rctSigPrunable &sig, rapidjson::Value &val)
+{
+  val.SetObject();
+
+  INSERT_INTO_JSON_OBJECT(val, doc, rangeSigs, sig.rangeSigs);
+  INSERT_INTO_JSON_OBJECT(val, doc, bulletproofs, sig.bulletproofs);
+  INSERT_INTO_JSON_OBJECT(val, doc, MGs, sig.MGs);
+}
+
+void fromJsonValue(const rapidjson::Value &val, rct::rctSigPrunable &sig)
+{
+  if(!val.IsObject())
+  {
+    throw WRONG_TYPE("json object");
+  }
+
+  GET_FROM_JSON_OBJECT(val, sig.rangeSigs, rangeSigs);
+  GET_FROM_JSON_OBJECT(val, sig.bulletproofs, bulletproofs);
+  GET_FROM_JSON_OBJECT(val, sig.MGs, MGs);
+}
+
+void toJsonValue(rapidjson::Document &doc, const rct::rangeSig &sig, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -1045,34 +1025,28 @@ void toJsonValue(rapidjson::Document& doc, const rct::rangeSig& sig, rapidjson::
   INSERT_INTO_JSON_OBJECT(val, doc, Ci, keyVector);
 }
 
-void fromJsonValue(const rapidjson::Value& val, rct::rangeSig& sig)
+void fromJsonValue(const rapidjson::Value &val, rct::rangeSig &sig)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
-  }
-
-  const auto ci = val.FindMember("Ci");
-  if (ci == val.MemberEnd())
-  {
-    throw MISSING_KEY("Ci");
   }
 
   GET_FROM_JSON_OBJECT(val, sig.asig, asig);
 
   std::vector<rct::key> keyVector;
-  cryptonote::json::fromJsonValue(ci->value, keyVector);
-  if (!(keyVector.size() == 64))
+  cryptonote::json::fromJsonValue(val["Ci"], keyVector);
+  if(!(keyVector.size() == 64))
   {
     throw WRONG_TYPE("key64 (rct::key[64])");
   }
-  for (size_t i=0; i < 64; i++)
+  for(size_t i = 0; i < 64; i++)
   {
     sig.Ci[i] = keyVector[i];
   }
 }
 
-void toJsonValue(rapidjson::Document& doc, const rct::Bulletproof& p, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const rct::Bulletproof &p, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -1090,9 +1064,9 @@ void toJsonValue(rapidjson::Document& doc, const rct::Bulletproof& p, rapidjson:
   INSERT_INTO_JSON_OBJECT(val, doc, t, p.t);
 }
 
-void fromJsonValue(const rapidjson::Value& val, rct::Bulletproof& p)
+void fromJsonValue(const rapidjson::Value &val, rct::Bulletproof &p)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -1111,22 +1085,22 @@ void fromJsonValue(const rapidjson::Value& val, rct::Bulletproof& p)
   GET_FROM_JSON_OBJECT(val, p.t, t);
 }
 
-void toJsonValue(rapidjson::Document& doc, const rct::boroSig& sig, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const rct::boroSig &sig, rapidjson::Value &val)
 {
   val.SetObject();
 
   std::vector<rct::key> keyVector(sig.s0, std::end(sig.s0));
-  INSERT_INTO_JSON_OBJECT(val, doc, s0, keyVector);
+  INSERT_INTO_JSON_OBJECT(val, doc, s0, sig.s0);
 
   keyVector.assign(sig.s1, std::end(sig.s1));
-  INSERT_INTO_JSON_OBJECT(val, doc, s1, keyVector);
+  INSERT_INTO_JSON_OBJECT(val, doc, s1, sig.s1);
 
   INSERT_INTO_JSON_OBJECT(val, doc, ee, sig.ee);
 }
 
-void fromJsonValue(const rapidjson::Value& val, rct::boroSig& sig)
+void fromJsonValue(const rapidjson::Value &val, rct::boroSig &sig)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -1134,11 +1108,11 @@ void fromJsonValue(const rapidjson::Value& val, rct::boroSig& sig)
   OBJECT_HAS_MEMBER_OR_THROW(val, "s0")
   std::vector<rct::key> keyVector;
   cryptonote::json::fromJsonValue(val["s0"], keyVector);
-  if (!(keyVector.size() == 64))
+  if(!(keyVector.size() == 64))
   {
     throw WRONG_TYPE("key64 (rct::key[64])");
   }
-  for (size_t i=0; i < 64; i++)
+  for(size_t i = 0; i < 64; i++)
   {
     sig.s0[i] = keyVector[i];
   }
@@ -1146,11 +1120,11 @@ void fromJsonValue(const rapidjson::Value& val, rct::boroSig& sig)
   OBJECT_HAS_MEMBER_OR_THROW(val, "s1")
   keyVector.clear();
   cryptonote::json::fromJsonValue(val["s1"], keyVector);
-  if (!(keyVector.size() == 64))
+  if(!(keyVector.size() == 64))
   {
     throw WRONG_TYPE("key64 (rct::key[64])");
   }
-  for (size_t i=0; i < 64; i++)
+  for(size_t i = 0; i < 64; i++)
   {
     sig.s1[i] = keyVector[i];
   }
@@ -1158,7 +1132,7 @@ void fromJsonValue(const rapidjson::Value& val, rct::boroSig& sig)
   GET_FROM_JSON_OBJECT(val, sig.ee, ee);
 }
 
-void toJsonValue(rapidjson::Document& doc, const rct::mgSig& sig, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const rct::mgSig &sig, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -1166,9 +1140,9 @@ void toJsonValue(rapidjson::Document& doc, const rct::mgSig& sig, rapidjson::Val
   INSERT_INTO_JSON_OBJECT(val, doc, cc, sig.cc);
 }
 
-void fromJsonValue(const rapidjson::Value& val, rct::mgSig& sig)
+void fromJsonValue(const rapidjson::Value &val, rct::mgSig &sig)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("key64 (rct::key[64])");
   }
@@ -1177,7 +1151,7 @@ void fromJsonValue(const rapidjson::Value& val, rct::mgSig& sig)
   GET_FROM_JSON_OBJECT(val, sig.cc, cc);
 }
 
-void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::DaemonInfo& info, rapidjson::Value& val)
+void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::DaemonInfo &info, rapidjson::Value &val)
 {
   val.SetObject();
 
@@ -1193,19 +1167,15 @@ void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::DaemonInfo& in
   INSERT_INTO_JSON_OBJECT(val, doc, white_peerlist_size, info.white_peerlist_size);
   INSERT_INTO_JSON_OBJECT(val, doc, grey_peerlist_size, info.grey_peerlist_size);
   INSERT_INTO_JSON_OBJECT(val, doc, testnet, info.testnet);
-  INSERT_INTO_JSON_OBJECT(val, doc, nettype, info.nettype);
   INSERT_INTO_JSON_OBJECT(val, doc, top_block_hash, info.top_block_hash);
   INSERT_INTO_JSON_OBJECT(val, doc, cumulative_difficulty, info.cumulative_difficulty);
   INSERT_INTO_JSON_OBJECT(val, doc, block_size_limit, info.block_size_limit);
-  INSERT_INTO_JSON_OBJECT(val, doc, block_weight_limit, info.block_weight_limit);
-  INSERT_INTO_JSON_OBJECT(val, doc, block_size_median, info.block_size_median);
-  INSERT_INTO_JSON_OBJECT(val, doc, block_weight_median, info.block_weight_median);
   INSERT_INTO_JSON_OBJECT(val, doc, start_time, info.start_time);
 }
 
-void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::DaemonInfo& info)
+void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::DaemonInfo &info)
 {
-  if (!val.IsObject())
+  if(!val.IsObject())
   {
     throw WRONG_TYPE("json object");
   }
@@ -1222,16 +1192,12 @@ void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::DaemonInfo& inf
   GET_FROM_JSON_OBJECT(val, info.white_peerlist_size, white_peerlist_size);
   GET_FROM_JSON_OBJECT(val, info.grey_peerlist_size, grey_peerlist_size);
   GET_FROM_JSON_OBJECT(val, info.testnet, testnet);
-  GET_FROM_JSON_OBJECT(val, info.nettype, nettype);
   GET_FROM_JSON_OBJECT(val, info.top_block_hash, top_block_hash);
   GET_FROM_JSON_OBJECT(val, info.cumulative_difficulty, cumulative_difficulty);
   GET_FROM_JSON_OBJECT(val, info.block_size_limit, block_size_limit);
-  GET_FROM_JSON_OBJECT(val, info.block_weight_limit, block_weight_limit);
-  GET_FROM_JSON_OBJECT(val, info.block_size_median, block_size_median);
-  GET_FROM_JSON_OBJECT(val, info.block_weight_median, block_weight_median);
   GET_FROM_JSON_OBJECT(val, info.start_time, start_time);
 }
 
-}  // namespace json
+} // namespace json
 
-}  // namespace cryptonote
+} // namespace cryptonote

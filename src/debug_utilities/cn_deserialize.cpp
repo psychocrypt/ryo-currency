@@ -1,20 +1,36 @@
-// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
 //
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
 //
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
+// Authors and copyright holders give permission for following:
 //
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
 //
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
+// 2. Modification of the source form for your own personal use.
 //
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -26,50 +42,44 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <boost/filesystem.hpp>
-#include <boost/algorithm/string/join.hpp>
-#include <boost/range/adaptor/transformed.hpp>
+#include "common/command_line.h"
 #include "cryptonote_basic/cryptonote_basic.h"
 #include "cryptonote_basic/tx_extra.h"
 #include "cryptonote_core/blockchain.h"
-#include "common/command_line.h"
 #include "version.h"
+#include <boost/filesystem.hpp>
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "debugtools.deserialize"
+//#undef RYO_DEFAULT_LOG_CATEGORY
+//#define RYO_DEFAULT_LOG_CATEGORY "debugtools.deserialize"
 
 namespace po = boost::program_options;
 using namespace epee;
 
 using namespace cryptonote;
 
-static std::string extra_nonce_to_string(const cryptonote::tx_extra_nonce &extra_nonce)
-{
-  if (extra_nonce.nonce.size() == 9 && extra_nonce.nonce[0] == TX_EXTRA_NONCE_ENCRYPTED_PAYMENT_ID)
-    return "encrypted payment ID: " + epee::string_tools::buff_to_hex_nodelimer(extra_nonce.nonce.substr(1));
-  if (extra_nonce.nonce.size() == 33 && extra_nonce.nonce[0] == TX_EXTRA_NONCE_PAYMENT_ID)
-    return "plaintext payment ID: " + epee::string_tools::buff_to_hex_nodelimer(extra_nonce.nonce.substr(1));
-  return epee::string_tools::buff_to_hex_nodelimer(extra_nonce.nonce);
-}
-
 static void print_extra_fields(const std::vector<cryptonote::tx_extra_field> &fields)
 {
   std::cout << "tx_extra has " << fields.size() << " field(s)" << std::endl;
-  for (size_t n = 0; n < fields.size(); ++n)
+  for(size_t n = 0; n < fields.size(); ++n)
   {
     std::cout << "field " << n << ": ";
-    if (typeid(cryptonote::tx_extra_padding) == fields[n].type()) std::cout << "extra padding: " << boost::get<cryptonote::tx_extra_padding>(fields[n]).size << " bytes";
-    else if (typeid(cryptonote::tx_extra_pub_key) == fields[n].type()) std::cout << "extra pub key: " << boost::get<cryptonote::tx_extra_pub_key>(fields[n]).pub_key;
-    else if (typeid(cryptonote::tx_extra_nonce) == fields[n].type()) std::cout << "extra nonce: " << extra_nonce_to_string(boost::get<cryptonote::tx_extra_nonce>(fields[n]));
-    else if (typeid(cryptonote::tx_extra_merge_mining_tag) == fields[n].type()) std::cout << "extra merge mining tag: depth " << boost::get<cryptonote::tx_extra_merge_mining_tag>(fields[n]).depth << ", merkle root " << boost::get<cryptonote::tx_extra_merge_mining_tag>(fields[n]).merkle_root;
-    else if (typeid(cryptonote::tx_extra_additional_pub_keys) == fields[n].type()) std::cout << "additional tx pubkeys: " << boost::join(boost::get<cryptonote::tx_extra_additional_pub_keys>(fields[n]).data | boost::adaptors::transformed([](const crypto::public_key &key){ return epee::string_tools::pod_to_hex(key); }), ", " );
-    else if (typeid(cryptonote::tx_extra_mysterious_minergate) == fields[n].type()) std::cout << "extra minergate custom: " << epee::string_tools::buff_to_hex_nodelimer(boost::get<cryptonote::tx_extra_mysterious_minergate>(fields[n]).data);
-    else std::cout << "unknown";
+    if(typeid(cryptonote::tx_extra_padding) == fields[n].type())
+      std::cout << "extra padding: " << boost::get<cryptonote::tx_extra_padding>(fields[n]).size << " bytes";
+    else if(typeid(cryptonote::tx_extra_pub_key) == fields[n].type())
+      std::cout << "extra pub key: " << boost::get<cryptonote::tx_extra_pub_key>(fields[n]).pub_key;
+    else if(typeid(cryptonote::tx_extra_nonce) == fields[n].type())
+      std::cout << "extra nonce: " << epee::string_tools::buff_to_hex_nodelimer(boost::get<cryptonote::tx_extra_nonce>(fields[n]).nonce);
+    else if(typeid(cryptonote::tx_extra_merge_mining_tag) == fields[n].type())
+      std::cout << "extra merge mining tag: depth " << boost::get<cryptonote::tx_extra_merge_mining_tag>(fields[n]).depth << ", merkle root " << boost::get<cryptonote::tx_extra_merge_mining_tag>(fields[n]).merkle_root;
+    else if(typeid(cryptonote::tx_extra_mysterious_minergate) == fields[n].type())
+      std::cout << "extra minergate custom: " << epee::string_tools::buff_to_hex_nodelimer(boost::get<cryptonote::tx_extra_mysterious_minergate>(fields[n]).data);
+    else
+      std::cout << "unknown";
     std::cout << std::endl;
   }
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
   uint32_t log_level = 0;
   std::string input;
@@ -81,7 +91,7 @@ int main(int argc, char* argv[])
   po::options_description desc_cmd_only("Command line options");
   po::options_description desc_cmd_sett("Command line options and settings options");
   const command_line::arg_descriptor<std::string> arg_output_file = {"output-file", "Specify output file", "", true};
-  const command_line::arg_descriptor<uint32_t> arg_log_level  = {"log-level",  "", log_level};
+  const command_line::arg_descriptor<uint32_t> arg_log_level = {"log-level", "", log_level};
   const command_line::arg_descriptor<std::string> arg_input = {"input", "Specify input has a hexadecimal string", ""};
 
   command_line::add_arg(desc_cmd_sett, arg_output_file);
@@ -94,25 +104,24 @@ int main(int argc, char* argv[])
   desc_options.add(desc_cmd_only).add(desc_cmd_sett);
 
   po::variables_map vm;
-  bool r = command_line::handle_error_helper(desc_options, [&]()
-  {
+  bool r = command_line::handle_error_helper(desc_options, [&]() {
     po::store(po::parse_command_line(argc, argv, desc_options), vm);
     po::notify(vm);
     return true;
   });
-  if (! r)
+  if(!r)
     return 1;
 
-  if (command_line::get_arg(vm, command_line::arg_help))
+  if(command_line::get_arg(vm, command_line::arg_help))
   {
-    std::cout << "Monero '" << MONERO_RELEASE_NAME << "' (v" << MONERO_VERSION_FULL << ")" << ENDL << ENDL;
+    std::cout << "Ryo '" << RYO_RELEASE_NAME << "' (" << RYO_VERSION_FULL << ")" << ENDL << ENDL;
     std::cout << desc_options << std::endl;
-    return 1;
+    return 0;
   }
 
-  log_level    = command_line::get_arg(vm, arg_log_level);
-  input        = command_line::get_arg(vm, arg_input);
-  if (input.empty())
+  log_level = command_line::get_arg(vm, arg_log_level);
+  input = command_line::get_arg(vm, arg_input);
+  if(input.empty())
   {
     std::cerr << "--input is mandatory" << std::endl;
     return 1;
@@ -124,16 +133,16 @@ int main(int argc, char* argv[])
 
   std::ostream *output;
   std::ofstream *raw_data_file = NULL;
-  if (command_line::has_arg(vm, arg_output_file))
+  if(command_line::has_arg(vm, arg_output_file))
   {
     output_file_path = boost::filesystem::path(command_line::get_arg(vm, arg_output_file));
 
     const boost::filesystem::path dir_path = output_file_path.parent_path();
-    if (!dir_path.empty())
+    if(!dir_path.empty())
     {
-      if (boost::filesystem::exists(dir_path))
+      if(boost::filesystem::exists(dir_path))
       {
-        if (!boost::filesystem::is_directory(dir_path))
+        if(!boost::filesystem::is_directory(dir_path))
         {
           std::cerr << "output directory path is a file: " << dir_path << std::endl;
           return 1;
@@ -141,7 +150,7 @@ int main(int argc, char* argv[])
       }
       else
       {
-        if (!boost::filesystem::create_directory(dir_path))
+        if(!boost::filesystem::create_directory(dir_path))
         {
           std::cerr << "Failed to create directory " << dir_path << std::endl;
           return 1;
@@ -151,7 +160,7 @@ int main(int argc, char* argv[])
 
     raw_data_file = new std::ofstream();
     raw_data_file->open(output_file_path.string(), std::ios_base::out | std::ios::trunc);
-    if (raw_data_file->fail())
+    if(raw_data_file->fail())
       return 1;
     output = raw_data_file;
   }
@@ -162,7 +171,7 @@ int main(int argc, char* argv[])
   }
 
   cryptonote::blobdata blob;
-  if (!epee::string_tools::parse_hexstr_to_binbuff(input, blob))
+  if(!epee::string_tools::parse_hexstr_to_binbuff(input, blob))
   {
     std::cerr << "Invalid hex input" << std::endl;
     std::cerr << "Invalid hex input: " << input << std::endl;
@@ -172,26 +181,21 @@ int main(int argc, char* argv[])
   cryptonote::block block;
   cryptonote::transaction tx;
   std::vector<cryptonote::tx_extra_field> fields;
-  if (cryptonote::parse_and_validate_block_from_blob(blob, block))
+  if(cryptonote::parse_and_validate_block_from_blob(blob, block))
   {
     std::cout << "Parsed block:" << std::endl;
     std::cout << cryptonote::obj_to_json_str(block) << std::endl;
   }
-  else if (cryptonote::parse_and_validate_tx_from_blob(blob, tx) || cryptonote::parse_and_validate_tx_base_from_blob(blob, tx))
+  else if(cryptonote::parse_and_validate_tx_from_blob(blob, tx))
   {
-/*
-    if (tx.pruned)
-      std::cout << "Parsed pruned transaction:" << std::endl;
-    else
-*/
-      std::cout << "Parsed transaction:" << std::endl;
+    std::cout << "Parsed transaction:" << std::endl;
     std::cout << cryptonote::obj_to_json_str(tx) << std::endl;
 
     bool parsed = cryptonote::parse_tx_extra(tx.extra, fields);
-    if (!parsed)
+    if(!parsed)
       std::cout << "Failed to parse tx_extra" << std::endl;
 
-    if (!fields.empty())
+    if(!fields.empty())
     {
       print_extra_fields(fields);
     }
@@ -200,7 +204,7 @@ int main(int argc, char* argv[])
       std::cout << "No fields were found in tx_extra" << std::endl;
     }
   }
-  else if (cryptonote::parse_tx_extra(std::vector<uint8_t>(blob.begin(), blob.end()), fields) && !fields.empty())
+  else if(cryptonote::parse_tx_extra(std::vector<uint8_t>(blob.begin(), blob.end()), fields) && !fields.empty())
   {
     std::cout << "Parsed tx_extra:" << std::endl;
     print_extra_fields(fields);
@@ -211,12 +215,10 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-
-
-  if (output->fail())
+  if(output->fail())
     return 1;
   output->flush();
-  if (raw_data_file)
+  if(raw_data_file)
     delete raw_data_file;
 
   return 0;

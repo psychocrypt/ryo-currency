@@ -1,21 +1,21 @@
 // Copyright (c) 2014-2018, The Monero Project
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -25,12 +25,11 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #include "chaingen.h"
 #include "chaingen_tests_list.h"
-#include "common/util.h"
 #include "common/command_line.h"
 #include "transaction_tests.h"
 
@@ -38,15 +37,14 @@ namespace po = boost::program_options;
 
 namespace
 {
-  const command_line::arg_descriptor<std::string> arg_test_data_path              = {"test_data_path", "", ""};
-  const command_line::arg_descriptor<bool>        arg_generate_test_data          = {"generate_test_data", ""};
-  const command_line::arg_descriptor<bool>        arg_play_test_data              = {"play_test_data", ""};
-  const command_line::arg_descriptor<bool>        arg_generate_and_play_test_data = {"generate_and_play_test_data", ""};
-  const command_line::arg_descriptor<bool>        arg_test_transactions           = {"test_transactions", ""};
-  const command_line::arg_descriptor<std::string> arg_filter                      = { "filter", "Regular expression filter for which tests to run" };
+const command_line::arg_descriptor<std::string> arg_test_data_path = {"test_data_path", "", ""};
+const command_line::arg_descriptor<bool> arg_generate_test_data = {"generate_test_data", ""};
+const command_line::arg_descriptor<bool> arg_play_test_data = {"play_test_data", ""};
+const command_line::arg_descriptor<bool> arg_generate_and_play_test_data = {"generate_and_play_test_data", ""};
+const command_line::arg_descriptor<bool> arg_test_transactions = {"test_transactions", ""};
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
   TRY_ENTRY();
   tools::on_startup();
@@ -55,7 +53,7 @@ int main(int argc, char* argv[])
   //set up logging options
   mlog_configure(mlog_get_default_log_path("core_tests.log"), true);
   mlog_set_log_level(2);
-  
+
   po::options_description desc_options("Allowed options");
   command_line::add_arg(desc_options, command_line::arg_help);
   command_line::add_arg(desc_options, arg_test_data_path);
@@ -63,39 +61,34 @@ int main(int argc, char* argv[])
   command_line::add_arg(desc_options, arg_play_test_data);
   command_line::add_arg(desc_options, arg_generate_and_play_test_data);
   command_line::add_arg(desc_options, arg_test_transactions);
-  command_line::add_arg(desc_options, arg_filter);
 
   po::variables_map vm;
-  bool r = command_line::handle_error_helper(desc_options, [&]()
-  {
+  bool r = command_line::handle_error_helper(desc_options, [&]() {
     po::store(po::parse_command_line(argc, argv, desc_options), vm);
     po::notify(vm);
     return true;
   });
-  if (!r)
+  if(!r)
     return 1;
 
-  if (command_line::get_arg(vm, command_line::arg_help))
+  if(command_line::get_arg(vm, command_line::arg_help))
   {
     std::cout << desc_options << std::endl;
     return 0;
   }
 
-  const std::string filter = tools::glob_to_regex(command_line::get_arg(vm, arg_filter));
-  boost::smatch match;
-
   size_t tests_count = 0;
   std::vector<std::string> failed_tests;
   std::string tests_folder = command_line::get_arg(vm, arg_test_data_path);
-  if (command_line::get_arg(vm, arg_generate_test_data))
+  if(command_line::get_arg(vm, arg_generate_test_data))
   {
     GENERATE("chain001.dat", gen_simple_chain_001);
   }
-  else if (command_line::get_arg(vm, arg_play_test_data))
+  else if(command_line::get_arg(vm, arg_play_test_data))
   {
     PLAY("chain001.dat", gen_simple_chain_001);
   }
-  else if (command_line::get_arg(vm, arg_generate_and_play_test_data))
+  else if(command_line::get_arg(vm, arg_generate_and_play_test_data))
   {
     GENERATE_AND_PLAY(gen_simple_chain_001);
     GENERATE_AND_PLAY(gen_simple_chain_split_1);
@@ -171,9 +164,9 @@ int main(int argc, char* argv[])
 
     GENERATE_AND_PLAY(gen_v2_tx_mixable_0_mixin);
     GENERATE_AND_PLAY(gen_v2_tx_mixable_low_mixin);
-//    GENERATE_AND_PLAY(gen_v2_tx_unmixable_only);
-//    GENERATE_AND_PLAY(gen_v2_tx_unmixable_one);
-//    GENERATE_AND_PLAY(gen_v2_tx_unmixable_two);
+    //    GENERATE_AND_PLAY(gen_v2_tx_unmixable_only);
+    //    GENERATE_AND_PLAY(gen_v2_tx_unmixable_one);
+    //    GENERATE_AND_PLAY(gen_v2_tx_unmixable_two);
     GENERATE_AND_PLAY(gen_v2_tx_dust);
 
     GENERATE_AND_PLAY(gen_rct_tx_valid_from_pre_rct);
@@ -224,27 +217,11 @@ int main(int argc, char* argv[])
     GENERATE_AND_PLAY(gen_multisig_tx_invalid_33_1_2_no_threshold);
     GENERATE_AND_PLAY(gen_multisig_tx_invalid_33_1_3_no_threshold);
 
-    GENERATE_AND_PLAY(gen_bp_tx_valid_1);
-    GENERATE_AND_PLAY(gen_bp_tx_invalid_1_1);
-    GENERATE_AND_PLAY(gen_bp_tx_valid_2);
-    GENERATE_AND_PLAY(gen_bp_tx_valid_3);
-    GENERATE_AND_PLAY(gen_bp_tx_valid_16);
-    GENERATE_AND_PLAY(gen_bp_tx_invalid_4_2_1);
-    GENERATE_AND_PLAY(gen_bp_tx_invalid_16_16);
-    GENERATE_AND_PLAY(gen_bp_txs_valid_2_and_2);
-    GENERATE_AND_PLAY(gen_bp_txs_invalid_2_and_8_2_and_16_16_1);
-    GENERATE_AND_PLAY(gen_bp_txs_valid_2_and_3_and_2_and_4);
-    GENERATE_AND_PLAY(gen_bp_tx_invalid_not_enough_proofs);
-    GENERATE_AND_PLAY(gen_bp_tx_invalid_empty_proofs);
-    GENERATE_AND_PLAY(gen_bp_tx_invalid_too_many_proofs);
-    GENERATE_AND_PLAY(gen_bp_tx_invalid_wrong_amount);
-    GENERATE_AND_PLAY(gen_bp_tx_invalid_borromean_type);
-
     el::Level level = (failed_tests.empty() ? el::Level::Info : el::Level::Error);
     MLOG(level, "\nREPORT:");
     MLOG(level, "  Test run: " << tests_count);
     MLOG(level, "  Failures: " << failed_tests.size());
-    if (!failed_tests.empty())
+    if(!failed_tests.empty())
     {
       MLOG(level, "FAILED TESTS:");
       BOOST_FOREACH(auto test_name, failed_tests)
@@ -253,7 +230,7 @@ int main(int argc, char* argv[])
       }
     }
   }
-  else if (command_line::get_arg(vm, arg_test_transactions))
+  else if(command_line::get_arg(vm, arg_test_transactions))
   {
     CALL_TEST("TRANSACTIONS TESTS", test_transactions);
   }

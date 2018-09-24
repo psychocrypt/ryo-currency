@@ -1,21 +1,37 @@
-// Copyright (c) 2014-2018, The Monero Project
-// 
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
+//
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
-// 
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
-// 
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
-// 
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+//
+// Authors and copyright holders give permission for following:
+//
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
+//
+// 2. Modification of the source form for your own personal use.
+//
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -32,36 +48,36 @@
 #include "cryptonote_protocol/cryptonote_protocol_handler.h"
 #include "misc_log_ex.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "daemon"
+//#undef RYO_DEFAULT_LOG_CATEGORY
+//#define RYO_DEFAULT_LOG_CATEGORY "daemon"
 
 namespace daemonize
 {
 
 class t_core final
 {
-public:
-  static void init_options(boost::program_options::options_description & option_spec)
+  public:
+  static void init_options(boost::program_options::options_description &option_spec)
   {
     cryptonote::core::init_options(option_spec);
   }
-private:
+
+  private:
   typedef cryptonote::t_cryptonote_protocol_handler<cryptonote::core> t_protocol_raw;
   cryptonote::core m_core;
   // TEMPORARY HACK - Yes, this creates a copy, but otherwise the original
   // variable map could go out of scope before the run method is called
   boost::program_options::variables_map const m_vm_HACK;
-public:
+
+  public:
   t_core(
-      boost::program_options::variables_map const & vm
-    )
-    : m_core{nullptr}
-    , m_vm_HACK{vm}
+    boost::program_options::variables_map const &vm)
+    : m_core{nullptr}, m_vm_HACK{vm}
   {
   }
 
   // TODO - get rid of circular dependencies in internals
-  void set_protocol(t_protocol_raw & protocol)
+  void set_protocol(t_protocol_raw &protocol)
   {
     m_core.set_cryptonote_protocol(&protocol);
   }
@@ -72,9 +88,8 @@ public:
     bool stagenet = command_line::get_arg(m_vm_HACK, cryptonote::arg_stagenet_on);
     bool mainnet = !testnet && !stagenet;
     std::string port = command_line::get_arg(m_vm_HACK, nodetool::arg_p2p_bind_port);
-    if ((mainnet && port != std::to_string(::config::P2P_DEFAULT_PORT))
-        || (testnet && port != std::to_string(::config::testnet::P2P_DEFAULT_PORT))
-        || (stagenet && port != std::to_string(::config::stagenet::P2P_DEFAULT_PORT))) {
+    if((mainnet && port != std::to_string(cryptonote::config<cryptonote::MAINNET>::P2P_DEFAULT_PORT)) || (testnet && port != std::to_string(cryptonote::config<cryptonote::TESTNET>::P2P_DEFAULT_PORT)) || (stagenet && port != std::to_string(cryptonote::config<cryptonote::STAGENET>::P2P_DEFAULT_PORT)))
+    {
       return port;
     }
     return std::string();
@@ -85,7 +100,7 @@ public:
     //initialize core here
     MGINFO("Initializing core...");
     std::string config_subdir = get_config_subdir();
-    if (!m_core.init(m_vm_HACK, config_subdir.empty() ? NULL : config_subdir.c_str()))
+    if(!m_core.init(m_vm_HACK, config_subdir.empty() ? NULL : config_subdir.c_str()))
     {
       return false;
     }
@@ -93,7 +108,7 @@ public:
     return true;
   }
 
-  cryptonote::core & get()
+  cryptonote::core &get()
   {
     return m_core;
   }
@@ -101,13 +116,15 @@ public:
   ~t_core()
   {
     MGINFO("Deinitializing core...");
-    try {
+    try
+    {
       m_core.deinit();
       m_core.set_cryptonote_protocol(nullptr);
-    } catch (...) {
+    }
+    catch(...)
+    {
       MERROR("Failed to deinitialize core...");
     }
   }
 };
-
 }

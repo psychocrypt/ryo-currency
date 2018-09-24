@@ -1,21 +1,21 @@
 // Copyright (c) 2014-2018, The Monero Project
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -25,24 +25,24 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #pragma once
 
 #include <vector>
 
+#include "crypto/crypto.h"
 #include "cryptonote_basic/account.h"
 #include "cryptonote_basic/cryptonote_basic.h"
 #include "cryptonote_core/cryptonote_tx_utils.h"
-#include "crypto/crypto.h"
 
-template<size_t a_ring_size>
+template <size_t a_ring_size>
 class multi_tx_test_base
 {
   static_assert(0 < a_ring_size, "ring_size must be greater than 0");
 
-public:
+  public:
   static const size_t ring_size = a_ring_size;
   static const size_t real_source_idx = ring_size / 2;
 
@@ -51,11 +51,11 @@ public:
     using namespace cryptonote;
 
     std::vector<tx_source_entry::output_entry> output_entries;
-    for (size_t i = 0; i < ring_size; ++i)
+    for(size_t i = 0; i < ring_size; ++i)
     {
-      m_miners[i].generate();
+      m_miners[i].generate_new(false);
 
-      if (!construct_miner_tx(0, 0, 0, 2, 0, m_miners[i].get_keys().m_account_address, m_miner_txs[i]))
+      if(!construct_miner_tx(MAINNET, 0, 0, 0, 2, 0, m_miners[i].get_keys().m_account_address, m_miner_txs[i]))
         return false;
 
       txout_to_key tx_out = boost::get<txout_to_key>(m_miner_txs[i].vout[0].target);
@@ -80,12 +80,12 @@ public:
     return true;
   }
 
-protected:
+  protected:
   cryptonote::account_base m_miners[ring_size];
   cryptonote::transaction m_miner_txs[ring_size];
   uint64_t m_source_amount;
 
   std::vector<cryptonote::tx_source_entry> m_sources;
   crypto::public_key m_public_keys[ring_size];
-  const crypto::public_key* m_public_key_ptrs[ring_size];
+  const crypto::public_key *m_public_key_ptrs[ring_size];
 };

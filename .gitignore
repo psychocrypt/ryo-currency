@@ -1,5 +1,4 @@
 .DS_Store
-/doc
 /build
 /tags
 log/
@@ -66,9 +65,15 @@ cmake-build-debug/
 ### Linux ###
 *~
 
+# KDevelop
+.kdev4
+*.kdev4
+
 # KDE directory preferences
 .directory
 
+# netbeans project files
+/nbproject/
 
 ### Eclipse ###
 *.pydevproject
@@ -104,3 +109,6 @@ local.properties
 .idea/
 
 /testnet
+
+# VS Code
+.vscode

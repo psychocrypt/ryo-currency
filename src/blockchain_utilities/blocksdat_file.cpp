@@ -1,20 +1,36 @@
-// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
 //
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
 //
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
+// Authors and copyright holders give permission for following:
 //
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
 //
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
+// 2. Modification of the source form for your own personal use.
 //
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -28,8 +44,8 @@
 
 #include "blocksdat_file.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "bcutil"
+//#undef RYO_DEFAULT_LOG_CATEGORY
+//#define RYO_DEFAULT_LOG_CATEGORY "bcutil"
 
 namespace po = boost::program_options;
 
@@ -38,19 +54,17 @@ using namespace epee;
 
 namespace
 {
-  std::string refresh_string = "\r                                    \r";
+std::string refresh_string = "\r                                    \r";
 }
 
-
-
-bool BlocksdatFile::open_writer(const boost::filesystem::path& file_path, uint64_t block_stop)
+bool BlocksdatFile::open_writer(const boost::filesystem::path &file_path, uint64_t block_stop)
 {
   const boost::filesystem::path dir_path = file_path.parent_path();
-  if (!dir_path.empty())
+  if(!dir_path.empty())
   {
-    if (boost::filesystem::exists(dir_path))
+    if(boost::filesystem::exists(dir_path))
     {
-      if (!boost::filesystem::is_directory(dir_path))
+      if(!boost::filesystem::is_directory(dir_path))
       {
         MFATAL("export directory path is a file: " << dir_path);
         return false;
@@ -58,7 +72,7 @@ bool BlocksdatFile::open_writer(const boost::filesystem::path& file_path, uint64
     }
     else
     {
-      if (!boost::filesystem::create_directory(dir_path))
+      if(!boost::filesystem::create_directory(dir_path))
       {
         MFATAL("Failed to create directory " << dir_path);
         return false;
@@ -71,14 +85,13 @@ bool BlocksdatFile::open_writer(const boost::filesystem::path& file_path, uint64
   MINFO("creating file");
 
   m_raw_data_file->open(file_path.string(), std::ios_base::binary | std::ios_base::out | std::ios::trunc);
-  if (m_raw_data_file->fail())
+  if(m_raw_data_file->fail())
     return false;
 
   initialize_file(block_stop);
 
   return true;
 }
-
 
 bool BlocksdatFile::initialize_file(uint64_t block_stop)
 {
@@ -99,10 +112,10 @@ bool BlocksdatFile::initialize_file(uint64_t block_stop)
   return true;
 }
 
-void BlocksdatFile::write_block(const crypto::hash& block_hash)
+void BlocksdatFile::write_block(const crypto::hash &block_hash)
 {
   m_hashes.push_back(block_hash);
-  while (m_hashes.size() >= HASH_OF_HASHES_STEP)
+  while(m_hashes.size() >= HASH_OF_HASHES_STEP)
   {
     crypto::hash hash;
     crypto::cn_fast_hash(m_hashes.data(), HASH_OF_HASHES_STEP * sizeof(crypto::hash), hash);
@@ -115,7 +128,7 @@ void BlocksdatFile::write_block(const crypto::hash& block_hash)
 
 bool BlocksdatFile::close()
 {
-  if (m_raw_data_file->fail())
+  if(m_raw_data_file->fail())
     return false;
 
   m_raw_data_file->flush();
@@ -123,8 +136,7 @@ bool BlocksdatFile::close()
   return true;
 }
 
-
-bool BlocksdatFile::store_blockchain_raw(Blockchain* _blockchain_storage, tx_memory_pool* _tx_pool, boost::filesystem::path& output_file, uint64_t requested_block_stop)
+bool BlocksdatFile::store_blockchain_raw(Blockchain *_blockchain_storage, tx_memory_pool *_tx_pool, boost::filesystem::path &output_file, uint64_t requested_block_stop)
 {
   uint64_t num_blocks_written = 0;
   m_blockchain_storage = _blockchain_storage;
@@ -133,8 +145,8 @@ bool BlocksdatFile::store_blockchain_raw(Blockchain* _blockchain_storage, tx_mem
 
   uint64_t block_start = 0;
   uint64_t block_stop = 0;
-  MINFO("source blockchain height: " <<  m_blockchain_storage->get_current_blockchain_height()-1);
-  if ((requested_block_stop > 0) && (requested_block_stop < m_blockchain_storage->get_current_blockchain_height()))
+  MINFO("source blockchain height: " << m_blockchain_storage->get_current_blockchain_height() - 1);
+  if((requested_block_stop > 0) && (requested_block_stop < m_blockchain_storage->get_current_blockchain_height()))
   {
     MINFO("Using requested block height: " << requested_block_stop);
     block_stop = requested_block_stop;
@@ -145,30 +157,31 @@ bool BlocksdatFile::store_blockchain_raw(Blockchain* _blockchain_storage, tx_mem
     MINFO("Using block height of source blockchain: " << block_stop);
   }
   MINFO("Storing blocks raw data...");
-  if (!BlocksdatFile::open_writer(output_file, block_stop))
+  if(!BlocksdatFile::open_writer(output_file, block_stop))
   {
     MFATAL("failed to open raw file for write");
     return false;
   }
-  for (m_cur_height = block_start; m_cur_height <= block_stop; ++m_cur_height)
+  for(m_cur_height = block_start; m_cur_height <= block_stop; ++m_cur_height)
   {
     // this method's height refers to 0-based height (genesis block = height 0)
     crypto::hash hash = m_blockchain_storage->get_block_id_by_height(m_cur_height);
     write_block(hash);
-    if (m_cur_height % NUM_BLOCKS_PER_CHUNK == 0) {
+    if(m_cur_height % NUM_BLOCKS_PER_CHUNK == 0)
+    {
       num_blocks_written += NUM_BLOCKS_PER_CHUNK;
     }
-    if (m_cur_height % progress_interval == 0) {
+    if(m_cur_height % progress_interval == 0)
+    {
       std::cout << refresh_string;
       std::cout << "block " << m_cur_height << "/" << block_stop << std::flush;
     }
   }
   // print message for last block, which may not have been printed yet due to progress_interval
   std::cout << refresh_string;
-  std::cout << "block " << m_cur_height-1 << "/" << block_stop << ENDL;
+  std::cout << "block " << m_cur_height - 1 << "/" << block_stop << ENDL;
 
   MINFO("Number of blocks exported: " << num_blocks_written);
 
   return BlocksdatFile::close();
 }
-

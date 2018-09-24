@@ -1,21 +1,37 @@
-// Copyright (c) 2016-2018, The Monero Project
-// 
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
+//
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
-// 
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
-// 
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
-// 
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+//
+// Authors and copyright holders give permission for following:
+//
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
+//
+// 2. Modification of the source form for your own personal use.
+//
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -30,8 +46,8 @@
 #include "daemon_rpc_version.h"
 #include "serialization/json_object.h"
 
-#include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 namespace cryptonote
 {
@@ -39,11 +55,11 @@ namespace cryptonote
 namespace rpc
 {
 
-const char* Message::STATUS_OK = "OK";
-const char* Message::STATUS_RETRY = "Retry";
-const char* Message::STATUS_FAILED = "Failed";
-const char* Message::STATUS_BAD_REQUEST = "Invalid request type";
-const char* Message::STATUS_BAD_JSON = "Malformed json";
+const char *Message::STATUS_OK = "OK";
+const char *Message::STATUS_RETRY = "Retry";
+const char *Message::STATUS_FAILED = "Failed";
+const char *Message::STATUS_BAD_REQUEST = "Invalid request type";
+const char *Message::STATUS_BAD_JSON = "Malformed json";
 
 namespace
 {
@@ -54,11 +70,11 @@ constexpr const char params_field[] = "params";
 constexpr const char result_field[] = "result";
 }
 
-rapidjson::Value Message::toJson(rapidjson::Document& doc) const
+rapidjson::Value Message::toJson(rapidjson::Document &doc) const
 {
   rapidjson::Value val(rapidjson::kObjectType);
 
-  auto& al = doc.GetAllocator();
+  auto &al = doc.GetAllocator();
 
   val.AddMember("status", rapidjson::StringRef(status.c_str()), al);
   val.AddMember("error_details", rapidjson::StringRef(error_details.c_str()), al);
@@ -67,15 +83,14 @@ rapidjson::Value Message::toJson(rapidjson::Document& doc) const
   return val;
 }
 
-void Message::fromJson(rapidjson::Value& val)
+void Message::fromJson(rapidjson::Value &val)
 {
   GET_FROM_JSON_OBJECT(val, status, status);
   GET_FROM_JSON_OBJECT(val, error_details, error_details);
   GET_FROM_JSON_OBJECT(val, rpc_version, rpc_version);
 }
 
-
-FullMessage::FullMessage(const std::string& request, Message* message)
+FullMessage::FullMessage(const std::string &request, Message *message)
 {
   doc.SetObject();
 
@@ -86,14 +101,14 @@ FullMessage::FullMessage(const std::string& request, Message* message)
   doc.AddMember("jsonrpc", rapidjson::Value("2.0"), doc.GetAllocator());
 }
 
-FullMessage::FullMessage(Message* message)
+FullMessage::FullMessage(Message *message)
 {
   doc.SetObject();
 
   // required by JSON-RPC 2.0 spec
   doc.AddMember("jsonrpc", "2.0", doc.GetAllocator());
 
-  if (message->status == Message::STATUS_OK)
+  if(message->status == Message::STATUS_OK)
   {
     doc.AddMember(result_field, message->toJson(doc), doc.GetAllocator());
   }
@@ -108,24 +123,24 @@ FullMessage::FullMessage(Message* message)
   }
 }
 
-FullMessage::FullMessage(const std::string& json_string, bool request)
+FullMessage::FullMessage(const std::string &json_string, bool request)
 {
   doc.Parse(json_string.c_str());
-  if (doc.HasParseError() || !doc.IsObject())
+  if(doc.HasParseError() || !doc.IsObject())
   {
     throw cryptonote::json::PARSE_FAIL();
   }
 
   OBJECT_HAS_MEMBER_OR_THROW(doc, "jsonrpc")
 
-  if (request)
+  if(request)
   {
     OBJECT_HAS_MEMBER_OR_THROW(doc, method_field)
     OBJECT_HAS_MEMBER_OR_THROW(doc, params_field)
   }
   else
   {
-    if (!doc.HasMember(result_field) && !doc.HasMember(error_field))
+    if(!doc.HasMember(result_field) && !doc.HasMember(error_field))
     {
       throw cryptonote::json::MISSING_KEY("error/result");
     }
@@ -135,7 +150,7 @@ FullMessage::FullMessage(const std::string& json_string, bool request)
 std::string FullMessage::getJson()
 {
 
-  if (!doc.HasMember(id_field))
+  if(!doc.HasMember(id_field))
   {
     doc.AddMember(id_field, rapidjson::Value("unused"), doc.GetAllocator());
   }
@@ -155,13 +170,13 @@ std::string FullMessage::getRequestType() const
   return doc[method_field].GetString();
 }
 
-rapidjson::Value& FullMessage::getMessage()
+rapidjson::Value &FullMessage::getMessage()
 {
-  if (doc.HasMember(params_field))
+  if(doc.HasMember(params_field))
   {
     return doc[params_field];
   }
-  else if (doc.HasMember(result_field))
+  else if(doc.HasMember(result_field))
   {
     return doc[result_field];
   }
@@ -169,26 +184,25 @@ rapidjson::Value& FullMessage::getMessage()
   //else
   OBJECT_HAS_MEMBER_OR_THROW(doc, error_field)
   return doc[error_field];
-
 }
 
 rapidjson::Value FullMessage::getMessageCopy()
 {
-  rapidjson::Value& val = getMessage();
+  rapidjson::Value &val = getMessage();
 
   return rapidjson::Value(val, doc.GetAllocator());
 }
 
-rapidjson::Value& FullMessage::getID()
+rapidjson::Value &FullMessage::getID()
 {
   OBJECT_HAS_MEMBER_OR_THROW(doc, id_field)
   return doc[id_field];
 }
 
-void FullMessage::setID(rapidjson::Value& id)
+void FullMessage::setID(rapidjson::Value &id)
 {
   auto itr = doc.FindMember(id_field);
-  if (itr != doc.MemberEnd())
+  if(itr != doc.MemberEnd())
   {
     itr->value = id;
   }
@@ -202,7 +216,7 @@ cryptonote::rpc::error FullMessage::getError()
 {
   cryptonote::rpc::error err;
   err.use = false;
-  if (doc.HasMember(error_field))
+  if(doc.HasMember(error_field))
   {
     GET_FROM_JSON_OBJECT(doc, err, error);
     err.use = true;
@@ -211,36 +225,36 @@ cryptonote::rpc::error FullMessage::getError()
   return err;
 }
 
-FullMessage FullMessage::requestMessage(const std::string& request, Message* message)
+FullMessage FullMessage::requestMessage(const std::string &request, Message *message)
 {
   return FullMessage(request, message);
 }
 
-FullMessage FullMessage::requestMessage(const std::string& request, Message* message, rapidjson::Value& id)
+FullMessage FullMessage::requestMessage(const std::string &request, Message *message, rapidjson::Value &id)
 {
   auto mes = requestMessage(request, message);
   mes.setID(id);
   return mes;
 }
 
-FullMessage FullMessage::responseMessage(Message* message)
+FullMessage FullMessage::responseMessage(Message *message)
 {
   return FullMessage(message);
 }
 
-FullMessage FullMessage::responseMessage(Message* message, rapidjson::Value& id)
+FullMessage FullMessage::responseMessage(Message *message, rapidjson::Value &id)
 {
   auto mes = responseMessage(message);
   mes.setID(id);
   return mes;
 }
 
-FullMessage* FullMessage::timeoutMessage()
+FullMessage *FullMessage::timeoutMessage()
 {
   auto *full_message = new FullMessage();
 
-  auto& doc = full_message->doc;
-  auto& al = full_message->doc.GetAllocator();
+  auto &doc = full_message->doc;
+  auto &al = full_message->doc.GetAllocator();
 
   doc.SetObject();
 
@@ -256,7 +270,7 @@ FullMessage* FullMessage::timeoutMessage()
 }
 
 // convenience functions for bad input
-std::string BAD_REQUEST(const std::string& request)
+std::string BAD_REQUEST(const std::string &request)
 {
   Message fail;
   fail.status = Message::STATUS_BAD_REQUEST;
@@ -267,7 +281,7 @@ std::string BAD_REQUEST(const std::string& request)
   return fail_response.getJson();
 }
 
-std::string BAD_REQUEST(const std::string& request, rapidjson::Value& id)
+std::string BAD_REQUEST(const std::string &request, rapidjson::Value &id)
 {
   Message fail;
   fail.status = Message::STATUS_BAD_REQUEST;
@@ -278,7 +292,7 @@ std::string BAD_REQUEST(const std::string& request, rapidjson::Value& id)
   return fail_response.getJson();
 }
 
-std::string BAD_JSON(const std::string& error_details)
+std::string BAD_JSON(const std::string &error_details)
 {
   Message fail;
   fail.status = Message::STATUS_BAD_JSON;
@@ -289,7 +303,6 @@ std::string BAD_JSON(const std::string& error_details)
   return fail_response.getJson();
 }
 
+} // namespace rpc
 
-}  // namespace rpc
-
-}  // namespace cryptonote
+} // namespace cryptonote

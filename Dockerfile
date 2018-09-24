@@ -3,8 +3,7 @@
 # builder stage
 FROM ubuntu:16.04 as builder
 
-RUN set -ex && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get --no-install-recommends --yes install \
         ca-certificates \
         cmake \
@@ -17,31 +16,16 @@ RUN set -ex && \
         curl \
         libtool-bin \
         autoconf \
-        automake \
-        bzip2
+        automake
 
 WORKDIR /usr/local
 
-#Cmake
-ARG CMAKE_VERSION=3.12.1
-ARG CMAKE_VERSION_DOT=v3.12
-ARG CMAKE_HASH=c53d5c2ce81d7a957ee83e3e635c8cda5dfe20c9d501a4828ee28e1615e57ab2
-RUN set -ex \
-    && curl -s -O https://cmake.org/files/${CMAKE_VERSION_DOT}/cmake-${CMAKE_VERSION}.tar.gz \
-    && echo "${CMAKE_HASH}  cmake-${CMAKE_VERSION}.tar.gz" | sha256sum -c \
-    && tar -xzf cmake-${CMAKE_VERSION}.tar.gz \
-    && cd cmake-${CMAKE_VERSION} \
-    && ./configure \
-    && make \
-    && make install
-
 ## Boost
-ARG BOOST_VERSION=1_68_0
-ARG BOOST_VERSION_DOT=1.68.0
-ARG BOOST_HASH=7f6130bc3cf65f56a618888ce9d5ea704fa10b462be126ad053e80e553d6d8b7
-RUN set -ex \
-    && curl -s -L -o  boost_${BOOST_VERSION}.tar.bz2 https://dl.bintray.com/boostorg/release/${BOOST_VERSION_DOT}/source/boost_${BOOST_VERSION}.tar.bz2 \
-    && echo "${BOOST_HASH}  boost_${BOOST_VERSION}.tar.bz2" | sha256sum -c \
+ARG BOOST_VERSION=1_66_0
+ARG BOOST_VERSION_DOT=1.66.0
+ARG BOOST_HASH=5721818253e6a0989583192f96782c4a98eb6204965316df9f5ad75819225ca9
+RUN curl -s -L -o  boost_${BOOST_VERSION}.tar.bz2 https://dl.bintray.com/boostorg/release/${BOOST_VERSION_DOT}/source/boost_${BOOST_VERSION}.tar.bz2 \
+    && echo "${BOOST_HASH} boost_${BOOST_VERSION}.tar.bz2" | sha256sum -c \
     && tar -xvf boost_${BOOST_VERSION}.tar.bz2 \
     && cd boost_${BOOST_VERSION} \
     && ./bootstrap.sh \
@@ -49,24 +33,21 @@ RUN set -ex \
 ENV BOOST_ROOT /usr/local/boost_${BOOST_VERSION}
 
 # OpenSSL
-ARG OPENSSL_VERSION=1.1.0h
-ARG OPENSSL_HASH=5835626cde9e99656585fc7aaa2302a73a7e1340bf8c14fd635a62c66802a517
-RUN set -ex \
-    && curl -s -O https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz \
-    && echo "${OPENSSL_HASH}  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c \
+ARG OPENSSL_VERSION=1.0.2n
+ARG OPENSSL_HASH=370babb75f278c39e0c50e8c4e7493bc0f18db6867478341a832a982fd15a8fe
+RUN curl -s -O https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz \
+    && echo "${OPENSSL_HASH} openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c \
     && tar -xzf openssl-${OPENSSL_VERSION}.tar.gz \
     && cd openssl-${OPENSSL_VERSION} \
     && ./Configure linux-x86_64 no-shared --static -fPIC \
-    && make build_generated \
-    && make libcrypto.a \
+    && make build_crypto build_ssl \
     && make install
 ENV OPENSSL_ROOT_DIR=/usr/local/openssl-${OPENSSL_VERSION}
 
 # ZMQ
-ARG ZMQ_VERSION=v4.2.5
-ARG ZMQ_HASH=d062edd8c142384792955796329baf1e5a3377cd
-RUN set -ex \
-    && git clone https://github.com/zeromq/libzmq.git -b ${ZMQ_VERSION} \
+ARG ZMQ_VERSION=v4.2.3
+ARG ZMQ_HASH=3226b8ebddd9c6c738ba42986822c26418a49afb
+RUN git clone https://github.com/zeromq/libzmq.git -b ${ZMQ_VERSION} \
     && cd libzmq \
     && test `git rev-parse HEAD` = ${ZMQ_HASH} || exit 1 \
     && ./autogen.sh \
@@ -76,10 +57,8 @@ RUN set -ex \
     && ldconfig
 
 # zmq.hpp
-ARG CPPZMQ_VERSION=v4.2.3
 ARG CPPZMQ_HASH=6aa3ab686e916cb0e62df7fa7d12e0b13ae9fae6
-RUN set -ex \
-    && git clone https://github.com/zeromq/cppzmq.git -b ${CPPZMQ_VERSION} \
+RUN git clone https://github.com/zeromq/cppzmq.git -b ${ZMQ_VERSION} \
     && cd cppzmq \
     && test `git rev-parse HEAD` = ${CPPZMQ_HASH} || exit 1 \
     && mv *.hpp /usr/local/include
@@ -87,9 +66,8 @@ RUN set -ex \
 # Readline
 ARG READLINE_VERSION=7.0
 ARG READLINE_HASH=750d437185286f40a369e1e4f4764eda932b9459b5ec9a731628393dd3d32334
-RUN set -ex \
-    && curl -s -O https://ftp.gnu.org/gnu/readline/readline-${READLINE_VERSION}.tar.gz \
-    && echo "${READLINE_HASH}  readline-${READLINE_VERSION}.tar.gz" | sha256sum -c \
+RUN curl -s -O https://ftp.gnu.org/gnu/readline/readline-${READLINE_VERSION}.tar.gz \
+    && echo "${READLINE_HASH} readline-${READLINE_VERSION}.tar.gz" | sha256sum -c \
     && tar -xzf readline-${READLINE_VERSION}.tar.gz \
     && cd readline-${READLINE_VERSION} \
     && CFLAGS="-fPIC" CXXFLAGS="-fPIC" ./configure \
@@ -99,8 +77,7 @@ RUN set -ex \
 # Sodium
 ARG SODIUM_VERSION=1.0.16
 ARG SODIUM_HASH=675149b9b8b66ff44152553fb3ebf9858128363d
-RUN set -ex \
-    && git clone https://github.com/jedisct1/libsodium.git -b ${SODIUM_VERSION} \
+RUN git clone https://github.com/jedisct1/libsodium.git -b ${SODIUM_VERSION} \
     && cd libsodium \
     && test `git rev-parse HEAD` = ${SODIUM_HASH} || exit 1 \
     && ./autogen.sh \
@@ -109,37 +86,44 @@ RUN set -ex \
     && make check \
     && make install
 
+# ncurses 
+# Needed for readline find module in cmake. Why is it not documented?
+# WARNING: ncurses 6.1 is not working correctly with RYO so we stay with the common 5.X
+ARG NCURSES_VERSION=5.9
+ARG NCURSES_HASH=9046298fb440324c9d4135ecea7879ffed8546dd1b58e59430ea07a4633f563b
+RUN curl -s -O ftp://ftp.gnu.org/pub/gnu/ncurses/ncurses-${NCURSES_VERSION}.tar.gz \
+    && tar -xvf ncurses-${NCURSES_VERSION}.tar.gz \
+    && echo "${NCURSES_HASH} ncurses-${NCURSES_VERSION}.tar.gz" | sha256sum -c \
+    && cd ncurses-${NCURSES_VERSION} \
+    && CFLAGS="-fPIC" CXXFLAGS="-fPIC -P" CPPFLAGS="-P" ./configure \
+    && make install
+
 WORKDIR /src
 COPY . .
 
 ARG NPROC
-RUN set -ex && \
-    rm -rf build && \
-    if [ -z "$NPROC" ] ; \
-    then make -j$(nproc) release-static ; \
-    else make -j$NPROC release-static ; \
-    fi
+RUN rm -rf build && \
+    if [ -z "$NPROC" ];then make -j$(nproc) release-static;else make -j$NPROC release-static;fi
 
 # runtime stage
 FROM ubuntu:16.04
 
-RUN set -ex && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get --no-install-recommends --yes install ca-certificates && \
     apt-get clean && \
     rm -rf /var/lib/apt
-COPY --from=builder /src/build/Linux/master/release/* /usr/local/bin/
+
+COPY --from=builder /src/build/release/bin/* /usr/local/bin/
 
 # Contains the blockchain
-VOLUME /root/.bitmonero
+VOLUME /root/.ryo
 
 # Generate your wallet via accessing the container and run:
 # cd /wallet
-# monero-wallet-cli
+# ryo-wallet-cli
 VOLUME /wallet
 
 EXPOSE 18080
 EXPOSE 18081
 
-ENTRYPOINT ["monerod", "--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=18080", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=18081", "--non-interactive", "--confirm-external-bind"]
-
+ENTRYPOINT ["ryod", "--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=18080", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=18081", "--non-interactive", "--confirm-external-bind"] 

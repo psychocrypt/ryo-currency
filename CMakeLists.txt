@@ -1,21 +1,36 @@
+# Copyright (c) 2018, Ryo Currency Project
 # Copyright (c) 2014-2018, The Monero Project
 #
 # All rights reserved.
+# 
+# Authors and copyright holders give permission for following:
 #
-# Redistribution and use in source and binary forms, with or without modification, are
-# permitted provided that the following conditions are met:
+# 1. Redistribution and use in source and binary forms WITHOUT modification.
 #
-# 1. Redistributions of source code must retain the above copyright notice, this list of
-#    conditions and the following disclaimer.
+# 2. Modification of the source form for your own personal use. 
+# 
+# As long as the following conditions are met:
+# 
+# 3. You must not distribute modified copies of the work to third parties. This includes 
+#    posting the work online, or hosting copies of the modified work for download.
 #
-# 2. Redistributions in binary form must reproduce the above copyright notice, this list
-#    of conditions and the following disclaimer in the documentation and/or other
-#    materials provided with the distribution.
+# 4. Any derivative version of this work is also covered by this license, including point 8.
 #
-# 3. Neither the name of the copyright holder nor the names of its contributors may be
+# 5. Neither the name of the copyright holders nor the names of the authors may be
 #    used to endorse or promote products derived from this software without specific
 #    prior written permission.
 #
+# 6. You agree that this licence is governed by and shall be construed in accordance 
+#    with the laws of England and Wales.
+#
+# 7. You agree to submit all disputes arising out of or in connection with this licence 
+#    to the exclusive jurisdiction of the Courts of England and Wales.
+#
+# Authors and copyright holders agree that:
+#
+# 8. This licence expires and the work covered by it is released into the 
+#    public domain on 1st of February 2019
+# 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 # EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 # MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -24,7 +39,7 @@
 # PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
-# THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE..
 #
 # Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 list(INSERT CMAKE_MODULE_PATH 0
@@ -39,9 +54,9 @@ if (IOS)
     INCLUDE(CmakeLists_IOS.txt)
 endif()
 
-cmake_minimum_required(VERSION 2.8.7)
+cmake_minimum_required(VERSION 3.1.0)
 
-project(monero)
+project(ryo)
 
 function (die msg)
   if (NOT WIN32)
@@ -137,28 +152,9 @@ endif()
 
 if(ARCH_ID STREQUAL "ppc64le")
   set(PPC64LE 1)
-  set(PPC64   0)
-  set(PPC     0)
-
 endif()
 
-if(ARCH_ID STREQUAL "powerpc64" OR ARCH_ID STREQUAL "ppc64")
-  set(PPC64LE 0)
-  set(PPC64   1)
-  set(PPC     0)
-endif()
-
-if(ARCH_ID STREQUAL "powerpc")
-  set(PPC64LE 0)
-  set(PPC64   0)
-  set(PPC     1)
-endif()
-
-if(ARCH_ID STREQUAL "s390x")
-  set(S390X 1)
-endif()
-
-if(WIN32 OR ARM OR PPC64LE OR PPC64 OR PPC)
+if(WIN32 OR ARM)
   set(OPT_FLAGS_RELEASE "-O2")
 else()
   set(OPT_FLAGS_RELEASE "-Ofast")
@@ -176,7 +172,7 @@ set(CMAKE_C_FLAGS_RELEASE "-DNDEBUG ${OPT_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG ${OPT_FLAGS_RELEASE}")
 
 # set this to 0 if per-block checkpoint needs to be disabled
-set(PER_BLOCK_CHECKPOINT 1)
+set(PER_BLOCK_CHECKPOINT 0)
 
 if(PER_BLOCK_CHECKPOINT)
   add_definitions("-DPER_BLOCK_CHECKPOINT")
@@ -376,9 +372,6 @@ add_definitions("-DBLOCKCHAIN_DB=${BLOCKCHAIN_DB}")
 if (APPLE)
   set(DEFAULT_STACK_TRACE OFF)
   set(LIBUNWIND_LIBRARIES "")
-elseif (DEPENDS AND NOT LINUX)
-  set(DEFAULT_STACK_TRACE OFF)
-  set(LIBUNWIND_LIBRARIES "")
 elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU" AND NOT MINGW)
   set(DEFAULT_STACK_TRACE ON)
   set(STACK_TRACE_LIB "easylogging++") # for diag output only
@@ -417,7 +410,6 @@ if (CMAKE_SYSTEM_NAME MATCHES "(SunOS|Solaris)")
 endif ()
 
 if (APPLE AND NOT IOS)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=x86-64 -fvisibility=default")
   if (NOT OpenSSL_DIR)
       EXECUTE_PROCESS(COMMAND brew --prefix openssl
         OUTPUT_VARIABLE OPENSSL_ROOT_DIR
@@ -435,7 +427,7 @@ if(STATIC AND NOT IOS)
   endif()
 endif()
 
-find_package(PCSC)
+# find_package(PCSC) PCSC is not useful to us yet
 
 add_definition_if_library_exists(c memset_s "string.h" HAVE_MEMSET_S)
 add_definition_if_library_exists(c explicit_bzero "strings.h" HAVE_EXPLICIT_BZERO)
@@ -444,16 +436,13 @@ add_definition_if_function_found(strptime HAVE_STRPTIME)
 add_definitions(-DAUTO_INITIALIZE_EASYLOGGINGPP)
 
 # Generate header for embedded translations
-# Generate header for embedded translations, use target toolchain if depends, otherwise use the
-# lrelease and lupdate binaries from the host
 include(ExternalProject)
 ExternalProject_Add(generate_translations_header
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/translations"
   BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/translations"
-  STAMP_DIR ${LRELEASE_PATH}
-  CMAKE_ARGS -DLRELEASE_PATH=${LRELEASE_PATH}
   INSTALL_COMMAND cmake -E echo "")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/translations")
+
 add_subdirectory(external)
 
 # Final setup for libunbound
@@ -498,36 +487,17 @@ if(MSVC)
   include_directories(SYSTEM src/platform/msc)
 else()
   include(TestCXXAcceptsFlag)
-  if (NOT ARM6)
-    if(NOT DEPENDS OR DEPENDS AND NOT ARM)
-      set(ARCH native CACHE STRING "CPU to build for: -march value or 'default' to not pass -march at all")
-    endif()
-  endif()
+  set(ARCH native CACHE STRING "CPU to build for: -march value or 'default' to not pass -march at all")
   message(STATUS "Building on ${CMAKE_SYSTEM_PROCESSOR} for ${ARCH}")
   if(ARCH STREQUAL "default")
     set(ARCH_FLAG "")
   elseif(PPC64LE)
-    set(ARCH_FLAG "-mcpu=power8")
-  elseif(PPC64)
-    set(ARCH_FLAG "-mcpu=970")
-  elseif(PPC)
-    set(ARCH_FLAG "-mcpu=7400")
+    set(ARCH_FLAG "-mcpu=${ARCH}")
   elseif(IOS AND ARCH STREQUAL "arm64")
     message(STATUS "IOS: Changing arch from arm64 to armv8")
     set(ARCH_FLAG "-march=armv8")
   else()
     set(ARCH_FLAG "-march=${ARCH}")
-    if(ARCH STREQUAL "native")
-      check_c_compiler_flag(-march=native CC_SUPPORTS_MARCH_NATIVE)
-      if (NOT CC_SUPPORTS_MARCH_NATIVE)
-        check_c_compiler_flag(-mtune=native CC_SUPPORTS_MTUNE_NATIVE)
-        if (CC_SUPPORTS_MTUNE_NATIVE)
-          set(ARCH_FLAG "-mtune=${ARCH}")
-        else()
-          set(ARCH_FLAG "")
-        endif()
-      endif()
-    endif()
   endif()
   set(WARNINGS "-Wall -Wextra -Wpointer-arith -Wundef -Wvla -Wwrite-strings -Wno-error=extra -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized")
   if(NOT MINGW)
@@ -593,23 +563,10 @@ else()
   add_cxx_flag_if_supported(-Wformat-security CXX_SECURITY_FLAGS)
 
   # -fstack-protector
-  if (NOT WIN32)
-    add_c_flag_if_supported(-fstack-protector C_SECURITY_FLAGS)
-    add_cxx_flag_if_supported(-fstack-protector CXX_SECURITY_FLAGS)
-    add_c_flag_if_supported(-fstack-protector-strong C_SECURITY_FLAGS)
-    add_cxx_flag_if_supported(-fstack-protector-strong CXX_SECURITY_FLAGS)
-  endif()
-
-  # New in GCC 8.2
-  if (NOT WIN32)
-    add_c_flag_if_supported(-fcf-protection=full C_SECURITY_FLAGS)
-    add_cxx_flag_if_supported(-fcf-protection=full CXX_SECURITY_FLAGS)
-    add_c_flag_if_supported(-fstack-clash-protection C_SECURITY_FLAGS)
-    add_cxx_flag_if_supported(-fstack-clash-protection CXX_SECURITY_FLAGS)
-  endif()
-
-  add_c_flag_if_supported(-mmitigate-rop C_SECURITY_FLAGS)
-  add_cxx_flag_if_supported(-mmitigate-rop CXX_SECURITY_FLAGS)
+  add_c_flag_if_supported(-fstack-protector C_SECURITY_FLAGS)
+  add_cxx_flag_if_supported(-fstack-protector CXX_SECURITY_FLAGS)
+  add_c_flag_if_supported(-fstack-protector-strong C_SECURITY_FLAGS)
+  add_cxx_flag_if_supported(-fstack-protector-strong CXX_SECURITY_FLAGS)
 
   # linker
   if (NOT WIN32)
@@ -645,14 +602,12 @@ else()
     message(STATUS "AES support explicitly disabled")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_AES")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNO_AES")
-  elseif(NOT ARM AND NOT PPC64LE AND NOT PPC64 AND NOT PPC AND NOT S390X)
+  elseif(NOT ARM AND NOT PPC64LE)
     message(STATUS "AES support enabled")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -maes")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -maes")
-  elseif(PPC64LE OR PPC64 OR PPC)
-    message(STATUS "AES support not available on POWER")
-  elseif(S390X)
-    message(STATUS "AES support not available on s390x")
+  elseif(PPC64LE)
+    message(STATUS "AES support not available on ppc64le")
   elseif(ARM6)
     message(STATUS "AES support not available on ARMv6")
   elseif(ARM7)
@@ -711,10 +666,6 @@ else()
       message(STATUS "Selecting VFP for ARMv6")
       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpu=vfp")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpu=vfp")
-      if(DEPENDS)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -marm")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -marm")
-      endif()
     endif(ARM6)
 
     if(ARM7)
@@ -769,7 +720,7 @@ else()
   endif()
 
   if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -DGTEST_HAS_TR1_TUPLE=0")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_HAS_TR1_TUPLE=0")
   endif()
 
   set(DEBUG_FLAGS "-g3")
@@ -805,6 +756,10 @@ else()
       else()
         set(CMAKE_AR "gcc-ar")
         set(CMAKE_RANLIB "gcc-ranlib")
+      endif()
+      # Default ubuntu 16.04 LTS ld.bfd refuses to cooperate with LTO'ed ar libs for some reason, gold linker works, go figure
+      if(NOT ARM)
+        set(RELEASE_FLAGS "${RELEASE_FLAGS} -fuse-ld=gold")
       endif()
     endif()
   endif()
@@ -858,15 +813,11 @@ endif()
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 if(MINGW)
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wa,-mbig-obj")
-  set(EXTRA_LIBRARIES mswsock;ws2_32;iphlpapi;crypt32)
-  if(DEPENDS)
-    set(ICU_LIBRARIES ${Boost_LOCALE_LIBRARY} sicuio sicuin sicuuc sicudt sicutu iconv)
-  else()
-    set(ICU_LIBRARIES ${Boost_LOCALE_LIBRARY} icuio icuin icuuc icudt icutu iconv)
-  endif()
+  set(EXTRA_LIBRARIES mswsock;ws2_32;iphlpapi)
+  set(ICU_LIBRARIES ${Boost_LOCALE_LIBRARY} icuio icuin icuuc icudt icutu iconv)
 elseif(APPLE OR OPENBSD OR ANDROID)
   set(EXTRA_LIBRARIES "")
+  set(ICU_LIBRARIES ${Boost_LOCALE_LIBRARY} iconv)
 elseif(FREEBSD)
   set(EXTRA_LIBRARIES execinfo)
 elseif(DRAGONFLY)
@@ -896,7 +847,6 @@ endif()
 
 if(ANDROID)
   set(ATOMIC libatomic.a)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=user-defined-warnings")
 endif()
 if(CMAKE_C_COMPILER_ID STREQUAL "Clang" AND ARCH_WIDTH EQUAL "32" AND NOT IOS AND NOT FREEBSD)
   find_library(ATOMIC atomic)

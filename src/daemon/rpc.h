@@ -1,21 +1,37 @@
-// Copyright (c) 2014-2018, The Monero Project
-// 
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
+//
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
-// 
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
-// 
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
-// 
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+//
+// Authors and copyright holders give permission for following:
+//
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
+//
+// 2. Modification of the source form for your own personal use.
+//
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -32,37 +48,32 @@
 
 #include "rpc/core_rpc_server.h"
 
-#undef MONERO_DEFAULT_LOG_CATEGORY
-#define MONERO_DEFAULT_LOG_CATEGORY "daemon"
+//#undef RYO_DEFAULT_LOG_CATEGORY
+//#define RYO_DEFAULT_LOG_CATEGORY "daemon"
 
 namespace daemonize
 {
 
 class t_rpc final
 {
-public:
-  static void init_options(boost::program_options::options_description & option_spec)
+  public:
+  static void init_options(boost::program_options::options_description &option_spec)
   {
     cryptonote::core_rpc_server::init_options(option_spec);
   }
-private:
+
+  private:
   cryptonote::core_rpc_server m_server;
   const std::string m_description;
-public:
+
+  public:
   t_rpc(
-      boost::program_options::variables_map const & vm
-    , t_core & core
-    , t_p2p & p2p
-    , const bool restricted
-    , const cryptonote::network_type nettype
-    , const std::string & port
-    , const std::string & description
-    )
+    boost::program_options::variables_map const &vm, t_core &core, t_p2p &p2p, const bool restricted, const cryptonote::network_type nettype, const std::string &port, const std::string &description)
     : m_server{core.get(), p2p.get()}, m_description{description}
   {
     MGINFO("Initializing " << m_description << " RPC server...");
 
-    if (!m_server.init(vm, restricted, nettype, port))
+    if(!m_server.init(vm, restricted, nettype, port))
     {
       throw std::runtime_error("Failed to initialize " + m_description + " RPC server.");
     }
@@ -72,7 +83,7 @@ public:
   void run()
   {
     MGINFO("Starting " << m_description << " RPC server...");
-    if (!m_server.run(2, false))
+    if(!m_server.run(2, false))
     {
       throw std::runtime_error("Failed to start " + m_description + " RPC server.");
     }
@@ -86,7 +97,7 @@ public:
     m_server.timed_wait_server_stop(5000);
   }
 
-  cryptonote::core_rpc_server* get_server()
+  cryptonote::core_rpc_server *get_server()
   {
     return &m_server;
   }
@@ -94,12 +105,14 @@ public:
   ~t_rpc()
   {
     MGINFO("Deinitializing " << m_description << " RPC server...");
-    try {
+    try
+    {
       m_server.deinit();
-    } catch (...) {
+    }
+    catch(...)
+    {
       MERROR("Failed to deinitialize " << m_description << " RPC server...");
     }
   }
 };
-
 }

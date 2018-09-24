@@ -1,19 +1,35 @@
-// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2018, Ryo Currency Project
+// Portions copyright (c) 2014-2018, The Monero Project
+// Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
 //
-// Redistribution and use in source and binary forms, with or without modification, are
-// permitted provided that the following conditions are met:
+// Authors and copyright holders give permission for following:
 //
-// 1. Redistributions of source code must retain the above copyright notice, this list of
-//    conditions and the following disclaimer.
+// 1. Redistribution and use in source and binary forms WITHOUT modification.
 //
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other
-//    materials provided with the distribution.
+// 2. Modification of the source form for your own personal use.
 //
-// 3. Neither the name of the copyright holder nor the names of its contributors may be
+// As long as the following conditions are met:
+//
+// 3. You must not distribute modified copies of the work to third parties. This includes
+//    posting the work online, or hosting copies of the modified work for download.
+//
+// 4. Any derivative version of this work is also covered by this license, including point 8.
+//
+// 5. Neither the name of the copyright holders nor the names of the authors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
+//
+// 6. You agree that this licence is governed by and shall be construed in accordance
+//    with the laws of England and Wales.
+//
+// 7. You agree to submit all disputes arising out of or in connection with this licence
+//    to the exclusive jurisdiction of the Courts of England and Wales.
+//
+// Authors and copyright holders agree that:
+//
+// 8. This licence expires and the work covered by it is released into the
+//    public domain on 1st of February 2019
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -50,9 +66,6 @@ typedef struct mdb_txn_cursors
   MDB_cursor *m_txc_output_amounts;
 
   MDB_cursor *m_txc_txs;
-  MDB_cursor *m_txc_txs_pruned;
-  MDB_cursor *m_txc_txs_prunable;
-  MDB_cursor *m_txc_txs_prunable_hash;
   MDB_cursor *m_txc_tx_indices;
   MDB_cursor *m_txc_tx_outputs;
 
@@ -64,21 +77,18 @@ typedef struct mdb_txn_cursors
   MDB_cursor *m_txc_hf_versions;
 } mdb_txn_cursors;
 
-#define m_cur_blocks	m_cursors->m_txc_blocks
-#define m_cur_block_heights	m_cursors->m_txc_block_heights
-#define m_cur_block_info	m_cursors->m_txc_block_info
-#define m_cur_output_txs	m_cursors->m_txc_output_txs
-#define m_cur_output_amounts	m_cursors->m_txc_output_amounts
-#define m_cur_txs	m_cursors->m_txc_txs
-#define m_cur_txs_pruned	m_cursors->m_txc_txs_pruned
-#define m_cur_txs_prunable	m_cursors->m_txc_txs_prunable
-#define m_cur_txs_prunable_hash	m_cursors->m_txc_txs_prunable_hash
-#define m_cur_tx_indices	m_cursors->m_txc_tx_indices
-#define m_cur_tx_outputs	m_cursors->m_txc_tx_outputs
-#define m_cur_spent_keys	m_cursors->m_txc_spent_keys
-#define m_cur_txpool_meta	m_cursors->m_txc_txpool_meta
-#define m_cur_txpool_blob	m_cursors->m_txc_txpool_blob
-#define m_cur_hf_versions	m_cursors->m_txc_hf_versions
+#define m_cur_blocks m_cursors->m_txc_blocks
+#define m_cur_block_heights m_cursors->m_txc_block_heights
+#define m_cur_block_info m_cursors->m_txc_block_info
+#define m_cur_output_txs m_cursors->m_txc_output_txs
+#define m_cur_output_amounts m_cursors->m_txc_output_amounts
+#define m_cur_txs m_cursors->m_txc_txs
+#define m_cur_tx_indices m_cursors->m_txc_tx_indices
+#define m_cur_tx_outputs m_cursors->m_txc_tx_outputs
+#define m_cur_spent_keys m_cursors->m_txc_spent_keys
+#define m_cur_txpool_meta m_cursors->m_txc_txpool_meta
+#define m_cur_txpool_blob m_cursors->m_txc_txpool_blob
+#define m_cur_hf_versions m_cursors->m_txc_hf_versions
 
 typedef struct mdb_rflags
 {
@@ -89,9 +99,6 @@ typedef struct mdb_rflags
   bool m_rf_output_txs;
   bool m_rf_output_amounts;
   bool m_rf_txs;
-  bool m_rf_txs_pruned;
-  bool m_rf_txs_prunable;
-  bool m_rf_txs_prunable_hash;
   bool m_rf_tx_indices;
   bool m_rf_tx_outputs;
   bool m_rf_spent_keys;
@@ -102,16 +109,16 @@ typedef struct mdb_rflags
 
 typedef struct mdb_threadinfo
 {
-  MDB_txn *m_ti_rtxn;	// per-thread read txn
-  mdb_txn_cursors m_ti_rcursors;	// per-thread read cursors
-  mdb_rflags m_ti_rflags;	// per-thread read state
+  MDB_txn *m_ti_rtxn;         // per-thread read txn
+  mdb_txn_cursors m_ti_rcursors; // per-thread read cursors
+  mdb_rflags m_ti_rflags;       // per-thread read state
 
   ~mdb_threadinfo();
 } mdb_threadinfo;
 
 struct mdb_txn_safe
 {
-  mdb_txn_safe(const bool check=true);
+  mdb_txn_safe(const bool check = true);
   ~mdb_txn_safe();
 
   void commit(std::string message = "");
@@ -123,12 +130,12 @@ struct mdb_txn_safe
   void abort();
   void uncheck();
 
-  operator MDB_txn*()
+  operator MDB_txn *()
   {
     return m_txn;
   }
 
-  operator MDB_txn**()
+  operator MDB_txn **()
   {
     return &m_txn;
   }
@@ -139,8 +146,8 @@ struct mdb_txn_safe
   static void wait_no_active_txns();
   static void allow_new_txns();
 
-  mdb_threadinfo* m_tinfo;
-  MDB_txn* m_txn;
+  mdb_threadinfo *m_tinfo;
+  MDB_txn *m_txn;
   bool m_batch_txn = false;
   bool m_check;
   static std::atomic<uint64_t> num_active_txns;
@@ -148,7 +155,6 @@ struct mdb_txn_safe
   // could use a mutex here, but this should be sufficient.
   static std::atomic_flag creation_gate;
 };
-
 
 // If m_batch_active is set, a batch transaction exists beyond this class, such
 // as a batch import with verification enabled, or possibly (later) a batch
@@ -165,11 +171,11 @@ struct mdb_txn_safe
 // write for block and tx data, so no write transaction is open at the time.
 class BlockchainLMDB : public BlockchainDB
 {
-public:
-  BlockchainLMDB(bool batch_transactions=true);
+  public:
+  BlockchainLMDB(bool batch_transactions = false);
   ~BlockchainLMDB();
 
-  virtual void open(const std::string& filename, const int mdb_flags=0);
+  virtual void open(const std::string &filename, const int mdb_flags = 0);
 
   virtual void close();
 
@@ -181,43 +187,39 @@ public:
 
   virtual std::vector<std::string> get_filenames() const;
 
-  virtual bool remove_data_file(const std::string& folder) const;
-
   virtual std::string get_db_name() const;
 
   virtual bool lock();
 
   virtual void unlock();
 
-  virtual bool block_exists(const crypto::hash& h, uint64_t *height = NULL) const;
+  virtual bool block_exists(const crypto::hash &h, uint64_t *height = NULL) const;
 
-  virtual uint64_t get_block_height(const crypto::hash& h) const;
+  virtual uint64_t get_block_height(const crypto::hash &h) const;
 
-  virtual block_header get_block_header(const crypto::hash& h) const;
+  virtual block_header get_block_header(const crypto::hash &h) const;
 
-  virtual cryptonote::blobdata get_block_blob(const crypto::hash& h) const;
+  virtual cryptonote::blobdata get_block_blob(const crypto::hash &h) const;
 
-  virtual cryptonote::blobdata get_block_blob_from_height(const uint64_t& height) const;
+  virtual cryptonote::blobdata get_block_blob_from_height(const uint64_t &height) const;
 
-  virtual std::vector<uint64_t> get_block_cumulative_rct_outputs(const std::vector<uint64_t> &heights) const;
-
-  virtual uint64_t get_block_timestamp(const uint64_t& height) const;
+  virtual uint64_t get_block_timestamp(const uint64_t &height) const;
 
   virtual uint64_t get_top_block_timestamp() const;
 
-  virtual size_t get_block_weight(const uint64_t& height) const;
+  virtual size_t get_block_size(const uint64_t &height) const;
 
-  virtual difficulty_type get_block_cumulative_difficulty(const uint64_t& height) const;
+  virtual difficulty_type get_block_cumulative_difficulty(const uint64_t &height) const;
 
-  virtual difficulty_type get_block_difficulty(const uint64_t& height) const;
+  virtual difficulty_type get_block_difficulty(const uint64_t &height) const;
 
-  virtual uint64_t get_block_already_generated_coins(const uint64_t& height) const;
+  virtual uint64_t get_block_already_generated_coins(const uint64_t &height) const;
 
-  virtual crypto::hash get_block_hash_from_height(const uint64_t& height) const;
+  virtual crypto::hash get_block_hash_from_height(const uint64_t &height) const;
 
-  virtual std::vector<block> get_blocks_range(const uint64_t& h1, const uint64_t& h2) const;
+  virtual std::vector<block> get_blocks_range(const uint64_t &h1, const uint64_t &h2) const;
 
-  virtual std::vector<crypto::hash> get_hashes_range(const uint64_t& h1, const uint64_t& h2) const;
+  virtual std::vector<crypto::hash> get_hashes_range(const uint64_t &h1, const uint64_t &h2) const;
 
   virtual crypto::hash top_block_hash() const;
 
@@ -225,62 +227,56 @@ public:
 
   virtual uint64_t height() const;
 
-  virtual bool tx_exists(const crypto::hash& h) const;
-  virtual bool tx_exists(const crypto::hash& h, uint64_t& tx_index) const;
+  virtual bool tx_exists(const crypto::hash &h) const;
+  virtual bool tx_exists(const crypto::hash &h, uint64_t &tx_index) const;
 
-  virtual uint64_t get_tx_unlock_time(const crypto::hash& h) const;
+  virtual uint64_t get_tx_unlock_time(const crypto::hash &h) const;
 
-  virtual bool get_tx_blob(const crypto::hash& h, cryptonote::blobdata &tx) const;
-  virtual bool get_pruned_tx_blob(const crypto::hash& h, cryptonote::blobdata &tx) const;
-  virtual bool get_prunable_tx_hash(const crypto::hash& tx_hash, crypto::hash &prunable_hash) const;
+  virtual bool get_tx_blob(const crypto::hash &h, cryptonote::blobdata &tx) const;
 
   virtual uint64_t get_tx_count() const;
 
-  virtual std::vector<transaction> get_tx_list(const std::vector<crypto::hash>& hlist) const;
+  virtual std::vector<transaction> get_tx_list(const std::vector<crypto::hash> &hlist) const;
 
-  virtual uint64_t get_tx_block_height(const crypto::hash& h) const;
+  virtual uint64_t get_tx_block_height(const crypto::hash &h) const;
 
-  virtual uint64_t get_num_outputs(const uint64_t& amount) const;
+  virtual uint64_t get_num_outputs(const uint64_t &amount) const;
 
-  virtual output_data_t get_output_key(const uint64_t& amount, const uint64_t& index);
+  virtual output_data_t get_output_key(const uint64_t &amount, const uint64_t &index);
+  virtual output_data_t get_output_key(const uint64_t &global_index) const;
   virtual void get_output_key(const uint64_t &amount, const std::vector<uint64_t> &offsets, std::vector<output_data_t> &outputs, bool allow_partial = false);
 
-  virtual tx_out_index get_output_tx_and_index_from_global(const uint64_t& index) const;
+  virtual tx_out_index get_output_tx_and_index_from_global(const uint64_t &index) const;
   virtual void get_output_tx_and_index_from_global(const std::vector<uint64_t> &global_indices,
-      std::vector<tx_out_index> &tx_out_indices) const;
+                           std::vector<tx_out_index> &tx_out_indices) const;
 
-  virtual tx_out_index get_output_tx_and_index(const uint64_t& amount, const uint64_t& index) const;
-  virtual void get_output_tx_and_index(const uint64_t& amount, const std::vector<uint64_t> &offsets, std::vector<tx_out_index> &indices) const;
+  virtual tx_out_index get_output_tx_and_index(const uint64_t &amount, const uint64_t &index) const;
+  virtual void get_output_tx_and_index(const uint64_t &amount, const std::vector<uint64_t> &offsets, std::vector<tx_out_index> &indices) const;
 
   virtual std::vector<uint64_t> get_tx_amount_output_indices(const uint64_t tx_id) const;
 
-  virtual bool has_key_image(const crypto::key_image& img) const;
+  virtual bool has_key_image(const crypto::key_image &img) const;
 
-  virtual void add_txpool_tx(const transaction &tx, const txpool_tx_meta_t& meta);
-  virtual void update_txpool_tx(const crypto::hash &txid, const txpool_tx_meta_t& meta);
+  virtual void add_txpool_tx(const transaction &tx, const txpool_tx_meta_t &meta);
+  virtual void update_txpool_tx(const crypto::hash &txid, const txpool_tx_meta_t &meta);
   virtual uint64_t get_txpool_tx_count(bool include_unrelayed_txes = true) const;
   virtual bool txpool_has_tx(const crypto::hash &txid) const;
-  virtual void remove_txpool_tx(const crypto::hash& txid);
-  virtual bool get_txpool_tx_meta(const crypto::hash& txid, txpool_tx_meta_t &meta) const;
-  virtual bool get_txpool_tx_blob(const crypto::hash& txid, cryptonote::blobdata &bd) const;
-  virtual cryptonote::blobdata get_txpool_tx_blob(const crypto::hash& txid) const;
-  virtual bool for_all_txpool_txes(std::function<bool(const crypto::hash&, const txpool_tx_meta_t&, const cryptonote::blobdata*)> f, bool include_blob = false, bool include_unrelayed_txes = true) const;
+  virtual void remove_txpool_tx(const crypto::hash &txid);
+  virtual bool get_txpool_tx_meta(const crypto::hash &txid, txpool_tx_meta_t &meta) const;
+  virtual bool get_txpool_tx_blob(const crypto::hash &txid, cryptonote::blobdata &bd) const;
+  virtual cryptonote::blobdata get_txpool_tx_blob(const crypto::hash &txid) const;
+  virtual bool for_all_txpool_txes(std::function<bool(const crypto::hash &, const txpool_tx_meta_t &, const cryptonote::blobdata *)> f, bool include_blob = false, bool include_unrelayed_txes = true) const;
 
-  virtual bool for_all_key_images(std::function<bool(const crypto::key_image&)>) const;
-  virtual bool for_blocks_range(const uint64_t& h1, const uint64_t& h2, std::function<bool(uint64_t, const crypto::hash&, const cryptonote::block&)>) const;
-  virtual bool for_all_transactions(std::function<bool(const crypto::hash&, const cryptonote::transaction&)>, bool pruned) const;
+  virtual bool for_all_key_images(std::function<bool(const crypto::key_image &)>) const;
+  virtual bool for_blocks_range(const uint64_t &h1, const uint64_t &h2, std::function<bool(uint64_t, const crypto::hash &, const cryptonote::block &)>) const;
+  virtual bool for_all_transactions(std::function<bool(const crypto::hash &, const cryptonote::transaction &)>) const;
   virtual bool for_all_outputs(std::function<bool(uint64_t amount, const crypto::hash &tx_hash, uint64_t height, size_t tx_idx)> f) const;
   virtual bool for_all_outputs(uint64_t amount, const std::function<bool(uint64_t height)> &f) const;
 
-  virtual uint64_t add_block( const block& blk
-                            , size_t block_weight
-                            , const difficulty_type& cumulative_difficulty
-                            , const uint64_t& coins_generated
-                            , const std::vector<transaction>& txs
-                            );
+  virtual uint64_t add_block(const block &blk, const size_t &block_size, const difficulty_type &cumulative_difficulty, const uint64_t &coins_generated, const std::vector<transaction> &txs);
 
   virtual void set_batch_transactions(bool batch_transactions);
-  virtual bool batch_start(uint64_t batch_num_blocks=0, uint64_t batch_bytes=0);
+  virtual bool batch_start(uint64_t batch_num_blocks = 0, uint64_t batch_bytes = 0);
   virtual void batch_commit();
   virtual void batch_stop();
   virtual void batch_abort();
@@ -291,7 +287,7 @@ public:
   virtual bool block_rtxn_start(MDB_txn **mtxn, mdb_txn_cursors **mcur) const;
   virtual void block_rtxn_stop() const;
 
-  virtual void pop_block(block& blk, std::vector<transaction>& txs);
+  virtual void pop_block(block &blk, std::vector<transaction> &txs);
 
   virtual bool can_thread_bulk_indices() const { return true; }
 
@@ -309,45 +305,37 @@ public:
 
   bool get_output_distribution(uint64_t amount, uint64_t from_height, uint64_t to_height, std::vector<uint64_t> &distribution, uint64_t &base) const;
 
-private:
-  void do_resize(uint64_t size_increase=0);
+  private:
+  void do_resize(uint64_t size_increase = 0);
 
-  bool need_resize(uint64_t threshold_size=0) const;
+  bool need_resize(uint64_t threshold_size = 0) const;
   void check_and_resize_for_batch(uint64_t batch_num_blocks, uint64_t batch_bytes);
   uint64_t get_estimated_batch_size(uint64_t batch_num_blocks, uint64_t batch_bytes) const;
 
-  virtual void add_block( const block& blk
-                , size_t block_weight
-                , const difficulty_type& cumulative_difficulty
-                , const uint64_t& coins_generated
-                , uint64_t num_rct_outs
-                , const crypto::hash& block_hash
-                );
+  virtual void add_block(const block &blk, const size_t &block_size, const difficulty_type &cumulative_difficulty, const uint64_t &coins_generated, const crypto::hash &block_hash);
 
   virtual void remove_block();
 
-  virtual uint64_t add_transaction_data(const crypto::hash& blk_hash, const transaction& tx, const crypto::hash& tx_hash, const crypto::hash& tx_prunable_hash);
+  virtual uint64_t add_transaction_data(const crypto::hash &blk_hash, const transaction &tx, const crypto::hash &tx_hash);
 
-  virtual void remove_transaction_data(const crypto::hash& tx_hash, const transaction& tx);
+  virtual void remove_transaction_data(const crypto::hash &tx_hash, const transaction &tx);
 
-  virtual uint64_t add_output(const crypto::hash& tx_hash,
-      const tx_out& tx_output,
-      const uint64_t& local_index,
-      const uint64_t unlock_time,
-      const rct::key *commitment
-      );
+  virtual uint64_t add_output(const crypto::hash &tx_hash,
+                const tx_out &tx_output,
+                const uint64_t &local_index,
+                const uint64_t unlock_time,
+                const rct::key *commitment);
 
   virtual void add_tx_amount_output_indices(const uint64_t tx_id,
-      const std::vector<uint64_t>& amount_output_indices
-      );
+                        const std::vector<uint64_t> &amount_output_indices);
 
-  void remove_tx_outputs(const uint64_t tx_id, const transaction& tx);
+  void remove_tx_outputs(const uint64_t tx_id, const transaction &tx);
 
-  void remove_output(const uint64_t amount, const uint64_t& out_index);
+  void remove_output(const uint64_t amount, const uint64_t &out_index);
 
-  virtual void add_spent_key(const crypto::key_image& k_image);
+  virtual void add_spent_key(const crypto::key_image &k_image);
 
-  virtual void remove_spent_key(const crypto::key_image& k_image);
+  virtual void remove_spent_key(const crypto::key_image &k_image);
 
   uint64_t num_outputs() const;
 
@@ -364,7 +352,7 @@ private:
    *
    * @return the resultant blob
    */
-  blobdata output_to_blob(const tx_out& output) const;
+  blobdata output_to_blob(const tx_out &output) const;
 
   /**
    * @brief convert a tx output blob to a tx output
@@ -373,13 +361,11 @@ private:
    *
    * @return the resultant tx output
    */
-  tx_out output_from_blob(const blobdata& blob) const;
+  tx_out output_from_blob(const blobdata &blob) const;
 
   void check_open() const;
 
   virtual bool is_read_only() const;
-
-  virtual uint64_t get_database_size() const;
 
   // fix up anything that may be wrong due to past bugs
   virtual void fixup();
@@ -390,25 +376,16 @@ private:
   // migrate from DB version 0 to 1
   void migrate_0_1();
 
-  // migrate from DB version 1 to 2
-  void migrate_1_2();
-
-  // migrate from DB version 2 to 3
-  void migrate_2_3();
-
   void cleanup_batch();
 
-private:
-  MDB_env* m_env;
+  private:
+  MDB_env *m_env;
 
   MDB_dbi m_blocks;
   MDB_dbi m_block_heights;
   MDB_dbi m_block_info;
 
   MDB_dbi m_txs;
-  MDB_dbi m_txs_pruned;
-  MDB_dbi m_txs_prunable;
-  MDB_dbi m_txs_prunable_hash;
   MDB_dbi m_tx_indices;
   MDB_dbi m_tx_outputs;
 
@@ -425,15 +402,15 @@ private:
 
   MDB_dbi m_properties;
 
-  mutable uint64_t m_cum_size;	// used in batch size estimation
+  mutable uint64_t m_cum_size; // used in batch size estimation
   mutable unsigned int m_cum_count;
   std::string m_folder;
-  mdb_txn_safe* m_write_txn; // may point to either a short-lived txn or a batch txn
-  mdb_txn_safe* m_write_batch_txn; // persist batch txn outside of BlockchainLMDB
+  mdb_txn_safe *m_write_txn;     // may point to either a short-lived txn or a batch txn
+  mdb_txn_safe *m_write_batch_txn; // persist batch txn outside of BlockchainLMDB
   boost::thread::id m_writer;
 
   bool m_batch_transactions; // support for batch transactions
-  bool m_batch_active; // whether batch transaction is in progress
+  bool m_batch_active;     // whether batch transaction is in progress
 
   mdb_txn_cursors m_wcursors;
   mutable boost::thread_specific_ptr<mdb_threadinfo> m_tinfo;
@@ -449,7 +426,7 @@ private:
 #endif
 #endif
 
-  constexpr static float RESIZE_PERCENT = 0.9f;
+  constexpr static float RESIZE_PERCENT = 0.8f;
 };
 
-}  // namespace cryptonote
+} // namespace cryptonote

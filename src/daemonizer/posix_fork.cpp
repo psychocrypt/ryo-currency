@@ -9,26 +9,28 @@
 
 #include <cstdlib>
 #include <fcntl.h>
-#include <unistd.h>
 #include <stdexcept>
 #include <string>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #ifndef TMPDIR
 #define TMPDIR "/tmp"
 #endif
 
-namespace posix {
+namespace posix
+{
 
-namespace {
-  void quit(const std::string & message)
-  {
-    LOG_ERROR(message);
-    throw std::runtime_error(message);
-  }
+namespace
+{
+void quit(const std::string &message)
+{
+  LOG_ERROR(message);
+  throw std::runtime_error(message);
+}
 }
 
-void fork(const std::string & pidfile)
+void fork(const std::string &pidfile)
 {
   // If a PID file is specified, we open the file here, because
   // we can't report errors after the fork operation.
@@ -37,23 +39,23 @@ void fork(const std::string & pidfile)
   // Only in the final child process do we write the PID to the
   // file (and close it).
   std::ofstream pidofs;
-  if (! pidfile.empty ())
+  if(!pidfile.empty())
   {
-	int oldpid;
+    int oldpid;
     std::ifstream pidrifs;
     pidrifs.open(pidfile, std::fstream::in);
-    if (! pidrifs.fail())
+    if(!pidrifs.fail())
     {
-	  // Read the PID and send signal 0 to see if the process exists.
-	  if (pidrifs >> oldpid && oldpid > 1 && kill(oldpid, 0) == 0)
+      // Read the PID and send signal 0 to see if the process exists.
+      if(pidrifs >> oldpid && oldpid > 1 && kill(oldpid, 0) == 0)
       {
         quit("PID file " + pidfile + " already exists and the PID therein is valid");
-	  }
-	  pidrifs.close();
-	}
+      }
+      pidrifs.close();
+    }
 
     pidofs.open(pidfile, std::fstream::out | std::fstream::trunc);
-    if (pidofs.fail())
+    if(pidofs.fail())
     {
       quit("Failed to open specified PID file for writing");
     }
@@ -61,9 +63,9 @@ void fork(const std::string & pidfile)
   // Fork the process and have the parent exit. If the process was started
   // from a shell, this returns control to the user. Forking a new process is
   // also a prerequisite for the subsequent call to setsid().
-  if (pid_t pid = ::fork())
+  if(pid_t pid = ::fork())
   {
-    if (pid > 0)
+    if(pid > 0)
     {
       // We're in the parent process and need to exit.
       pidofs.close();
@@ -83,9 +85,9 @@ void fork(const std::string & pidfile)
   setsid();
 
   // A second fork ensures the process cannot acquire a controlling terminal.
-  if (pid_t pid = ::fork())
+  if(pid_t pid = ::fork())
   {
-    if (pid > 0)
+    if(pid > 0)
     {
       pidofs.close();
       exit(0);
@@ -96,7 +98,7 @@ void fork(const std::string & pidfile)
     }
   }
 
-  if (! pidofs.fail())
+  if(!pidofs.fail())
   {
     int pid = ::getpid();
     pidofs << pid << std::endl;
@@ -110,7 +112,7 @@ void fork(const std::string & pidfile)
   close(2);
 
   // We don't want the daemon to have any standard input.
-  if (open("/dev/null", O_RDONLY) < 0)
+  if(open("/dev/null", O_RDONLY) < 0)
   {
     quit("Unable to open /dev/null");
   }
@@ -118,19 +120,19 @@ void fork(const std::string & pidfile)
 #ifdef DEBUG_TMPDIR_LOG
   // Send standard output to a log file.
   const char *tmpdir = getenv("TMPDIR");
-  if (!tmpdir)
+  if(!tmpdir)
     tmpdir = TMPDIR;
   std::string output = tmpdir;
-  output += "/bitmonero.daemon.stdout.stderr";
+  output += "/ryo.daemon.stdout.stderr";
   const int flags = O_WRONLY | O_CREAT | O_APPEND;
   const mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-  if (open(output.c_str(), flags, mode) < 0)
+  if(open(output.c_str(), flags, mode) < 0)
   {
     quit("Unable to open output file: " + output);
   }
 
   // Also send standard error to the same log file.
-  if (dup(1) < 0)
+  if(dup(1) < 0)
   {
     quit("Unable to dup output descriptor");
   }
