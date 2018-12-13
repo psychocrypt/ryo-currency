@@ -1,5 +1,4 @@
 // Copyright (c) 2018, Ryo Currency Project
-// Portions copyright (c) 2014-2018, The Monero Project
 //
 // Portions of this file are available under BSD-3 license. Please see ORIGINAL-LICENSE for details
 // All rights reserved.
@@ -41,44 +40,15 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-// Most of this file is originally copyright (c) 2017 Raymond Chen, Microsoft
-// This algorithm is adapted from Raymond Chen's code:
-// https://blogs.msdn.microsoft.com/oldnewthing/20170109-00/?p=95145
 
 #pragma once
-#include "common/gulps.hpp"
-#include <functional>
-#include <vector>
 
-namespace tools
-{
+#include <string>
 
-template <typename F>
-void apply_permutation(std::vector<size_t> permutation, const F &swap)
-{
-	//sanity check
-	for(size_t n = 0; n < permutation.size(); ++n)
-		GULPS_CHECK_AND_ASSERT_THROW_MES(std::find(permutation.begin(), permutation.end(), n) != permutation.end(), "Bad permutation");
-
-	for(size_t i = 0; i < permutation.size(); ++i)
-	{
-		size_t current = i;
-		while(i != permutation[current])
-		{
-			size_t next = permutation[current];
-			swap(current, next);
-			permutation[current] = current;
-			current = next;
-		}
-		permutation[current] = current;
-	}
-}
-
-template <typename T>
-void apply_permutation(const std::vector<size_t> &permutation, std::vector<T> &v)
-{
-	GULPS_CHECK_AND_ASSERT_THROW_MES(permutation.size() == v.size(), "Mismatched vector sizes");
-	apply_permutation(permutation, [&v](size_t i0, size_t i1) { std::swap(v[i0], v[i1]); });
-}
-}
+/** convert a C string into a C++ std::string
+ *
+ * @code{cpp}
+ * auto foo = "Hello World!"_s; // type of foo is std::string
+ * @endcode
+ */
+std::string operator ""_s(const char * str, size_t len);
