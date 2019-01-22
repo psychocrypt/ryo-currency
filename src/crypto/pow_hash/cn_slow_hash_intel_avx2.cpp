@@ -135,7 +135,7 @@ inline HW_TARGET_AVX2 __m256i double_comupte(__m256 n0, __m256 n1, __m256 n2, __
 }
 
 template <size_t rot>
-inline void double_comupte_wrap(__m256 n0, __m256 n1, __m256 n2, __m256 n3, float lcnt, float hcnt, __m256 rnd_c, __m256& sum, __m256i& out)
+inline HW_TARGET_AVX2 void double_comupte_wrap(__m256 n0, __m256 n1, __m256 n2, __m256 n3, float lcnt, float hcnt, __m256 rnd_c, __m256& sum, __m256i& out)
 {
 	__m256i r = double_comupte<rot % 2 != 0>(n0, n1, n2, n3, lcnt, hcnt, rnd_c, sum);
 	if(rot != 0)
