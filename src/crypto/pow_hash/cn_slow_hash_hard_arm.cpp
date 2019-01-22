@@ -115,7 +115,7 @@ inline void soft_aes_genkey_sub(aeskeydata& xout0, aeskeydata& xout2)
 	xout2 ^= sub_word(xout0.x3);
 }
 
-inline void aes_genkey(const uint8_t* memory, uint8x16_t& k0, uint8x16_t& k1, uint8x16_t& k2, uint8x16_t& k3, uint8x16_t& k4,
+inline HW_TARGET void aes_genkey(const uint8_t* memory, uint8x16_t& k0, uint8x16_t& k1, uint8x16_t& k2, uint8x16_t& k3, uint8x16_t& k4,
 					   uint8x16_t& k5, uint8x16_t& k6, uint8x16_t& k7, uint8x16_t& k8, uint8x16_t& k9)
 {
 	aeskeydata xout0(memory);
@@ -141,7 +141,7 @@ inline void aes_genkey(const uint8_t* memory, uint8x16_t& k0, uint8x16_t& k1, ui
 	k9 = xout2.store();
 }
 
-inline void aes_round10(uint8x16_t& x, const uint8x16_t& k0, const uint8x16_t& k1, const uint8x16_t& k2, const uint8x16_t& k3,
+inline HW_TARGET void aes_round10(uint8x16_t& x, const uint8x16_t& k0, const uint8x16_t& k1, const uint8x16_t& k2, const uint8x16_t& k3,
 						const uint8x16_t& k4, const uint8x16_t& k5, const uint8x16_t& k6, const uint8x16_t& k7, const uint8x16_t& k8, const uint8x16_t& k9)
 {
 	x = vaesmcq_u8(vaeseq_u8(x, vdupq_n_u8(0)));
@@ -183,7 +183,7 @@ inline void mem_load(cn_sptr& lpad, size_t i, uint8x16_t& x0, uint8x16_t& x1, ui
 }
 
 template <size_t MEMORY, size_t ITER, size_t VERSION>
-void cn_slow_hash<MEMORY, ITER, VERSION>::implode_scratchpad_hard()
+void HW_TARGET cn_slow_hash<MEMORY, ITER, VERSION>::implode_scratchpad_hard()
 {
 	uint8x16_t x0, x1, x2, x3, x4, x5, x6, x7;
 	uint8x16_t k0, k1, k2, k3, k4, k5, k6, k7, k8, k9;
@@ -257,7 +257,7 @@ void cn_slow_hash<MEMORY, ITER, VERSION>::implode_scratchpad_hard()
 }
 
 template <size_t MEMORY, size_t ITER, size_t VERSION>
-void cn_slow_hash<MEMORY, ITER, VERSION>::explode_scratchpad_hard()
+void HW_TARGET cn_slow_hash<MEMORY, ITER, VERSION>::explode_scratchpad_hard()
 {
 	uint8x16_t x0, x1, x2, x3, x4, x5, x6, x7;
 	uint8x16_t k0, k1, k2, k3, k4, k5, k6, k7, k8, k9;
@@ -322,7 +322,7 @@ inline uint8x16_t _mm_set_epi64x(const uint64_t a, const uint64_t b)
 }
 
 template <size_t MEMORY, size_t ITER, size_t VERSION>
-void cn_slow_hash<MEMORY, ITER, VERSION>::hardware_hash(const void* in, size_t len, void* out)
+void HW_TARGET cn_slow_hash<MEMORY, ITER, VERSION>::hardware_hash(const void* in, size_t len, void* out)
 {
 	keccak((const uint8_t*)in, len, spad.as_byte(), 200);
 
@@ -402,14 +402,14 @@ void cn_slow_hash<MEMORY, ITER, VERSION>::hardware_hash(const void* in, size_t l
 
 #ifdef HAS_ARM
 
-inline void prep_dv(cn_sptr& idx, int32x4_t& v, float32x4_t& n)
+inline HW_TARGET void prep_dv(cn_sptr& idx, int32x4_t& v, float32x4_t& n)
 {
 	v = vld1q_s32((int32_t*)idx.as_void());
 	n = vcvtq_f32_s32(v);
 }
 
 // 14
-inline void sub_round(const float32x4_t& n0, const float32x4_t& n1, const float32x4_t& n2, const float32x4_t& n3,
+inline HW_TARGET void sub_round(const float32x4_t& n0, const float32x4_t& n1, const float32x4_t& n2, const float32x4_t& n3,
 					  const float32x4_t& rnd_c, float32x4_t& n, float32x4_t& d, float32x4_t& c)
 {
 	float32x4_t ln1 = vaddq_f32(n1, c);
@@ -433,7 +433,7 @@ inline void sub_round(const float32x4_t& n0, const float32x4_t& n1, const float3
 	c = vaddq_f32(c, r);
 }
 
-inline void round_compute(const float32x4_t& n0, const float32x4_t& n1, const float32x4_t& n2, const float32x4_t& n3,
+inline HW_TARGET void round_compute(const float32x4_t& n0, const float32x4_t& n1, const float32x4_t& n2, const float32x4_t& n3,
 						  const float32x4_t& rnd_c, float32x4_t& c, float32x4_t& r)
 {
 	float32x4_t n = vdupq_n_f32(0.0f), d = vdupq_n_f32(0.0f);
@@ -453,7 +453,7 @@ inline void round_compute(const float32x4_t& n0, const float32x4_t& n1, const fl
 }
 
 template <bool add>
-inline int32x4_t single_comupte(const float32x4_t& n0, const float32x4_t& n1, const float32x4_t& n2, const float32x4_t& n3,
+inline HW_TARGET int32x4_t single_comupte(const float32x4_t& n0, const float32x4_t& n1, const float32x4_t& n2, const float32x4_t& n3,
 								float cnt, const float32x4_t& rnd_c, float32x4_t& sum)
 {
 	float32x4_t c = vdupq_n_f32(cnt);
@@ -479,7 +479,7 @@ inline int32x4_t single_comupte(const float32x4_t& n0, const float32x4_t& n1, co
 }
 
 template <size_t rot>
-inline void single_comupte_wrap(const float32x4_t& n0, const float32x4_t& n1, const float32x4_t& n2, const float32x4_t& n3,
+inline HW_TARGET void single_comupte_wrap(const float32x4_t& n0, const float32x4_t& n1, const float32x4_t& n2, const float32x4_t& n3,
 								float cnt, const float32x4_t& rnd_c, float32x4_t& sum, int32x4_t& out)
 {
 	int32x4_t r = single_comupte<rot % 2 != 0>(n0, n1, n2, n3, cnt, rnd_c, sum);
@@ -488,7 +488,7 @@ inline void single_comupte_wrap(const float32x4_t& n0, const float32x4_t& n1, co
 }
 
 template <size_t MEMORY, size_t ITER, size_t VERSION>
-void cn_slow_hash<MEMORY, ITER, VERSION>::inner_hash_3()
+void HW_TARGET cn_slow_hash<MEMORY, ITER, VERSION>::inner_hash_3()
 {
 	uint32_t s = spad.as_dword(0) >> 8;
 	cn_sptr idx0 = scratchpad_ptr(s, 0);
@@ -569,7 +569,7 @@ void cn_slow_hash<MEMORY, ITER, VERSION>::inner_hash_3()
 
 #if defined(__aarch64__)
 template <size_t MEMORY, size_t ITER, size_t VERSION>
-void cn_slow_hash<MEMORY, ITER, VERSION>::hardware_hash_3(const void* in, size_t len, void* pout)
+void HW_TARGET cn_slow_hash<MEMORY, ITER, VERSION>::hardware_hash_3(const void* in, size_t len, void* pout)
 {
 	keccak((const uint8_t*)in, len, spad.as_byte(), 200);
 
@@ -583,7 +583,7 @@ void cn_slow_hash<MEMORY, ITER, VERSION>::hardware_hash_3(const void* in, size_t
 #endif
 
 template <size_t MEMORY, size_t ITER, size_t VERSION>
-void cn_slow_hash<MEMORY, ITER, VERSION>::software_hash_3(const void* in, size_t len, void* pout)
+void HW_TARGET cn_slow_hash<MEMORY, ITER, VERSION>::software_hash_3(const void* in, size_t len, void* pout)
 {
 	keccak((const uint8_t*)in, len, spad.as_byte(), 200);
 

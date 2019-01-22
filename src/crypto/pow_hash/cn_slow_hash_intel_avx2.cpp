@@ -54,20 +54,20 @@
 
 #ifdef HAS_INTEL_HW
 
-inline void prep_dv_avx(cn_sptr& idx, __m256i& v, __m256& n01)
+inline HW_TARGET_AVX2 void prep_dv_avx(cn_sptr& idx, __m256i& v, __m256& n01)
 {
 	v = _mm256_load_si256(idx.as_xmm256());
 	n01 = _mm256_cvtepi32_ps(v);
 }
 
-inline __m256 xor_flip(__m256 x)
+inline HW_TARGET_AVX2 __m256 xor_flip(__m256 x)
 {
 	// Break the dependency chain by flipping the lower bit of mantissa (FMA avoidance)
 	return _mm256_xor_ps((__m256)_mm256_set1_epi32(0x00000001), x);
 }
 
 // 14
-inline void sub_round(__m256 n0, __m256 n1, __m256 n2, __m256 n3, __m256 rnd_c, __m256& n, __m256& d, __m256& c)
+inline HW_TARGET_AVX2 void sub_round(__m256 n0, __m256 n1, __m256 n2, __m256 n3, __m256 rnd_c, __m256& n, __m256& d, __m256& c)
 {
 	n1 = _mm256_add_ps(n1, c);
 	__m256 nn = _mm256_mul_ps(n0, c);
@@ -91,7 +91,7 @@ inline void sub_round(__m256 n0, __m256 n1, __m256 n2, __m256 n3, __m256 rnd_c, 
 }
 
 // 14*8 + 2 = 112
-inline void round_compute(__m256 n0, __m256 n1, __m256 n2, __m256 n3, __m256 rnd_c, __m256& c, __m256& r)
+inline HW_TARGET_AVX2 void round_compute(__m256 n0, __m256 n1, __m256 n2, __m256 n3, __m256 rnd_c, __m256& c, __m256& r)
 {
 	__m256 n = _mm256_setzero_ps(), d = _mm256_setzero_ps();
 
@@ -111,7 +111,7 @@ inline void round_compute(__m256 n0, __m256 n1, __m256 n2, __m256 n3, __m256 rnd
 
 // 112×4 = 448
 template <bool add>
-inline __m256i double_comupte(__m256 n0, __m256 n1, __m256 n2, __m256 n3, float lcnt, float hcnt, __m256 rnd_c, __m256& sum)
+inline HW_TARGET_AVX2 __m256i double_comupte(__m256 n0, __m256 n1, __m256 n2, __m256 n3, float lcnt, float hcnt, __m256 rnd_c, __m256& sum)
 {
 	__m256 c = _mm256_insertf128_ps(_mm256_castps128_ps256(_mm_set1_ps(lcnt)), _mm_set1_ps(hcnt), 1);
 	__m256 r = _mm256_setzero_ps();
@@ -145,7 +145,7 @@ inline void double_comupte_wrap(__m256 n0, __m256 n1, __m256 n2, __m256 n3, floa
 }
 
 template <size_t MEMORY, size_t ITER, size_t VERSION>
-void cn_slow_hash<MEMORY, ITER, VERSION>::inner_hash_3_avx()
+void HW_TARGET_AVX2 cn_slow_hash<MEMORY, ITER, VERSION>::inner_hash_3_avx()
 {
 	uint32_t s = spad.as_dword(0) >> 8;
 	cn_sptr idx0 = scratchpad_ptr(s, 0);
