@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 				 << "Found: " << res << endl;
 			return 1;
 		}
-		timestamps.push_back(timestamp);
+		timestamps.push_back(timestamp)
 		cumulative_difficulties.push_back(cumulative_difficulty += difficulty);
 		++n;
 	}
