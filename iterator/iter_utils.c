@@ -282,10 +282,13 @@ iter_filter_unsuitable(struct iter_env* iter_env, struct module_env* env,
 static int
 iter_fill_rtt(struct iter_env* iter_env, struct module_env* env,
 	uint8_t* name, size_t namelen, uint16_t qtype, time_t now, 
-	struct delegpt* dp, int* best_rtt, struct sock_list* blacklist)
+	struct delegpt* dp, int* best_rtt, struct sock_list* blacklist,
+	size_t* num_suitable_results)
 {
 	int got_it = 0;
 	struct delegpt_addr* a;
+	*num_suitable_results = 0;
+
 	if(dp->bogus)
 		return 0; /* NS bogus, all bogus, nothing found */
 	for(a=dp->result_list; a; a = a->next_result) {
@@ -301,9 +304,56 @@ iter_fill_rtt(struct iter_env* iter_env, struct module_env* env,
 			} else if(a->sel_rtt < *best_rtt) {
 				*best_rtt = a->sel_rtt;
 			}
+			(*num_suitable_results)++;
 		}
 	}
 	return got_it;
+}
+
+/** compare two rtts, return -1, 0 or 1 */
+static int
+rtt_compare(const void* x, const void* y)
+{
+	if(*(int*)x == *(int*)y)
+		return 0;
+	if(*(int*)x > *(int*)y)
+		return 1;
+	return -1;
+}
+
+/** get RTT for the Nth fastest server */
+static int
+nth_rtt(struct delegpt_addr* result_list, size_t num_results, size_t n)
+{
+	int rtt_band;
+	size_t i;
+	int* rtt_list, *rtt_index;
+	
+	if(num_results < 1 || n >= num_results) {
+		return -1;
+	}
+
+	rtt_list = calloc(num_results, sizeof(int));
+	if(!rtt_list) {
+		log_err("malloc failure: allocating rtt_list");
+		return -1;
+	}
+	rtt_index = rtt_list;
+
+	for(i=0; i<num_results && result_list; i++) {
+		if(result_list->sel_rtt != -1) {
+			*rtt_index = result_list->sel_rtt;
+			rtt_index++;
+		}
+		result_list=result_list->next_result;
+	}
+	qsort(rtt_list, num_results, sizeof(*rtt_list), rtt_compare);
+
+	log_assert(n > 0);
+	rtt_band = rtt_list[n-1];
+	free(rtt_list);
+
+	return rtt_band;
 }
 
 /** filter the address list, putting best targets at front,
@@ -312,14 +362,15 @@ static int
 iter_filter_order(struct iter_env* iter_env, struct module_env* env,
 	uint8_t* name, size_t namelen, uint16_t qtype, time_t now, 
 	struct delegpt* dp, int* selected_rtt, int open_target, 
-	struct sock_list* blacklist)
+	struct sock_list* blacklist, time_t prefetch)
 {
-	int got_num = 0, low_rtt = 0, swap_to_front;
+	int got_num = 0, low_rtt = 0, swap_to_front, rtt_band = RTT_BAND, nth;
+	size_t num_results;
 	struct delegpt_addr* a, *n, *prev=NULL;
 
 	/* fillup sel_rtt and find best rtt in the bunch */
 	got_num = iter_fill_rtt(iter_env, env, name, namelen, qtype, now, dp, 
-		&low_rtt, blacklist);
+		&low_rtt, blacklist, &num_results);
 	if(got_num == 0) 
 		return 0;
 	if(low_rtt >= USEFUL_SERVER_TOP_TIMEOUT &&
@@ -327,6 +378,21 @@ iter_filter_order(struct iter_env* iter_env, struct module_env* env,
 		verbose(VERB_ALGO, "Bad choices, trying to get more choice");
 		return 0; /* we want more choice. The best choice is a bad one.
 			     return 0 to force the caller to fetch more */
+	}
+
+	if(env->cfg->fast_server_permil != 0 && prefetch == 0 &&
+		num_results > env->cfg->fast_server_num &&
+		ub_random_max(env->rnd, 1000) < env->cfg->fast_server_permil) {
+		/* the query is not prefetch, but for a downstream client,
+		 * there are more servers available then the fastest N we want
+		 * to choose from. Limit our choice to the fastest servers. */
+		nth = nth_rtt(dp->result_list, num_results,
+			env->cfg->fast_server_num);
+		if(nth > 0) {
+			rtt_band = nth - low_rtt;
+			if(rtt_band > RTT_BAND)
+				rtt_band = RTT_BAND;
+		}
 	}
 
 	got_num = 0;
@@ -340,10 +406,10 @@ iter_filter_order(struct iter_env* iter_env, struct module_env* env,
 		}
 		/* classify the server address and determine what to do */
 		swap_to_front = 0;
-		if(a->sel_rtt >= low_rtt && a->sel_rtt - low_rtt <= RTT_BAND) {
+		if(a->sel_rtt >= low_rtt && a->sel_rtt - low_rtt <= rtt_band) {
 			got_num++;
 			swap_to_front = 1;
-		} else if(a->sel_rtt<low_rtt && low_rtt-a->sel_rtt<=RTT_BAND) {
+		} else if(a->sel_rtt<low_rtt && low_rtt-a->sel_rtt<=rtt_band) {
 			got_num++;
 			swap_to_front = 1;
 		}
@@ -365,11 +431,34 @@ iter_filter_order(struct iter_env* iter_env, struct module_env* env,
 		int got_num6 = 0;
 		int low_rtt6 = 0;
 		int i;
+		int attempt = -1; /* filter to make sure addresses have
+		  less attempts on them than the first, to force round
+		  robin when all the IPv6 addresses fail */
+		int num4ok = 0; /* number ip4 at low attempt count */
+		int num4_lowrtt = 0;
 		prev = NULL;
 		a = dp->result_list;
 		for(i = 0; i < got_num; i++) {
 			swap_to_front = 0;
+			if(a->addr.ss_family != AF_INET6 && attempt == -1) {
+				/* if we only have ip4 at low attempt count,
+				 * then ip6 is failing, and we need to
+				 * select one of the remaining IPv4 addrs */
+				attempt = a->attempts;
+				num4ok++;
+				num4_lowrtt = a->sel_rtt;
+			} else if(a->addr.ss_family != AF_INET6 && attempt == a->attempts) {
+				num4ok++;
+				if(num4_lowrtt == 0 || a->sel_rtt < num4_lowrtt) {
+					num4_lowrtt = a->sel_rtt;
+				}
+			}
 			if(a->addr.ss_family == AF_INET6) {
+				if(attempt == -1) {
+					attempt = a->attempts;
+				} else if(a->attempts > attempt) {
+					break;
+				}
 				got_num6++;
 				swap_to_front = 1;
 				if(low_rtt6 == 0 || a->sel_rtt < low_rtt6) {
@@ -391,6 +480,9 @@ iter_filter_order(struct iter_env* iter_env, struct module_env* env,
 		if(got_num6 > 0) {
 			got_num = got_num6;
 			*selected_rtt = low_rtt6;
+		} else if(num4ok > 0) {
+			got_num = num4ok;
+			*selected_rtt = num4_lowrtt;
 		}
 	}
 	return got_num;
@@ -400,13 +492,14 @@ struct delegpt_addr*
 iter_server_selection(struct iter_env* iter_env, 
 	struct module_env* env, struct delegpt* dp, 
 	uint8_t* name, size_t namelen, uint16_t qtype, int* dnssec_lame,
-	int* chase_to_rd, int open_target, struct sock_list* blacklist)
+	int* chase_to_rd, int open_target, struct sock_list* blacklist,
+	time_t prefetch)
 {
 	int sel;
 	int selrtt;
 	struct delegpt_addr* a, *prev;
 	int num = iter_filter_order(iter_env, env, name, namelen, qtype,
-		*env->now, dp, &selrtt, open_target, blacklist);
+		*env->now, dp, &selrtt, open_target, blacklist, prefetch);
 
 	if(num == 0)
 		return NULL;
@@ -625,7 +718,7 @@ iter_dp_is_useless(struct query_info* qinfo, uint16_t qflags,
 }
 
 int
-iter_indicates_dnssec_fwd(struct module_env* env, struct query_info *qinfo)
+iter_qname_indicates_dnssec(struct module_env* env, struct query_info *qinfo)
 {
 	struct trust_anchor* a;
 	if(!env || !env->anchors || !qinfo || !qinfo->qname)
@@ -1172,4 +1265,51 @@ int iter_dp_cangodown(struct query_info* qinfo, struct delegpt* dp)
 	if(dname_count_labels(qinfo->qname) == dp->namelabs+1)
 		return 0;
 	return 1;
+}
+
+int
+iter_stub_fwd_no_cache(struct module_qstate *qstate, struct query_info *qinf)
+{
+	struct iter_hints_stub *stub;
+	struct delegpt *dp;
+
+	/* Check for stub. */
+	stub = hints_lookup_stub(qstate->env->hints, qinf->qname,
+	    qinf->qclass, NULL);
+	dp = forwards_lookup(qstate->env->fwds, qinf->qname, qinf->qclass);
+
+	/* see if forward or stub is more pertinent */
+	if(stub && stub->dp && dp) {
+		if(dname_strict_subdomain(dp->name, dp->namelabs,
+			stub->dp->name, stub->dp->namelabs)) {
+			stub = NULL; /* ignore stub, forward is lower */
+		} else {
+			dp = NULL; /* ignore forward, stub is lower */
+		}
+	}
+
+	/* check stub */
+	if (stub != NULL && stub->dp != NULL) {
+		if(stub->dp->no_cache) {
+			char qname[255+1];
+			char dpname[255+1];
+			dname_str(qinf->qname, qname);
+			dname_str(stub->dp->name, dpname);
+			verbose(VERB_ALGO, "stub for %s %s has no_cache", qname, dpname);
+		}
+		return (stub->dp->no_cache);
+	}
+
+	/* Check for forward. */
+	if (dp) {
+		if(dp->no_cache) {
+			char qname[255+1];
+			char dpname[255+1];
+			dname_str(qinf->qname, qname);
+			dname_str(dp->name, dpname);
+			verbose(VERB_ALGO, "forward for %s %s has no_cache", qname, dpname);
+		}
+		return (dp->no_cache);
+	}
+	return 0;
 }
