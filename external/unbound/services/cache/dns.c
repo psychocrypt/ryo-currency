@@ -108,6 +108,48 @@ store_rrsets(struct module_env* env, struct reply_info* rep, time_t now,
         }
 }
 
+/** delete message from message cache */
+void
+msg_cache_remove(struct module_env* env, uint8_t* qname, size_t qnamelen, 
+	uint16_t qtype, uint16_t qclass, uint16_t flags)
+{
+	struct query_info k;
+	hashvalue_type h;
+
+	k.qname = qname;
+	k.qname_len = qnamelen;
+	k.qtype = qtype;
+	k.qclass = qclass;
+	k.local_alias = NULL;
+	h = query_info_hash(&k, flags);
+	slabhash_remove(env->msg_cache, h, &k);
+}
+
+/** remove servfail msg cache entry */
+static void
+msg_del_servfail(struct module_env* env, struct query_info* qinfo,
+	uint32_t flags)
+{
+	struct msgreply_entry* e;
+	/* see if the entry is servfail, and then remove it, so that
+	 * lookups move from the cacheresponse stage to the recursionresponse
+	 * stage */
+	e = msg_cache_lookup(env, qinfo->qname, qinfo->qname_len,
+		qinfo->qtype, qinfo->qclass, flags, 0, 0);
+	if(!e) return;
+	/* we don't check for the ttl here, also expired servfail entries
+	 * are removed.  If the user uses serve-expired, they would still be
+	 * used to answer from cache */
+	if(FLAGS_GET_RCODE(((struct reply_info*)e->entry.data)->flags)
+		!= LDNS_RCODE_SERVFAIL) {
+		lock_rw_unlock(&e->entry.lock);
+		return;
+	}
+	lock_rw_unlock(&e->entry.lock);
+	msg_cache_remove(env, qinfo->qname, qinfo->qname_len, qinfo->qtype,
+		qinfo->qclass, flags);
+}
+
 void 
 dns_cache_store_msg(struct module_env* env, struct query_info* qinfo,
 	hashvalue_type hash, struct reply_info* rep, time_t leeway, int pside,
@@ -132,6 +174,12 @@ dns_cache_store_msg(struct module_env* env, struct query_info* qinfo,
 		 * which could be useful for delegation information */
 		verbose(VERB_ALGO, "TTL 0: dropped msg from cache");
 		free(rep);
+		/* if the message is SERVFAIL in cache, remove that SERVFAIL,
+		 * so that the TTL 0 response can be returned for future
+		 * responses (i.e. don't get answered by the servfail from
+		 * cache, but instead go to recursion to get this TTL0
+		 * response). */
+		msg_del_servfail(env, qinfo, flags);
 		return;
 	}
 
@@ -499,6 +547,7 @@ tomsg(struct module_env* env, struct query_info* q, struct reply_info* r,
 	if(r->prefetch_ttl > now)
 		msg->rep->prefetch_ttl = r->prefetch_ttl - now;
 	else	msg->rep->prefetch_ttl = PREFETCH_TTL_CALC(msg->rep->ttl);
+	msg->rep->serve_expired_ttl = msg->rep->ttl + SERVE_EXPIRED_TTL;
 	msg->rep->security = r->security;
 	msg->rep->an_numrrsets = r->an_numrrsets;
 	msg->rep->ns_numrrsets = r->ns_numrrsets;
@@ -553,6 +602,7 @@ rrset_msg(struct ub_packed_rrset_key* rrset, struct regional* region,
 	msg->rep->qdcount = 1;
 	msg->rep->ttl = d->ttl - now;
 	msg->rep->prefetch_ttl = PREFETCH_TTL_CALC(msg->rep->ttl);
+	msg->rep->serve_expired_ttl = msg->rep->ttl + SERVE_EXPIRED_TTL;
 	msg->rep->security = sec_status_unchecked;
 	msg->rep->an_numrrsets = 1;
 	msg->rep->ns_numrrsets = 0;
@@ -590,6 +640,7 @@ synth_dname_msg(struct ub_packed_rrset_key* rrset, struct regional* region,
 	msg->rep->qdcount = 1;
 	msg->rep->ttl = d->ttl - now;
 	msg->rep->prefetch_ttl = PREFETCH_TTL_CALC(msg->rep->ttl);
+	msg->rep->serve_expired_ttl = msg->rep->ttl + SERVE_EXPIRED_TTL;
 	msg->rep->security = sec_status_unchecked;
 	msg->rep->an_numrrsets = 1;
 	msg->rep->ns_numrrsets = 0;
@@ -648,6 +699,7 @@ synth_dname_msg(struct ub_packed_rrset_key* rrset, struct regional* region,
 	newd->rr_ttl[0] = newd->ttl;
 	msg->rep->ttl = newd->ttl;
 	msg->rep->prefetch_ttl = PREFETCH_TTL_CALC(newd->ttl);
+	msg->rep->serve_expired_ttl = newd->ttl + SERVE_EXPIRED_TTL;
 	sldns_write_uint16(newd->rr_data[0], newlen);
 	memmove(newd->rr_data[0] + sizeof(uint16_t), newname, newlen);
 	msg->rep->an_numrrsets ++;
@@ -668,6 +720,17 @@ fill_any(struct module_env* env,
 		LDNS_RR_TYPE_DNAME, 0};
 	int i, num=6; /* number of RR types to look up */
 	log_assert(lookup[num] == 0);
+
+	if(env->cfg->deny_any) {
+		/* return empty message */
+		msg = dns_msg_create(qname, qnamelen, qtype, qclass,
+			region, 0);
+		if(!msg) {
+			return NULL;
+		}
+		msg->rep->security = sec_status_indeterminate;
+		return msg;
+	}
 
 	for(i=0; i<num; i++) {
 		/* look up this RR for inclusion in type ANY response */

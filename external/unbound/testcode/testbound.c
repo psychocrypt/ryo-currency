@@ -177,7 +177,8 @@ spool_temp_file(FILE* in, int* lineno, char* id)
 		while(isspace((unsigned char)*parse))
 			parse++;
 		if(strncmp(parse, "$INCLUDE_TEMPFILE", 17) == 0) {
-			char l2[MAX_LINE_LEN];
+			char l2[MAX_LINE_LEN-30]; /* -30 makes it fit with
+				a preceding $INCLUDE in the buf line[] */
 			char* tid = parse+17;
 			while(isspace((unsigned char)*tid))
 				tid++;
@@ -343,6 +344,7 @@ main(int argc, char* argv[])
 
 	/* we do not want the test to depend on the timezone */
 	(void)putenv("TZ=UTC");
+	memset(pass_argv, 0, sizeof(pass_argv));
 
 	log_init(NULL, 0, NULL);
 	/* determine commandline options for the daemon */
@@ -428,14 +430,14 @@ main(int argc, char* argv[])
 		case 'h':
 		default:
 			testbound_usage();
-			return 1;
+			exit(1);
 		}
 	}
 	argc -= optind;
-	argv += optind;
+	/* argv += optind; not using further arguments */
 	if(argc != 0) {
 		testbound_usage();
-		return 1;
+		exit(1);
 	}
 	log_info("Start of %s testbound program.", PACKAGE_STRING);
 	if(atexit(&remove_configfile) != 0)

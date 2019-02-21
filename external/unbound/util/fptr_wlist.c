@@ -303,6 +303,9 @@ fptr_whitelist_hash_markdelfunc(lruhash_markdelfunc_type fptr)
 {
 	if(fptr == NULL) return 1;
 	else if(fptr == &rrset_markdel) return 1;
+#ifdef CLIENT_SUBNET
+	else if(fptr == &subnet_markdel) return 1;
+#endif
 	return 0;
 }
 
@@ -311,7 +314,8 @@ int
 fptr_whitelist_modenv_send_query(struct outbound_entry* (*fptr)(
 	struct query_info* qinfo, uint16_t flags, int dnssec, int want_dnssec,
 	int nocaps, struct sockaddr_storage* addr, socklen_t addrlen,
-	uint8_t* zone, size_t zonelen, int ssl_upstream, struct module_qstate* q))
+	uint8_t* zone, size_t zonelen, int ssl_upstream, char* tls_auth_name,
+	struct module_qstate* q))
 {
 	if(fptr == &worker_send_query) return 1;
 	else if(fptr == &libworker_send_query) return 1;
@@ -560,9 +564,12 @@ int fptr_whitelist_inplace_cb_query(inplace_cb_query_func_type* fptr)
 #ifdef CLIENT_SUBNET
 	if(fptr == &ecs_whitelist_check)
 		return 1;
-#else
-	(void)fptr;
 #endif
+#ifdef WITH_PYTHONMODULE
+        if(fptr == &python_inplace_cb_query_generic)
+                return 1;
+#endif
+	(void)fptr;
 	return 0;
 }
 

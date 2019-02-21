@@ -235,6 +235,7 @@ void neg_delete_data(struct val_neg_cache* neg, struct val_neg_data* el)
 
 	/* remove it from the lru list */
 	neg_lru_remove(neg, el);
+	log_assert(neg->first != el && neg->last != el);
 	
 	/* go up the tree and reduce counts */
 	p = el;
@@ -1515,6 +1516,10 @@ val_neg_getmsg(struct val_neg_cache* neg, struct query_info* qinfo,
 			return NULL;
 		if(addsoa && !add_soa(rrset_cache, now, region, msg, NULL))
 			return NULL;
+
+		lock_basic_lock(&neg->lock);
+		neg->num_neg_cache_noerror++;
+		lock_basic_unlock(&neg->lock);
 		return msg;
 	} else if(nsec && val_nsec_proves_name_error(nsec, qinfo->qname)) {
 		if(!(msg = dns_msg_create(qinfo->qname, qinfo->qname_len, 
@@ -1578,7 +1583,7 @@ val_neg_getmsg(struct val_neg_cache* neg, struct query_info* qinfo,
 					rcode = LDNS_RCODE_NXDOMAIN;
 				else if(!nsec_proves_nodata(wcrr, &wc_qinfo,
 					&nodata_wc) || nodata_wc)
-					/* &nodata_wc shoudn't be set, wc_qinfo
+					/* &nodata_wc shouldn't be set, wc_qinfo
 					 * already contains wildcard domain. */
 					/* NSEC doesn't prove anything for
 					 * wildcard. */
@@ -1594,6 +1599,14 @@ val_neg_getmsg(struct val_neg_cache* neg, struct query_info* qinfo,
 			return NULL;
 		if(addsoa && !add_soa(rrset_cache, now, region, msg, NULL))
 			return NULL;
+
+		/* Increment statistic counters */
+		lock_basic_lock(&neg->lock);
+		if(rcode == LDNS_RCODE_NOERROR)
+			neg->num_neg_cache_noerror++;
+		else if(rcode == LDNS_RCODE_NXDOMAIN)
+			neg->num_neg_cache_nxdomain++;
+		lock_basic_unlock(&neg->lock);
 
 		FLAGS_SET_RCODE(msg->rep->flags, rcode);
 		return msg;
