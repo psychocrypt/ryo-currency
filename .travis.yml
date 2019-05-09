@@ -5,7 +5,7 @@ cache:
   apt: true
 
 os: linux
-dist: trusty
+dist: xenial
 
 addons:
   apt:
