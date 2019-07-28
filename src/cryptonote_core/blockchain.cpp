@@ -75,7 +75,7 @@
 #if defined(PER_BLOCK_CHECKPOINT)
 #include "blocks/blocks.h"
 #endif
-
+ #include <iterator>
 #include "common/gulps.hpp"
 
 GULPS_CAT_MAJOR("blockchain");
@@ -2417,12 +2417,20 @@ bool Blockchain::find_blockchain_supplement_indexed(const uint64_t req_start_blo
 	std::vector<block_complete_entry_v*> ent;
 	std::vector<COMMAND_RPC_GET_BLOCKS_FAST::block_output_indices*> idx;
 	std::vector<std::pair<block, bool>> b;
-	
+
 	struct tx_blob
 	{
 		cryptonote::blobdata blob;
 		size_t bi;
 		size_t txi;
+
+		tx_blob& operator=(const tx_blob & other)
+		{
+			blob = other.blob;
+			bi = other.bi;
+			txi = other.txi;
+			return *this;
+		}
 	};
 
 	std::vector<tx_blob> tx;
@@ -2455,30 +2463,63 @@ bool Blockchain::find_blockchain_supplement_indexed(const uint64_t req_start_blo
 			tpool.submit(&waiter, [&, bi] { b[bi].second = parse_and_validate_block_from_blob(ent[bi]->block, b[bi].first); });
 		waiter.wait();
 
-		size_t total_tx_cnt = 0;
-		size_t ttxi = 0;
+		std::vector<size_t> total_tx_cnt_v(batch_size, 0);
+		std::vector<size_t> ttxi_v(batch_size, 0);
+		std::vector<std::vector<tx_blob>> tx_v(batch_size);
+
+
 		for(size_t bi = 0; bi < batch_size; bi++)
 		{
-			GULPS_CHECK_AND_ASSERT_MES(b[bi].second, false, "internal error, invalid block");
-			const block& bl = b[bi].first;
-			size_t tx_cnt = bl.tx_hashes.size();
-			idx[bi]->indices.resize(tx_cnt+1);
+			tpool.submit(&waiter, [&, bi] {
+				size_t total_tx_cnt = 0;
+				size_t ttxi = 0;
+				size_t thdid = bi;
 
-			get_tx_outputs_gindexs(get_transaction_hash(bl.miner_tx), idx[bi]->indices[0].indices);
+				{
+					//GULPS_CHECK_AND_ASSERT_MES(b[bi].second, false, "internal error, invalid block");
+					const block& bl = b[bi].first;
+					size_t tx_cnt = bl.tx_hashes.size();
+					idx[bi]->indices.resize(tx_cnt+1);
 
-			total_tx_cnt += tx_cnt;
-			if(tx.size() < total_tx_cnt)
-				tx.resize(total_tx_cnt*2);
+					get_tx_outputs_gindexs(get_transaction_hash(bl.miner_tx), idx[bi]->indices[0].indices);
 
-			ent[bi]->txs.resize(tx_cnt);
-			for(size_t txi=0; txi < tx_cnt; txi++, ttxi++)
-			{
-				GULPS_CHECK_AND_ASSERT_MES(m_db->get_tx_blob_indexed(bl.tx_hashes[txi], tx[ttxi].blob, idx[bi]->indices[txi+1].indices), 
-										   false, "internal error, transaction from block not found");
-				tx[ttxi].bi = bi;
-				tx[ttxi].txi = txi;
-			}
+					total_tx_cnt += tx_cnt;
+					if(tx_v[thdid].size() < total_tx_cnt)
+						tx_v[thdid].resize(total_tx_cnt);
+					ent[bi]->txs.resize(tx_cnt);
+					for(size_t txi=0; txi < tx_cnt; txi++, ttxi++)
+					{
+						m_db->get_tx_blob_indexed(bl.tx_hashes[txi], tx_v[thdid][ttxi].blob, idx[bi]->indices[txi+1].indices);
+						//GULPS_CHECK_AND_ASSERT_MES(m_db->get_tx_blob_indexed(bl.tx_hashes[txi], tx_v[thdid][ttxi].blob, idx[bi]->indices[txi+1].indices),
+						//						   false, "internal error, transaction from block not found");
+						tx_v[thdid][ttxi].bi = bi;
+						tx_v[thdid][ttxi].txi = txi;
+					}
+				}
+				total_tx_cnt_v[thdid] = total_tx_cnt;
+				ttxi_v[thdid] = ttxi;
+			});
 		}
+		waiter.wait();
+
+		size_t total_tx_cnt = 0;
+		size_t ttxi = 0;
+
+		for(size_t thdid=0; thdid < batch_size; thdid++)
+		{
+			total_tx_cnt += total_tx_cnt_v[thdid];
+			ttxi += ttxi_v[thdid];
+
+		}
+		tx.reserve(total_tx_cnt);
+		tx.resize(0);
+		for(size_t thdid=0; thdid < batch_size; thdid++)
+		{
+			//std::copy (tx_v.begin(), tx_v.end(), std::back_inserter(tx));
+		//	std::cerr<<tx_v[thdid].size()<<" in "<<total_tx_cnt<<std::endl;
+			tx.insert(tx.end(), tx_v[thdid].begin(), tx_v[thdid].end());
+		}
+		//std::cerr<<tx.size()<<" == "<<total_tx_cnt<<std::endl;
 
 		size_t txpt = total_tx_cnt / max_conc;
 		if(txpt > 0)
@@ -2647,7 +2688,7 @@ bool Blockchain::check_for_double_spend(const transaction &tx, key_images_contai
 bool Blockchain::get_tx_outputs_gindexs(const crypto::hash &tx_id, std::vector<uint64_t> &indexs) const
 {
 	GULPS_LOG_L3("Blockchain::", __func__);
-	CRITICAL_REGION_LOCAL(m_blockchain_lock);
+	//CRITICAL_REGION_LOCAL(m_blockchain_lock);
 	uint64_t tx_index;
 	if(!m_db->tx_exists(tx_id, tx_index))
 	{
