@@ -53,7 +53,7 @@ TEST(apply_permutation, bad_size)
 		tools::apply_permutation({3, 5, 6, 1, 2, 4, 0}, v_large);
 		ASSERT_FALSE(true);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 	}
 	try
@@ -61,7 +61,7 @@ TEST(apply_permutation, bad_size)
 		tools::apply_permutation({3, 5, 6, 1, 2, 4, 0}, v_small);
 		ASSERT_FALSE(true);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 	}
 }
@@ -74,7 +74,7 @@ TEST(apply_permutation, bad_permutation)
 		tools::apply_permutation({3, 5, 6, 1, 2, 4, 1}, v);
 		ASSERT_FALSE(true);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 	}
 }

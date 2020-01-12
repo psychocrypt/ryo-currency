@@ -55,8 +55,9 @@ struct t_internals;
 class t_daemon final
 {
 	GULPS_CAT_MAJOR("daemon");
+
   public:
-	static void init_options(boost::program_options::options_description &option_spec);
+	static void init_options(boost::program_options::options_description& option_spec);
 
   private:
 	void stop_p2p();
@@ -68,12 +69,12 @@ class t_daemon final
 
   public:
 	t_daemon(
-		boost::program_options::variables_map const &vm);
-	t_daemon(t_daemon &&other);
-	t_daemon &operator=(t_daemon &&other);
+		boost::program_options::variables_map const& vm);
+	t_daemon(t_daemon&& other);
+	t_daemon& operator=(t_daemon&& other);
 	~t_daemon();
 
 	bool run(bool interactive = false);
 	void stop();
 };
-}
+} // namespace daemonize

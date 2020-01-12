@@ -39,7 +39,7 @@ class global_regexp_critical_section
 
   public:
 	global_regexp_critical_section() {}
-	critical_section &get_lock() const { return regexp_lock; }
+	critical_section& get_lock() const { return regexp_lock; }
 };
 
 const static global_regexp_critical_section gregexplock;
@@ -79,6 +79,6 @@ const static global_regexp_critical_section gregexplock;
 		boost::interprocess::ipcdetail::atomic_write32(&regexp_initialized_3, 1); \
 		gregexplock.get_lock().lock().unlock();                                   \
 	}
-}
+} // namespace epee
 
 #endif //_REG_EXP_DEFINER_H_

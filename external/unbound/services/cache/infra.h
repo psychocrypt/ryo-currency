@@ -55,7 +55,8 @@ struct config_file;
 /**
  * Host information kept for every server, per zone.
  */
-struct infra_key {
+struct infra_key
+{
 	/** the host address. */
 	struct sockaddr_storage addr;
 	/** length of addr. */
@@ -72,7 +73,8 @@ struct infra_key {
  * Host information encompasses host capabilities and retransmission timeouts.
  * And lameness information (notAuthoritative, noEDNS, Recursive)
  */
-struct infra_data {
+struct infra_data
+{
 	/** TTL value for this entry. absolute time. */
 	time_t ttl;
 
@@ -109,7 +111,8 @@ struct infra_data {
 /**
  * Infra cache 
  */
-struct infra_cache {
+struct infra_cache
+{
 	/** The hash table with hosts */
 	struct slabhash* hosts;
 	/** TTL value for host information, in seconds */
@@ -128,7 +131,8 @@ extern int infra_dp_ratelimit;
 /**
  * ratelimit settings for domains
  */
-struct domain_limit_data {
+struct domain_limit_data
+{
 	/** key for rbtree, must be first in struct, name of domain */
 	struct name_tree_node node;
 	/** ratelimit for exact match with this name, -1 if not set */
@@ -140,7 +144,8 @@ struct domain_limit_data {
 /**
  * key for ratelimit lookups, a domain name
  */
-struct rate_key {
+struct rate_key
+{
 	/** lruhash key entry */
 	struct lruhash_entry entry;
 	/** domain name in uncompressed wireformat */
@@ -155,7 +160,8 @@ extern int infra_ip_ratelimit;
 /**
  * key for ip_ratelimit lookups, a source IP.
  */
-struct ip_rate_key {
+struct ip_rate_key
+{
 	/** lruhash key entry */
 	struct lruhash_entry entry;
 	/** client ip information */
@@ -174,7 +180,8 @@ struct ip_rate_key {
  * If a new delegation point is found (a referral reply), the previous
  * delegation point is decremented, and the new one is charged with the query.
  */
-struct rate_data {
+struct rate_data
+{
 	/** queries counted, for that second. 0 if not in use. */
 	int qps[RATE_WINDOW];
 	/** what the timestamp is of the qps array members, counter is
@@ -210,7 +217,7 @@ void infra_delete(struct infra_cache* infra);
  * @param cfg: config options.
  * @return the new infra cache pointer or NULL on error.
  */
-struct infra_cache* infra_adjust(struct infra_cache* infra, 
+struct infra_cache* infra_adjust(struct infra_cache* infra,
 	struct config_file* cfg);
 
 /**
@@ -245,7 +252,7 @@ struct lruhash_entry* infra_lookup_nottl(struct infra_cache* infra,
  * @param to: timeout to use, is returned.
  * @return: 0 on error.
  */
-int infra_host(struct infra_cache* infra, struct sockaddr_storage* addr, 
+int infra_host(struct infra_cache* infra, struct sockaddr_storage* addr,
 	socklen_t addrlen, uint8_t* name, size_t namelen,
 	time_t timenow, int* edns_vs, uint8_t* edns_lame_known, int* to);
 
@@ -265,7 +272,7 @@ int infra_host(struct infra_cache* infra, struct sockaddr_storage* addr,
  * @return: 0 on error.
  */
 int infra_set_lame(struct infra_cache* infra,
-        struct sockaddr_storage* addr, socklen_t addrlen,
+	struct sockaddr_storage* addr, socklen_t addrlen,
 	uint8_t* name, size_t namelen, time_t timenow, int dnsseclame,
 	int reclame, uint16_t qtype);
 
@@ -297,7 +304,7 @@ int infra_rtt_update(struct infra_cache* infra, struct sockaddr_storage* addr,
  * @param namelen: length of name
  */
 void infra_update_tcp_works(struct infra_cache* infra,
-        struct sockaddr_storage* addr, socklen_t addrlen,
+	struct sockaddr_storage* addr, socklen_t addrlen,
 	uint8_t* name, size_t namelen);
 
 /**
@@ -313,7 +320,7 @@ void infra_update_tcp_works(struct infra_cache* infra,
  * @return: 0 on error.
  */
 int infra_edns_update(struct infra_cache* infra,
-        struct sockaddr_storage* addr, socklen_t addrlen,
+	struct sockaddr_storage* addr, socklen_t addrlen,
 	uint8_t* name, size_t namelen, int edns_version, time_t timenow);
 
 /**
@@ -335,8 +342,8 @@ int infra_edns_update(struct infra_cache* infra,
  * @return if found in cache, or false if not (or TTL bad).
  */
 int infra_get_lame_rtt(struct infra_cache* infra,
-        struct sockaddr_storage* addr, socklen_t addrlen, 
-	uint8_t* name, size_t namelen, uint16_t qtype, 
+	struct sockaddr_storage* addr, socklen_t addrlen,
+	uint8_t* name, size_t namelen, uint16_t qtype,
 	int* lame, int* dnsseclame, int* reclame, int* rtt, time_t timenow);
 
 /**
@@ -356,7 +363,7 @@ int infra_get_lame_rtt(struct infra_cache* infra,
  *	TTL -2: found but expired.
  */
 long long infra_get_host_rto(struct infra_cache* infra,
-        struct sockaddr_storage* addr, socklen_t addrlen, uint8_t* name,
+	struct sockaddr_storage* addr, socklen_t addrlen, uint8_t* name,
 	size_t namelen, struct rtt_info* rtt, int* delay, time_t timenow,
 	int* tA, int* tAAAA, int* tother);
 

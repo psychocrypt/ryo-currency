@@ -39,7 +39,8 @@ namespace
 class call_counter
 {
   public:
-	call_counter() : m_counter(0) {}
+	call_counter() :
+		m_counter(0) {}
 
 	// memory_order_relaxed is enough for call counter
 	void inc() volatile { m_counter.fetch_add(1, std::memory_order_relaxed); }
@@ -59,12 +60,13 @@ typedef epee::levin::async_protocol_handler<test_levin_connection_context> test_
 
 struct test_levin_commands_handler : public epee::levin::levin_commands_handler<test_levin_connection_context>
 {
-	test_levin_commands_handler()
-		: m_return_code(LEVIN_OK), m_last_command(-1)
+	test_levin_commands_handler() :
+		m_return_code(LEVIN_OK),
+		m_last_command(-1)
 	{
 	}
 
-	virtual int invoke(int command, const std::string &in_buff, std::string &buff_out, test_levin_connection_context &context)
+	virtual int invoke(int command, const std::string& in_buff, std::string& buff_out, test_levin_connection_context& context)
 	{
 		m_invoke_counter.inc();
 		boost::unique_lock<boost::mutex> lock(m_mutex);
@@ -74,7 +76,7 @@ struct test_levin_commands_handler : public epee::levin::levin_commands_handler<
 		return m_return_code;
 	}
 
-	virtual int notify(int command, const std::string &in_buff, test_levin_connection_context &context)
+	virtual int notify(int command, const std::string& in_buff, test_levin_connection_context& context)
 	{
 		m_notify_counter.inc();
 		boost::unique_lock<boost::mutex> lock(m_mutex);
@@ -83,19 +85,19 @@ struct test_levin_commands_handler : public epee::levin::levin_commands_handler<
 		return m_return_code;
 	}
 
-	virtual void callback(test_levin_connection_context &context)
+	virtual void callback(test_levin_connection_context& context)
 	{
 		m_callback_counter.inc();
 		//std::cout << "test_levin_commands_handler::callback()" << std::endl;
 	}
 
-	virtual void on_connection_new(test_levin_connection_context &context)
+	virtual void on_connection_new(test_levin_connection_context& context)
 	{
 		m_new_connection_counter.inc();
 		//std::cout << "test_levin_commands_handler::on_connection_new()" << std::endl;
 	}
 
-	virtual void on_connection_close(test_levin_connection_context &context)
+	virtual void on_connection_close(test_levin_connection_context& context)
 	{
 		m_close_connection_counter.inc();
 		//std::cout << "test_levin_commands_handler::on_connection_close()" << std::endl;
@@ -110,11 +112,11 @@ struct test_levin_commands_handler : public epee::levin::levin_commands_handler<
 	int return_code() const { return m_return_code; }
 	void return_code(int v) { m_return_code = v; }
 
-	const std::string &invoke_out_buf() const { return m_invoke_out_buf; }
-	void invoke_out_buf(const std::string &v) { m_invoke_out_buf = v; }
+	const std::string& invoke_out_buf() const { return m_invoke_out_buf; }
+	void invoke_out_buf(const std::string& v) { m_invoke_out_buf = v; }
 
 	int last_command() const { return m_last_command; }
-	const std::string &last_in_buf() const { return m_last_in_buf; }
+	const std::string& last_in_buf() const { return m_last_in_buf; }
 
   private:
 	call_counter m_invoke_counter;
@@ -135,8 +137,10 @@ struct test_levin_commands_handler : public epee::levin::levin_commands_handler<
 class test_connection : public epee::net_utils::i_service_endpoint
 {
   public:
-	test_connection(boost::asio::io_service &io_service, test_levin_protocol_handler_config &protocol_config)
-		: m_io_service(io_service), m_protocol_handler(this, protocol_config, m_context), m_send_return(true)
+	test_connection(boost::asio::io_service& io_service, test_levin_protocol_handler_config& protocol_config) :
+		m_io_service(io_service),
+		m_protocol_handler(this, protocol_config, m_context),
+		m_send_return(true)
 	{
 	}
 
@@ -146,24 +150,24 @@ class test_connection : public epee::net_utils::i_service_endpoint
 	}
 
 	// Implement epee::net_utils::i_service_endpoint interface
-	virtual bool do_send(const void *ptr, size_t cb)
+	virtual bool do_send(const void* ptr, size_t cb)
 	{
 		m_send_counter.inc();
 		boost::unique_lock<boost::mutex> lock(m_mutex);
-		m_last_send_data.append(reinterpret_cast<const char *>(ptr), cb);
+		m_last_send_data.append(reinterpret_cast<const char*>(ptr), cb);
 		return m_send_return;
 	}
 
 	virtual bool close() { return true; }
 	virtual bool call_run_once_service_io() { return true; }
 	virtual bool request_callback() { return true; }
-	virtual boost::asio::io_service &get_io_service() { return m_io_service; }
+	virtual boost::asio::io_service& get_io_service() { return m_io_service; }
 	virtual bool add_ref() { return true; }
 	virtual bool release() { return true; }
 
 	size_t send_counter() const { return m_send_counter.get(); }
 
-	const std::string &last_send_data() const { return m_last_send_data; }
+	const std::string& last_send_data() const { return m_last_send_data; }
 	void reset_last_send_data()
 	{
 		boost::unique_lock<boost::mutex> lock(m_mutex);
@@ -178,7 +182,7 @@ class test_connection : public epee::net_utils::i_service_endpoint
 	test_levin_protocol_handler m_protocol_handler;
 
   private:
-	boost::asio::io_service &m_io_service;
+	boost::asio::io_service& m_io_service;
 
 	call_counter m_send_counter;
 	boost::mutex m_mutex;
@@ -277,14 +281,14 @@ class test_connection : public epee::net_utils::i_service_endpoint
     std::string m_expected_invoke_out_buf;
   };
 #endif
-}
+} // namespace
 
 class LevinFuzzer : public Fuzzer
 {
   public:
 	LevinFuzzer() {} //: handler(endpoint, config, context) {}
 	virtual int init();
-	virtual int run(const std::string &filename);
+	virtual int run(const std::string& filename);
 
   private:
 	//epee::net_utils::connection_context_base context;
@@ -296,7 +300,7 @@ int LevinFuzzer::init()
 	return 0;
 }
 
-int LevinFuzzer::run(const std::string &filename)
+int LevinFuzzer::run(const std::string& filename)
 {
 	std::string s;
 
@@ -323,15 +327,15 @@ int LevinFuzzer::run(const std::string &filename)
 		//std::unique_ptr<test_connection> conn = new test();
 		boost::asio::io_service io_service;
 		test_levin_protocol_handler_config m_handler_config;
-		test_levin_commands_handler *m_pcommands_handler = new test_levin_commands_handler();
-		m_handler_config.set_handler(m_pcommands_handler, [](epee::levin::levin_commands_handler<test_levin_connection_context> *handler) { delete handler; });
+		test_levin_commands_handler* m_pcommands_handler = new test_levin_commands_handler();
+		m_handler_config.set_handler(m_pcommands_handler, [](epee::levin::levin_commands_handler<test_levin_connection_context>* handler) { delete handler; });
 		std::unique_ptr<test_connection> conn(new test_connection(io_service, m_handler_config));
 		conn->start();
 		//m_commands_handler.invoke_out_buf(expected_out_data);
 		//m_commands_handler.return_code(expected_return_code);
 		conn->m_protocol_handler.handle_recv(s.data(), s.size());
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		std::cerr << "Failed to test http client: " << e.what() << std::endl;
 		return 1;
@@ -339,7 +343,7 @@ int LevinFuzzer::run(const std::string &filename)
 	return 0;
 }
 
-int main(int argc, const char **argv)
+int main(int argc, const char** argv)
 {
 	LevinFuzzer fuzzer;
 	return run_fuzzer(argc, argv, fuzzer);

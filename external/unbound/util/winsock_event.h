@@ -106,15 +106,15 @@
 #define signal_del winsocksignal_del
 
 /** event timeout */
-#define EV_TIMEOUT      0x01
+#define EV_TIMEOUT 0x01
 /** event fd readable */
-#define EV_READ         0x02
+#define EV_READ 0x02
 /** event fd writable */
-#define EV_WRITE        0x04
+#define EV_WRITE 0x04
 /** event signal */
-#define EV_SIGNAL       0x08
+#define EV_SIGNAL 0x08
 /** event must persist */
-#define EV_PERSIST      0x10
+#define EV_PERSIST 0x10
 
 /* needs our redblack tree */
 #include "rbtree.h"
@@ -140,7 +140,7 @@ struct event_base
 	/** capacity of array, size of array in items */
 	int cap;
 	/** array of 0 - maxsig of ptr to event for it */
-        struct event** signals;
+	struct event** signals;
 	/** if we need to exit */
 	int need_to_exit;
 	/** where to store time in seconds */
@@ -167,25 +167,26 @@ struct event_base
 /**
  * Event structure. Has some of the event elements.
  */
-struct event {
-        /** node in timeout rbtree */
-        rbnode_type node;
-        /** is event already added */
-        int added;
+struct event
+{
+	/** node in timeout rbtree */
+	rbnode_type node;
+	/** is event already added */
+	int added;
 
-        /** event base it belongs to */
-        struct event_base *ev_base;
-        /** fd to poll or -1 for timeouts. signal number for sigs. */
-        int ev_fd;
-        /** what events this event is interested in, see EV_.. above. */
-        short ev_events;
-        /** timeout value */
-        struct timeval ev_timeout;
+	/** event base it belongs to */
+	struct event_base* ev_base;
+	/** fd to poll or -1 for timeouts. signal number for sigs. */
+	int ev_fd;
+	/** what events this event is interested in, see EV_.. above. */
+	short ev_events;
+	/** timeout value */
+	struct timeval ev_timeout;
 
-        /** callback to call: fd, eventbits, userarg */
-        void (*ev_callback)(int, short, void *);
-        /** callback user arg */
-        void *ev_arg;
+	/** callback to call: fd, eventbits, userarg */
+	void (*ev_callback)(int, short, void*);
+	/** callback user arg */
+	void* ev_arg;
 
 	/* ----- nonpublic part, for winsock_event only ----- */
 	/** index of this event in the items array (if added) */
@@ -209,39 +210,39 @@ struct event {
 };
 
 /** create event base */
-void *event_init(time_t* time_secs, struct timeval* time_tv);
+void* event_init(time_t* time_secs, struct timeval* time_tv);
 /** get version */
-const char *event_get_version(void);
+const char* event_get_version(void);
 /** get polling method (select,epoll) */
-const char *event_get_method(void);
+const char* event_get_method(void);
 /** run select in a loop */
-int event_base_dispatch(struct event_base *);
+int event_base_dispatch(struct event_base*);
 /** exit that loop */
-int event_base_loopexit(struct event_base *, struct timeval *);
+int event_base_loopexit(struct event_base*, struct timeval*);
 /** free event base. Free events yourself */
-void event_base_free(struct event_base *);
+void event_base_free(struct event_base*);
 /** set content of event */
-void event_set(struct event *, int, short, void (*)(int, short, void *), void *);
+void event_set(struct event*, int, short, void (*)(int, short, void*), void*);
 
 /** add event to a base. You *must* call this for every event. */
-int event_base_set(struct event_base *, struct event *);
+int event_base_set(struct event_base*, struct event*);
 /** add event to make it active. You may not change it with event_set anymore */
-int event_add(struct event *, struct timeval *);
+int event_add(struct event*, struct timeval*);
 /** remove event. You may change it again */
-int event_del(struct event *);
+int event_del(struct event*);
 
-#define evtimer_add(ev, tv)             event_add(ev, tv)
-#define evtimer_del(ev)                 event_del(ev)
+#define evtimer_add(ev, tv) event_add(ev, tv)
+#define evtimer_del(ev) event_del(ev)
 
 /* uses different implementation. Cannot mix fd/timeouts and signals inside
  * the same struct event. create several event structs for that.  */
 /** install signal handler */
-int signal_add(struct event *, struct timeval *);
+int signal_add(struct event*, struct timeval*);
 /** set signal event contents */
-#define signal_set(ev, x, cb, arg)      \
-        event_set(ev, x, EV_SIGNAL|EV_PERSIST, cb, arg)
+#define signal_set(ev, x, cb, arg) \
+	event_set(ev, x, EV_SIGNAL | EV_PERSIST, cb, arg)
 /** remove signal handler */
-int signal_del(struct event *);
+int signal_del(struct event*);
 
 /** compare events in tree, based on timevalue, ptr for uniqueness */
 int mini_ev_cmp(const void* a, const void* b);

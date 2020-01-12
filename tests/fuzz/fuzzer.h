@@ -32,7 +32,7 @@ class Fuzzer
 {
   public:
 	virtual int init() { return 0; }
-	virtual int run(const std::string &filename) = 0;
+	virtual int run(const std::string& filename) = 0;
 };
 
-int run_fuzzer(int argc, const char **argv, Fuzzer &fuzzer);
+int run_fuzzer(int argc, const char** argv, Fuzzer& fuzzer);

@@ -69,12 +69,15 @@ struct json_archive_base
 	typedef json_archive_base<Stream, IsSaving> base_type;
 	typedef boost::mpl::bool_<IsSaving> is_saving;
 
-	typedef const char *variant_tag_type;
+	typedef const char* variant_tag_type;
 
-	json_archive_base(stream_type &s, bool indent = false)
-		: stream_(s), indent_(indent), object_begin(false), depth_(0) {}
+	json_archive_base(stream_type& s, bool indent = false) :
+		stream_(s),
+		indent_(indent),
+		object_begin(false),
+		depth_(0) {}
 
-	void tag(const char *tag)
+	void tag(const char* tag)
 	{
 		if(!object_begin)
 			stream_ << ", ";
@@ -99,7 +102,7 @@ struct json_archive_base
 
 	void begin_variant() { begin_object(); }
 	void end_variant() { end_object(); }
-	Stream &stream() { return stream_; }
+	Stream& stream() { return stream_; }
 
   protected:
 	void make_indent()
@@ -112,7 +115,7 @@ struct json_archive_base
 	}
 
   protected:
-	stream_type &stream_;
+	stream_type& stream_;
 	bool indent_;
 	bool object_begin;
 	size_t depth_;
@@ -130,7 +133,8 @@ struct json_archive;
 template <>
 struct json_archive<true> : public json_archive_base<std::ostream, true>
 {
-	json_archive(stream_type &s, bool indent = false) : base_type(s, indent) {}
+	json_archive(stream_type& s, bool indent = false) :
+		base_type(s, indent) {}
 
 	template <typename T>
 	static auto promote_to_printable_integer_type(T v) -> decltype(+v)
@@ -146,29 +150,29 @@ struct json_archive<true> : public json_archive_base<std::ostream, true>
 		stream_ << std::dec << promote_to_printable_integer_type(v);
 	}
 
-	void serialize_blob(void *buf, size_t len, const char *delimiter = "\"")
+	void serialize_blob(void* buf, size_t len, const char* delimiter = "\"")
 	{
 		begin_string(delimiter);
 		for(size_t i = 0; i < len; i++)
 		{
-			unsigned char c = ((unsigned char *)buf)[i];
+			unsigned char c = ((unsigned char*)buf)[i];
 			stream_ << std::hex << std::setw(2) << std::setfill('0') << (int)c;
 		}
 		end_string(delimiter);
 	}
 
 	template <class T>
-	void serialize_varint(T &v)
+	void serialize_varint(T& v)
 	{
 		stream_ << std::dec << promote_to_printable_integer_type(v);
 	}
 
-	void begin_string(const char *delimiter = "\"")
+	void begin_string(const char* delimiter = "\"")
 	{
 		stream_ << delimiter;
 	}
 
-	void end_string(const char *delimiter = "\"")
+	void end_string(const char* delimiter = "\"")
 	{
 		stream_ << delimiter;
 	}
@@ -195,7 +199,7 @@ struct json_archive<true> : public json_archive_base<std::ostream, true>
 		stream_ << "]";
 	}
 
-	void write_variant_tag(const char *t)
+	void write_variant_tag(const char* t)
 	{
 		tag(t);
 	}

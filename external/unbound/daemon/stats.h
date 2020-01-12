@@ -88,7 +88,7 @@ void server_stats_obtain(struct worker* worker, struct worker* who,
  * @param reset: if true, depending on config stats are reset.
  * 	if false, statistics are not reset.
  */
-void server_stats_compile(struct worker* worker, struct ub_stats_info* s, 
+void server_stats_compile(struct worker* worker, struct ub_stats_info* s,
 	int reset);
 
 /**
@@ -116,7 +116,7 @@ void server_stats_add(struct ub_stats_info* total, struct ub_stats_info* a);
  * @param repinfo: reply info with remote address
  */
 void server_stats_insquery(struct ub_server_stats* stats, struct comm_point* c,
-	uint16_t qtype, uint16_t qclass, struct edns_data* edns, 
+	uint16_t qtype, uint16_t qclass, struct edns_data* edns,
 	struct comm_reply* repinfo);
 
 /**

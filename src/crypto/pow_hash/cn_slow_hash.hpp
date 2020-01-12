@@ -55,7 +55,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 // Macros are for template instantiations
 // Cryptonight
 #define cn_v1_hash_t cn_slow_hash<2 * 1024 * 1024, 0x80000, 0>
@@ -122,7 +121,8 @@ inline bool hw_check_aes()
 class cn_sptr
 {
   public:
-	cn_sptr() : base_ptr(nullptr) {}
+	cn_sptr() :
+		base_ptr(nullptr) {}
 	cn_sptr(uint64_t* ptr) { base_ptr = ptr; }
 	cn_sptr(uint32_t* ptr) { base_ptr = ptr; }
 	cn_sptr(uint8_t* ptr) { base_ptr = ptr; }
@@ -157,13 +157,17 @@ template <size_t MEMORY, size_t ITER, size_t VERSION>
 class cn_slow_hash
 {
   public:
-	cn_slow_hash() : borrowed_pad(false)
+	cn_slow_hash() :
+		borrowed_pad(false)
 	{
 		lpad.set(boost::alignment::aligned_alloc(4096, MEMORY));
 		spad.set(boost::alignment::aligned_alloc(4096, 4096));
 	}
 
-	cn_slow_hash(cn_slow_hash&& other) noexcept : lpad(other.lpad.as_byte()), spad(other.spad.as_byte()), borrowed_pad(other.borrowed_pad)
+	cn_slow_hash(cn_slow_hash&& other) noexcept :
+		lpad(other.lpad.as_byte()),
+		spad(other.spad.as_byte()),
+		borrowed_pad(other.borrowed_pad)
 	{
 		other.lpad.set(nullptr);
 		other.spad.set(nullptr);

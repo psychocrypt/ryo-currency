@@ -51,13 +51,13 @@ struct regional;
  * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  * |QR|   Opcode  |AA|TC|RD|RA| Z|AD|CD|   RCODE   |
  * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- */ 
+ */
 /** CD flag */
 #define BIT_CD 0x0010
 /** AD flag */
 #define BIT_AD 0x0020
 /** Z flag */
-#define BIT_Z  0x0040
+#define BIT_Z 0x0040
 /** RA flag */
 #define BIT_RA 0x0080
 /** RD flag */
@@ -69,16 +69,16 @@ struct regional;
 /** QR flag */
 #define BIT_QR 0x8000
 /** get RCODE bits from uint16 flags */
-#define FLAGS_GET_RCODE(f) ((f) & 0xf)
+#define FLAGS_GET_RCODE(f) ((f)&0xf)
 /** set RCODE bits in uint16 flags */
-#define FLAGS_SET_RCODE(f, r) (f = (((f) & 0xfff0) | (r)))
+#define FLAGS_SET_RCODE(f, r) (f = (((f)&0xfff0) | (r)))
 
 /** timeout in seconds for UDP queries to auth servers. */
 #define UDP_AUTH_QUERY_TIMEOUT 4
 /** timeout in seconds for TCP queries to auth servers. */
 #define TCP_AUTH_QUERY_TIMEOUT 30
 /** Advertised version of EDNS capabilities */
-#define EDNS_ADVERTISED_VERSION         0
+#define EDNS_ADVERTISED_VERSION 0
 /** Advertised size of EDNS capabilities */
 extern uint16_t EDNS_ADVERTISED_SIZE;
 /** bits for EDNS bitfield */
@@ -111,14 +111,14 @@ int str_is_ip6(const char* str);
  * @param s: file descriptor.
  * @return: 0 on error (error is printed to log).
  */
-int fd_set_nonblock(int s); 
+int fd_set_nonblock(int s);
 
 /**
  * Set fd (back to) blocking.
  * @param s: file descriptor.
  * @return: 0 on error (error is printed to log).
  */
-int fd_set_block(int s); 
+int fd_set_block(int s);
 
 /**
  * See if number is a power of 2.
@@ -142,7 +142,7 @@ void* memdup(void* data, size_t len);
  * @param addr: the sockaddr to print. Can be ip4 or ip6.
  * @param addrlen: length of addr.
  */
-void log_addr(enum verbosity_value v, const char* str, 
+void log_addr(enum verbosity_value v, const char* str,
 	struct sockaddr_storage* addr, socklen_t addrlen);
 
 /**
@@ -153,7 +153,7 @@ void log_addr(enum verbosity_value v, const char* str,
  * @param addr: the sockaddr to print. Can be ip4 or ip6.
  * @param addrlen: length of addr.
  */
-void log_name_addr(enum verbosity_value v, const char* str, uint8_t* zone, 
+void log_name_addr(enum verbosity_value v, const char* str, uint8_t* zone,
 	struct sockaddr_storage* addr, socklen_t addrlen);
 
 /**
@@ -174,7 +174,7 @@ void log_err_addr(const char* str, const char* err,
  * @param addrlen: length of stored sockaddr is returned.
  * @return 0 on error.
  */
-int extstrtoaddr(const char* str, struct sockaddr_storage* addr, 
+int extstrtoaddr(const char* str, struct sockaddr_storage* addr,
 	socklen_t* addrlen);
 
 /**
@@ -218,7 +218,7 @@ void sockaddr_store_port(struct sockaddr_storage* addr, socklen_t addrlen,
  * @param type: host format RR type.
  * @param dclass: host format RR class.
  */
-void log_nametypeclass(enum verbosity_value v, const char* str, 
+void log_nametypeclass(enum verbosity_value v, const char* str,
 	uint8_t* name, uint16_t type, uint16_t dclass);
 
 /**
@@ -230,7 +230,7 @@ void log_nametypeclass(enum verbosity_value v, const char* str,
  * @param len2: lengths of addr2.
  * @return: 0 if addr1 == addr2. -1 if addr1 is smaller, +1 if larger.
  */
-int sockaddr_cmp(struct sockaddr_storage* addr1, socklen_t len1, 
+int sockaddr_cmp(struct sockaddr_storage* addr1, socklen_t len1,
 	struct sockaddr_storage* addr2, socklen_t len2);
 
 /**
@@ -241,7 +241,7 @@ int sockaddr_cmp(struct sockaddr_storage* addr1, socklen_t len1,
  * @param len2: lengths of addr2.
  * @return: 0 if addr1 == addr2. -1 if addr1 is smaller, +1 if larger.
  */
-int sockaddr_cmp_addr(struct sockaddr_storage* addr1, socklen_t len1, 
+int sockaddr_cmp_addr(struct sockaddr_storage* addr1, socklen_t len1,
 	struct sockaddr_storage* addr2, socklen_t len2);
 
 /**
@@ -335,7 +335,7 @@ void sock_list_prepend(struct sock_list** list, struct sock_list* add);
  * @return true if found.
  */
 int sock_list_find(struct sock_list* list, struct sockaddr_storage* addr,
-        socklen_t len);
+	socklen_t len);
 
 /**
  * Merge socklist into another socket list.  Allocates the new entries

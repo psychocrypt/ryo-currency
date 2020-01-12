@@ -76,8 +76,10 @@ template <typename T>
 class test_runner
 {
   public:
-	test_runner(const Params &params)
-		: m_elapsed(0), m_params(params), m_per_call_timers(T::loop_count * params.loop_multiplier, {true})
+	test_runner(const Params& params) :
+		m_elapsed(0),
+		m_params(params),
+		m_per_call_timers(T::loop_count * params.loop_multiplier, {true})
 	{
 	}
 
@@ -119,7 +121,7 @@ class test_runner
 	uint64_t per_call_min() const
 	{
 		uint64_t v = std::numeric_limits<uint64_t>::max();
-		for(const auto &pt : m_per_call_timers)
+		for(const auto& pt : m_per_call_timers)
 			v = std::min(v, pt.value());
 		return v;
 	}
@@ -127,7 +129,7 @@ class test_runner
 	uint64_t per_call_max() const
 	{
 		uint64_t v = std::numeric_limits<uint64_t>::min();
-		for(const auto &pt : m_per_call_timers)
+		for(const auto& pt : m_per_call_timers)
 			v = std::max(v, pt.value());
 		return v;
 	}
@@ -135,7 +137,7 @@ class test_runner
 	uint64_t per_call_mean() const
 	{
 		uint64_t v = 0;
-		for(const auto &pt : m_per_call_timers)
+		for(const auto& pt : m_per_call_timers)
 			v += pt.value();
 		return v / m_per_call_timers.size();
 	}
@@ -144,7 +146,7 @@ class test_runner
 	{
 		std::vector<uint64_t> values;
 		values.reserve(m_per_call_timers.size());
-		for(const auto &pt : m_per_call_timers)
+		for(const auto& pt : m_per_call_timers)
 			values.push_back(pt.value());
 		return epee::misc_utils::median(values);
 	}
@@ -155,7 +157,7 @@ class test_runner
 			return 0;
 		const uint64_t mean = per_call_mean();
 		uint64_t acc = 0;
-		for(const auto &pt : m_per_call_timers)
+		for(const auto& pt : m_per_call_timers)
 		{
 			int64_t dv = pt.value() - mean;
 			acc += dv * dv;
@@ -192,7 +194,7 @@ class test_runner
 };
 
 template <typename T>
-void run_test(const std::string &filter, const Params &params, const char *test_name)
+void run_test(const std::string& filter, const Params& params, const char* test_name)
 {
 	boost::smatch match;
 	if(!filter.empty() && !boost::regex_match(std::string(test_name), match, boost::regex(filter)))
@@ -218,7 +220,7 @@ void run_test(const std::string &filter, const Params &params, const char *test_
 		{
 			std::cout << test_name << " (" << T::loop_count * params.loop_multiplier << " calls) - OK:";
 		}
-		const char *unit = "ms";
+		const char* unit = "ms";
 		uint64_t scale = 1000000;
 		int time_per_call = runner.time_per_call();
 		if(time_per_call < 30000)

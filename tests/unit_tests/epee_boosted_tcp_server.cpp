@@ -56,7 +56,7 @@ struct test_protocol_handler
 	typedef test_connection_context connection_context;
 	typedef test_protocol_handler_config config_type;
 
-	test_protocol_handler(epee::net_utils::i_service_endpoint * /*psnd_hndlr*/, config_type & /*config*/, connection_context & /*conn_context*/)
+	test_protocol_handler(epee::net_utils::i_service_endpoint* /*psnd_hndlr*/, config_type& /*config*/, connection_context& /*conn_context*/)
 	{
 	}
 
@@ -73,14 +73,14 @@ struct test_protocol_handler
 		return true;
 	}
 
-	bool handle_recv(const void * /*data*/, size_t /*size*/)
+	bool handle_recv(const void* /*data*/, size_t /*size*/)
 	{
 		return false;
 	}
 };
 
 typedef epee::net_utils::boosted_tcp_server<test_protocol_handler> test_tcp_server;
-}
+} // namespace
 
 TEST(boosted_tcp_server, worker_threads_are_exception_resistant)
 {

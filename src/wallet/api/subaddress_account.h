@@ -53,20 +53,20 @@ class WalletImpl;
 class SubaddressAccountImpl : public SubaddressAccount
 {
   public:
-	SubaddressAccountImpl(WalletImpl *wallet);
+	SubaddressAccountImpl(WalletImpl* wallet);
 	~SubaddressAccountImpl();
 
 	// Fetches addresses from Wallet2
 	void refresh();
-	std::vector<SubaddressAccountRow *> getAll() const;
-	void addRow(const std::string &label);
-	void setLabel(uint32_t accountIndex, const std::string &label);
+	std::vector<SubaddressAccountRow*> getAll() const;
+	void addRow(const std::string& label);
+	void setLabel(uint32_t accountIndex, const std::string& label);
 
   private:
 	void clearRows();
 
   private:
-	WalletImpl *m_wallet;
-	std::vector<SubaddressAccountRow *> m_rows;
+	WalletImpl* m_wallet;
+	std::vector<SubaddressAccountRow*> m_rows;
 };
-}
+} // namespace Ryo

@@ -47,7 +47,8 @@ struct cachedb_backend;
  * Shared between threads, this represents long term information.
  * Like database connections.
  */
-struct cachedb_env {
+struct cachedb_env
+{
 	/** true is cachedb is enabled, the backend is turned on */
 	int enabled;
 
@@ -61,14 +62,16 @@ struct cachedb_env {
 /**
  * Per query state for the cachedb module.
  */
-struct cachedb_qstate {
+struct cachedb_qstate
+{
 	int todo;
 };
 
 /**
  * Backend call routines
  */
-struct cachedb_backend {
+struct cachedb_backend
+{
 	/** backend name */
 	const char* name;
 
@@ -81,7 +84,7 @@ struct cachedb_backend {
 	/** Lookup (env, cachedb_env, key, result_buffer): true if found */
 	int (*lookup)(struct module_env*, struct cachedb_env*, char*,
 		struct sldns_buffer*);
-	
+
 	/** Store (env, cachedb_env, key, data, data_len) */
 	void (*store)(struct module_env*, struct cachedb_env*, char*,
 		uint8_t*, size_t);
@@ -107,4 +110,3 @@ size_t cachedb_get_mem(struct module_env* env, int id);
  * @return the function block for "cachedb".
  */
 struct module_func_block* cachedb_get_funcblock(void);
-

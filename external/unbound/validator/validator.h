@@ -56,13 +56,13 @@ struct config_strlist;
  * will be primed no more often than this interval.  Used when harden-
  * dnssec-stripped is off and the trust anchor fails.
  */
-#define NULL_KEY_TTL	60 /* seconds */
+#define NULL_KEY_TTL 60 /* seconds */
 
 /**
  * TTL for bogus key entries.  When a DS or DNSKEY fails in the chain of
  * trust the entire zone for that name is blacked out for this TTL.
  */
-#define BOGUS_KEY_TTL	60 /* seconds */
+#define BOGUS_KEY_TTL 60 /* seconds */
 
 /** max number of query restarts, number of IPs to probe */
 #define VAL_MAX_RESTART_COUNT 5
@@ -70,7 +70,8 @@ struct config_strlist;
 /**
  * Global state for the validator. 
  */
-struct val_env {
+struct val_env
+{
 	/** key cache; these are validated keys. trusted keys only
 	 * end up here after being primed. */
 	struct key_cache* kcache;
@@ -121,7 +122,8 @@ struct val_env {
 /**
  * State of the validator for a query.
  */
-enum val_state {
+enum val_state
+{
 	/** initial state for validation */
 	VAL_INIT_STATE = 0,
 	/** find the proper keys for validation, follow trust chain */
@@ -137,7 +139,8 @@ enum val_state {
 /**
  * Per query state for the validator module.
  */
-struct val_qstate {
+struct val_qstate
+{
 	/** 
 	 * State of the validator module.
 	 */
@@ -225,10 +228,11 @@ struct val_qstate {
 	/** length of dlv insecure point name */
 	size_t dlv_insecure_at_len;
 	/** status of DLV lookup. Indication to VAL_DLV_STATE what to do */
-	enum dlv_status {
-		dlv_error, /* server failure */
-		dlv_success, /* got a DLV */
-		dlv_ask_higher, /* ask again */
+	enum dlv_status
+	{
+		dlv_error,			/* server failure */
+		dlv_success,		/* got a DLV */
+		dlv_ask_higher,		/* ask again */
 		dlv_there_is_no_dlv /* got no DLV, sure of it */
 	} dlv_status;
 };
@@ -254,7 +258,7 @@ void val_deinit(struct module_env* env, int id);
 
 /** validator operate on a query */
 void val_operate(struct module_qstate* qstate, enum module_ev event, int id,
-        struct outbound_entry* outbound);
+	struct outbound_entry* outbound);
 
 /** 
  * inform validator super.

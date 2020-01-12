@@ -55,16 +55,16 @@ struct tx_builder
 		add_tx_pub_key_to_extra(m_tx, m_tx_key.pub);
 	}
 
-	void step2_fill_inputs(const account_keys &sender_account_keys, const std::vector<tx_source_entry> &sources)
+	void step2_fill_inputs(const account_keys& sender_account_keys, const std::vector<tx_source_entry>& sources)
 	{
-		BOOST_FOREACH(const tx_source_entry &src_entr, sources)
+		BOOST_FOREACH(const tx_source_entry& src_entr, sources)
 		{
 			m_in_contexts.push_back(keypair());
-			keypair &in_ephemeral = m_in_contexts.back();
+			keypair& in_ephemeral = m_in_contexts.back();
 			crypto::key_image img;
 			std::unordered_map<crypto::public_key, cryptonote::subaddress_index> subaddresses;
 			subaddresses[sender_account_keys.m_account_address.m_spend_public_key] = {0, 0};
-			auto &out_key = reinterpret_cast<const crypto::public_key &>(src_entr.outputs[src_entr.real_output].second.dest);
+			auto& out_key = reinterpret_cast<const crypto::public_key&>(src_entr.outputs[src_entr.real_output].second.dest);
 			generate_key_image_helper(sender_account_keys, subaddresses, out_key, src_entr.real_out_tx_key, src_entr.real_out_additional_tx_keys, src_entr.real_output_in_tx_index, in_ephemeral, img, hw::get_device(("default")));
 
 			// put key image into tx input
@@ -73,7 +73,7 @@ struct tx_builder
 			input_to_key.k_image = img;
 
 			// fill outputs array and use relative offsets
-			BOOST_FOREACH(const tx_source_entry::output_entry &out_entry, src_entr.outputs)
+			BOOST_FOREACH(const tx_source_entry::output_entry& out_entry, src_entr.outputs)
 				input_to_key.key_offsets.push_back(out_entry.first);
 
 			input_to_key.key_offsets = absolute_output_offsets_to_relative(input_to_key.key_offsets);
@@ -81,10 +81,10 @@ struct tx_builder
 		}
 	}
 
-	void step3_fill_outputs(const std::vector<tx_destination_entry> &destinations)
+	void step3_fill_outputs(const std::vector<tx_destination_entry>& destinations)
 	{
 		size_t output_index = 0;
-		BOOST_FOREACH(const tx_destination_entry &dst_entr, destinations)
+		BOOST_FOREACH(const tx_destination_entry& dst_entr, destinations)
 		{
 			crypto::key_derivation derivation;
 			crypto::public_key out_eph_public_key;
@@ -106,17 +106,17 @@ struct tx_builder
 		get_transaction_prefix_hash(m_tx, m_tx_prefix_hash);
 	}
 
-	void step5_sign(const std::vector<tx_source_entry> &sources)
+	void step5_sign(const std::vector<tx_source_entry>& sources)
 	{
 		m_tx.signatures.clear();
 
 		size_t i = 0;
-		BOOST_FOREACH(const tx_source_entry &src_entr, sources)
+		BOOST_FOREACH(const tx_source_entry& src_entr, sources)
 		{
-			std::vector<const crypto::public_key *> keys_ptrs;
+			std::vector<const crypto::public_key*> keys_ptrs;
 			std::vector<crypto::public_key> keys(src_entr.outputs.size());
 			size_t j = 0;
-			BOOST_FOREACH(const tx_source_entry::output_entry &o, src_entr.outputs)
+			BOOST_FOREACH(const tx_source_entry::output_entry& o, src_entr.outputs)
 			{
 				keys[j] = rct::rct2pk(o.second.dest);
 				keys_ptrs.push_back(&keys[j]);
@@ -124,7 +124,7 @@ struct tx_builder
 			}
 
 			m_tx.signatures.push_back(std::vector<crypto::signature>());
-			std::vector<crypto::signature> &sigs = m_tx.signatures.back();
+			std::vector<crypto::signature>& sigs = m_tx.signatures.back();
 			sigs.resize(src_entr.outputs.size());
 			generate_ring_signature(m_tx_prefix_hash, boost::get<txin_to_key>(m_tx.vin[i]).k_image, keys_ptrs, m_in_contexts[i].sec, src_entr.real_output, sigs.data());
 			i++;
@@ -137,9 +137,9 @@ struct tx_builder
 	crypto::hash m_tx_prefix_hash;
 };
 
-transaction make_simple_tx_with_unlock_time(const std::vector<test_event_entry> &events,
-											const cryptonote::block &blk_head, const cryptonote::account_base &from, const cryptonote::account_base &to,
-											uint64_t amount, uint64_t unlock_time)
+transaction make_simple_tx_with_unlock_time(const std::vector<test_event_entry>& events,
+	const cryptonote::block& blk_head, const cryptonote::account_base& from, const cryptonote::account_base& to,
+	uint64_t amount, uint64_t unlock_time)
 {
 	std::vector<tx_source_entry> sources;
 	std::vector<tx_destination_entry> destinations;
@@ -178,12 +178,12 @@ crypto::key_image generate_invalid_key_image()
 		throw std::runtime_error("invalid key image wasn't found");
 	return key_image;
 }
-}
+} // namespace
 
 //----------------------------------------------------------------------------------------------------------------------
 // Tests
 
-bool gen_tx_big_version::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_big_version::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -208,7 +208,7 @@ bool gen_tx_big_version::generate(std::vector<test_event_entry> &events) const
 	return true;
 }
 
-bool gen_tx_unlock_time::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_unlock_time::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -249,7 +249,7 @@ bool gen_tx_unlock_time::generate(std::vector<test_event_entry> &events) const
 	return true;
 }
 
-bool gen_tx_input_is_not_txin_to_key::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_input_is_not_txin_to_key::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -263,7 +263,7 @@ bool gen_tx_input_is_not_txin_to_key::generate(std::vector<test_event_entry> &ev
 	DO_CALLBACK(events, "mark_invalid_tx");
 	events.push_back(blk_tmp.miner_tx);
 
-	auto make_tx_with_input = [&](const txin_v &tx_input) -> transaction {
+	auto make_tx_with_input = [&](const txin_v& tx_input) -> transaction {
 		std::vector<tx_source_entry> sources;
 		std::vector<tx_destination_entry> destinations;
 		fill_tx_sources_and_destinations(events, blk_0, miner_account, miner_account, MK_COINS(1), TESTS_DEFAULT_FEE, 0, sources, destinations);
@@ -284,7 +284,7 @@ bool gen_tx_input_is_not_txin_to_key::generate(std::vector<test_event_entry> &ev
 	return true;
 }
 
-bool gen_tx_no_inputs_no_outputs::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_no_inputs_no_outputs::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -300,7 +300,7 @@ bool gen_tx_no_inputs_no_outputs::generate(std::vector<test_event_entry> &events
 	return true;
 }
 
-bool gen_tx_no_inputs_has_outputs::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_no_inputs_has_outputs::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -321,7 +321,7 @@ bool gen_tx_no_inputs_has_outputs::generate(std::vector<test_event_entry> &event
 	return true;
 }
 
-bool gen_tx_has_inputs_no_outputs::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_has_inputs_no_outputs::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -347,7 +347,7 @@ bool gen_tx_has_inputs_no_outputs::generate(std::vector<test_event_entry> &event
 	return true;
 }
 
-bool gen_tx_invalid_input_amount::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_invalid_input_amount::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -373,7 +373,7 @@ bool gen_tx_invalid_input_amount::generate(std::vector<test_event_entry> &events
 	return true;
 }
 
-bool gen_tx_input_wo_key_offsets::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_input_wo_key_offsets::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -389,7 +389,7 @@ bool gen_tx_input_wo_key_offsets::generate(std::vector<test_event_entry> &events
 	builder.step1_init();
 	builder.step2_fill_inputs(miner_account.get_keys(), sources);
 	builder.step3_fill_outputs(destinations);
-	txin_to_key &in_to_key = boost::get<txin_to_key>(builder.m_tx.vin.front());
+	txin_to_key& in_to_key = boost::get<txin_to_key>(builder.m_tx.vin.front());
 	uint64_t key_offset = in_to_key.key_offsets.front();
 	in_to_key.key_offsets.pop_back();
 	GULPS_CHECK_AND_ASSERT_MES(in_to_key.key_offsets.empty(), false, "txin contained more than one key_offset");
@@ -404,7 +404,7 @@ bool gen_tx_input_wo_key_offsets::generate(std::vector<test_event_entry> &events
 	return true;
 }
 
-bool gen_tx_key_offest_points_to_foreign_key::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_key_offest_points_to_foreign_key::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -429,7 +429,7 @@ bool gen_tx_key_offest_points_to_foreign_key::generate(std::vector<test_event_en
 	tx_builder builder;
 	builder.step1_init();
 	builder.step2_fill_inputs(bob_account.get_keys(), sources_bob);
-	txin_to_key &in_to_key = boost::get<txin_to_key>(builder.m_tx.vin.front());
+	txin_to_key& in_to_key = boost::get<txin_to_key>(builder.m_tx.vin.front());
 	in_to_key.key_offsets.front() = sources_alice.front().outputs.front().first;
 	builder.step3_fill_outputs(destinations_bob);
 	builder.step4_calc_hash();
@@ -441,7 +441,7 @@ bool gen_tx_key_offest_points_to_foreign_key::generate(std::vector<test_event_en
 	return true;
 }
 
-bool gen_tx_sender_key_offest_not_exist::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_sender_key_offest_not_exist::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -456,7 +456,7 @@ bool gen_tx_sender_key_offest_not_exist::generate(std::vector<test_event_entry> 
 	tx_builder builder;
 	builder.step1_init();
 	builder.step2_fill_inputs(miner_account.get_keys(), sources);
-	txin_to_key &in_to_key = boost::get<txin_to_key>(builder.m_tx.vin.front());
+	txin_to_key& in_to_key = boost::get<txin_to_key>(builder.m_tx.vin.front());
 	in_to_key.key_offsets.front() = std::numeric_limits<uint64_t>::max();
 	builder.step3_fill_outputs(destinations);
 	builder.step4_calc_hash();
@@ -468,7 +468,7 @@ bool gen_tx_sender_key_offest_not_exist::generate(std::vector<test_event_entry> 
 	return true;
 }
 
-bool gen_tx_mixed_key_offest_not_exist::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_mixed_key_offest_not_exist::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -501,7 +501,7 @@ bool gen_tx_mixed_key_offest_not_exist::generate(std::vector<test_event_entry> &
 	return true;
 }
 
-bool gen_tx_key_image_not_derive_from_tx_key::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_key_image_not_derive_from_tx_key::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -517,7 +517,7 @@ bool gen_tx_key_image_not_derive_from_tx_key::generate(std::vector<test_event_en
 	builder.step1_init();
 	builder.step2_fill_inputs(miner_account.get_keys(), sources);
 
-	txin_to_key &in_to_key = boost::get<txin_to_key>(builder.m_tx.vin.front());
+	txin_to_key& in_to_key = boost::get<txin_to_key>(builder.m_tx.vin.front());
 	keypair kp = keypair::generate(hw::get_device("default"));
 	key_image another_ki;
 	crypto::generate_key_image(kp.pub, kp.sec, another_ki);
@@ -537,7 +537,7 @@ bool gen_tx_key_image_not_derive_from_tx_key::generate(std::vector<test_event_en
 	return true;
 }
 
-bool gen_tx_key_image_is_invalid::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_key_image_is_invalid::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -553,7 +553,7 @@ bool gen_tx_key_image_is_invalid::generate(std::vector<test_event_entry> &events
 	builder.step1_init();
 	builder.step2_fill_inputs(miner_account.get_keys(), sources);
 
-	txin_to_key &in_to_key = boost::get<txin_to_key>(builder.m_tx.vin.front());
+	txin_to_key& in_to_key = boost::get<txin_to_key>(builder.m_tx.vin.front());
 	in_to_key.k_image = generate_invalid_key_image();
 
 	builder.step3_fill_outputs(destinations);
@@ -570,7 +570,7 @@ bool gen_tx_key_image_is_invalid::generate(std::vector<test_event_entry> &events
 	return true;
 }
 
-bool gen_tx_check_input_unlock_time::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_check_input_unlock_time::generate(std::vector<test_event_entry>& events) const
 {
 	static const size_t tests_count = 6;
 
@@ -591,7 +591,7 @@ bool gen_tx_check_input_unlock_time::generate(std::vector<test_event_entry> &eve
 	std::list<transaction> txs_0;
 	auto make_tx_to_acc = [&](size_t acc_idx, uint64_t unlock_time) {
 		txs_0.push_back(make_simple_tx_with_unlock_time(events, blk_1, miner_account, accounts[acc_idx],
-														MK_COINS(1) + TESTS_DEFAULT_FEE, unlock_time));
+			MK_COINS(1) + TESTS_DEFAULT_FEE, unlock_time));
 		events.push_back(txs_0.back());
 	};
 
@@ -629,7 +629,7 @@ bool gen_tx_check_input_unlock_time::generate(std::vector<test_event_entry> &eve
 	return true;
 }
 
-bool gen_tx_txout_to_key_has_invalid_key::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_txout_to_key_has_invalid_key::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -646,7 +646,7 @@ bool gen_tx_txout_to_key_has_invalid_key::generate(std::vector<test_event_entry>
 	builder.step2_fill_inputs(miner_account.get_keys(), sources);
 	builder.step3_fill_outputs(destinations);
 
-	txout_to_key &out_to_key = boost::get<txout_to_key>(builder.m_tx.vout.front().target);
+	txout_to_key& out_to_key = boost::get<txout_to_key>(builder.m_tx.vout.front().target);
 	out_to_key.key = generate_invalid_pub_key();
 
 	builder.step4_calc_hash();
@@ -658,7 +658,7 @@ bool gen_tx_txout_to_key_has_invalid_key::generate(std::vector<test_event_entry>
 	return true;
 }
 
-bool gen_tx_output_with_zero_amount::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_output_with_zero_amount::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -686,7 +686,7 @@ bool gen_tx_output_with_zero_amount::generate(std::vector<test_event_entry> &eve
 	return true;
 }
 
-bool gen_tx_output_is_not_txout_to_key::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_output_is_not_txout_to_key::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -728,7 +728,7 @@ bool gen_tx_output_is_not_txout_to_key::generate(std::vector<test_event_entry> &
 	return true;
 }
 
-bool gen_tx_signatures_are_invalid::generate(std::vector<test_event_entry> &events) const
+bool gen_tx_signatures_are_invalid::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 

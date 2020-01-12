@@ -53,7 +53,8 @@ struct regional;
  * The rrset cache
  * Thin wrapper around hashtable, like a typedef.
  */
-struct rrset_cache {
+struct rrset_cache
+{
 	/** uses partitioned hash table */
 	struct slabhash table;
 };
@@ -64,7 +65,7 @@ struct rrset_cache {
  * @param alloc: initial default rrset key allocation.
  * @return: NULL on error.
  */
-struct rrset_cache* rrset_cache_create(struct config_file* cfg, 
+struct rrset_cache* rrset_cache_create(struct config_file* cfg,
 	struct alloc_cache* alloc);
 
 /**
@@ -82,7 +83,7 @@ void rrset_cache_delete(struct rrset_cache* r);
  * @param alloc: initial default rrset key allocation.
  * @return 0 on error, or new rrset cache pointer on success.
  */
-struct rrset_cache* rrset_cache_adjust(struct rrset_cache* r, 
+struct rrset_cache* rrset_cache_adjust(struct rrset_cache* r,
 	struct config_file* cfg, struct alloc_cache* alloc);
 
 /**
@@ -130,7 +131,7 @@ void rrset_cache_touch(struct rrset_cache* r, struct ub_packed_rrset_key* key,
  * 	2: reference updated, item in cache is considered superior.
  *	   also the rdata is equal (but other parameters in cache are superior).
  */
-int rrset_cache_update(struct rrset_cache* r, struct rrset_ref* ref, 
+int rrset_cache_update(struct rrset_cache* r, struct rrset_ref* ref,
 	struct alloc_cache* alloc, time_t timenow);
 
 /**
@@ -147,7 +148,7 @@ int rrset_cache_update(struct rrset_cache* r, struct rrset_ref* ref,
  * @param alloc: how to allocate (and deallocate) the special rrset key.
  * @param timenow: current time (to see if ttl in cache is expired).
  */
-void rrset_cache_update_wildcard(struct rrset_cache* rrset_cache, 
+void rrset_cache_update_wildcard(struct rrset_cache* rrset_cache,
 	struct ub_packed_rrset_key* rrset, uint8_t* ce, size_t ce_len,
 	struct alloc_cache* alloc, time_t timenow);
 
@@ -216,7 +217,7 @@ void rrset_array_unlock_touch(struct rrset_cache* r, struct regional* scratch,
  * 	untouched. The rrset in the cache is updated in-place.
  * @param now: current time.
  */
-void rrset_update_sec_status(struct rrset_cache* r, 
+void rrset_update_sec_status(struct rrset_cache* r,
 	struct ub_packed_rrset_key* rrset, time_t now);
 
 /**
@@ -228,7 +229,7 @@ void rrset_update_sec_status(struct rrset_cache* r,
  * 	But its status will only improve, towards secure.
  * @param now: current time.
  */
-void rrset_check_sec_status(struct rrset_cache* r, 
+void rrset_check_sec_status(struct rrset_cache* r,
 	struct ub_packed_rrset_key* rrset, time_t now);
 
 /**

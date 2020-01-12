@@ -38,11 +38,11 @@ namespace
 {
 struct test_data
 {
-	const uint8_t *key;
-	const uint8_t *iv;
+	const uint8_t* key;
+	const uint8_t* iv;
 	const size_t text_length;
-	const uint8_t *plain_text;
-	const uint8_t *cipher_text;
+	const uint8_t* plain_text;
+	const uint8_t* cipher_text;
 };
 
 #define ARR(...) __VA_ARGS__
@@ -82,18 +82,18 @@ MAKE_TEST_DATA(
 	ARR({0x00}),
 	ARR({0xdb}))
 
-void run_test(const test_data *test)
+void run_test(const test_data* test)
 {
 	std::string buf;
 	buf.resize(test->text_length);
 
 	crypto::chacha8(test->plain_text, test->text_length, test->key, test->iv, &buf[0]);
-	ASSERT_EQ(buf, std::string(reinterpret_cast<const char *>(test->cipher_text), test->text_length));
+	ASSERT_EQ(buf, std::string(reinterpret_cast<const char*>(test->cipher_text), test->text_length));
 
 	crypto::chacha8(test->cipher_text, test->text_length, test->key, test->iv, &buf[0]);
-	ASSERT_EQ(buf, std::string(reinterpret_cast<const char *>(test->plain_text), test->text_length));
+	ASSERT_EQ(buf, std::string(reinterpret_cast<const char*>(test->plain_text), test->text_length));
 }
-}
+} // namespace
 
 #define TEST_CHACHA8(test_no)           \
 	TEST(chacha8, is_correct_##test_no) \

@@ -38,7 +38,7 @@
 using namespace std;
 using cryptonote::check_hash;
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	crypto::hash h;
 	for(uint64_t diff = 1;; diff += 1 + (diff >> 8))
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 			if(b > 0)
 			{
 				memset(&h, 0, sizeof(crypto::hash));
-				((char *)&h)[31] = b;
+				((char*)&h)[31] = b;
 				if(check_hash(h, diff) != (diff <= 255 / b))
 				{
 					return 1;
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 			for(int i = 31; i >= 0; i--)
 			{
 				val = val * 256 + 255;
-				((char *)&h)[i] = static_cast<char>(val / diff);
+				((char*)&h)[i] = static_cast<char>(val / diff);
 				val %= diff;
 			}
 			if(check_hash(h, diff) != true)
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 					{
 						abort();
 					}
-					if(++((char *)&h)[i] != 0)
+					if(++((char*)&h)[i] != 0)
 					{
 						break;
 					}

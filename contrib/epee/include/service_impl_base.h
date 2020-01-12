@@ -36,13 +36,14 @@ namespace epee
 class service_impl_base
 {
 	GULPS_CAT_MAJOR("epee_srv_imp_base");
+
   public:
 	service_impl_base();
 	virtual ~service_impl_base();
 
-	virtual const char *get_name() = 0;
-	virtual const char *get_caption() = 0;
-	virtual const char *get_description() = 0;
+	virtual const char* get_name() = 0;
+	virtual const char* get_caption() = 0;
+	virtual const char* get_description() = 0;
 
 	bool run_service();
 	virtual bool install();
@@ -55,14 +56,14 @@ class service_impl_base
   private:
 	virtual void service_main() = 0;
 	virtual unsigned service_handler(unsigned control, unsigned event_code,
-									 void *pdata) = 0;
+		void* pdata) = 0;
 	//-------------------------------------------------------------------------
-	static service_impl_base *&instance();
+	static service_impl_base*& instance();
 	//-------------------------------------------------------------------------
 	static DWORD __stdcall _service_handler(DWORD control, DWORD event,
-											void *pdata, void *pcontext);
-	static void __stdcall service_entry(DWORD argc, char **pargs);
-	virtual SERVICE_FAILURE_ACTIONSA *get_failure_actions();
+		void* pdata, void* pcontext);
+	static void __stdcall service_entry(DWORD argc, char** pargs);
+	virtual SERVICE_FAILURE_ACTIONSA* get_failure_actions();
 
   private:
 	SC_HANDLE m_manager;
@@ -96,17 +97,17 @@ inline service_impl_base::~service_impl_base()
 	instance() = 0;
 }
 //-----------------------------------------------------------------------------
-inline service_impl_base *&service_impl_base::instance()
+inline service_impl_base*& service_impl_base::instance()
 {
-	static service_impl_base *pservice = NULL;
+	static service_impl_base* pservice = NULL;
 	return pservice;
 }
 //-----------------------------------------------------------------------------
 inline bool service_impl_base::install()
 {
 	GULPS_CHECK_AND_ASSERT(!m_service, false);
-	const char *psz_descr = get_description();
-	SERVICE_FAILURE_ACTIONSA *fail_acts = get_failure_actions();
+	const char* psz_descr = get_description();
+	SERVICE_FAILURE_ACTIONSA* fail_acts = get_failure_actions();
 
 	char sz_path[MAX_PATH];
 	::GetModuleFileNameA(0, sz_path, sizeof(sz_path));
@@ -125,8 +126,8 @@ inline bool service_impl_base::install()
 			}
 		}
 		m_service = ::CreateServiceA(m_manager, get_name(), get_caption(),
-									 SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS, SERVICE_DEMAND_START,
-									 SERVICE_ERROR_IGNORE, sz_path, 0, 0, 0, 0, 0);
+			SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS, SERVICE_DEMAND_START,
+			SERVICE_ERROR_IGNORE, sz_path, 0, 0, 0, 0, 0);
 		if(!m_service)
 		{
 			int err = GetLastError();
@@ -136,9 +137,9 @@ inline bool service_impl_base::install()
 
 		if(psz_descr)
 		{
-			SERVICE_DESCRIPTIONA sd = {(char *)psz_descr};
+			SERVICE_DESCRIPTIONA sd = {(char*)psz_descr};
 			if(!::ChangeServiceConfig2A(m_service, SERVICE_CONFIG_DESCRIPTION,
-										&sd))
+				   &sd))
 			{
 				int err = GetLastError();
 				GULPSF_LOG_ERROR("Failed to ChangeServiceConfig2(SERVICE_CONFIG_DESCRIPTION), last err={}", log_space::get_win32_err_descr(err));
@@ -149,7 +150,7 @@ inline bool service_impl_base::install()
 		if(fail_acts)
 		{
 			if(!::ChangeServiceConfig2A(m_service, SERVICE_CONFIG_FAILURE_ACTIONS,
-										fail_acts))
+				   fail_acts))
 			{
 				int err = GetLastError();
 				GULPSF_LOG_ERROR("Failed to ChangeServiceConfig2(SERVICE_CONFIG_FAILURE_ACTIONS), last err={}", log_space::get_win32_err_descr(err));
@@ -232,7 +233,7 @@ inline bool service_impl_base::run_service()
 	SERVICE_TABLE_ENTRYA service_table[2];
 	ZeroMemory(&service_table, sizeof(service_table));
 
-	service_table->lpServiceName = (char *)get_name();
+	service_table->lpServiceName = (char*)get_name();
 	service_table->lpServiceProc = service_entry;
 
 	GULPS_LOG_L1("[+] Start service control dispatcher for \"{}\"", get_name());
@@ -253,17 +254,17 @@ inline bool service_impl_base::run_service()
 }
 //-----------------------------------------------------------------------------
 inline DWORD __stdcall service_impl_base::_service_handler(DWORD control,
-														   DWORD event, void *pdata, void *pcontext)
+	DWORD event, void* pdata, void* pcontext)
 {
 	GULPS_CHECK_AND_ASSERT(pcontext, ERROR_CALL_NOT_IMPLEMENTED);
 
-	service_impl_base *pservice = (service_impl_base *)pcontext;
+	service_impl_base* pservice = (service_impl_base*)pcontext;
 	return pservice->service_handler(control, event, pdata);
 }
 //-----------------------------------------------------------------------------
-inline void __stdcall service_impl_base::service_entry(DWORD argc, char **pargs)
+inline void __stdcall service_impl_base::service_entry(DWORD argc, char** pargs)
 {
-	service_impl_base *pme = instance();
+	service_impl_base* pme = instance();
 	GULPS_LOG_L3("instance: ");
 	if(!pme)
 	{
@@ -271,7 +272,7 @@ inline void __stdcall service_impl_base::service_entry(DWORD argc, char **pargs)
 		return;
 	}
 	pme->m_status_handle = ::RegisterServiceCtrlHandlerExA(pme->get_name(),
-														   _service_handler, pme);
+		_service_handler, pme);
 
 	pme->set_status(SERVICE_RUNNING);
 	pme->service_main();
@@ -312,18 +313,18 @@ inline unsigned service_impl_base::get_control_accepted()
 	return m_accepted_control;
 }
 //-----------------------------------------------------------------------------------------
-inline SERVICE_FAILURE_ACTIONSA *service_impl_base::get_failure_actions()
+inline SERVICE_FAILURE_ACTIONSA* service_impl_base::get_failure_actions()
 {
 	// first 3 failures in 30 minutes. Service will be restarted.
 	// do nothing for next failures
 	static SC_ACTION sa[] = {{SC_ACTION_RESTART, 3 * 1000}, {SC_ACTION_RESTART, 3 * 1000}, {SC_ACTION_RESTART, 3 * 1000}, {SC_ACTION_NONE, 0}};
 
 	static SERVICE_FAILURE_ACTIONSA sfa = {1800, // interval for failures counter - 30 min
-										   "", NULL, 4, (SC_ACTION *)&sa};
+		"", NULL, 4, (SC_ACTION*)&sa};
 
 	// TODO: refactor this code, really unsafe!
 	return &sfa;
 }
-}
+} // namespace epee
 
 #endif //_SERVICE_IMPL_BASE_H_

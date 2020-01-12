@@ -56,9 +56,9 @@ namespace cryptonote
 /*                                                                      */
 /************************************************************************/
 template <class t_array>
-struct array_hasher : std::unary_function<t_array &, std::size_t>
+struct array_hasher : std::unary_function<t_array&, std::size_t>
 {
-	std::size_t operator()(const t_array &val) const
+	std::size_t operator()(const t_array& val) const
 	{
 		return boost::hash_range(&val.data[0], &val.data[sizeof(val.data)]);
 	}
@@ -82,13 +82,13 @@ struct public_integrated_address_outer_blob
 
 namespace
 {
-inline std::string return_first_address(const std::string &url, const std::vector<std::string> &addresses, bool dnssec_valid)
+inline std::string return_first_address(const std::string& url, const std::vector<std::string>& addresses, bool dnssec_valid)
 {
 	if(addresses.empty())
 		return {};
 	return addresses[0];
 }
-}
+} // namespace
 
 struct address_parse_info
 {
@@ -129,18 +129,18 @@ inline bool get_dev_fund_amount(network_type nettype, uint64_t height, uint64_t&
 	}
 }
 
-bool get_block_reward(network_type nettype, size_t median_size, size_t current_block_size, uint64_t already_generated_coins, uint64_t &reward, uint64_t height);
-uint8_t get_account_address_checksum(const public_address_outer_blob &bl);
-uint8_t get_account_integrated_address_checksum(const public_integrated_address_outer_blob &bl);
+bool get_block_reward(network_type nettype, size_t median_size, size_t current_block_size, uint64_t already_generated_coins, uint64_t& reward, uint64_t height);
+uint8_t get_account_address_checksum(const public_address_outer_blob& bl);
+uint8_t get_account_integrated_address_checksum(const public_integrated_address_outer_blob& bl);
 
 template <network_type NETTYPE>
-std::string get_public_address_as_str(bool subaddress, const account_public_address &adr);
+std::string get_public_address_as_str(bool subaddress, const account_public_address& adr);
 
-extern template std::string get_public_address_as_str<MAINNET>(bool subaddress, const account_public_address &adr);
-extern template std::string get_public_address_as_str<TESTNET>(bool subaddress, const account_public_address &adr);
-extern template std::string get_public_address_as_str<STAGENET>(bool subaddress, const account_public_address &adr);
+extern template std::string get_public_address_as_str<MAINNET>(bool subaddress, const account_public_address& adr);
+extern template std::string get_public_address_as_str<TESTNET>(bool subaddress, const account_public_address& adr);
+extern template std::string get_public_address_as_str<STAGENET>(bool subaddress, const account_public_address& adr);
 
-inline std::string get_public_address_as_str(network_type nettype, bool subaddress, const account_public_address &adr)
+inline std::string get_public_address_as_str(network_type nettype, bool subaddress, const account_public_address& adr)
 {
 	switch(nettype)
 	{
@@ -156,13 +156,13 @@ inline std::string get_public_address_as_str(network_type nettype, bool subaddre
 }
 
 template <network_type NETTYPE>
-std::string get_account_integrated_address_as_str(const account_public_address &adr, const crypto::hash8 &payment_id);
+std::string get_account_integrated_address_as_str(const account_public_address& adr, const crypto::hash8& payment_id);
 
-extern template std::string get_account_integrated_address_as_str<MAINNET>(account_public_address const &adr, crypto::hash8 const &payment_id);
-extern template std::string get_account_integrated_address_as_str<TESTNET>(account_public_address const &adr, crypto::hash8 const &payment_id);
-extern template std::string get_account_integrated_address_as_str<STAGENET>(account_public_address const &adr, crypto::hash8 const &payment_id);
+extern template std::string get_account_integrated_address_as_str<MAINNET>(account_public_address const& adr, crypto::hash8 const& payment_id);
+extern template std::string get_account_integrated_address_as_str<TESTNET>(account_public_address const& adr, crypto::hash8 const& payment_id);
+extern template std::string get_account_integrated_address_as_str<STAGENET>(account_public_address const& adr, crypto::hash8 const& payment_id);
 
-inline std::string get_account_integrated_address_as_str(network_type nettype, const account_public_address &adr, const crypto::hash8 &payment_id)
+inline std::string get_account_integrated_address_as_str(network_type nettype, const account_public_address& adr, const crypto::hash8& payment_id)
 {
 	switch(nettype)
 	{
@@ -178,9 +178,9 @@ inline std::string get_account_integrated_address_as_str(network_type nettype, c
 }
 
 template <network_type NETTYPE>
-bool get_account_address_from_str(address_parse_info &info, const std::string &str);
+bool get_account_address_from_str(address_parse_info& info, const std::string& str);
 
-inline bool get_account_address_from_str(network_type nettype, address_parse_info &info, const std::string &str)
+inline bool get_account_address_from_str(network_type nettype, address_parse_info& info, const std::string& str)
 {
 	switch(nettype)
 	{
@@ -195,10 +195,10 @@ inline bool get_account_address_from_str(network_type nettype, address_parse_inf
 	}
 }
 
-bool is_coinbase(const transaction &tx);
+bool is_coinbase(const transaction& tx);
 
-bool operator==(const cryptonote::transaction &a, const cryptonote::transaction &b);
-bool operator==(const cryptonote::block &a, const cryptonote::block &b);
-}
+bool operator==(const cryptonote::transaction& a, const cryptonote::transaction& b);
+bool operator==(const cryptonote::block& a, const cryptonote::block& b);
+} // namespace cryptonote
 
-bool parse_hash256(const std::string str_hash, crypto::hash &hash);
+bool parse_hash256(const std::string str_hash, crypto::hash& hash);

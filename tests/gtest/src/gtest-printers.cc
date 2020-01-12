@@ -62,8 +62,8 @@ using ::std::ostream;
 GTEST_ATTRIBUTE_NO_SANITIZE_MEMORY_
 GTEST_ATTRIBUTE_NO_SANITIZE_ADDRESS_
 GTEST_ATTRIBUTE_NO_SANITIZE_THREAD_
-void PrintByteSegmentInObjectTo(const unsigned char *obj_bytes, size_t start,
-								size_t count, ostream *os)
+void PrintByteSegmentInObjectTo(const unsigned char* obj_bytes, size_t start,
+	size_t count, ostream* os)
 {
 	char text[5] = "";
 	for(size_t i = 0; i != count; i++)
@@ -84,8 +84,8 @@ void PrintByteSegmentInObjectTo(const unsigned char *obj_bytes, size_t start,
 }
 
 // Prints the bytes in the given value to the given ostream.
-void PrintBytesInObjectToImpl(const unsigned char *obj_bytes, size_t count,
-							  ostream *os)
+void PrintBytesInObjectToImpl(const unsigned char* obj_bytes, size_t count,
+	ostream* os)
 {
 	// Tells the user how big the object is.
 	*os << count << "-byte object <";
@@ -121,8 +121,8 @@ namespace internal2
 // uses the << operator and thus is easier done outside of the
 // ::testing::internal namespace, which contains a << operator that
 // sometimes conflicts with the one in STL.
-void PrintBytesInObjectTo(const unsigned char *obj_bytes, size_t count,
-						  ostream *os)
+void PrintBytesInObjectTo(const unsigned char* obj_bytes, size_t count,
+	ostream* os)
 {
 	PrintBytesInObjectToImpl(obj_bytes, count, os);
 }
@@ -157,7 +157,7 @@ inline bool IsPrintableAscii(wchar_t c)
 // The template argument UnsignedChar is the unsigned version of Char,
 // which is the type of c.
 template <typename UnsignedChar, typename Char>
-static CharFormat PrintAsCharLiteralTo(Char c, ostream *os)
+static CharFormat PrintAsCharLiteralTo(Char c, ostream* os)
 {
 	switch(static_cast<wchar_t>(c))
 	{
@@ -208,7 +208,7 @@ static CharFormat PrintAsCharLiteralTo(Char c, ostream *os)
 
 // Prints a wchar_t c as if it's part of a string literal, escaping it when
 // necessary; returns how c was formatted.
-static CharFormat PrintAsStringLiteralTo(wchar_t c, ostream *os)
+static CharFormat PrintAsStringLiteralTo(wchar_t c, ostream* os)
 {
 	switch(c)
 	{
@@ -225,7 +225,7 @@ static CharFormat PrintAsStringLiteralTo(wchar_t c, ostream *os)
 
 // Prints a char c as if it's part of a string literal, escaping it when
 // necessary; returns how c was formatted.
-static CharFormat PrintAsStringLiteralTo(char c, ostream *os)
+static CharFormat PrintAsStringLiteralTo(char c, ostream* os)
 {
 	return PrintAsStringLiteralTo(
 		static_cast<wchar_t>(static_cast<unsigned char>(c)), os);
@@ -236,7 +236,7 @@ static CharFormat PrintAsStringLiteralTo(char c, ostream *os)
 // using the standard C++ escape sequence.  The template argument
 // UnsignedChar is the unsigned version of Char, which is the type of c.
 template <typename UnsignedChar, typename Char>
-void PrintCharAndCodeTo(Char c, ostream *os)
+void PrintCharAndCodeTo(Char c, ostream* os)
 {
 	// First, print c as a literal in the most readable form we can find.
 	*os << ((sizeof(c) > 1) ? "L'" : "'");
@@ -264,18 +264,18 @@ void PrintCharAndCodeTo(Char c, ostream *os)
 	*os << ")";
 }
 
-void PrintTo(unsigned char c, ::std::ostream *os)
+void PrintTo(unsigned char c, ::std::ostream* os)
 {
 	PrintCharAndCodeTo<unsigned char>(c, os);
 }
-void PrintTo(signed char c, ::std::ostream *os)
+void PrintTo(signed char c, ::std::ostream* os)
 {
 	PrintCharAndCodeTo<unsigned char>(c, os);
 }
 
 // Prints a wchar_t as a symbol if it is printable or as its internal
 // code otherwise and also as its code.  L'\0' is printed as "L'\\0'".
-void PrintTo(wchar_t wc, ostream *os)
+void PrintTo(wchar_t wc, ostream* os)
 {
 	PrintCharAndCodeTo<wchar_t>(wc, os);
 }
@@ -289,9 +289,9 @@ GTEST_ATTRIBUTE_NO_SANITIZE_MEMORY_
 	GTEST_ATTRIBUTE_NO_SANITIZE_ADDRESS_
 		GTEST_ATTRIBUTE_NO_SANITIZE_THREAD_ static void
 		PrintCharsAsStringTo(
-			const CharType *begin, size_t len, ostream *os)
+			const CharType* begin, size_t len, ostream* os)
 {
-	const char *const kQuoteBegin = sizeof(CharType) == 1 ? "\"" : "L\"";
+	const char* const kQuoteBegin = sizeof(CharType) == 1 ? "\"" : "L\"";
 	*os << kQuoteBegin;
 	bool is_previous_hex = false;
 	for(size_t index = 0; index < len; ++index)
@@ -316,7 +316,7 @@ GTEST_ATTRIBUTE_NO_SANITIZE_MEMORY_
 	GTEST_ATTRIBUTE_NO_SANITIZE_ADDRESS_
 		GTEST_ATTRIBUTE_NO_SANITIZE_THREAD_ static void
 		UniversalPrintCharArray(
-			const CharType *begin, size_t len, ostream *os)
+			const CharType* begin, size_t len, ostream* os)
 {
 	// The code
 	//   const char kFoo[] = "foo";
@@ -340,20 +340,20 @@ GTEST_ATTRIBUTE_NO_SANITIZE_MEMORY_
 }
 
 // Prints a (const) char array of 'len' elements, starting at address 'begin'.
-void UniversalPrintArray(const char *begin, size_t len, ostream *os)
+void UniversalPrintArray(const char* begin, size_t len, ostream* os)
 {
 	UniversalPrintCharArray(begin, len, os);
 }
 
 // Prints a (const) wchar_t array of 'len' elements, starting at address
 // 'begin'.
-void UniversalPrintArray(const wchar_t *begin, size_t len, ostream *os)
+void UniversalPrintArray(const wchar_t* begin, size_t len, ostream* os)
 {
 	UniversalPrintCharArray(begin, len, os);
 }
 
 // Prints the given C string to the ostream.
-void PrintTo(const char *s, ostream *os)
+void PrintTo(const char* s, ostream* os)
 {
 	if(s == NULL)
 	{
@@ -361,7 +361,7 @@ void PrintTo(const char *s, ostream *os)
 	}
 	else
 	{
-		*os << ImplicitCast_<const void *>(s) << " pointing to ";
+		*os << ImplicitCast_<const void*>(s) << " pointing to ";
 		PrintCharsAsStringTo(s, strlen(s), os);
 	}
 }
@@ -374,7 +374,7 @@ void PrintTo(const char *s, ostream *os)
 // wchar_t is implemented as a native type.
 #if !defined(_MSC_VER) || defined(_NATIVE_WCHAR_T_DEFINED)
 // Prints the given wide C string to the ostream.
-void PrintTo(const wchar_t *s, ostream *os)
+void PrintTo(const wchar_t* s, ostream* os)
 {
 	if(s == NULL)
 	{
@@ -382,7 +382,7 @@ void PrintTo(const wchar_t *s, ostream *os)
 	}
 	else
 	{
-		*os << ImplicitCast_<const void *>(s) << " pointing to ";
+		*os << ImplicitCast_<const void*>(s) << " pointing to ";
 		PrintCharsAsStringTo(s, std::wcslen(s), os);
 	}
 }
@@ -390,27 +390,27 @@ void PrintTo(const wchar_t *s, ostream *os)
 
 // Prints a ::string object.
 #if GTEST_HAS_GLOBAL_STRING
-void PrintStringTo(const ::string &s, ostream *os)
+void PrintStringTo(const ::string& s, ostream* os)
 {
 	PrintCharsAsStringTo(s.data(), s.size(), os);
 }
 #endif // GTEST_HAS_GLOBAL_STRING
 
-void PrintStringTo(const ::std::string &s, ostream *os)
+void PrintStringTo(const ::std::string& s, ostream* os)
 {
 	PrintCharsAsStringTo(s.data(), s.size(), os);
 }
 
 // Prints a ::wstring object.
 #if GTEST_HAS_GLOBAL_WSTRING
-void PrintWideStringTo(const ::wstring &s, ostream *os)
+void PrintWideStringTo(const ::wstring& s, ostream* os)
 {
 	PrintCharsAsStringTo(s.data(), s.size(), os);
 }
 #endif // GTEST_HAS_GLOBAL_WSTRING
 
 #if GTEST_HAS_STD_WSTRING
-void PrintWideStringTo(const ::std::wstring &s, ostream *os)
+void PrintWideStringTo(const ::std::wstring& s, ostream* os)
 {
 	PrintCharsAsStringTo(s.data(), s.size(), os);
 }

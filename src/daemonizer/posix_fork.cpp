@@ -20,20 +20,19 @@
 
 #include "common/gulps.hpp"
 
-
 namespace posix
 {
-	GULPS_CAT_MAJOR("posix_fork");
+GULPS_CAT_MAJOR("posix_fork");
 namespace
 {
-void quit(const std::string &message)
+void quit(const std::string& message)
 {
 	GULPS_ERROR(message);
 	throw std::runtime_error(message);
 }
-}
+} // namespace
 
-void fork(const std::string &pidfile)
+void fork(const std::string& pidfile)
 {
 	// If a PID file is specified, we open the file here, because
 	// we can't report errors after the fork operation.
@@ -122,7 +121,7 @@ void fork(const std::string &pidfile)
 
 #ifdef DEBUG_TMPDIR_LOG
 	// Send standard output to a log file.
-	const char *tmpdir = getenv("TMPDIR");
+	const char* tmpdir = getenv("TMPDIR");
 	if(!tmpdir)
 		tmpdir = TMPDIR;
 	std::string output = tmpdir;

@@ -54,13 +54,13 @@ struct iter_priv;
 struct rbtree_type;
 
 /** max number of targets spawned for a query and its subqueries */
-#define MAX_TARGET_COUNT	64
+#define MAX_TARGET_COUNT 64
 /** max number of query restarts. Determines max number of CNAME chain. */
-#define MAX_RESTART_COUNT       8
+#define MAX_RESTART_COUNT 8
 /** max number of referrals. Makes sure resolver does not run away */
-#define MAX_REFERRAL_COUNT	130
+#define MAX_REFERRAL_COUNT 130
 /** max number of queries-sent-out.  Make sure large NS set does not loop */
-#define MAX_SENT_COUNT		32
+#define MAX_SENT_COUNT 32
 /** max number of queries for which to perform dnsseclameness detection,
  * (rrsigs missing detection) after that, just pick up that response */
 #define DNSSEC_LAME_DETECT_COUNT 4
@@ -68,7 +68,7 @@ struct rbtree_type;
  * max number of QNAME minimisation iterations. Limits number of queries for
  * QNAMEs with a lot of labels.
 */
-#define MAX_MINIMISE_COUNT	10
+#define MAX_MINIMISE_COUNT 10
 /* max number of time-outs for minimised query. Prevents resolving failures
  * when the QNAME minimisation QTYPE is blocked. */
 #define MAX_MINIMISE_TIMEOUT_COUNT 3
@@ -76,10 +76,10 @@ struct rbtree_type;
  * number of labels from QNAME that are always send individually when using
  * QNAME minimisation, even when the number of labels of the QNAME is bigger
  * tham MAX_MINIMISE_COUNT */
-#define MINIMISE_ONE_LAB	4
-#define MINIMISE_MULTIPLE_LABS	(MAX_MINIMISE_COUNT - MINIMISE_ONE_LAB)
+#define MINIMISE_ONE_LAB 4
+#define MINIMISE_MULTIPLE_LABS (MAX_MINIMISE_COUNT - MINIMISE_ONE_LAB)
 /** at what query-sent-count to stop target fetch policy */
-#define TARGET_FETCH_STOP	3
+#define TARGET_FETCH_STOP 3
 /** how nice is a server without further information, in msec 
  * Equals rtt initial timeout value.
  */
@@ -88,7 +88,7 @@ struct rbtree_type;
  * After host_ttl this will be timed out and the host will be tried again. 
  * Equals RTT_MAX_TIMEOUT
  */
-#define USEFUL_SERVER_TOP_TIMEOUT	120000
+#define USEFUL_SERVER_TOP_TIMEOUT 120000
 /** number of retries on outgoing queries */
 #define OUTBOUND_MSG_RETRY 5
 /** RTT band, within this amount from the best, servers are chosen randomly.
@@ -101,7 +101,8 @@ struct rbtree_type;
 /**
  * Global state for the iterator. 
  */
-struct iter_env {
+struct iter_env
+{
 	/** A flag to indicate whether or not we have an IPv6 route */
 	int supports_ipv6;
 
@@ -139,7 +140,8 @@ struct iter_env {
 /**
  * QNAME minimisation state
  */
-enum minimisation_state {
+enum minimisation_state
+{
 	/**
 	 * (Re)start minimisation. Outgoing QNAME should be set to dp->name.
 	 * State entered on new query or after following referral or CNAME.
@@ -162,7 +164,8 @@ enum minimisation_state {
 /**
  * State of the iterator for a query.
  */
-enum iter_state {
+enum iter_state
+{
 	/**
 	 * Externally generated queries start at this state. Query restarts are
 	 * reset to this state.
@@ -214,7 +217,8 @@ enum iter_state {
 /**
  * Per query state for the iterator module.
  */
-struct iter_qstate {
+struct iter_qstate
+{
 	/** 
 	 * State of the iterator module.
 	 * This is the state that event is in or should sent to -- all 
@@ -303,7 +307,7 @@ struct iter_qstate {
 
 	/** number of queries fired off */
 	int sent_count;
-	
+
 	/** number of target queries spawned in [1], for this query and its
 	 * subqueries, the malloced-array is shared, [0] refcount. */
 	int* target_count;
@@ -397,7 +401,8 @@ struct iter_qstate {
 /**
  * List of prepend items
  */
-struct iter_prep_list {
+struct iter_prep_list
+{
 	/** next in list */
 	struct iter_prep_list* next;
 	/** rrset */
@@ -444,7 +449,7 @@ void iter_operate(struct module_qstate* qstate, enum module_ev event, int id,
  * @param id: module id.
  * @param super: the qstate to inform.
  */
-void iter_inform_super(struct module_qstate* qstate, int id, 
+void iter_inform_super(struct module_qstate* qstate, int id,
 	struct module_qstate* super);
 
 /** iterator cleanup query state */

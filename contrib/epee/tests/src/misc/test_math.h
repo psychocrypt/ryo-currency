@@ -73,5 +73,5 @@ bool test_median()
 	GULPS_CHECK_AND_ASSERT_MES(m == 22, false, "test failed");
 	return true;
 }
-}
-}
+} // namespace tests
+} // namespace epee

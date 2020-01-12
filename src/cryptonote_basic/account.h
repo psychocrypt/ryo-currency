@@ -63,7 +63,7 @@ struct account_keys
 	crypto::secret_key m_view_secret_key;
 	std::vector<crypto::secret_key> m_multisig_keys;
 	crypto::secret_key_16 m_short_seed;
-	hw::device *m_device = &hw::get_device("default");
+	hw::device* m_device = &hw::get_device("default");
 
 	BEGIN_KV_SERIALIZE_MAP(account_keys)
 	KV_SERIALIZE(m_account_address)
@@ -73,10 +73,10 @@ struct account_keys
 	KV_SERIALIZE_VAL_POD_AS_BLOB_FORCE(m_short_seed)
 	END_KV_SERIALIZE_MAP()
 
-	account_keys &operator=(account_keys const &) = default;
+	account_keys& operator=(account_keys const&) = default;
 
-	hw::device &get_device() const;
-	void set_device(hw::device &hwdev);
+	hw::device& get_device() const;
+	void set_device(hw::device& hwdev);
 };
 
 /************************************************************************/
@@ -85,7 +85,6 @@ struct account_keys
 class account_base
 {
   public:
-
 	inline crypto::secret_key_16 generate_new(uint8_t acc_opt)
 	{
 		crypto::generate_wallet_secret(m_keys.m_short_seed);
@@ -94,7 +93,7 @@ class account_base
 		return generate();
 	}
 
-	inline void recover(const crypto::secret_key_16 &recovery_seed, uint8_t acc_opt)
+	inline void recover(const crypto::secret_key_16& recovery_seed, uint8_t acc_opt)
 	{
 		m_keys.m_short_seed = recovery_seed;
 		m_acc_opt = acc_opt;
@@ -102,19 +101,19 @@ class account_base
 		generate();
 	}
 
-	void recover_legacy(const crypto::secret_key &recovery_seed);
+	void recover_legacy(const crypto::secret_key& recovery_seed);
 
-	void create_from_device(const std::string &device_name);
-	void create_from_keys(const cryptonote::account_public_address &address, const crypto::secret_key &spendkey, const crypto::secret_key &viewkey);
-	void create_from_viewkey(const cryptonote::account_public_address &address, const crypto::secret_key &viewkey);
-	bool make_multisig(const crypto::secret_key &view_secret_key, const crypto::secret_key &spend_secret_key, const crypto::public_key &spend_public_key, const std::vector<crypto::secret_key> &multisig_keys);
-	void finalize_multisig(const crypto::public_key &spend_public_key);
-	const account_keys &get_keys() const;
+	void create_from_device(const std::string& device_name);
+	void create_from_keys(const cryptonote::account_public_address& address, const crypto::secret_key& spendkey, const crypto::secret_key& viewkey);
+	void create_from_viewkey(const cryptonote::account_public_address& address, const crypto::secret_key& viewkey);
+	bool make_multisig(const crypto::secret_key& view_secret_key, const crypto::secret_key& spend_secret_key, const crypto::public_key& spend_public_key, const std::vector<crypto::secret_key>& multisig_keys);
+	void finalize_multisig(const crypto::public_key& spend_public_key);
+	const account_keys& get_keys() const;
 	std::string get_public_address_str(network_type nettype) const;
-	std::string get_public_integrated_address_str(const crypto::hash8 &payment_id, network_type nettype) const;
+	std::string get_public_integrated_address_str(const crypto::hash8& payment_id, network_type nettype) const;
 
-	hw::device &get_device() const { return m_keys.get_device(); }
-	void set_device(hw::device &hwdev) { m_keys.set_device(hwdev); }
+	hw::device& get_device() const { return m_keys.get_device(); }
+	void set_device(hw::device& hwdev) { m_keys.set_device(hwdev); }
 
 	uint64_t get_createtime() const { return m_creation_timestamp; }
 	void set_createtime(uint64_t val) { m_creation_timestamp = val; }
@@ -125,17 +124,17 @@ class account_base
 	bool has_25word_seed() const;
 	bool has_14word_seed() const;
 
-	bool load(const std::string &file_path);
-	bool store(const std::string &file_path);
+	bool load(const std::string& file_path);
+	bool store(const std::string& file_path);
 
 	void forget_spend_key();
-	const std::vector<crypto::secret_key> &get_multisig_keys() const { return m_keys.m_multisig_keys; }
+	const std::vector<crypto::secret_key>& get_multisig_keys() const { return m_keys.m_multisig_keys; }
 
 	template <class t_archive>
-	inline void serialize(t_archive &a, const unsigned int /*ver*/)
+	inline void serialize(t_archive& a, const unsigned int /*ver*/)
 	{
-		a &m_keys;
-		a &m_creation_timestamp;
+		a& m_keys;
+		a& m_creation_timestamp;
 	}
 
 	static constexpr uint64_t EARLIEST_TIMESTAMP = 1483228800; // 01-01-2017 00:00
@@ -153,4 +152,4 @@ class account_base
 	uint64_t m_creation_timestamp;
 	uint8_t m_acc_opt;
 };
-}
+} // namespace cryptonote

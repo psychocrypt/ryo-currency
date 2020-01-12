@@ -28,14 +28,13 @@
 
 #include "common/gulps.hpp"
 
-
 namespace epee
 {
 namespace misc_utils
 {
 namespace parse
 {
-inline std::string transform_to_escape_sequence(const std::string &src)
+inline std::string transform_to_escape_sequence(const std::string& src)
 {
 	//std::stringstream res;
 	std::string res;
@@ -91,7 +90,7 @@ inline std::string transform_to_escape_sequence(const std::string &src)
       \\  Backslash character
 
       */
-inline void match_string2(std::string::const_iterator &star_end_string, std::string::const_iterator buf_end, std::string &val)
+inline void match_string2(std::string::const_iterator& star_end_string, std::string::const_iterator buf_end, std::string& val)
 {
 	val.clear();
 	bool escape_mode = false;
@@ -156,7 +155,7 @@ inline void match_string2(std::string::const_iterator &star_end_string, std::str
 	}
 	GULPS_ASSERT_MES_AND_THROW("Failed to match string in json entry: ", std::string(star_end_string, buf_end));
 }
-inline bool match_string(std::string::const_iterator &star_end_string, std::string::const_iterator buf_end, std::string &val)
+inline bool match_string(std::string::const_iterator& star_end_string, std::string::const_iterator buf_end, std::string& val)
 {
 	try
 	{
@@ -169,7 +168,7 @@ inline bool match_string(std::string::const_iterator &star_end_string, std::stri
 		return false;
 	}
 }
-inline void match_number2(std::string::const_iterator &star_end_string, std::string::const_iterator buf_end, std::string &val, bool &is_float_val, bool &is_signed_val)
+inline void match_number2(std::string::const_iterator& star_end_string, std::string::const_iterator buf_end, std::string& val, bool& is_float_val, bool& is_signed_val)
 {
 	val.clear();
 	is_float_val = false;
@@ -197,7 +196,7 @@ inline void match_number2(std::string::const_iterator &star_end_string, std::str
 	}
 	GULPS_ASSERT_MES_AND_THROW("wrong number in json entry: ", std::string(star_end_string, buf_end));
 }
-inline bool match_number(std::string::const_iterator &star_end_string, std::string::const_iterator buf_end, std::string &val)
+inline bool match_number(std::string::const_iterator& star_end_string, std::string::const_iterator buf_end, std::string& val)
 {
 	try
 	{
@@ -211,7 +210,7 @@ inline bool match_number(std::string::const_iterator &star_end_string, std::stri
 		return false;
 	}
 }
-inline void match_word2(std::string::const_iterator &star_end_string, std::string::const_iterator buf_end, std::string &val)
+inline void match_word2(std::string::const_iterator& star_end_string, std::string::const_iterator buf_end, std::string& val)
 {
 	val.clear();
 	GULPS_CAT_MAJOR("epee_pars_bs_utls");
@@ -231,7 +230,7 @@ inline void match_word2(std::string::const_iterator &star_end_string, std::strin
 	}
 	GULPS_ASSERT_MES_AND_THROW("failed to match word number in json entry: ", std::string(star_end_string, buf_end));
 }
-inline bool match_word(std::string::const_iterator &star_end_string, std::string::const_iterator buf_end, std::string &val)
+inline bool match_word(std::string::const_iterator& star_end_string, std::string::const_iterator buf_end, std::string& val)
 {
 	try
 	{
@@ -243,7 +242,7 @@ inline bool match_word(std::string::const_iterator &star_end_string, std::string
 		return false;
 	}
 }
-inline bool match_word_with_extrasymb(std::string::const_iterator &star_end_string, std::string::const_iterator buf_end, std::string &val)
+inline bool match_word_with_extrasymb(std::string::const_iterator& star_end_string, std::string::const_iterator buf_end, std::string& val)
 {
 	val.clear();
 
@@ -263,7 +262,7 @@ inline bool match_word_with_extrasymb(std::string::const_iterator &star_end_stri
 	}
 	return false;
 }
-inline bool match_word_til_equal_mark(std::string::const_iterator &star_end_string, std::string::const_iterator buf_end, std::string::const_iterator &word_end)
+inline bool match_word_til_equal_mark(std::string::const_iterator& star_end_string, std::string::const_iterator buf_end, std::string::const_iterator& word_end)
 {
 	word_end = star_end_string;
 
@@ -283,6 +282,6 @@ inline bool match_word_til_equal_mark(std::string::const_iterator &star_end_stri
 	}
 	return false;
 }
-}
-}
-}
+} // namespace parse
+} // namespace misc_utils
+} // namespace epee

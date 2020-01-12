@@ -34,8 +34,6 @@
 #include <boost/optional/optional.hpp>
 #include <string>
 
-
-
 namespace epee
 {
 namespace net_utils
@@ -64,7 +62,7 @@ class simple_http_connection_handler
 	typedef t_connection_context connection_context; //t_connection_context net_utils::connection_context_base connection_context;
 	typedef http_server_config config_type;
 
-	simple_http_connection_handler(i_service_endpoint *psnd_hndlr, config_type &config);
+	simple_http_connection_handler(i_service_endpoint* psnd_hndlr, config_type& config);
 	virtual ~simple_http_connection_handler() {}
 
 	bool release_protocol()
@@ -85,8 +83,8 @@ class simple_http_connection_handler
 	{
 		return true;
 	}
-	virtual bool handle_recv(const void *ptr, size_t cb);
-	virtual bool handle_request(const http::http_request_info &query_info, http_response_info &response);
+	virtual bool handle_recv(const void* ptr, size_t cb);
+	virtual bool handle_request(const http::http_request_info& query_info, http_response_info& response);
 
   private:
 	enum machine_state
@@ -108,25 +106,25 @@ class simple_http_connection_handler
 		http_body_transfer_undefined
 	};
 
-	bool handle_buff_in(std::string &buf);
+	bool handle_buff_in(std::string& buf);
 
 	bool analize_cached_request_header_and_invoke_state(size_t pos);
 
 	bool handle_invoke_query_line();
-	bool parse_cached_header(http_header_info &body_info, const std::string &m_cache_to_process, size_t pos);
-	std::string::size_type match_end_of_header(const std::string &buf);
-	bool get_len_from_content_lenght(const std::string &str, size_t &len);
+	bool parse_cached_header(http_header_info& body_info, const std::string& m_cache_to_process, size_t pos);
+	std::string::size_type match_end_of_header(const std::string& buf);
+	bool get_len_from_content_lenght(const std::string& str, size_t& len);
 	bool handle_retriving_query_body();
 	bool handle_query_measure();
 	bool set_ready_state();
-	bool slash_to_back_slash(std::string &str);
-	std::string get_file_mime_tipe(const std::string &path);
-	std::string get_response_header(const http_response_info &response);
+	bool slash_to_back_slash(std::string& str);
+	std::string get_file_mime_tipe(const std::string& path);
+	std::string get_response_header(const http_response_info& response);
 
 	//major function
-	inline bool handle_request_and_send_response(const http::http_request_info &query_info);
+	inline bool handle_request_and_send_response(const http::http_request_info& query_info);
 
-	std::string get_not_found_response_body(const std::string &URI);
+	std::string get_not_found_response_body(const std::string& URI);
 
 	std::string m_root_path;
 	std::string m_cache;
@@ -135,21 +133,21 @@ class simple_http_connection_handler
 	bool m_is_stop_handling;
 	http::http_request_info m_query_info;
 	size_t m_len_summary, m_len_remain;
-	config_type &m_config;
+	config_type& m_config;
 	bool m_want_close;
 	size_t m_newlines;
 
   protected:
-	i_service_endpoint *m_psnd_hndlr;
+	i_service_endpoint* m_psnd_hndlr;
 };
 
 template <class t_connection_context>
 struct i_http_server_handler
 {
 	virtual ~i_http_server_handler() {}
-	virtual bool handle_http_request(const http_request_info &query_info,
-									 http_response_info &response,
-									 t_connection_context &m_conn_context) = 0;
+	virtual bool handle_http_request(const http_request_info& query_info,
+		http_response_info& response,
+		t_connection_context& m_conn_context) = 0;
 	virtual bool init_server_thread() { return true; }
 	virtual bool deinit_server_thread() { return true; }
 };
@@ -157,8 +155,8 @@ struct i_http_server_handler
 template <class t_connection_context>
 struct custum_handler_config : public http_server_config
 {
-	i_http_server_handler<t_connection_context> *m_phandler;
-	std::function<void(size_t, uint8_t *)> rng;
+	i_http_server_handler<t_connection_context>* m_phandler;
+	std::function<void(size_t, uint8_t*)> rng;
 };
 
 /************************************************************************/
@@ -171,14 +169,14 @@ class http_custom_handler : public simple_http_connection_handler<t_connection_c
   public:
 	typedef custum_handler_config<t_connection_context> config_type;
 
-	http_custom_handler(i_service_endpoint *psnd_hndlr, config_type &config, t_connection_context &conn_context)
-		: simple_http_connection_handler<t_connection_context>(psnd_hndlr, config),
-		  m_config(config),
-		  m_conn_context(conn_context),
-		  m_auth(m_config.m_user ? http_server_auth{*m_config.m_user, config.rng} : http_server_auth{})
+	http_custom_handler(i_service_endpoint* psnd_hndlr, config_type& config, t_connection_context& conn_context) :
+		simple_http_connection_handler<t_connection_context>(psnd_hndlr, config),
+		m_config(config),
+		m_conn_context(conn_context),
+		m_auth(m_config.m_user ? http_server_auth{*m_config.m_user, config.rng} : http_server_auth{})
 	{
 	}
-	inline bool handle_request(const http_request_info &query_info, http_response_info &response)
+	inline bool handle_request(const http_request_info& query_info, http_response_info& response)
 	{
 		GULPS_CHECK_AND_ASSERT_MES(m_config.m_phandler, false, "m_config.m_phandler is NULL!!!!");
 
@@ -218,13 +216,13 @@ class http_custom_handler : public simple_http_connection_handler<t_connection_c
 
   private:
 	//simple_http_connection_handler::config_type m_stub_config;
-	config_type &m_config;
-	t_connection_context &m_conn_context;
+	config_type& m_config;
+	t_connection_context& m_conn_context;
 	http_server_auth m_auth;
 };
-}
-}
-}
+} // namespace http
+} // namespace net_utils
+} // namespace epee
 
 #include "http_protocol_handler.inl"
 

@@ -53,7 +53,7 @@ GULPS_CAT_MAJOR("updates");
 
 namespace tools
 {
-bool check_updates(const std::string &software, const std::string &buildtag, std::string &version, std::string &hash)
+bool check_updates(const std::string& software, const std::string& buildtag, std::string& version, std::string& hash)
 {
 	return false; //Temporarily disabled
 #if 0
@@ -116,7 +116,7 @@ bool check_updates(const std::string &software, const std::string &buildtag, std
 #endif
 }
 
-std::string get_update_url(const std::string &software, const std::string &subdir, const std::string &buildtag, const std::string &version, bool user)
+std::string get_update_url(const std::string& software, const std::string& subdir, const std::string& buildtag, const std::string& version, bool user)
 {
 #if 0
     const char *base = user ? "https://downloads.getmonero.org/" : "https://updates.getmonero.org/";
@@ -136,4 +136,4 @@ std::string get_update_url(const std::string &software, const std::string &subdi
 #endif
 	return "";
 }
-}
+} // namespace tools

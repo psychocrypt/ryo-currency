@@ -49,15 +49,15 @@ struct comm_base;
 struct event_base;
 
 /** event timeout */
-#define UB_EV_TIMEOUT      0x01
+#define UB_EV_TIMEOUT 0x01
 /** event fd readable */
-#define UB_EV_READ         0x02
+#define UB_EV_READ 0x02
 /** event fd writable */
-#define UB_EV_WRITE        0x04
+#define UB_EV_WRITE 0x04
 /** event signal */
-#define UB_EV_SIGNAL       0x08
+#define UB_EV_SIGNAL 0x08
 /** event must persist */
-#define UB_EV_PERSIST      0x10
+#define UB_EV_PERSIST 0x10
 
 /** Returns event-base type. Could be "mini-event", "winsock-event" for the
  * daemon compile, and will be "pluggable-event<PACKAGE_VERSION>" for 
@@ -96,7 +96,7 @@ struct ub_event* ub_winsock_register_wsaevent(struct ub_event_base*,
 
 /** Add event bits for this event to fire on */
 void ub_event_add_bits(struct ub_event*, short bits);
- /** Configure the event so it will not longer fire on given bits */
+/** Configure the event so it will not longer fire on given bits */
 void ub_event_del_bits(struct ub_event*, short bits);
 /** Change or set the file descriptor on the event */
 void ub_event_set_fd(struct ub_event*, int fd);

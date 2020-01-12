@@ -52,8 +52,8 @@ class INode
 {
   public:
 	virtual ~INode() = 0;
-	virtual void addObserver(INodeObserver *observer) = 0;
-	virtual void removeObserver(INodeObserver *observer) = 0;
+	virtual void addObserver(INodeObserver* observer) = 0;
+	virtual void removeObserver(INodeObserver* observer) = 0;
 
 	virtual void init() = 0;
 	virtual void shutdown() = 0;
@@ -62,4 +62,4 @@ class INode
 	virtual uint64_t getLastLocalBlockHeight() = 0;
 	virtual uint64_t getLastKnownBlockHeight() = 0;
 };
-}
+} // namespace CryptoNote

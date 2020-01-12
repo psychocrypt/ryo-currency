@@ -64,7 +64,7 @@ void ub_systemseed(unsigned int seed);
  * 	is itself seeded with entropy.
  * @return new state or NULL alloc failure.
  */
-struct ub_randstate* ub_initstate(unsigned int seed, 
+struct ub_randstate* ub_initstate(unsigned int seed,
 	struct ub_randstate* from);
 
 /**

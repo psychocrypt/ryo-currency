@@ -38,7 +38,7 @@ class PortableStorageFuzzer : public Fuzzer
   public:
 	PortableStorageFuzzer() {}
 	virtual int init();
-	virtual int run(const std::string &filename);
+	virtual int run(const std::string& filename);
 };
 
 int PortableStorageFuzzer::init()
@@ -46,7 +46,7 @@ int PortableStorageFuzzer::init()
 	return 0;
 }
 
-int PortableStorageFuzzer::run(const std::string &filename)
+int PortableStorageFuzzer::run(const std::string& filename)
 {
 	std::string s;
 
@@ -60,7 +60,7 @@ int PortableStorageFuzzer::run(const std::string &filename)
 		epee::serialization::portable_storage ps;
 		ps.load_from_json(s);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		std::cerr << "Failed to load from binary: " << e.what() << std::endl;
 		return 1;
@@ -68,7 +68,7 @@ int PortableStorageFuzzer::run(const std::string &filename)
 	return 0;
 }
 
-int main(int argc, const char **argv)
+int main(int argc, const char** argv)
 {
 	PortableStorageFuzzer fuzzer;
 	return run_fuzzer(argc, argv, fuzzer);

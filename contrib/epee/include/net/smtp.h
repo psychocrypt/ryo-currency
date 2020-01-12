@@ -47,7 +47,7 @@ GULPS_CAT_MAJOR("epee_smtp");
 
 using boost::asio::ip::tcp;
 using namespace boost::archive::iterators;
-typedef base64_from_binary<transform_width<const char *, 6, 8>> base64_text;
+typedef base64_from_binary<transform_width<const char*, 6, 8>> base64_text;
 
 /************************************************************************/
 /*                                                                      */
@@ -55,11 +55,17 @@ typedef base64_from_binary<transform_width<const char *, 6, 8>> base64_text;
 class smtp_client
 {
   public:
-	smtp_client(std::string pServer, unsigned int pPort, std::string pUser, std::string pPassword) : mServer(pServer), mPort(pPort), mUserName(pUser), mPassword(pPassword), mSocket(mIOService), mResolver(mIOService)
+	smtp_client(std::string pServer, unsigned int pPort, std::string pUser, std::string pPassword) :
+		mServer(pServer),
+		mPort(pPort),
+		mUserName(pUser),
+		mPassword(pPassword),
+		mSocket(mIOService),
+		mResolver(mIOService)
 	{
 		tcp::resolver::query qry(mServer, boost::lexical_cast<std::string>(mPort));
 		mResolver.async_resolve(qry, boost::bind(&smtp_client::handleResolve, this, boost::asio::placeholders::error,
-												 boost::asio::placeholders::iterator));
+										 boost::asio::placeholders::iterator));
 	}
 	bool Send(std::string pFrom, std::string pTo, std::string pSubject, std::string pMessage)
 	{
@@ -80,13 +86,13 @@ class smtp_client
 		std::copy(base64_text(pData.c_str()), base64_text(pData.c_str() + sz), std::ostream_iterator<char>(os));
 		return os.str();
 	}
-	void handleResolve(const boost::system::error_code &err, tcp::resolver::iterator endpoint_iterator)
+	void handleResolve(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator)
 	{
 		if(!err)
 		{
 			tcp::endpoint endpoint = *endpoint_iterator;
 			mSocket.async_connect(endpoint,
-								  boost::bind(&smtp_client::handleConnect, this, boost::asio::placeholders::error, ++endpoint_iterator));
+				boost::bind(&smtp_client::handleConnect, this, boost::asio::placeholders::error, ++endpoint_iterator));
 		}
 		else
 		{
@@ -101,14 +107,14 @@ class smtp_client
 		boost::asio::write(mSocket, mRequest);
 		req_strm.clear();
 	}
-	void readLine(std::string &pData)
+	void readLine(std::string& pData)
 	{
 		boost::asio::streambuf response;
 		boost::asio::read_until(mSocket, response, "\r\n");
 		std::istream response_stream(&response);
 		response_stream >> pData;
 	}
-	void handleConnect(const boost::system::error_code &err, tcp::resolver::iterator endpoint_iterator)
+	void handleConnect(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator)
 	{
 		if(!err)
 		{
@@ -160,8 +166,8 @@ class smtp_client
 	std::string mErrorMsg;
 };
 
-bool send_mail(const std::string &server, int port, const std::string &login, const std::string &pass, const std::string &from_email, /*"STIL CRAWLER",*/
-			   const std::string &maillist, const std::string &subject, const std::string &body)
+bool send_mail(const std::string& server, int port, const std::string& login, const std::string& pass, const std::string& from_email, /*"STIL CRAWLER",*/
+	const std::string& maillist, const std::string& subject, const std::string& body)
 {
 	STD_TRY_BEGIN();
 	//smtp_client mailc("yoursmtpserver.com",25,"user@yourdomain.com","password");
@@ -170,8 +176,8 @@ bool send_mail(const std::string &server, int port, const std::string &login, co
 	return mailc.Send(from_email, maillist, subject, body);
 	STD_TRY_CATCH("at send_mail", false);
 }
-}
-}
-}
+} // namespace smtp
+} // namespace net_utils
+} // namespace epee
 
 //#include "smtp.inl"

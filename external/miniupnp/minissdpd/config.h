@@ -13,7 +13,7 @@
 #define USE_DAEMON
 
 /* set the syslog facility to use. See man syslog(3) and syslog.conf(5). */
-#define LOG_MINISSDPD	LOG_DAEMON
+#define LOG_MINISSDPD LOG_DAEMON
 
 /* enable IPv6 */
 #define ENABLE_IPV6

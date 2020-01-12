@@ -28,4 +28,4 @@
 //
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
-bool transactions_generation_from_blockchain(std::string &blockchain_path);
+bool transactions_generation_from_blockchain(std::string& blockchain_path);

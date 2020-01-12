@@ -52,7 +52,7 @@
 #include "profile_tools.h"
 
 using epee::string_tools::pod_to_hex;
-#define DB_DEFAULT_TX (m_write_txn != nullptr ? *m_write_txn : (DbTxn *)nullptr)
+#define DB_DEFAULT_TX (m_write_txn != nullptr ? *m_write_txn : (DbTxn*)nullptr)
 
 // Increase when the DB changes in a non backward compatible way, and there
 // is no automatic conversion, so that a full resync is needed.
@@ -62,14 +62,14 @@ namespace
 {
 
 template <typename T>
-inline void throw0(const T &e)
+inline void throw0(const T& e)
 {
 	LOG_PRINT_L0(e.what());
 	throw e;
 }
 
 template <typename T>
-inline void throw1(const T &e)
+inline void throw1(const T& e)
 {
 	LOG_PRINT_L1(e.what());
 	throw e;
@@ -79,7 +79,7 @@ inline void throw1(const T &e)
 //  this helps if the function using it throws
 struct bdb_cur
 {
-	bdb_cur(DbTxn *txn, Db *dbi)
+	bdb_cur(DbTxn* txn, Db* dbi)
 	{
 		if(dbi->cursor(txn, &m_cur, 0))
 			throw0(cryptonote::DB_ERROR("Error opening db cursor"));
@@ -91,15 +91,15 @@ struct bdb_cur
 		close();
 	}
 
-	operator Dbc *()
+	operator Dbc*()
 	{
 		return m_cur;
 	}
-	operator Dbc **()
+	operator Dbc**()
 	{
 		return &m_cur;
 	}
-	Dbc *operator->()
+	Dbc* operator->()
 	{
 		return m_cur;
 	}
@@ -114,34 +114,34 @@ struct bdb_cur
 	}
 
   private:
-	Dbc *m_cur;
+	Dbc* m_cur;
 	bool done;
 };
 
-const char *const BDB_BLOCKS = "blocks";
-const char *const BDB_BLOCK_TIMESTAMPS = "block_timestamps";
-const char *const BDB_BLOCK_HEIGHTS = "block_heights";
-const char *const BDB_BLOCK_HASHES = "block_hashes";
-const char *const BDB_BLOCK_SIZES = "block_sizes";
-const char *const BDB_BLOCK_DIFFS = "block_diffs";
-const char *const BDB_BLOCK_COINS = "block_coins";
+const char* const BDB_BLOCKS = "blocks";
+const char* const BDB_BLOCK_TIMESTAMPS = "block_timestamps";
+const char* const BDB_BLOCK_HEIGHTS = "block_heights";
+const char* const BDB_BLOCK_HASHES = "block_hashes";
+const char* const BDB_BLOCK_SIZES = "block_sizes";
+const char* const BDB_BLOCK_DIFFS = "block_diffs";
+const char* const BDB_BLOCK_COINS = "block_coins";
 
-const char *const BDB_TXS = "txs";
-const char *const BDB_TX_UNLOCKS = "tx_unlocks";
-const char *const BDB_TX_HEIGHTS = "tx_heights";
-const char *const BDB_TX_OUTPUTS = "tx_outputs";
+const char* const BDB_TXS = "txs";
+const char* const BDB_TX_UNLOCKS = "tx_unlocks";
+const char* const BDB_TX_HEIGHTS = "tx_heights";
+const char* const BDB_TX_OUTPUTS = "tx_outputs";
 
-const char *const BDB_OUTPUT_TXS = "output_txs";
-const char *const BDB_OUTPUT_INDICES = "output_indices";
-const char *const BDB_OUTPUT_AMOUNTS = "output_amounts";
-const char *const BDB_OUTPUT_KEYS = "output_keys";
+const char* const BDB_OUTPUT_TXS = "output_txs";
+const char* const BDB_OUTPUT_INDICES = "output_indices";
+const char* const BDB_OUTPUT_AMOUNTS = "output_amounts";
+const char* const BDB_OUTPUT_KEYS = "output_keys";
 
-const char *const BDB_SPENT_KEYS = "spent_keys";
+const char* const BDB_SPENT_KEYS = "spent_keys";
 
-const char *const BDB_HF_STARTING_HEIGHTS = "hf_starting_heights";
-const char *const BDB_HF_VERSIONS = "hf_versions";
+const char* const BDB_HF_STARTING_HEIGHTS = "hf_starting_heights";
+const char* const BDB_HF_VERSIONS = "hf_versions";
 
-const char *const BDB_PROPERTIES = "properties";
+const char* const BDB_PROPERTIES = "properties";
 
 const unsigned int MB = 1024 * 1024;
 // ND: FIXME: db keeps running out of locks when doing full syncs. Possible bug??? Set it to 5K for now.
@@ -159,7 +159,8 @@ const unsigned int DB_BUFFER_COUNT = 1;
 template <typename T>
 struct Dbt_copy : public Dbt
 {
-	Dbt_copy(const T &t) : t_copy(t)
+	Dbt_copy(const T& t) :
+		t_copy(t)
 	{
 		init();
 	}
@@ -189,7 +190,8 @@ struct Dbt_copy : public Dbt
 template <>
 struct Dbt_copy<cryptonote::blobdata> : public Dbt
 {
-	Dbt_copy(const cryptonote::blobdata &bd) : m_data(new char[bd.size()])
+	Dbt_copy(const cryptonote::blobdata& bd) :
+		m_data(new char[bd.size()])
 	{
 		memcpy(m_data.get(), bd.data(), bd.size());
 		set_data(m_data.get());
@@ -203,9 +205,10 @@ struct Dbt_copy<cryptonote::blobdata> : public Dbt
 };
 
 template <>
-struct Dbt_copy<const char *> : public Dbt
+struct Dbt_copy<const char*> : public Dbt
 {
-	Dbt_copy(const char *s) : m_data(strdup(s))
+	Dbt_copy(const char* s) :
+		m_data(strdup(s))
 	{
 		size_t len = strlen(s) + 1; // include the NUL, makes it easier for compare
 		set_data(m_data.get());
@@ -227,7 +230,7 @@ struct Dbt_safe : public Dbt
 	}
 	~Dbt_safe()
 	{
-		void *buf = get_data();
+		void* buf = get_data();
 		if(buf != NULL)
 		{
 			free(buf);
@@ -240,7 +243,7 @@ struct Dbt_safe : public Dbt
 namespace cryptonote
 {
 
-void BlockchainBDB::add_block(const block &blk, const size_t &block_size, const difficulty_type &cumulative_difficulty, const uint64_t &coins_generated, const crypto::hash &blk_hash)
+void BlockchainBDB::add_block(const block& blk, const size_t& block_size, const difficulty_type& cumulative_difficulty, const uint64_t& coins_generated, const crypto::hash& blk_hash)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -329,7 +332,7 @@ void BlockchainBDB::remove_block()
 		throw1(DB_ERROR("Failed to add removal of block hash to db transaction"));
 }
 
-void BlockchainBDB::add_transaction_data(const crypto::hash &blk_hash, const transaction &tx, const crypto::hash &tx_hash)
+void BlockchainBDB::add_transaction_data(const crypto::hash& blk_hash, const transaction& tx, const crypto::hash& tx_hash)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -352,7 +355,7 @@ void BlockchainBDB::add_transaction_data(const crypto::hash &blk_hash, const tra
 		throw0(DB_ERROR("Failed to add tx unlock time to db transaction"));
 }
 
-void BlockchainBDB::remove_transaction_data(const crypto::hash &tx_hash, const transaction &tx)
+void BlockchainBDB::remove_transaction_data(const crypto::hash& tx_hash, const transaction& tx)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -377,7 +380,7 @@ void BlockchainBDB::remove_transaction_data(const crypto::hash &tx_hash, const t
 		throw1(DB_ERROR("Failed to add removal of tx outputs to db transaction"));
 }
 
-void BlockchainBDB::add_output(const crypto::hash &tx_hash, const tx_out &tx_output, const uint64_t &local_index, const uint64_t unlock_time, const rct::key *commitment)
+void BlockchainBDB::add_output(const crypto::hash& tx_hash, const tx_out& tx_output, const uint64_t& local_index, const uint64_t unlock_time, const rct::key* commitment)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -417,7 +420,7 @@ void BlockchainBDB::add_output(const crypto::hash &tx_hash, const tx_out &tx_out
 	m_num_outputs++;
 }
 
-void BlockchainBDB::remove_tx_outputs(const crypto::hash &tx_hash, const transaction &tx)
+void BlockchainBDB::remove_tx_outputs(const crypto::hash& tx_hash, const transaction& tx)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 
@@ -465,13 +468,13 @@ void BlockchainBDB::remove_tx_outputs(const crypto::hash &tx_hash, const transac
 }
 
 // TODO: probably remove this function
-void BlockchainBDB::remove_output(const tx_out &tx_output)
+void BlockchainBDB::remove_output(const tx_out& tx_output)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__ << " (unused version - does nothing)");
 	return;
 }
 
-void BlockchainBDB::remove_output(const uint64_t &out_index, const uint64_t amount)
+void BlockchainBDB::remove_output(const uint64_t& out_index, const uint64_t amount)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -585,7 +588,7 @@ void BlockchainBDB::remove_amount_output_index(const uint64_t amount, const uint
 	cur.close();
 }
 
-void BlockchainBDB::add_spent_key(const crypto::key_image &k_image)
+void BlockchainBDB::add_spent_key(const crypto::key_image& k_image)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -599,7 +602,7 @@ void BlockchainBDB::add_spent_key(const crypto::key_image &k_image)
 		throw1(DB_ERROR("Error adding spent key image to db transaction."));
 }
 
-void BlockchainBDB::remove_spent_key(const crypto::key_image &k_image)
+void BlockchainBDB::remove_spent_key(const crypto::key_image& k_image)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -610,7 +613,7 @@ void BlockchainBDB::remove_spent_key(const crypto::key_image &k_image)
 		throw1(DB_ERROR("Error adding removal of key image to db transaction"));
 }
 
-bool BlockchainBDB::for_all_key_images(std::function<bool(const crypto::key_image &)> f) const
+bool BlockchainBDB::for_all_key_images(std::function<bool(const crypto::key_image&)> f) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -636,7 +639,7 @@ bool BlockchainBDB::for_all_key_images(std::function<bool(const crypto::key_imag
 	return ret;
 }
 
-bool BlockchainBDB::for_all_blocks(std::function<bool(uint64_t, const crypto::hash &, const cryptonote::block &)> f) const
+bool BlockchainBDB::for_all_blocks(std::function<bool(uint64_t, const crypto::hash&, const cryptonote::block&)> f) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -651,7 +654,7 @@ bool BlockchainBDB::for_all_blocks(std::function<bool(uint64_t, const crypto::ha
 	{
 		uint64_t height = k - 1;
 		blobdata bd;
-		bd.assign(reinterpret_cast<char *>(v.get_data()), v.get_size());
+		bd.assign(reinterpret_cast<char*>(v.get_data()), v.get_size());
 		block b;
 		if(!parse_and_validate_block_from_blob(bd, b))
 			throw0(DB_ERROR("Failed to parse block from blob retrieved from the db"));
@@ -671,7 +674,7 @@ bool BlockchainBDB::for_all_blocks(std::function<bool(uint64_t, const crypto::ha
 	return ret;
 }
 
-bool BlockchainBDB::for_all_transactions(std::function<bool(const crypto::hash &, const cryptonote::transaction &)> f) const
+bool BlockchainBDB::for_all_transactions(std::function<bool(const crypto::hash&, const cryptonote::transaction&)> f) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -685,7 +688,7 @@ bool BlockchainBDB::for_all_transactions(std::function<bool(const crypto::hash &
 	while((result = cur->get(&k, &v, DB_NEXT)) == 0)
 	{
 		blobdata bd;
-		bd.assign(reinterpret_cast<char *>(v.get_data()), v.get_size());
+		bd.assign(reinterpret_cast<char*>(v.get_data()), v.get_size());
 		transaction tx;
 		if(!parse_and_validate_tx_from_blob(bd, tx))
 			throw0(DB_ERROR("Failed to parse tx from blob retrieved from the db"));
@@ -702,7 +705,7 @@ bool BlockchainBDB::for_all_transactions(std::function<bool(const crypto::hash &
 	return ret;
 }
 
-bool BlockchainBDB::for_all_outputs(std::function<bool(uint64_t amount, const crypto::hash &tx_hash, size_t tx_idx)> f) const
+bool BlockchainBDB::for_all_outputs(std::function<bool(uint64_t amount, const crypto::hash& tx_hash, size_t tx_idx)> f) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -730,7 +733,7 @@ bool BlockchainBDB::for_all_outputs(std::function<bool(uint64_t amount, const cr
 	return ret;
 }
 
-blobdata BlockchainBDB::output_to_blob(const tx_out &output) const
+blobdata BlockchainBDB::output_to_blob(const tx_out& output) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	blobdata b;
@@ -739,7 +742,7 @@ blobdata BlockchainBDB::output_to_blob(const tx_out &output) const
 	return b;
 }
 
-tx_out BlockchainBDB::output_from_blob(const blobdata &blob) const
+tx_out BlockchainBDB::output_from_blob(const blobdata& blob) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	std::stringstream ss;
@@ -753,7 +756,7 @@ tx_out BlockchainBDB::output_from_blob(const blobdata &blob) const
 	return o;
 }
 
-uint64_t BlockchainBDB::get_output_global_index(const uint64_t &amount, const uint64_t &index)
+uint64_t BlockchainBDB::get_output_global_index(const uint64_t& amount, const uint64_t& index)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -785,8 +788,9 @@ BlockchainBDB::~BlockchainBDB()
 	}
 }
 
-BlockchainBDB::BlockchainBDB(bool batch_transactions) : BlockchainDB(),
-														m_buffer(DB_BUFFER_COUNT, DB_BUFFER_LENGTH)
+BlockchainBDB::BlockchainBDB(bool batch_transactions) :
+	BlockchainDB(),
+	m_buffer(DB_BUFFER_COUNT, DB_BUFFER_LENGTH)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	// initialize folder to something "safe" just in case
@@ -800,7 +804,7 @@ BlockchainBDB::BlockchainBDB(bool batch_transactions) : BlockchainDB(),
 	m_hardfork = nullptr;
 }
 
-void BlockchainBDB::open(const std::string &filename, const int db_flags)
+void BlockchainBDB::open(const std::string& filename, const int db_flags)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 
@@ -931,7 +935,7 @@ void BlockchainBDB::open(const std::string &filename, const int db_flags)
 
 		txn.commit();
 
-		DB_BTREE_STAT *stats;
+		DB_BTREE_STAT* stats;
 
 		// DB_FAST_STAT can apparently cause an incorrect number of records
 		// to be returned.  The flag should be set to 0 instead if this proves
@@ -952,7 +956,7 @@ void BlockchainBDB::open(const std::string &filename, const int db_flags)
 		// checks for compatibility
 		bool compatible = true;
 
-		Dbt_copy<const char *> key("version");
+		Dbt_copy<const char*> key("version");
 		Dbt_copy<uint32_t> result;
 		auto get_result = m_properties->get(DB_DEFAULT_TX, &key, &result, 0);
 		if(get_result == 0)
@@ -989,7 +993,7 @@ void BlockchainBDB::open(const std::string &filename, const int db_flags)
 			// only write version on an empty DB
 			if(m_height == 0)
 			{
-				Dbt_copy<const char *> k("version");
+				Dbt_copy<const char*> k("version");
 				Dbt_copy<uint32_t> v(VERSION);
 				auto put_result = m_properties->put(DB_DEFAULT_TX, &k, &v, 0);
 				if(put_result != 0)
@@ -1005,7 +1009,7 @@ void BlockchainBDB::open(const std::string &filename, const int db_flags)
 		m_run_checkpoint = true;
 		m_checkpoint_thread.reset(new boost::thread(&BlockchainBDB::checkpoint_worker, this));
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		throw0(DB_OPEN_FAILURE(e.what()));
 	}
@@ -1095,7 +1099,7 @@ void BlockchainBDB::sync()
 
 		m_properties->sync(0);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		throw0(DB_ERROR(std::string("Failed to sync database: ").append(e.what()).c_str()));
 	}
@@ -1139,7 +1143,7 @@ void BlockchainBDB::reset()
 
 		m_properties->truncate(*m_write_txn, &count, 0);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		throw0(DB_ERROR(std::string("Failed to reset database: ").append(e.what()).c_str()));
 	}
@@ -1156,8 +1160,8 @@ std::vector<std::string> BlockchainBDB::get_filenames() const
 	char *fname, *dbname;
 	const char **pfname, **pdbname;
 
-	pfname = (const char **)&fname;
-	pdbname = (const char **)&dbname;
+	pfname = (const char**)&fname;
+	pdbname = (const char**)&dbname;
 
 	m_blocks->get_dbname(pfname, pdbname);
 	filenames.push_back(fname);
@@ -1218,7 +1222,7 @@ std::vector<std::string> BlockchainBDB::get_filenames() const
 
 	std::vector<std::string> full_paths;
 
-	for(auto &filename : filenames)
+	for(auto& filename : filenames)
 	{
 		boost::filesystem::path p(m_folder);
 		p /= filename;
@@ -1250,7 +1254,7 @@ void BlockchainBDB::unlock()
 	check_open();
 }
 
-bool BlockchainBDB::block_exists(const crypto::hash &h, uint64_t *height) const
+bool BlockchainBDB::block_exists(const crypto::hash& h, uint64_t* height) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1272,7 +1276,7 @@ bool BlockchainBDB::block_exists(const crypto::hash &h, uint64_t *height) const
 	return true;
 }
 
-block BlockchainBDB::get_block(const crypto::hash &h) const
+block BlockchainBDB::get_block(const crypto::hash& h) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1280,7 +1284,7 @@ block BlockchainBDB::get_block(const crypto::hash &h) const
 	return get_block_from_height(get_block_height(h));
 }
 
-uint64_t BlockchainBDB::get_block_height(const crypto::hash &h) const
+uint64_t BlockchainBDB::get_block_height(const crypto::hash& h) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1297,7 +1301,7 @@ uint64_t BlockchainBDB::get_block_height(const crypto::hash &h) const
 	return result - 1;
 }
 
-block_header BlockchainBDB::get_block_header(const crypto::hash &h) const
+block_header BlockchainBDB::get_block_header(const crypto::hash& h) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1306,7 +1310,7 @@ block_header BlockchainBDB::get_block_header(const crypto::hash &h) const
 	return get_block(h);
 }
 
-block BlockchainBDB::get_block_from_height(const uint64_t &height) const
+block BlockchainBDB::get_block_from_height(const uint64_t& height) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1322,7 +1326,7 @@ block BlockchainBDB::get_block_from_height(const uint64_t &height) const
 		throw0(DB_ERROR("Error attempting to retrieve a block from the db"));
 
 	blobdata bd;
-	bd.assign(reinterpret_cast<char *>(result.get_data()), result.get_size());
+	bd.assign(reinterpret_cast<char*>(result.get_data()), result.get_size());
 
 	block b;
 	if(!parse_and_validate_block_from_blob(bd, b))
@@ -1331,7 +1335,7 @@ block BlockchainBDB::get_block_from_height(const uint64_t &height) const
 	return b;
 }
 
-uint64_t BlockchainBDB::get_block_timestamp(const uint64_t &height) const
+uint64_t BlockchainBDB::get_block_timestamp(const uint64_t& height) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1363,7 +1367,7 @@ uint64_t BlockchainBDB::get_top_block_timestamp() const
 	return get_block_timestamp(m_height - 1);
 }
 
-size_t BlockchainBDB::get_block_size(const uint64_t &height) const
+size_t BlockchainBDB::get_block_size(const uint64_t& height) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1381,7 +1385,7 @@ size_t BlockchainBDB::get_block_size(const uint64_t &height) const
 	return result;
 }
 
-difficulty_type BlockchainBDB::get_block_cumulative_difficulty(const uint64_t &height) const
+difficulty_type BlockchainBDB::get_block_cumulative_difficulty(const uint64_t& height) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__ << "  height: " << height);
 	check_open();
@@ -1399,7 +1403,7 @@ difficulty_type BlockchainBDB::get_block_cumulative_difficulty(const uint64_t &h
 	return result;
 }
 
-difficulty_type BlockchainBDB::get_block_difficulty(const uint64_t &height) const
+difficulty_type BlockchainBDB::get_block_difficulty(const uint64_t& height) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1416,7 +1420,7 @@ difficulty_type BlockchainBDB::get_block_difficulty(const uint64_t &height) cons
 	return diff1 - diff2;
 }
 
-uint64_t BlockchainBDB::get_block_already_generated_coins(const uint64_t &height) const
+uint64_t BlockchainBDB::get_block_already_generated_coins(const uint64_t& height) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1434,7 +1438,7 @@ uint64_t BlockchainBDB::get_block_already_generated_coins(const uint64_t &height
 	return result;
 }
 
-crypto::hash BlockchainBDB::get_block_hash_from_height(const uint64_t &height) const
+crypto::hash BlockchainBDB::get_block_hash_from_height(const uint64_t& height) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1452,7 +1456,7 @@ crypto::hash BlockchainBDB::get_block_hash_from_height(const uint64_t &height) c
 	return result;
 }
 
-std::vector<block> BlockchainBDB::get_blocks_range(const uint64_t &h1, const uint64_t &h2) const
+std::vector<block> BlockchainBDB::get_blocks_range(const uint64_t& h1, const uint64_t& h2) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1466,7 +1470,7 @@ std::vector<block> BlockchainBDB::get_blocks_range(const uint64_t &h1, const uin
 	return v;
 }
 
-std::vector<crypto::hash> BlockchainBDB::get_hashes_range(const uint64_t &h1, const uint64_t &h2) const
+std::vector<crypto::hash> BlockchainBDB::get_hashes_range(const uint64_t& h1, const uint64_t& h2) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1514,7 +1518,7 @@ uint64_t BlockchainBDB::height() const
 	return m_height;
 }
 
-bool BlockchainBDB::tx_exists(const crypto::hash &h) const
+bool BlockchainBDB::tx_exists(const crypto::hash& h) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1536,7 +1540,7 @@ bool BlockchainBDB::tx_exists(const crypto::hash &h) const
 	return true;
 }
 
-uint64_t BlockchainBDB::get_tx_unlock_time(const crypto::hash &h) const
+uint64_t BlockchainBDB::get_tx_unlock_time(const crypto::hash& h) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1552,7 +1556,7 @@ uint64_t BlockchainBDB::get_tx_unlock_time(const crypto::hash &h) const
 	return result;
 }
 
-transaction BlockchainBDB::get_tx(const crypto::hash &h) const
+transaction BlockchainBDB::get_tx(const crypto::hash& h) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1566,7 +1570,7 @@ transaction BlockchainBDB::get_tx(const crypto::hash &h) const
 		throw0(DB_ERROR("DB error attempting to fetch tx from hash"));
 
 	blobdata bd;
-	bd.assign(reinterpret_cast<char *>(result.get_data()), result.get_size());
+	bd.assign(reinterpret_cast<char*>(result.get_data()), result.get_size());
 
 	transaction tx;
 	if(!parse_and_validate_tx_from_blob(bd, tx))
@@ -1580,7 +1584,7 @@ uint64_t BlockchainBDB::get_tx_count() const
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
 
-	DB_BTREE_STAT *stats;
+	DB_BTREE_STAT* stats;
 
 	// DB_FAST_STAT can apparently cause an incorrect number of records
 	// to be returned.  The flag should be set to 0 instead if this proves
@@ -1592,13 +1596,13 @@ uint64_t BlockchainBDB::get_tx_count() const
 	return num_txs;
 }
 
-std::vector<transaction> BlockchainBDB::get_tx_list(const std::vector<crypto::hash> &hlist) const
+std::vector<transaction> BlockchainBDB::get_tx_list(const std::vector<crypto::hash>& hlist) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
 	std::vector<transaction> v;
 
-	for(auto &h : hlist)
+	for(auto& h : hlist)
 	{
 		v.push_back(get_tx(h));
 	}
@@ -1606,7 +1610,7 @@ std::vector<transaction> BlockchainBDB::get_tx_list(const std::vector<crypto::ha
 	return v;
 }
 
-uint64_t BlockchainBDB::get_tx_block_height(const crypto::hash &h) const
+uint64_t BlockchainBDB::get_tx_block_height(const crypto::hash& h) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1624,7 +1628,7 @@ uint64_t BlockchainBDB::get_tx_block_height(const crypto::hash &h) const
 	return (uint64_t)result - 1;
 }
 
-uint64_t BlockchainBDB::get_num_outputs(const uint64_t &amount) const
+uint64_t BlockchainBDB::get_num_outputs(const uint64_t& amount) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1649,7 +1653,7 @@ uint64_t BlockchainBDB::get_num_outputs(const uint64_t &amount) const
 	return num_elems;
 }
 
-output_data_t BlockchainBDB::get_output_key(const uint64_t &global_index) const
+output_data_t BlockchainBDB::get_output_key(const uint64_t& global_index) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1665,7 +1669,7 @@ output_data_t BlockchainBDB::get_output_key(const uint64_t &global_index) const
 	return v;
 }
 
-output_data_t BlockchainBDB::get_output_key(const uint64_t &amount, const uint64_t &index)
+output_data_t BlockchainBDB::get_output_key(const uint64_t& amount, const uint64_t& index)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1674,7 +1678,7 @@ output_data_t BlockchainBDB::get_output_key(const uint64_t &amount, const uint64
 	return get_output_key(glob_index);
 }
 
-tx_out_index BlockchainBDB::get_output_tx_and_index(const uint64_t &amount, const uint64_t &index)
+tx_out_index BlockchainBDB::get_output_tx_and_index(const uint64_t& amount, const uint64_t& index)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	std::vector<uint64_t> offsets;
@@ -1687,7 +1691,7 @@ tx_out_index BlockchainBDB::get_output_tx_and_index(const uint64_t &amount, cons
 	return indices[0];
 }
 
-std::vector<uint64_t> BlockchainBDB::get_tx_output_indices(const crypto::hash &h) const
+std::vector<uint64_t> BlockchainBDB::get_tx_output_indices(const crypto::hash& h) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1717,7 +1721,7 @@ std::vector<uint64_t> BlockchainBDB::get_tx_output_indices(const crypto::hash &h
 	return index_vec;
 }
 
-std::vector<uint64_t> BlockchainBDB::get_tx_amount_output_indices(const crypto::hash &h) const
+std::vector<uint64_t> BlockchainBDB::get_tx_amount_output_indices(const crypto::hash& h) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1732,7 +1736,7 @@ std::vector<uint64_t> BlockchainBDB::get_tx_amount_output_indices(const crypto::
 
 	uint64_t i = 0;
 	uint64_t global_index;
-	for(const auto &vout : tx.vout)
+	for(const auto& vout : tx.vout)
 	{
 		uint64_t amount = vout.amount;
 
@@ -1784,7 +1788,7 @@ std::vector<uint64_t> BlockchainBDB::get_tx_amount_output_indices(const crypto::
 	return index_vec2;
 }
 
-tx_out_index BlockchainBDB::get_output_tx_and_index_from_global(const uint64_t &index) const
+tx_out_index BlockchainBDB::get_output_tx_and_index_from_global(const uint64_t& index) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1810,7 +1814,7 @@ tx_out_index BlockchainBDB::get_output_tx_and_index_from_global(const uint64_t &
 	return tx_out_index(tx_hash, result);
 }
 
-bool BlockchainBDB::has_key_image(const crypto::key_image &img) const
+bool BlockchainBDB::has_key_image(const crypto::key_image& img) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1870,7 +1874,7 @@ void BlockchainBDB::block_txn_abort()
 	// TODO
 }
 
-uint64_t BlockchainBDB::add_block(const block &blk, const size_t &block_size, const difficulty_type &cumulative_difficulty, const uint64_t &coins_generated, const std::vector<transaction> &txs)
+uint64_t BlockchainBDB::add_block(const block& blk, const size_t& block_size, const difficulty_type& cumulative_difficulty, const uint64_t& coins_generated, const std::vector<transaction>& txs)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1891,7 +1895,7 @@ uint64_t BlockchainBDB::add_block(const block &blk, const size_t &block_size, co
 		TIME_MEASURE_FINISH(time1);
 		time_commit1 += time1;
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		m_num_outputs = num_outputs;
 		m_write_txn = NULL;
@@ -1901,7 +1905,7 @@ uint64_t BlockchainBDB::add_block(const block &blk, const size_t &block_size, co
 	return ++m_height;
 }
 
-void BlockchainBDB::pop_block(block &blk, std::vector<transaction> &txs)
+void BlockchainBDB::pop_block(block& blk, std::vector<transaction>& txs)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -1929,13 +1933,13 @@ void BlockchainBDB::pop_block(block &blk, std::vector<transaction> &txs)
 	--m_height;
 }
 
-void BlockchainBDB::get_output_tx_and_index_from_global(const std::vector<uint64_t> &global_indices, std::vector<tx_out_index> &tx_out_indices) const
+void BlockchainBDB::get_output_tx_and_index_from_global(const std::vector<uint64_t>& global_indices, std::vector<tx_out_index>& tx_out_indices) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
 	tx_out_indices.clear();
 
-	for(const uint64_t &index : global_indices)
+	for(const uint64_t& index : global_indices)
 	{
 		Dbt_copy<uint32_t> k(index);
 		Dbt_copy<crypto::hash> v;
@@ -1959,7 +1963,7 @@ void BlockchainBDB::get_output_tx_and_index_from_global(const std::vector<uint64
 	}
 }
 
-void BlockchainBDB::get_output_global_indices(const uint64_t &amount, const std::vector<uint64_t> &offsets, std::vector<uint64_t> &global_indices)
+void BlockchainBDB::get_output_global_indices(const uint64_t& amount, const std::vector<uint64_t>& offsets, std::vector<uint64_t>& global_indices)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	TIME_MEASURE_START(txx);
@@ -1967,24 +1971,24 @@ void BlockchainBDB::get_output_global_indices(const uint64_t &amount, const std:
 
 	bdb_cur cur(DB_DEFAULT_TX, m_output_amounts);
 	uint64_t max = 0;
-	for(const uint64_t &index : offsets)
+	for(const uint64_t& index : offsets)
 	{
 		if(index > max)
 			max = index;
 	}
 
 // get returned keypairs count
-#define DB_COUNT_RECORDS(dbt, cnt)                                   \
-	do                                                               \
-	{                                                                \
-		uint32_t *_p = (uint32_t *)((uint8_t *)(dbt)->data +         \
-									(dbt)->ulen - sizeof(uint32_t)); \
-		cnt = 0;                                                     \
-		while(*_p != (uint32_t)-1)                                   \
-		{                                                            \
-			_p -= 2;                                                 \
-			++cnt;                                                   \
-		}                                                            \
+#define DB_COUNT_RECORDS(dbt, cnt)                                  \
+	do                                                              \
+	{                                                               \
+		uint32_t* _p = (uint32_t*)((uint8_t*)(dbt)->data +          \
+								   (dbt)->ulen - sizeof(uint32_t)); \
+		cnt = 0;                                                    \
+		while(*_p != (uint32_t)-1)                                  \
+		{                                                           \
+			_p -= 2;                                                \
+			++cnt;                                                  \
+		}                                                           \
 	} while(0);
 
 	Dbt_copy<uint64_t> k(amount);
@@ -2008,7 +2012,7 @@ void BlockchainBDB::get_output_global_indices(const uint64_t &amount, const std:
 	TIME_MEASURE_START(db2);
 	if(max <= 1)
 	{
-		for(const uint64_t &index : offsets)
+		for(const uint64_t& index : offsets)
 		{
 			TIME_MEASURE_START(t_seek);
 
@@ -2054,7 +2058,7 @@ void BlockchainBDB::get_output_global_indices(const uint64_t &amount, const std:
 
 		uint32_t curcount = 0;
 		uint32_t blockstart = 0;
-		for(const uint64_t &index : offsets)
+		for(const uint64_t& index : offsets)
 		{
 			if(index >= num_elems)
 			{
@@ -2090,10 +2094,10 @@ void BlockchainBDB::get_output_global_indices(const uint64_t &amount, const std:
 						blockstart = curcount;
 
 						int count = 0;
-						DB_COUNT_RECORDS((DBT *)&data, count);
+						DB_COUNT_RECORDS((DBT*)&data, count);
 						curcount += count;
 					}
-					catch(const std::exception &e)
+					catch(const std::exception& e)
 					{
 						cur.close();
 						throw0(DB_ERROR(std::string("Failed on DB_MULTIPLE: ").append(e.what()).c_str()));
@@ -2107,13 +2111,13 @@ void BlockchainBDB::get_output_global_indices(const uint64_t &amount, const std:
 
 				LOG_PRINT_L3("Records returned: " << curcount << " Index: " << index);
 				TIME_MEASURE_START(t_db2);
-				DBT *pdata = (DBT *)&data;
+				DBT* pdata = (DBT*)&data;
 
-				uint8_t *value;
+				uint8_t* value;
 				uint64_t dlen = 0;
 
-				void *pbase = ((uint8_t *)(pdata->data)) + pdata->ulen - sizeof(uint32_t);
-				uint32_t *p = (uint32_t *)pbase;
+				void* pbase = ((uint8_t*)(pdata->data)) + pdata->ulen - sizeof(uint32_t);
+				uint32_t* p = (uint32_t*)pbase;
 				if(*p == (uint32_t)-1)
 				{
 					value = NULL;
@@ -2121,15 +2125,15 @@ void BlockchainBDB::get_output_global_indices(const uint64_t &amount, const std:
 				else
 				{
 					p -= (index - blockstart) * 2; // index * 4 + 2; <- if DB_MULTIPLE_KEY
-					value = (uint8_t *)pdata->data + *p--;
+					value = (uint8_t*)pdata->data + *p--;
 					dlen = *p--;
-					if(value == (uint8_t *)pdata->data)
+					if(value == (uint8_t*)pdata->data)
 						value = NULL;
 				}
 
 				if(value != NULL)
 				{
-					v = dlen == sizeof(uint64_t) ? *((uint64_t *)value) : *((uint32_t *)value);
+					v = dlen == sizeof(uint64_t) ? *((uint64_t*)value) : *((uint32_t*)value);
 				}
 				TIME_MEASURE_FINISH(t_db2);
 				t_dbscan += t_db2;
@@ -2150,7 +2154,7 @@ void BlockchainBDB::get_output_global_indices(const uint64_t &amount, const std:
 	LOG_PRINT_L3("blen: " << buflen << " txx: " << txx << " db1: " << t_dbmul << " db2: " << t_dbscan);
 }
 
-void BlockchainBDB::get_output_key(const uint64_t &amount, const std::vector<uint64_t> &offsets, std::vector<output_data_t> &outputs)
+void BlockchainBDB::get_output_key(const uint64_t& amount, const std::vector<uint64_t>& offsets, std::vector<output_data_t>& outputs)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -2163,7 +2167,7 @@ void BlockchainBDB::get_output_key(const uint64_t &amount, const std::vector<uin
 	TIME_MEASURE_START(db3);
 	if(global_indices.size() > 0)
 	{
-		for(const uint64_t &index : global_indices)
+		for(const uint64_t& index : global_indices)
 		{
 			Dbt_copy<uint32_t> k(index);
 			Dbt_copy<output_data_t> v;
@@ -2174,7 +2178,7 @@ void BlockchainBDB::get_output_key(const uint64_t &amount, const std::vector<uin
 			else if(get_result)
 				throw0(DB_ERROR("DB error attempting to fetch output tx hash"));
 
-			output_data_t data = *(output_data_t *)v.get_data();
+			output_data_t data = *(output_data_t*)v.get_data();
 			outputs.push_back(data);
 		}
 	}
@@ -2183,7 +2187,7 @@ void BlockchainBDB::get_output_key(const uint64_t &amount, const std::vector<uin
 	LOG_PRINT_L3("db3: " << db3);
 }
 
-void BlockchainBDB::get_output_tx_and_index(const uint64_t &amount, const std::vector<uint64_t> &offsets, std::vector<tx_out_index> &indices)
+void BlockchainBDB::get_output_tx_and_index(const uint64_t& amount, const std::vector<uint64_t>& offsets, std::vector<tx_out_index>& indices)
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	check_open();
@@ -2199,7 +2203,7 @@ void BlockchainBDB::get_output_tx_and_index(const uint64_t &amount, const std::v
 	LOG_PRINT_L3("db3: " << db3);
 }
 
-std::map<uint64_t, uint64_t>::BlockchainBDB::get_output_histogram(const std::vector<uint64_t> &amounts) const
+std::map<uint64_t, uint64_t>::BlockchainBDB::get_output_histogram(const std::vector<uint64_t>& amounts) const
 {
 	LOG_PRINT_L3("BlockchainBDB::" << __func__);
 	throw1(DB_ERROR("Not implemented."));
@@ -2231,7 +2235,7 @@ void BlockchainBDB::check_hard_fork_info()
 								   << "num hf_versions " << db_stat2->bt_nkeys << " - will clear the two hard fork DBs");
 
 		bdb_txn_safe txn;
-		bdb_txn_safe *txn_ptr = &txn;
+		bdb_txn_safe* txn_ptr = &txn;
 		if(m_write_txn)
 			txn_ptr = m_write_txn;
 		else
@@ -2251,7 +2255,7 @@ void BlockchainBDB::check_hard_fork_info()
 			if(!m_write_txn)
 				txn.commit();
 		}
-		catch(const std::exception &e)
+		catch(const std::exception& e)
 		{
 			throw0(DB_ERROR(std::string("Failed to clear two hard fork DBs: ").append(e.what()).c_str()));
 		}
@@ -2266,7 +2270,7 @@ void BlockchainBDB::drop_hard_fork_info()
 	check_open();
 
 	bdb_txn_safe txn;
-	bdb_txn_safe *txn_ptr = &txn;
+	bdb_txn_safe* txn_ptr = &txn;
 	if(m_write_txn)
 		txn_ptr = m_write_txn;
 	else
@@ -2289,7 +2293,7 @@ void BlockchainBDB::drop_hard_fork_info()
 		if(!m_write_txn)
 			txn.commit();
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		throw0(DB_ERROR(std::string("Failed to drop hard fork info: ").append(e.what()).c_str()));
 	}

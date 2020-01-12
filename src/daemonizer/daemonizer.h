@@ -51,12 +51,12 @@
 namespace daemonizer
 {
 void init_options(
-	boost::program_options::options_description &hidden_options, boost::program_options::options_description &normal_options);
+	boost::program_options::options_description& hidden_options, boost::program_options::options_description& normal_options);
 
 boost::filesystem::path get_default_data_dir();
 
 boost::filesystem::path get_relative_path_base(
-	boost::program_options::variables_map const &vm);
+	boost::program_options::variables_map const& vm);
 
 /**
    * @arg create_before_detach - this indicates that the daemon should be
@@ -66,10 +66,10 @@ boost::filesystem::path get_relative_path_base(
    */
 template <typename T_executor>
 bool daemonize(
-	int argc, char* argv[], T_executor &&executor // universal ref
+	int argc, char* argv[], T_executor&& executor // universal ref
 	,
-	boost::program_options::variables_map const &vm);
-}
+	boost::program_options::variables_map const& vm);
+} // namespace daemonizer
 
 #ifdef WIN32
 #include "daemonizer/windows_daemonizer.inl"

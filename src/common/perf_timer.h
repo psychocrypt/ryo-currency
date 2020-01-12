@@ -79,7 +79,7 @@ class PerformanceTimer
 class LoggingPerformanceTimer : public PerformanceTimer
 {
   public:
-	LoggingPerformanceTimer(const std::string &s, const std::string &cat, uint64_t unit, gulps::level l = gulps::LEVEL_DEBUG);
+	LoggingPerformanceTimer(const std::string& s, const std::string& cat, uint64_t unit, gulps::level l = gulps::LEVEL_DEBUG);
 	~LoggingPerformanceTimer();
 
   private:
@@ -103,4 +103,4 @@ void set_performance_timer_log_level(gulps::level level);
 	} while(0)
 #define PERF_TIMER_PAUSE(name) pt_##name->pause()
 #define PERF_TIMER_RESUME(name) pt_##name->resume()
-}
+} // namespace tools

@@ -39,7 +39,7 @@ static tools::wallet2::transfer_container make_transfers_container(size_t N)
 	for(size_t n = 0; n < N; ++n)
 	{
 		transfers.push_back(AUTO_VAL_INIT(tools::wallet2::transfer_details()));
-		tools::wallet2::transfer_details &td = transfers.back();
+		tools::wallet2::transfer_details& td = transfers.back();
 		td.m_block_height = 1000;
 		td.m_spent = false;
 		td.m_txid = crypto::null_hash;

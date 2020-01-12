@@ -38,7 +38,7 @@ GULPS_CAT_MAJOR("test");
 
 namespace
 {
-void split_miner_tx_outs(transaction &miner_tx, uint64_t amount_1)
+void split_miner_tx_outs(transaction& miner_tx, uint64_t amount_1)
 {
 	uint64_t total_amount = get_outs_money_amount(miner_tx);
 	uint64_t amount_2 = total_amount - amount_1;
@@ -57,7 +57,7 @@ void split_miner_tx_outs(transaction &miner_tx, uint64_t amount_1)
 	miner_tx.vout.push_back(out2);
 }
 
-void append_tx_source_entry(std::vector<cryptonote::tx_source_entry> &sources, const transaction &tx, size_t out_idx)
+void append_tx_source_entry(std::vector<cryptonote::tx_source_entry>& sources, const transaction& tx, size_t out_idx)
 {
 	cryptonote::tx_source_entry se;
 	se.amount = tx.vout[out_idx].amount;
@@ -70,27 +70,27 @@ void append_tx_source_entry(std::vector<cryptonote::tx_source_entry> &sources, c
 
 	sources.push_back(se);
 }
-}
+} // namespace
 
 //======================================================================================================================
 
-gen_uint_overflow_base::gen_uint_overflow_base()
-	: m_last_valid_block_event_idx(static_cast<size_t>(-1))
+gen_uint_overflow_base::gen_uint_overflow_base() :
+	m_last_valid_block_event_idx(static_cast<size_t>(-1))
 {
 	REGISTER_CALLBACK_METHOD(gen_uint_overflow_1, mark_last_valid_block);
 }
 
-bool gen_uint_overflow_base::check_tx_verification_context(const cryptonote::tx_verification_context &tvc, bool tx_added, size_t event_idx, const cryptonote::transaction & /*tx*/)
+bool gen_uint_overflow_base::check_tx_verification_context(const cryptonote::tx_verification_context& tvc, bool tx_added, size_t event_idx, const cryptonote::transaction& /*tx*/)
 {
 	return m_last_valid_block_event_idx < event_idx ? !tx_added && tvc.m_verifivation_failed : tx_added && !tvc.m_verifivation_failed;
 }
 
-bool gen_uint_overflow_base::check_block_verification_context(const cryptonote::block_verification_context &bvc, size_t event_idx, const cryptonote::block & /*block*/)
+bool gen_uint_overflow_base::check_block_verification_context(const cryptonote::block_verification_context& bvc, size_t event_idx, const cryptonote::block& /*block*/)
 {
 	return m_last_valid_block_event_idx < event_idx ? bvc.m_verifivation_failed | bvc.m_marked_as_orphaned : !bvc.m_verifivation_failed;
 }
 
-bool gen_uint_overflow_base::mark_last_valid_block(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events)
+bool gen_uint_overflow_base::mark_last_valid_block(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events)
 {
 	m_last_valid_block_event_idx = ev_index - 1;
 	return true;
@@ -98,7 +98,7 @@ bool gen_uint_overflow_base::mark_last_valid_block(cryptonote::core &c, size_t e
 
 //======================================================================================================================
 
-bool gen_uint_overflow_1::generate(std::vector<test_event_entry> &events) const
+bool gen_uint_overflow_1::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -142,7 +142,7 @@ bool gen_uint_overflow_1::generate(std::vector<test_event_entry> &events) const
 
 //======================================================================================================================
 
-bool gen_uint_overflow_2::generate(std::vector<test_event_entry> &events) const
+bool gen_uint_overflow_2::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -169,7 +169,7 @@ bool gen_uint_overflow_2::generate(std::vector<test_event_entry> &events) const
 	}
 
 	std::vector<cryptonote::tx_destination_entry> destinations;
-	const account_public_address &bob_addr = bob_account.get_keys().m_account_address;
+	const account_public_address& bob_addr = bob_account.get_keys().m_account_address;
 	destinations.push_back(tx_destination_entry(MONEY_SUPPLY, bob_addr, false));
 	destinations.push_back(tx_destination_entry(MONEY_SUPPLY - 1, bob_addr, false));
 	// sources.front().amount = destinations[0].amount + destinations[2].amount + destinations[3].amount + TESTS_DEFAULT_FEE
@@ -187,7 +187,7 @@ bool gen_uint_overflow_2::generate(std::vector<test_event_entry> &events) const
 	sources.clear();
 	for(size_t i = 0; i < tx_1.vout.size(); ++i)
 	{
-		auto &tx_1_out = tx_1.vout[i];
+		auto& tx_1_out = tx_1.vout[i];
 		if(tx_1_out.amount < MONEY_SUPPLY - 1)
 			continue;
 

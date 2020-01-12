@@ -42,7 +42,6 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #include "zmq_server.h"
 #include <boost/chrono/chrono.hpp>
 
@@ -54,10 +53,11 @@ namespace cryptonote
 namespace rpc
 {
 
-ZmqServer::ZmqServer(RpcHandler &h) : handler(h),
-									  stop_signal(false),
-									  running(false),
-									  context(DEFAULT_NUM_ZMQ_THREADS) // TODO: make this configurable
+ZmqServer::ZmqServer(RpcHandler& h) :
+	handler(h),
+	stop_signal(false),
+	running(false),
+	context(DEFAULT_NUM_ZMQ_THREADS) // TODO: make this configurable
 {
 }
 
@@ -80,24 +80,24 @@ void ZmqServer::serve()
 			}
 			while(rep_socket->recv(&message))
 			{
-				std::string message_string(reinterpret_cast<const char *>(message.data()), message.size());
+				std::string message_string(reinterpret_cast<const char*>(message.data()), message.size());
 
 				GULPS_LOG_L1(std::string("Received RPC request: \""), message_string, "\"");
 
 				std::string response = handler.handle(message_string);
 
 				zmq::message_t reply(response.size());
-				memcpy((void *)reply.data(), response.c_str(), response.size());
+				memcpy((void*)reply.data(), response.c_str(), response.size());
 
 				rep_socket->send(reply);
 				GULPS_LOG_L1(std::string("Sent RPC reply: \""), response, "\"");
 			}
 		}
-		catch(const boost::thread_interrupted &e)
+		catch(const boost::thread_interrupted& e)
 		{
 			GULPS_LOG_L1("ZMQ Server thread interrupted.");
 		}
-		catch(const zmq::error_t &e)
+		catch(const zmq::error_t& e)
 		{
 			GULPS_ERROR(std::string("ZMQ error: "), e.what());
 		}
@@ -124,7 +124,7 @@ bool ZmqServer::addTCPSocket(std::string address, std::string port)
 		std::string bind_address = addr_prefix + address + std::string(":") + port;
 		rep_socket->bind(bind_address.c_str());
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		GULPS_ERROR(std::string("Error creating ZMQ Socket: "), e.what());
 		return false;
@@ -153,6 +153,6 @@ void ZmqServer::stop()
 	return;
 }
 
-} // namespace cryptonote
-
 } // namespace rpc
+
+} // namespace cryptonote

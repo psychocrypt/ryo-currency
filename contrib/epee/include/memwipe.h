@@ -33,10 +33,11 @@
 #ifdef __cplusplus
 #include <array>
 
-extern "C" {
+extern "C"
+{
 #endif
 
-void *memwipe(void *src, size_t n);
+	void* memwipe(void* src, size_t n);
 
 #ifdef __cplusplus
 }
@@ -64,18 +65,18 @@ struct scrubbed : public T
 	void scrub()
 	{
 		static_assert(std::is_pod<T>::value,
-					  "T cannot be auto-scrubbed. T must be POD.");
+			"T cannot be auto-scrubbed. T must be POD.");
 		static_assert(std::is_trivially_destructible<T>::value,
-					  "T cannot be auto-scrubbed. T must be trivially destructable.");
+			"T cannot be auto-scrubbed. T must be trivially destructable.");
 		memwipe(this, sizeof(T));
 	}
 };
 
 template <typename T>
-T &unwrap(scrubbed<T> &src) { return src; }
+T& unwrap(scrubbed<T>& src) { return src; }
 
 template <typename T>
-const T &unwrap(scrubbed<T> const &src) { return src; }
+const T& unwrap(scrubbed<T> const& src) { return src; }
 
 template <class T, size_t N>
 using scrubbed_arr = scrubbed<std::array<T, N>>;

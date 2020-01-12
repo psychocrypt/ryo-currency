@@ -92,7 +92,8 @@ struct txout_to_scripthash
 struct txout_to_key
 {
 	txout_to_key() {}
-	txout_to_key(const crypto::public_key &_key) : key(_key) {}
+	txout_to_key(const crypto::public_key& _key) :
+		key(_key) {}
 	crypto::public_key key;
 };
 
@@ -207,7 +208,12 @@ class transaction : public transaction_prefix
 	mutable size_t blob_size;
 
 	transaction();
-	transaction(const transaction &t) : transaction_prefix(t), hash_valid(false), blob_size_valid(false), signatures(t.signatures), rct_signatures(t.rct_signatures)
+	transaction(const transaction& t) :
+		transaction_prefix(t),
+		hash_valid(false),
+		blob_size_valid(false),
+		signatures(t.signatures),
+		rct_signatures(t.rct_signatures)
 	{
 		if(t.is_hash_valid())
 		{
@@ -220,7 +226,7 @@ class transaction : public transaction_prefix
 			set_blob_size_valid(true);
 		}
 	}
-	transaction &operator=(const transaction &t)
+	transaction& operator=(const transaction& t)
 	{
 		transaction_prefix::operator=(t);
 		set_hash_valid(false);
@@ -254,7 +260,7 @@ class transaction : public transaction_prefix
 		set_blob_size_valid(false);
 	}
 
-	FIELDS(*static_cast<transaction_prefix *>(this))
+	FIELDS(*static_cast<transaction_prefix*>(this))
 
 	if(version == 1)
 	{
@@ -302,7 +308,7 @@ class transaction : public transaction_prefix
 				ar.tag("rctsig_prunable");
 				ar.begin_object();
 				r = rct_signatures.p.serialize_rctsig_prunable(ar, rct_signatures.type, vin.size(), vout.size(),
-															   vin.size() > 0 && vin[0].type() == typeid(txin_to_key) ? boost::get<txin_to_key>(vin[0]).key_offsets.size() - 1 : 0);
+					vin.size() > 0 && vin[0].type() == typeid(txin_to_key) ? boost::get<txin_to_key>(vin[0]).key_offsets.size() - 1 : 0);
 				if(!r || !ar.stream().good())
 					return false;
 				ar.end_object();
@@ -312,9 +318,9 @@ class transaction : public transaction_prefix
 	END_SERIALIZE()
 
 	template <bool W, template <bool> class Archive>
-	bool serialize_base(Archive<W> &ar)
+	bool serialize_base(Archive<W>& ar)
 	{
-		FIELDS(*static_cast<transaction_prefix *>(this))
+		FIELDS(*static_cast<transaction_prefix*>(this))
 
 		if(version == 1)
 		{
@@ -335,7 +341,7 @@ class transaction : public transaction_prefix
 	}
 
   private:
-	static size_t get_signature_size(const txin_v &tx_in);
+	static size_t get_signature_size(const txin_v& tx_in);
 };
 
 inline transaction::transaction()
@@ -367,14 +373,14 @@ inline void transaction::invalidate_hashes()
 	set_blob_size_valid(false);
 }
 
-inline size_t transaction::get_signature_size(const txin_v &tx_in)
+inline size_t transaction::get_signature_size(const txin_v& tx_in)
 {
 	struct txin_signature_size_visitor : public boost::static_visitor<size_t>
 	{
-		size_t operator()(const txin_gen &txin) const { return 0; }
-		size_t operator()(const txin_to_script &txin) const { return 0; }
-		size_t operator()(const txin_to_scripthash &txin) const { return 0; }
-		size_t operator()(const txin_to_key &txin) const { return txin.key_offsets.size(); }
+		size_t operator()(const txin_gen& txin) const { return 0; }
+		size_t operator()(const txin_to_script& txin) const { return 0; }
+		size_t operator()(const txin_to_scripthash& txin) const { return 0; }
+		size_t operator()(const txin_to_key& txin) const { return txin.key_offsets.size(); }
 	};
 
 	return boost::apply_visitor(txin_signature_size_visitor(), tx_in);
@@ -407,8 +413,14 @@ struct block : public block_header
 	mutable std::atomic<bool> hash_valid;
 
   public:
-	block() : block_header(), hash_valid(false) {}
-	block(const block &b) : block_header(b), hash_valid(false), miner_tx(b.miner_tx), tx_hashes(b.tx_hashes)
+	block() :
+		block_header(),
+		hash_valid(false) {}
+	block(const block& b) :
+		block_header(b),
+		hash_valid(false),
+		miner_tx(b.miner_tx),
+		tx_hashes(b.tx_hashes)
 	{
 		if(b.is_hash_valid())
 		{
@@ -416,7 +428,7 @@ struct block : public block_header
 			set_hash_valid(true);
 		}
 	}
-	block &operator=(const block &b)
+	block& operator=(const block& b)
 	{
 		block_header::operator=(b);
 		hash_valid = false;
@@ -443,7 +455,7 @@ struct block : public block_header
 	if(!typename Archive<W>::is_saving())
 		set_hash_valid(false);
 
-	FIELDS(*static_cast<block_header *>(this))
+	FIELDS(*static_cast<block_header*>(this))
 	FIELD(miner_tx)
 	FIELD(tx_hashes)
 	END_SERIALIZE()
@@ -454,9 +466,10 @@ struct block : public block_header
 /************************************************************************/
 struct account_public_address
 {
-	account_public_address(const crypto::public_key m_spend_public_key, const  crypto::public_key m_view_public_key) : m_spend_public_key(m_spend_public_key), 
-			      m_view_public_key(m_view_public_key) {}
-  
+	account_public_address(const crypto::public_key m_spend_public_key, const crypto::public_key m_view_public_key) :
+		m_spend_public_key(m_spend_public_key),
+		m_view_public_key(m_view_public_key) {}
+
 	crypto::public_key m_spend_public_key;
 	crypto::public_key m_view_public_key;
 
@@ -470,13 +483,13 @@ struct account_public_address
 	KV_SERIALIZE_VAL_POD_AS_BLOB_FORCE(m_view_public_key)
 	END_KV_SERIALIZE_MAP()
 
-	bool operator==(const account_public_address &rhs) const
+	bool operator==(const account_public_address& rhs) const
 	{
 		return m_spend_public_key == rhs.m_spend_public_key &&
 			   m_view_public_key == rhs.m_view_public_key;
 	}
 
-	bool operator!=(const account_public_address &rhs) const
+	bool operator!=(const account_public_address& rhs) const
 	{
 		return !(*this == rhs);
 	}
@@ -487,7 +500,7 @@ struct keypair
 	crypto::public_key pub;
 	crypto::secret_key sec;
 
-	static inline keypair generate(hw::device &hwdev)
+	static inline keypair generate(hw::device& hwdev)
 	{
 		keypair k;
 		// Use legacy generation for a random pair
@@ -496,14 +509,14 @@ struct keypair
 	}
 };
 //---------------------------------------------------------------
-}
+} // namespace cryptonote
 
 namespace std
 {
 template <>
 struct hash<cryptonote::account_public_address>
 {
-	std::size_t operator()(const cryptonote::account_public_address &addr) const
+	std::size_t operator()(const cryptonote::account_public_address& addr) const
 	{
 		// https://stackoverflow.com/a/17017281
 		size_t res = 17;
@@ -512,7 +525,7 @@ struct hash<cryptonote::account_public_address>
 		return res;
 	}
 };
-}
+} // namespace std
 
 BLOB_SERIALIZER(cryptonote::txout_to_key);
 BLOB_SERIALIZER(cryptonote::txout_to_scripthash);

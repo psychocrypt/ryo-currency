@@ -13,21 +13,18 @@
 /* add_redirect_rule2() uses DIOCCHANGERULE ioctl
  * proto can take the values IPPROTO_UDP or IPPROTO_TCP
  */
-int
-add_redirect_rule2(const char * ifname,
-                   const char * rhost, unsigned short eport,
-                   const char * iaddr, unsigned short iport, int proto,
-                   const char * desc, unsigned int timestamp);
+int add_redirect_rule2(const char* ifname,
+	const char* rhost, unsigned short eport,
+	const char* iaddr, unsigned short iport, int proto,
+	const char* desc, unsigned int timestamp);
 
 /* add_filter_rule2() uses DIOCCHANGERULE ioctl
  * proto can take the values IPPROTO_UDP or IPPROTO_TCP
  */
-int
-add_filter_rule2(const char * ifname,
-                 const char * rhost, const char * iaddr,
-                 unsigned short eport, unsigned short iport,
-                 int proto, const char * desc);
-
+int add_filter_rule2(const char* ifname,
+	const char* rhost, const char* iaddr,
+	unsigned short eport, unsigned short iport,
+	int proto, const char* desc);
 
 /* get_redirect_rule() gets internal IP and port from
  * interface, external port and protocl
@@ -49,22 +46,16 @@ get_redirect_rule_by_index(int index,
 
 /* delete_redirect_rule()
  */
-int
-delete_redirect_rule(const char * ifname, unsigned short eport, int proto);
+int delete_redirect_rule(const char* ifname, unsigned short eport, int proto);
 
 /* delete_redirect_and_filter_rules()
  */
-int
-delete_redirect_and_filter_rules(const char * ifname, unsigned short eport,
-                                 int proto);
+int delete_redirect_and_filter_rules(const char* ifname, unsigned short eport,
+	int proto);
 
 #ifdef TEST
-int
-clear_redirect_rules(void);
-int
-clear_filter_rules(void);
+int clear_redirect_rules(void);
+int clear_filter_rules(void);
 #endif
 
 #endif
-
-

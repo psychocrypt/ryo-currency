@@ -54,46 +54,46 @@ namespace Ryo
 class WalletManagerImpl : public WalletManager
 {
   public:
-	Wallet *createWallet(const std::string &path, const std::string &password,
-						 const std::string &language, NetworkType nettype);
-	Wallet *openWallet(const std::string &path, const std::string &password, NetworkType nettype);
-	virtual Wallet *recoveryWallet(const std::string &path,
-								   const std::string &password,
-								   const std::string &mnemonic,
-								   NetworkType nettype,
-								   uint64_t restoreHeight);
-	virtual Wallet *createWalletFromKeys(const std::string &path,
-										 const std::string &password,
-										 const std::string &language,
-										 NetworkType nettype,
-										 uint64_t restoreHeight,
-										 const std::string &addressString,
-										 const std::string &viewKeyString,
-										 const std::string &spendKeyString = "");
+	Wallet* createWallet(const std::string& path, const std::string& password,
+		const std::string& language, NetworkType nettype);
+	Wallet* openWallet(const std::string& path, const std::string& password, NetworkType nettype);
+	virtual Wallet* recoveryWallet(const std::string& path,
+		const std::string& password,
+		const std::string& mnemonic,
+		NetworkType nettype,
+		uint64_t restoreHeight);
+	virtual Wallet* createWalletFromKeys(const std::string& path,
+		const std::string& password,
+		const std::string& language,
+		NetworkType nettype,
+		uint64_t restoreHeight,
+		const std::string& addressString,
+		const std::string& viewKeyString,
+		const std::string& spendKeyString = "");
 	// next two methods are deprecated - use the above version which allow setting of a password
-	virtual Wallet *recoveryWallet(const std::string &path, const std::string &mnemonic, NetworkType nettype, uint64_t restoreHeight);
+	virtual Wallet* recoveryWallet(const std::string& path, const std::string& mnemonic, NetworkType nettype, uint64_t restoreHeight);
 	// deprecated: use createWalletFromKeys(..., password, ...) instead
-	virtual Wallet *createWalletFromKeys(const std::string &path,
-										 const std::string &language,
-										 NetworkType nettype,
-										 uint64_t restoreHeight,
-										 const std::string &addressString,
-										 const std::string &viewKeyString,
-										 const std::string &spendKeyString = "");
-	virtual bool closeWallet(Wallet *wallet, bool store = true);
-	bool walletExists(const std::string &path);
-	bool verifyWalletPassword(const std::string &keys_file_name, const std::string &password, bool no_spend_key) const;
-	std::vector<std::string> findWallets(const std::string &path);
+	virtual Wallet* createWalletFromKeys(const std::string& path,
+		const std::string& language,
+		NetworkType nettype,
+		uint64_t restoreHeight,
+		const std::string& addressString,
+		const std::string& viewKeyString,
+		const std::string& spendKeyString = "");
+	virtual bool closeWallet(Wallet* wallet, bool store = true);
+	bool walletExists(const std::string& path);
+	bool verifyWalletPassword(const std::string& keys_file_name, const std::string& password, bool no_spend_key) const;
+	std::vector<std::string> findWallets(const std::string& path);
 	std::string errorString() const;
-	void setDaemonAddress(const std::string &address);
-	bool connected(uint32_t *version = NULL);
+	void setDaemonAddress(const std::string& address);
+	bool connected(uint32_t* version = NULL);
 	uint64_t blockchainHeight();
 	uint64_t blockchainTargetHeight();
 	uint64_t networkDifficulty();
 	double miningHashRate();
 	uint64_t blockTarget();
 	bool isMining();
-	bool startMining(const std::string &address, uint32_t threads = 1, bool background_mining = false, bool ignore_battery = true);
+	bool startMining(const std::string& address, uint32_t threads = 1, bool background_mining = false, bool ignore_battery = true);
 	bool stopMining();
 
   private:
@@ -104,4 +104,4 @@ class WalletManagerImpl : public WalletManager
 	std::string m_errorString;
 };
 
-} // namespace
+} // namespace Ryo

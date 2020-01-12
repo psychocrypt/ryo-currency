@@ -44,7 +44,6 @@
 //
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
-
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <unordered_set>
@@ -64,7 +63,6 @@
 #include "warnings.h"
 
 #include "common/gulps.hpp"
-
 
 DISABLE_VS_WARNINGS(4244 4345 4503) //'boost::foreach_detail_::or_' : decorated name length exceeded, name was truncated
 
@@ -105,7 +103,9 @@ uint64_t template_accept_threshold(uint64_t amount)
 class LockedTXN
 {
   public:
-	LockedTXN(Blockchain &b) : m_blockchain(b), m_batch(false)
+	LockedTXN(Blockchain& b) :
+		m_blockchain(b),
+		m_batch(false)
 	{
 		m_batch = m_blockchain.get_db().batch_start();
 	}
@@ -118,24 +118,27 @@ class LockedTXN
 				m_blockchain.get_db().batch_stop();
 			}
 		}
-		catch(const std::exception &e)
+		catch(const std::exception& e)
 		{
 			GULPS_WARN("LockedTXN dtor filtering exception: ", e.what());
 		}
 	}
 
   private:
-	Blockchain &m_blockchain;
+	Blockchain& m_blockchain;
 	bool m_batch;
 };
-}
+} // namespace
 //---------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------
-tx_memory_pool::tx_memory_pool(Blockchain &bchs) : m_blockchain(bchs), m_txpool_max_size(DEFAULT_TXPOOL_MAX_SIZE), m_txpool_size(0)
+tx_memory_pool::tx_memory_pool(Blockchain& bchs) :
+	m_blockchain(bchs),
+	m_txpool_max_size(DEFAULT_TXPOOL_MAX_SIZE),
+	m_txpool_size(0)
 {
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::add_tx(transaction &tx, /*const crypto::hash& tx_prefix_hash,*/ const crypto::hash &id, size_t blob_size, tx_verification_context &tvc, bool kept_by_block, bool relayed, bool do_not_relay)
+bool tx_memory_pool::add_tx(transaction& tx, /*const crypto::hash& tx_prefix_hash,*/ const crypto::hash& id, size_t blob_size, tx_verification_context& tvc, bool kept_by_block, bool relayed, bool do_not_relay)
 {
 	// this should already be called with that lock, but let's make it explicit for clarity
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
@@ -195,7 +198,7 @@ bool tx_memory_pool::add_tx(transaction &tx, /*const crypto::hash& tx_prefix_has
 		if(have_tx_keyimges_as_spent(tx))
 		{
 			mark_double_spend(tx);
-			GULPSF_LOG_L1("Transaction with id= {} used already spent key images", id );
+			GULPSF_LOG_L1("Transaction with id= {} used already spent key images", id);
 			tvc.m_verifivation_failed = true;
 			tvc.m_double_spend = true;
 			return false;
@@ -204,7 +207,7 @@ bool tx_memory_pool::add_tx(transaction &tx, /*const crypto::hash& tx_prefix_has
 
 	if(!m_blockchain.check_tx_outputs(tx, tvc))
 	{
-		GULPSF_LOG_L1("Transaction with id= {} has at least one invalid output", id );
+		GULPSF_LOG_L1("Transaction with id= {} has at least one invalid output", id);
 		tvc.m_verifivation_failed = true;
 		tvc.m_invalid_output = true;
 		return false;
@@ -247,9 +250,9 @@ bool tx_memory_pool::add_tx(transaction &tx, /*const crypto::hash& tx_prefix_has
 					return false;
 				m_txs_by_fee_and_receive_time.emplace(std::pair<double, std::time_t>(fee / (double)blob_size, receive_time), id);
 			}
-			catch(const std::exception &e)
+			catch(const std::exception& e)
 			{
-				GULPSF_ERROR("transaction already exists at inserting in memory pool: {}" , e.what());
+				GULPSF_ERROR("transaction already exists at inserting in memory pool: {}", e.what());
 				return false;
 			}
 			tvc.m_verifivation_impossible = true;
@@ -290,9 +293,9 @@ bool tx_memory_pool::add_tx(transaction &tx, /*const crypto::hash& tx_prefix_has
 				return false;
 			m_txs_by_fee_and_receive_time.emplace(std::pair<double, std::time_t>(fee / (double)blob_size, receive_time), id);
 		}
-		catch(const std::exception &e)
+		catch(const std::exception& e)
 		{
-			GULPSF_ERROR("internal error: transaction already exists at inserting in memory pool: {}" , e.what());
+			GULPSF_ERROR("internal error: transaction already exists at inserting in memory pool: {}", e.what());
 			return false;
 		}
 		tvc.m_added_to_pool = true;
@@ -304,14 +307,14 @@ bool tx_memory_pool::add_tx(transaction &tx, /*const crypto::hash& tx_prefix_has
 	tvc.m_verifivation_failed = false;
 	m_txpool_size += blob_size;
 
-	GULPSF_INFO("Transaction added to pool: txid {} bytes: {} fee/byte: {}", id , blob_size , (fee / (double)blob_size));
+	GULPSF_INFO("Transaction added to pool: txid {} bytes: {} fee/byte: {}", id, blob_size, (fee / (double)blob_size));
 
 	prune(m_txpool_max_size);
 
 	return true;
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::add_tx(transaction &tx, tx_verification_context &tvc, bool keeped_by_block, bool relayed, bool do_not_relay)
+bool tx_memory_pool::add_tx(transaction& tx, tx_verification_context& tvc, bool keeped_by_block, bool relayed, bool do_not_relay)
 {
 	crypto::hash h = null_hash;
 	size_t blob_size = 0;
@@ -348,7 +351,7 @@ void tx_memory_pool::prune(size_t bytes)
 			break;
 		try
 		{
-			const crypto::hash &txid = it->second;
+			const crypto::hash& txid = it->second;
 			txpool_tx_meta_t meta;
 			if(!m_blockchain.get_txpool_tx_meta(txid, meta))
 			{
@@ -369,16 +372,16 @@ void tx_memory_pool::prune(size_t bytes)
 				return;
 			}
 			// remove first, in case this throws, so key images aren't removed
-			GULPSF_INFO("Pruning tx {} from txpool: size: {}, fee/byte: {}", txid , it->first.second , it->first.first);
+			GULPSF_INFO("Pruning tx {} from txpool: size: {}, fee/byte: {}", txid, it->first.second, it->first.first);
 			m_blockchain.remove_txpool_tx(txid);
 			m_txpool_size -= txblob.size();
 			remove_transaction_keyimages(tx);
-			GULPSF_INFO("Pruned tx {} from txpool: size: {}, fee/byte: {}", txid , it->first.second , it->first.first);
+			GULPSF_INFO("Pruned tx {} from txpool: size: {}, fee/byte: {}", txid, it->first.second, it->first.first);
 			m_txs_by_fee_and_receive_time.erase(it--);
 		}
-		catch(const std::exception &e)
+		catch(const std::exception& e)
 		{
-			GULPSF_ERROR("Error while pruning txpool: {}" , e.what());
+			GULPSF_ERROR("Error while pruning txpool: {}", e.what());
 			return;
 		}
 	}
@@ -386,15 +389,14 @@ void tx_memory_pool::prune(size_t bytes)
 		GULPSF_INFO("Pool size after pruning is larger than limit: {}/{}", m_txpool_size, bytes);
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::insert_key_images(const transaction &tx, bool kept_by_block)
+bool tx_memory_pool::insert_key_images(const transaction& tx, bool kept_by_block)
 {
-	for(const auto &in : tx.vin)
+	for(const auto& in : tx.vin)
 	{
 		const crypto::hash id = get_transaction_hash(tx);
 		CHECKED_GET_SPECIFIC_VARIANT(in, const txin_to_key, txin, false);
-		std::unordered_set<crypto::hash> &kei_image_set = m_spent_key_images[txin.k_image];
-		GULPS_CHECK_AND_ASSERT_MES(kept_by_block || kei_image_set.size() == 0, false, "internal error: kept_by_block=", kept_by_block
-																												 ,",  kei_image_set.size()=", kei_image_set.size(), "\ntxin.k_image=", txin.k_image, "\ntx_id=", id);
+		std::unordered_set<crypto::hash>& kei_image_set = m_spent_key_images[txin.k_image];
+		GULPS_CHECK_AND_ASSERT_MES(kept_by_block || kei_image_set.size() == 0, false, "internal error: kept_by_block=", kept_by_block, ",  kei_image_set.size()=", kei_image_set.size(), "\ntxin.k_image=", txin.k_image, "\ntx_id=", id);
 		auto ins_res = kei_image_set.insert(id);
 		GULPS_CHECK_AND_ASSERT_MES(ins_res.second, false, "internal error: try to insert duplicate iterator in key_image set");
 	}
@@ -404,26 +406,23 @@ bool tx_memory_pool::insert_key_images(const transaction &tx, bool kept_by_block
 //FIXME: Can return early before removal of all of the key images.
 //       At the least, need to make sure that a false return here
 //       is treated properly.  Should probably not return early, however.
-bool tx_memory_pool::remove_transaction_keyimages(const transaction &tx)
+bool tx_memory_pool::remove_transaction_keyimages(const transaction& tx)
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
 	// ND: Speedup
 	// 1. Move transaction hash calcuation outside of loop. ._.
 	crypto::hash actual_hash = get_transaction_hash(tx);
-	for(const txin_v &vi : tx.vin)
+	for(const txin_v& vi : tx.vin)
 	{
 		CHECKED_GET_SPECIFIC_VARIANT(vi, const txin_to_key, txin, false);
 		auto it = m_spent_key_images.find(txin.k_image);
-		GULPS_CHECK_AND_ASSERT_MES(it != m_spent_key_images.end(), false, "failed to find transaction input in key images. img=" , txin.k_image , "\n"
-																														   , "transaction id = " , get_transaction_hash(tx));
-		std::unordered_set<crypto::hash> &key_image_set = it->second;
-		GULPS_CHECK_AND_ASSERT_MES(key_image_set.size(), false, "empty key_image set, img=" , txin.k_image , "\n"
-																					  , "transaction id = " , actual_hash);
+		GULPS_CHECK_AND_ASSERT_MES(it != m_spent_key_images.end(), false, "failed to find transaction input in key images. img=", txin.k_image, "\n", "transaction id = ", get_transaction_hash(tx));
+		std::unordered_set<crypto::hash>& key_image_set = it->second;
+		GULPS_CHECK_AND_ASSERT_MES(key_image_set.size(), false, "empty key_image set, img=", txin.k_image, "\n", "transaction id = ", actual_hash);
 
 		auto it_in_set = key_image_set.find(actual_hash);
-		GULPS_CHECK_AND_ASSERT_MES(it_in_set != key_image_set.end(), false, "transaction id not found in key_image set, img=" , txin.k_image , "\n"
-																														, "transaction id = " , actual_hash);
+		GULPS_CHECK_AND_ASSERT_MES(it_in_set != key_image_set.end(), false, "transaction id not found in key_image set, img=", txin.k_image, "\n", "transaction id = ", actual_hash);
 		key_image_set.erase(it_in_set);
 		if(!key_image_set.size())
 		{
@@ -434,7 +433,7 @@ bool tx_memory_pool::remove_transaction_keyimages(const transaction &tx)
 	return true;
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::take_tx(const crypto::hash &id, transaction &tx, size_t &blob_size, uint64_t &fee, bool &relayed, bool &do_not_relay, bool &double_spend_seen)
+bool tx_memory_pool::take_tx(const crypto::hash& id, transaction& tx, size_t& blob_size, uint64_t& fee, bool& relayed, bool& do_not_relay, bool& double_spend_seen)
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
@@ -469,9 +468,9 @@ bool tx_memory_pool::take_tx(const crypto::hash &id, transaction &tx, size_t &bl
 		m_txpool_size -= blob_size;
 		remove_transaction_keyimages(tx);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
-		GULPSF_ERROR("Failed to remove tx from txpool: {}" , e.what());
+		GULPSF_ERROR("Failed to remove tx from txpool: {}", e.what());
 		return false;
 	}
 
@@ -484,9 +483,9 @@ void tx_memory_pool::on_idle()
 	m_remove_stuck_tx_interval.do_call([this]() { return remove_stuck_transactions(); });
 }
 //---------------------------------------------------------------------------------
-sorted_tx_container::iterator tx_memory_pool::find_tx_in_sorted_container(const crypto::hash &id) const
+sorted_tx_container::iterator tx_memory_pool::find_tx_in_sorted_container(const crypto::hash& id) const
 {
-	return std::find_if(m_txs_by_fee_and_receive_time.begin(), m_txs_by_fee_and_receive_time.end(), [&](const sorted_tx_container::value_type &a) {
+	return std::find_if(m_txs_by_fee_and_receive_time.begin(), m_txs_by_fee_and_receive_time.end(), [&](const sorted_tx_container::value_type& a) {
 		return a.second == id;
 	});
 }
@@ -497,17 +496,17 @@ bool tx_memory_pool::remove_stuck_transactions()
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
 	std::unordered_set<crypto::hash> remove;
-	m_blockchain.for_all_txpool_txes([this, &remove](const crypto::hash &txid, const txpool_tx_meta_t &meta, const cryptonote::blobdata *) {
+	m_blockchain.for_all_txpool_txes([this, &remove](const crypto::hash& txid, const txpool_tx_meta_t& meta, const cryptonote::blobdata*) {
 		uint64_t tx_age = time(nullptr) - meta.receive_time;
 
 		if((tx_age > CRYPTONOTE_MEMPOOL_TX_LIVETIME && !meta.kept_by_block) ||
-		   (tx_age > CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME && meta.kept_by_block))
+			(tx_age > CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME && meta.kept_by_block))
 		{
 			GULPSF_LOG_L1("Tx {} removed from tx pool due to outdated, age: {}", txid, tx_age);
 			auto sorted_it = find_tx_in_sorted_container(txid);
 			if(sorted_it == m_txs_by_fee_and_receive_time.end())
 			{
-				GULPSF_LOG_L1("Removing tx {} from tx pool, but it was not found in the sorted txs container!", txid );
+				GULPSF_LOG_L1("Removing tx {} from tx pool, but it was not found in the sorted txs container!", txid);
 			}
 			else
 			{
@@ -518,12 +517,12 @@ bool tx_memory_pool::remove_stuck_transactions()
 		}
 		return true;
 	},
-									 false);
+		false);
 
 	if(!remove.empty())
 	{
 		LockedTXN lock(m_blockchain);
-		for(const crypto::hash &txid : remove)
+		for(const crypto::hash& txid : remove)
 		{
 			try
 			{
@@ -542,7 +541,7 @@ bool tx_memory_pool::remove_stuck_transactions()
 					remove_transaction_keyimages(tx);
 				}
 			}
-			catch(const std::exception &e)
+			catch(const std::exception& e)
 			{
 				GULPS_WARN("Failed to remove stuck transaction: ", txid);
 				// ignore error
@@ -553,12 +552,12 @@ bool tx_memory_pool::remove_stuck_transactions()
 }
 //---------------------------------------------------------------------------------
 //TODO: investigate whether boolean return is appropriate
-bool tx_memory_pool::get_relayable_transactions(std::list<std::pair<crypto::hash, cryptonote::blobdata>> &txs) const
+bool tx_memory_pool::get_relayable_transactions(std::list<std::pair<crypto::hash, cryptonote::blobdata>>& txs) const
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
 	const uint64_t now = time(NULL);
-	m_blockchain.for_all_txpool_txes([this, now, &txs](const crypto::hash &txid, const txpool_tx_meta_t &meta, const cryptonote::blobdata *) {
+	m_blockchain.for_all_txpool_txes([this, now, &txs](const crypto::hash& txid, const txpool_tx_meta_t& meta, const cryptonote::blobdata*) {
 		// 0 fee transactions are never relayed
 		if(meta.fee > 0 && !meta.do_not_relay && now - meta.last_relayed_time > get_relay_delay(now, meta.receive_time))
 		{
@@ -573,7 +572,7 @@ bool tx_memory_pool::get_relayable_transactions(std::list<std::pair<crypto::hash
 					cryptonote::blobdata bd = m_blockchain.get_txpool_tx_blob(txid);
 					txs.push_back(std::make_pair(txid, bd));
 				}
-				catch(const std::exception &e)
+				catch(const std::exception& e)
 				{
 					GULPS_ERROR("Failed to get transaction blob from db");
 					// ignore error
@@ -582,11 +581,11 @@ bool tx_memory_pool::get_relayable_transactions(std::list<std::pair<crypto::hash
 		}
 		return true;
 	},
-									 false);
+		false);
 	return true;
 }
 //---------------------------------------------------------------------------------
-void tx_memory_pool::set_relayed(const std::list<std::pair<crypto::hash, cryptonote::blobdata>> &txs)
+void tx_memory_pool::set_relayed(const std::list<std::pair<crypto::hash, cryptonote::blobdata>>& txs)
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
@@ -604,9 +603,9 @@ void tx_memory_pool::set_relayed(const std::list<std::pair<crypto::hash, crypton
 				m_blockchain.update_txpool_tx(it->first, meta);
 			}
 		}
-		catch(const std::exception &e)
+		catch(const std::exception& e)
 		{
-			GULPSF_ERROR("Failed to update txpool transaction metadata: {}" , e.what());
+			GULPSF_ERROR("Failed to update txpool transaction metadata: {}", e.what());
 			// continue
 		}
 	}
@@ -619,11 +618,11 @@ size_t tx_memory_pool::get_transactions_count(bool include_unrelayed_txes) const
 	return m_blockchain.get_txpool_tx_count(include_unrelayed_txes);
 }
 //---------------------------------------------------------------------------------
-void tx_memory_pool::get_transactions(std::list<transaction> &txs, bool include_unrelayed_txes) const
+void tx_memory_pool::get_transactions(std::list<transaction>& txs, bool include_unrelayed_txes) const
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
-	m_blockchain.for_all_txpool_txes([&txs](const crypto::hash &txid, const txpool_tx_meta_t &meta, const cryptonote::blobdata *bd) {
+	m_blockchain.for_all_txpool_txes([&txs](const crypto::hash& txid, const txpool_tx_meta_t& meta, const cryptonote::blobdata* bd) {
 		transaction tx;
 		if(!parse_and_validate_tx_from_blob(*bd, tx))
 		{
@@ -634,33 +633,33 @@ void tx_memory_pool::get_transactions(std::list<transaction> &txs, bool include_
 		txs.push_back(tx);
 		return true;
 	},
-									 true, include_unrelayed_txes);
+		true, include_unrelayed_txes);
 }
 //------------------------------------------------------------------
-void tx_memory_pool::get_transaction_hashes(std::vector<crypto::hash> &txs, bool include_unrelayed_txes) const
+void tx_memory_pool::get_transaction_hashes(std::vector<crypto::hash>& txs, bool include_unrelayed_txes) const
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
-	m_blockchain.for_all_txpool_txes([&txs](const crypto::hash &txid, const txpool_tx_meta_t &meta, const cryptonote::blobdata *bd) {
+	m_blockchain.for_all_txpool_txes([&txs](const crypto::hash& txid, const txpool_tx_meta_t& meta, const cryptonote::blobdata* bd) {
 		txs.push_back(txid);
 		return true;
 	},
-									 false, include_unrelayed_txes);
+		false, include_unrelayed_txes);
 }
 //------------------------------------------------------------------
-void tx_memory_pool::get_transaction_backlog(std::vector<tx_backlog_entry> &backlog, bool include_unrelayed_txes) const
+void tx_memory_pool::get_transaction_backlog(std::vector<tx_backlog_entry>& backlog, bool include_unrelayed_txes) const
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
 	const uint64_t now = time(NULL);
-	m_blockchain.for_all_txpool_txes([&backlog, now](const crypto::hash &txid, const txpool_tx_meta_t &meta, const cryptonote::blobdata *bd) {
+	m_blockchain.for_all_txpool_txes([&backlog, now](const crypto::hash& txid, const txpool_tx_meta_t& meta, const cryptonote::blobdata* bd) {
 		backlog.push_back({meta.blob_size, meta.fee, meta.receive_time - now});
 		return true;
 	},
-									 false, include_unrelayed_txes);
+		false, include_unrelayed_txes);
 }
 //------------------------------------------------------------------
-void tx_memory_pool::get_transaction_stats(struct txpool_stats &stats, bool include_unrelayed_txes) const
+void tx_memory_pool::get_transaction_stats(struct txpool_stats& stats, bool include_unrelayed_txes) const
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
@@ -669,7 +668,7 @@ void tx_memory_pool::get_transaction_stats(struct txpool_stats &stats, bool incl
 	stats.txs_total = m_blockchain.get_txpool_tx_count(include_unrelayed_txes);
 	std::vector<uint32_t> sizes;
 	sizes.reserve(stats.txs_total);
-	m_blockchain.for_all_txpool_txes([&stats, &sizes, now, &agebytes](const crypto::hash &txid, const txpool_tx_meta_t &meta, const cryptonote::blobdata *bd) {
+	m_blockchain.for_all_txpool_txes([&stats, &sizes, now, &agebytes](const crypto::hash& txid, const txpool_tx_meta_t& meta, const cryptonote::blobdata* bd) {
 		sizes.push_back(meta.blob_size);
 		stats.bytes_total += meta.blob_size;
 		if(!stats.bytes_min || meta.blob_size < stats.bytes_min)
@@ -692,7 +691,7 @@ void tx_memory_pool::get_transaction_stats(struct txpool_stats &stats, bool incl
 			++stats.num_double_spends;
 		return true;
 	},
-									 false, include_unrelayed_txes);
+		false, include_unrelayed_txes);
 	stats.bytes_med = epee::misc_utils::median(sizes);
 	if(stats.txs_total > 1)
 	{
@@ -741,11 +740,11 @@ void tx_memory_pool::get_transaction_stats(struct txpool_stats &stats, bool incl
 }
 //------------------------------------------------------------------
 //TODO: investigate whether boolean return is appropriate
-bool tx_memory_pool::get_transactions_and_spent_keys_info(std::vector<tx_info> &tx_infos, std::vector<spent_key_image_info> &key_image_infos, bool include_sensitive_data) const
+bool tx_memory_pool::get_transactions_and_spent_keys_info(std::vector<tx_info>& tx_infos, std::vector<spent_key_image_info>& key_image_infos, bool include_sensitive_data) const
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
-	m_blockchain.for_all_txpool_txes([&tx_infos, key_image_infos, include_sensitive_data](const crypto::hash &txid, const txpool_tx_meta_t &meta, const cryptonote::blobdata *bd) {
+	m_blockchain.for_all_txpool_txes([&tx_infos, key_image_infos, include_sensitive_data](const crypto::hash& txid, const txpool_tx_meta_t& meta, const cryptonote::blobdata* bd) {
 		tx_info txi;
 		txi.id_hash = epee::string_tools::pod_to_hex(txid);
 		txi.tx_blob = *bd;
@@ -774,16 +773,16 @@ bool tx_memory_pool::get_transactions_and_spent_keys_info(std::vector<tx_info> &
 		tx_infos.push_back(txi);
 		return true;
 	},
-									 true, include_sensitive_data);
+		true, include_sensitive_data);
 
 	txpool_tx_meta_t meta;
-	for(const key_images_container::value_type &kee : m_spent_key_images)
+	for(const key_images_container::value_type& kee : m_spent_key_images)
 	{
-		const crypto::key_image &k_image = kee.first;
-		const std::unordered_set<crypto::hash> &kei_image_set = kee.second;
+		const crypto::key_image& k_image = kee.first;
+		const std::unordered_set<crypto::hash>& kei_image_set = kee.second;
 		spent_key_image_info ki;
 		ki.id_hash = epee::string_tools::pod_to_hex(k_image);
-		for(const crypto::hash &tx_id_hash : kei_image_set)
+		for(const crypto::hash& tx_id_hash : kei_image_set)
 		{
 			if(!include_sensitive_data)
 			{
@@ -798,9 +797,9 @@ bool tx_memory_pool::get_transactions_and_spent_keys_info(std::vector<tx_info> &
 						// Do not include that transaction if in restricted mode and it's not relayed
 						continue;
 				}
-				catch(const std::exception &e)
+				catch(const std::exception& e)
 				{
-					GULPSF_ERROR("Failed to get tx meta from txpool: {}" , e.what());
+					GULPSF_ERROR("Failed to get tx meta from txpool: {}", e.what());
 					return false;
 				}
 			}
@@ -813,11 +812,11 @@ bool tx_memory_pool::get_transactions_and_spent_keys_info(std::vector<tx_info> &
 	return true;
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::get_pool_for_rpc(std::vector<cryptonote::rpc::tx_in_pool> &tx_infos, cryptonote::rpc::key_images_with_tx_hashes &key_image_infos) const
+bool tx_memory_pool::get_pool_for_rpc(std::vector<cryptonote::rpc::tx_in_pool>& tx_infos, cryptonote::rpc::key_images_with_tx_hashes& key_image_infos) const
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
-	m_blockchain.for_all_txpool_txes([&tx_infos, key_image_infos](const crypto::hash &txid, const txpool_tx_meta_t &meta, const cryptonote::blobdata *bd) {
+	m_blockchain.for_all_txpool_txes([&tx_infos, key_image_infos](const crypto::hash& txid, const txpool_tx_meta_t& meta, const cryptonote::blobdata* bd) {
 		cryptonote::rpc::tx_in_pool txi;
 		txi.tx_hash = txid;
 		transaction tx;
@@ -843,31 +842,31 @@ bool tx_memory_pool::get_pool_for_rpc(std::vector<cryptonote::rpc::tx_in_pool> &
 		tx_infos.push_back(txi);
 		return true;
 	},
-									 true, false);
+		true, false);
 
-	for(const key_images_container::value_type &kee : m_spent_key_images)
+	for(const key_images_container::value_type& kee : m_spent_key_images)
 	{
 		std::vector<crypto::hash> tx_hashes;
-		const std::unordered_set<crypto::hash> &kei_image_set = kee.second;
-		for(const crypto::hash &tx_id_hash : kei_image_set)
+		const std::unordered_set<crypto::hash>& kei_image_set = kee.second;
+		for(const crypto::hash& tx_id_hash : kei_image_set)
 		{
 			tx_hashes.push_back(tx_id_hash);
 		}
 
-		const crypto::key_image &k_image = kee.first;
+		const crypto::key_image& k_image = kee.first;
 		key_image_infos[k_image] = tx_hashes;
 	}
 	return true;
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::check_for_key_images(const std::vector<crypto::key_image> &key_images, std::vector<bool> spent) const
+bool tx_memory_pool::check_for_key_images(const std::vector<crypto::key_image>& key_images, std::vector<bool> spent) const
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
 
 	spent.clear();
 
-	for(const auto &image : key_images)
+	for(const auto& image : key_images)
 	{
 		spent.push_back(m_spent_key_images.find(image) == m_spent_key_images.end() ? false : true);
 	}
@@ -875,7 +874,7 @@ bool tx_memory_pool::check_for_key_images(const std::vector<crypto::key_image> &
 	return true;
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::get_transaction(const crypto::hash &id, cryptonote::blobdata &txblob) const
+bool tx_memory_pool::get_transaction(const crypto::hash& id, cryptonote::blobdata& txblob) const
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
@@ -883,34 +882,34 @@ bool tx_memory_pool::get_transaction(const crypto::hash &id, cryptonote::blobdat
 	{
 		return m_blockchain.get_txpool_tx_blob(id, txblob);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		return false;
 	}
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::on_blockchain_inc(uint64_t new_block_height, const crypto::hash &top_block_id)
+bool tx_memory_pool::on_blockchain_inc(uint64_t new_block_height, const crypto::hash& top_block_id)
 {
 	return true;
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::on_blockchain_dec(uint64_t new_block_height, const crypto::hash &top_block_id)
+bool tx_memory_pool::on_blockchain_dec(uint64_t new_block_height, const crypto::hash& top_block_id)
 {
 	return true;
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::have_tx(const crypto::hash &id) const
+bool tx_memory_pool::have_tx(const crypto::hash& id) const
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
 	return m_blockchain.get_db().txpool_has_tx(id);
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::have_tx_keyimges_as_spent(const transaction &tx) const
+bool tx_memory_pool::have_tx_keyimges_as_spent(const transaction& tx) const
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
-	for(const auto &in : tx.vin)
+	for(const auto& in : tx.vin)
 	{
 		CHECKED_GET_SPECIFIC_VARIANT(in, const txin_to_key, tokey_in, true); //should never fail
 		if(have_tx_keyimg_as_spent(tokey_in.k_image))
@@ -919,7 +918,7 @@ bool tx_memory_pool::have_tx_keyimges_as_spent(const transaction &tx) const
 	return false;
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::have_tx_keyimg_as_spent(const crypto::key_image &key_im) const
+bool tx_memory_pool::have_tx_keyimg_as_spent(const crypto::key_image& key_im) const
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	return m_spent_key_images.end() != m_spent_key_images.find(key_im);
@@ -935,7 +934,7 @@ void tx_memory_pool::unlock() const
 	m_transactions_lock.unlock();
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::is_transaction_ready_to_go(txpool_tx_meta_t &txd, transaction &tx) const
+bool tx_memory_pool::is_transaction_ready_to_go(txpool_tx_meta_t& txd, transaction& tx) const
 {
 	//not the best implementation at this time, sorry :(
 	//check is ring_signature already checked ?
@@ -983,7 +982,7 @@ bool tx_memory_pool::is_transaction_ready_to_go(txpool_tx_meta_t &txd, transacti
 	return true;
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::have_key_images(const std::unordered_set<crypto::key_image> &k_images, const transaction &tx)
+bool tx_memory_pool::have_key_images(const std::unordered_set<crypto::key_image>& k_images, const transaction& tx)
 {
 	for(size_t i = 0; i != tx.vin.size(); i++)
 	{
@@ -994,18 +993,18 @@ bool tx_memory_pool::have_key_images(const std::unordered_set<crypto::key_image>
 	return false;
 }
 //---------------------------------------------------------------------------------
-bool tx_memory_pool::append_key_images(std::unordered_set<crypto::key_image> &k_images, const transaction &tx)
+bool tx_memory_pool::append_key_images(std::unordered_set<crypto::key_image>& k_images, const transaction& tx)
 {
 	for(size_t i = 0; i != tx.vin.size(); i++)
 	{
 		CHECKED_GET_SPECIFIC_VARIANT(tx.vin[i], const txin_to_key, itk, false);
 		auto i_res = k_images.insert(itk.k_image);
-		GULPS_CHECK_AND_ASSERT_MES(i_res.second, false, "internal error: key images pool cache - inserted duplicate image in set: " , itk.k_image);
+		GULPS_CHECK_AND_ASSERT_MES(i_res.second, false, "internal error: key images pool cache - inserted duplicate image in set: ", itk.k_image);
 	}
 	return true;
 }
 //---------------------------------------------------------------------------------
-void tx_memory_pool::mark_double_spend(const transaction &tx)
+void tx_memory_pool::mark_double_spend(const transaction& tx)
 {
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
@@ -1016,7 +1015,7 @@ void tx_memory_pool::mark_double_spend(const transaction &tx)
 		const key_images_container::const_iterator it = m_spent_key_images.find(itk.k_image);
 		if(it != m_spent_key_images.end())
 		{
-			for(const crypto::hash &txid : it->second)
+			for(const crypto::hash& txid : it->second)
 			{
 				txpool_tx_meta_t meta;
 				if(!m_blockchain.get_txpool_tx_meta(txid, meta))
@@ -1033,9 +1032,9 @@ void tx_memory_pool::mark_double_spend(const transaction &tx)
 					{
 						m_blockchain.update_txpool_tx(txid, meta);
 					}
-					catch(const std::exception &e)
+					catch(const std::exception& e)
 					{
-						GULPSF_ERROR("Failed to update tx meta: {}" , e.what());
+						GULPSF_ERROR("Failed to update tx meta: {}", e.what());
 						// continue, not fatal
 					}
 				}
@@ -1049,7 +1048,7 @@ std::string tx_memory_pool::print_pool(bool short_format) const
 	std::stringstream ss;
 	CRITICAL_REGION_LOCAL(m_transactions_lock);
 	CRITICAL_REGION_LOCAL1(m_blockchain);
-	m_blockchain.for_all_txpool_txes([&ss, short_format](const crypto::hash &txid, const txpool_tx_meta_t &meta, const cryptonote::blobdata *txblob) {
+	m_blockchain.for_all_txpool_txes([&ss, short_format](const crypto::hash& txid, const txpool_tx_meta_t& meta, const cryptonote::blobdata* txblob) {
 		ss << "id: " << txid << std::endl;
 		if(!short_format)
 		{
@@ -1071,13 +1070,13 @@ std::string tx_memory_pool::print_pool(bool short_format) const
 		   << "last_failed_id: " << meta.last_failed_id << std::endl;
 		return true;
 	},
-									 !short_format);
+		!short_format);
 
 	return ss.str();
 }
 //---------------------------------------------------------------------------------
 //TODO: investigate whether boolean return is appropriate
-bool tx_memory_pool::fill_block_template(block &bl, size_t median_size, uint64_t already_generated_coins, size_t &total_size, uint64_t &fee, uint64_t &expected_reward, uint64_t height)
+bool tx_memory_pool::fill_block_template(block& bl, size_t median_size, uint64_t already_generated_coins, size_t& total_size, uint64_t& fee, uint64_t& expected_reward, uint64_t height)
 {
 	// Warning: This function takes already_generated_
 	// coins as an argument and appears to do nothing
@@ -1151,9 +1150,9 @@ bool tx_memory_pool::fill_block_template(block &bl, size_t median_size, uint64_t
 			{
 				m_blockchain.update_txpool_tx(tx_hash.second, meta);
 			}
-			catch(const std::exception &e)
+			catch(const std::exception& e)
 			{
-				GULPSF_ERROR("Failed to update tx meta: {}" , e.what());
+				GULPSF_ERROR("Failed to update tx meta: {}", e.what());
 				// continue, not fatal
 			}
 		}
@@ -1178,7 +1177,7 @@ bool tx_memory_pool::fill_block_template(block &bl, size_t median_size, uint64_t
 
 	expected_reward = best_coinbase;
 	GULPSF_LOG_L2("Block template filled with {} txes, size {}/{}, coinbase {} (including {} in fees)", bl.tx_hashes.size(),
-												total_size, max_total_size , print_money(best_coinbase), print_money(fee));
+		total_size, max_total_size, print_money(best_coinbase), print_money(fee));
 	return true;
 }
 //---------------------------------------------------------------------------------
@@ -1190,7 +1189,7 @@ size_t tx_memory_pool::validate()
 	std::unordered_set<crypto::hash> remove;
 
 	m_txpool_size = 0;
-	m_blockchain.for_all_txpool_txes([this, &remove, tx_size_limit](const crypto::hash &txid, const txpool_tx_meta_t &meta, const cryptonote::blobdata *) {
+	m_blockchain.for_all_txpool_txes([this, &remove, tx_size_limit](const crypto::hash& txid, const txpool_tx_meta_t& meta, const cryptonote::blobdata*) {
 		m_txpool_size += meta.blob_size;
 		if(meta.blob_size > tx_size_limit)
 		{
@@ -1199,18 +1198,18 @@ size_t tx_memory_pool::validate()
 		}
 		else if(m_blockchain.have_tx(txid))
 		{
-			GULPSF_LOG_L1("Transaction {} is in the blockchain, removing it from pool", txid );
+			GULPSF_LOG_L1("Transaction {} is in the blockchain, removing it from pool", txid);
 			remove.insert(txid);
 		}
 		return true;
 	},
-									 false);
+		false);
 
 	size_t n_removed = 0;
 	if(!remove.empty())
 	{
 		LockedTXN lock(m_blockchain);
-		for(const crypto::hash &txid : remove)
+		for(const crypto::hash& txid : remove)
 		{
 			try
 			{
@@ -1228,7 +1227,7 @@ size_t tx_memory_pool::validate()
 				auto sorted_it = find_tx_in_sorted_container(txid);
 				if(sorted_it == m_txs_by_fee_and_receive_time.end())
 				{
-					GULPSF_LOG_L1("Removing tx {} from tx pool, but it was not found in the sorted txs container!", txid );
+					GULPSF_LOG_L1("Removing tx {} from tx pool, but it was not found in the sorted txs container!", txid);
 				}
 				else
 				{
@@ -1236,7 +1235,7 @@ size_t tx_memory_pool::validate()
 				}
 				++n_removed;
 			}
-			catch(const std::exception &e)
+			catch(const std::exception& e)
 			{
 				GULPS_ERROR("Failed to remove invalid tx from pool");
 				// continue
@@ -1262,7 +1261,7 @@ bool tx_memory_pool::init(size_t max_txpool_size)
 	for(int pass = 0; pass < 2; ++pass)
 	{
 		const bool kept = pass == 1;
-		bool r = m_blockchain.for_all_txpool_txes([this, &remove, kept](const crypto::hash &txid, const txpool_tx_meta_t &meta, const cryptonote::blobdata *bd) {
+		bool r = m_blockchain.for_all_txpool_txes([this, &remove, kept](const crypto::hash& txid, const txpool_tx_meta_t& meta, const cryptonote::blobdata* bd) {
 			if(!!kept != !!meta.kept_by_block)
 				return true;
 			cryptonote::transaction tx;
@@ -1280,20 +1279,20 @@ bool tx_memory_pool::init(size_t max_txpool_size)
 			m_txpool_size += meta.blob_size;
 			return true;
 		},
-												  true);
+			true);
 		if(!r)
 			return false;
 	}
 	if(!remove.empty())
 	{
 		LockedTXN lock(m_blockchain);
-		for(const auto &txid : remove)
+		for(const auto& txid : remove)
 		{
 			try
 			{
 				m_blockchain.remove_txpool_tx(txid);
 			}
-			catch(const std::exception &e)
+			catch(const std::exception& e)
 			{
 				GULPS_WARN("Failed to remove corrupt transaction: ", txid);
 				// ignore error
@@ -1308,4 +1307,4 @@ bool tx_memory_pool::deinit()
 {
 	return true;
 }
-}
+} // namespace cryptonote

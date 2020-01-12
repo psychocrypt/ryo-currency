@@ -15,16 +15,16 @@
 #include "config.h"
 
 /* name of the network interface used to access internet */
-extern const char * ext_if_name;
+extern const char* ext_if_name;
 
 /* file to store all leases */
 #ifdef ENABLE_LEASEFILE
-extern const char * lease_file;
+extern const char* lease_file;
 #endif
 
 /* forced ip address to use for this interface
  * when NULL, getifaddr() is used */
-extern const char * use_ext_ip_addr;
+extern const char* use_ext_ip_addr;
 
 /* parameters to return to upnp client when asked */
 extern unsigned long downstream_bitrate;
@@ -42,42 +42,42 @@ extern unsigned long int max_lifetime;
 
 /* runtime boolean flags */
 extern int runtime_flags;
-#define LOGPACKETSMASK		0x0001
-#define SYSUPTIMEMASK		0x0002
+#define LOGPACKETSMASK 0x0001
+#define SYSUPTIMEMASK 0x0002
 #ifdef ENABLE_NATPMP
-#define ENABLENATPMPMASK	0x0004
+#define ENABLENATPMPMASK 0x0004
 #endif
-#define CHECKCLIENTIPMASK	0x0008
-#define SECUREMODEMASK		0x0010
+#define CHECKCLIENTIPMASK 0x0008
+#define SECUREMODEMASK 0x0010
 
-#define ENABLEUPNPMASK		0x0020
+#define ENABLEUPNPMASK 0x0020
 
 #ifdef PF_ENABLE_FILTER_RULES
-#define PFNOQUICKRULESMASK	0x0040
+#define PFNOQUICKRULESMASK 0x0040
 #endif
 #ifdef ENABLE_IPV6
-#define IPV6DISABLEDMASK	0x0080
+#define IPV6DISABLEDMASK 0x0080
 #endif
 #ifdef ENABLE_6FC_SERVICE
-#define IPV6FCFWDISABLEDMASK		0x0100
-#define IPV6FCINBOUNDDISALLOWEDMASK	0x0200
+#define IPV6FCFWDISABLEDMASK 0x0100
+#define IPV6FCINBOUNDDISALLOWEDMASK 0x0200
 #endif
 #ifdef ENABLE_PCP
-#define PCP_ALLOWTHIRDPARTYMASK	0x0400
+#define PCP_ALLOWTHIRDPARTYMASK 0x0400
 #endif
 #ifdef IGD_V2
 #define FORCEIGDDESCV1MASK 0x0800
 #endif
 
-#define SETFLAG(mask)	runtime_flags |= mask
-#define GETFLAG(mask)	(runtime_flags & mask)
-#define CLEARFLAG(mask)	runtime_flags &= ~mask
+#define SETFLAG(mask) runtime_flags |= mask
+#define GETFLAG(mask) (runtime_flags & mask)
+#define CLEARFLAG(mask) runtime_flags &= ~mask
 
-extern const char * pidfilename;
+extern const char* pidfilename;
 
-extern char uuidvalue_igd[];	/* uuid of root device (IGD) */
-extern char uuidvalue_wan[];	/* uuid of WAN Device */
-extern char uuidvalue_wcd[];	/* uuid of WAN Connection Device */
+extern char uuidvalue_igd[]; /* uuid of root device (IGD) */
+extern char uuidvalue_wan[]; /* uuid of WAN Device */
+extern char uuidvalue_wcd[]; /* uuid of WAN Connection Device */
 
 #define SERIALNUMBER_MAX_LEN (10)
 extern char serialnumber[];
@@ -109,7 +109,7 @@ extern char model_url[];
 #endif
 
 /* UPnP permission rules : */
-extern struct upnpperm * upnppermlist;
+extern struct upnpperm* upnppermlist;
 extern unsigned int num_upnpperm;
 
 #ifdef PCP_SADSCP
@@ -121,18 +121,18 @@ extern unsigned int num_dscp_values;
 extern unsigned int nextruletoclean_timestamp;
 
 #ifdef USE_PF
-extern const char * anchor_name;
+extern const char* anchor_name;
 /* queue and tag for PF rules */
-extern const char * queue;
-extern const char * tag;
+extern const char* queue;
+extern const char* tag;
 #endif
 
 #ifdef USE_NETFILTER
-extern const char * miniupnpd_nat_chain;
-extern const char * miniupnpd_nat_postrouting_chain;
-extern const char * miniupnpd_forward_chain;
+extern const char* miniupnpd_nat_chain;
+extern const char* miniupnpd_nat_postrouting_chain;
+extern const char* miniupnpd_forward_chain;
 #ifdef ENABLE_UPNPPINHOLE
-extern const char * miniupnpd_v6_filter_chain;
+extern const char* miniupnpd_v6_filter_chain;
 #endif
 #endif
 
@@ -154,7 +154,7 @@ extern struct in6_addr ipv6_bind_addr;
 
 #endif /* ENABLE_IPV6 */
 
-extern const char * minissdpdsocketpath;
+extern const char* minissdpdsocketpath;
 
 /* BOOTID.UPNP.ORG and CONFIGID.UPNP.ORG */
 extern unsigned int upnp_bootid;

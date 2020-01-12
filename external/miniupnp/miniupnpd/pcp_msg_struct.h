@@ -32,56 +32,56 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef PCP_MSG_STRUCT_H_INCLUDED
 #define PCP_MSG_STRUCT_H_INCLUDED
 
-#define PCP_OPCODE_ANNOUNCE   0
-#define PCP_OPCODE_MAP        1
-#define PCP_OPCODE_PEER       2
-#ifdef  PCP_SADSCP
-#define PCP_OPCODE_SADSCP     3
+#define PCP_OPCODE_ANNOUNCE 0
+#define PCP_OPCODE_MAP 1
+#define PCP_OPCODE_PEER 2
+#ifdef PCP_SADSCP
+#define PCP_OPCODE_SADSCP 3
 #endif
 
 /* Possible response codes sent by server, as a result of client request*/
-#define PCP_SUCCESS                     0
+#define PCP_SUCCESS 0
 
-#define PCP_ERR_UNSUPP_VERSION          1
+#define PCP_ERR_UNSUPP_VERSION 1
 /** The version number at the start of the PCP Request
  * header is not recognized by this PCP server.  This is a long
  * lifetime error.  This document describes PCP version 2.
  */
 
-#define PCP_ERR_NOT_AUTHORIZED          2
+#define PCP_ERR_NOT_AUTHORIZED 2
 /**The requested operation is disabled for this PCP
  * client, or the PCP client requested an operation that cannot be
  * fulfilled by the PCP server's security policy.  This is a long
  * lifetime error.
  */
 
-#define PCP_ERR_MALFORMED_REQUEST       3
+#define PCP_ERR_MALFORMED_REQUEST 3
 /**The request could not be successfully parsed.
  * This is a long lifetime error.
  */
 
-#define PCP_ERR_UNSUPP_OPCODE           4
+#define PCP_ERR_UNSUPP_OPCODE 4
 /** Unsupported Opcode.  This is a long lifetime error.
  */
 
-#define PCP_ERR_UNSUPP_OPTION           5
+#define PCP_ERR_UNSUPP_OPTION 5
 /**Unsupported Option.  This error only occurs if the
  * Option is in the mandatory-to-process range.  This is a long
  * lifetime error.
  */
 
-#define PCP_ERR_MALFORMED_OPTION        6
+#define PCP_ERR_MALFORMED_OPTION 6
 /**Malformed Option (e.g., appears too many times,
  * invalid length).  This is a long lifetime error.
  */
 
-#define PCP_ERR_NETWORK_FAILURE         7
+#define PCP_ERR_NETWORK_FAILURE 7
 /**The PCP server or the device it controls are
  * experiencing a network failure of some sort (e.g., has not
  * obtained an External IP address).  This is a short lifetime error.
  */
 
-#define PCP_ERR_NO_RESOURCES            8
+#define PCP_ERR_NO_RESOURCES 8
 /**Request is well-formed and valid, but the server has
  * insufficient resources to complete the requested operation at this
  * time.  For example, the NAT device cannot create more mappings at
@@ -93,12 +93,12 @@ POSSIBILITY OF SUCH DAMAGE.
  * short lifetime error.
  */
 
-#define PCP_ERR_UNSUPP_PROTOCOL         9
+#define PCP_ERR_UNSUPP_PROTOCOL 9
 /**Unsupported transport protocol, e.g.  SCTP in a
  * NAT that handles only UDP and TCP.  This is a long lifetime error.
  */
 
-#define PCP_ERR_USER_EX_QUOTA           10
+#define PCP_ERR_USER_EX_QUOTA 10
 /** This attempt to create a new mapping would exceed
  * this subscriber's port quota.  This is a short lifetime error.
  */
@@ -113,29 +113,29 @@ POSSIBILITY OF SUCH DAMAGE.
  *      *  PEER requests
  */
 
-#define PCP_ERR_ADDRESS_MISMATCH        12
+#define PCP_ERR_ADDRESS_MISMATCH 12
 /** The source IP address of the request packet does
  * not match the contents of the PCP Client's IP Address field, due
  * to an unexpected NAT on the path between the PCP client and the
  * PCP-controlled NAT or firewall.  This is a long lifetime error.
  */
 
-#define PCP_ERR_EXCESSIVE_REMOTE_PEERS  13
+#define PCP_ERR_EXCESSIVE_REMOTE_PEERS 13
 /** The PCP server was not able to create the
  * filters in this request.  This result code MUST only be returned
  * if the MAP request contained the FILTER Option.  See Section 13.3
  * for processing information.  This is a long lifetime error.
  */
 
-typedef enum pcp_options  {
-    PCP_OPTION_3RD_PARTY = 1,
-    PCP_OPTION_PREF_FAIL = 2,
-    PCP_OPTION_FILTER = 3,
+typedef enum pcp_options
+{
+	PCP_OPTION_3RD_PARTY = 1,
+	PCP_OPTION_PREF_FAIL = 2,
+	PCP_OPTION_FILTER = 3,
 #ifdef PCP_FLOWP
-    PCP_OPTION_FLOW_PRIORITY = 4,  /*TODO: change it to correct value*/
+	PCP_OPTION_FLOW_PRIORITY = 4, /*TODO: change it to correct value*/
 #endif
 } pcp_options_t;
-
 
 /* PCP common request header*/
 #if 0
@@ -167,7 +167,6 @@ typedef struct pcp_response {
 } pcp_response_t;
 #endif
 #define PCP_COMMON_RESPONSE_SIZE (24)
-
 
 #if 0
 typedef struct pcp_options_hdr {
@@ -261,7 +260,7 @@ typedef struct pcp_sadscp_resp {
     uint8_t   reserved[3];
 }  pcp_sadscp_resp_t;
 #endif
-#define PCP_SADSCP_MASK ((1<<6)-1)
+#define PCP_SADSCP_MASK ((1 << 6) - 1)
 #endif /* PCP_SADSCP */
 
 #if 0
@@ -299,7 +298,7 @@ typedef struct pcp_flow_priority_option{
    uint8_t  next_data[0];
 } pcp_flow_priority_option_t;
 #endif
-#define PCP_DSCP_MASK ((1<<6)-1)
+#define PCP_DSCP_MASK ((1 << 6) - 1)
 #define PCP_FLOW_PRIORITY_OPTION_SIZE (8)
 #endif
 

@@ -53,7 +53,7 @@ namespace serialization
 {
 
 template <class T>
-std::string dump_json(T &v)
+std::string dump_json(T& v)
 {
 	std::stringstream ostr;
 	json_archive<true> oar(ostr);

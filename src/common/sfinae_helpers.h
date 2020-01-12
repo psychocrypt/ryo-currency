@@ -68,25 +68,25 @@ struct is_not_container
   private:
 	// does not have const iterator
 	template <typename C>
-	static false_type c_iter(typename C::const_iterator *);
+	static false_type c_iter(typename C::const_iterator*);
 	template <typename C>
 	static true_type c_iter(...);
 
 	// does not have value_type
 	template <typename C>
-	static false_type v_type(typename C::value_type *);
+	static false_type v_type(typename C::value_type*);
 	template <typename C>
 	static true_type v_type(...);
 
 	// does not have key_type
 	template <typename C>
-	static false_type k_type(typename C::key_type *);
+	static false_type k_type(typename C::key_type*);
 	template <typename C>
 	static true_type k_type(...);
 
 	// does not have mapped_type
 	template <typename C>
-	static false_type m_type(typename C::mapped_type *);
+	static false_type m_type(typename C::mapped_type*);
 	template <typename C>
 	static true_type m_type(...);
 
@@ -107,25 +107,25 @@ struct is_vector_like
   private:
 	// has const iterator
 	template <typename C>
-	static true_type c_iter(typename C::const_iterator *);
+	static true_type c_iter(typename C::const_iterator*);
 	template <typename C>
 	static false_type c_iter(...);
 
 	// has value_type
 	template <typename C>
-	static true_type v_type(typename C::value_type *);
+	static true_type v_type(typename C::value_type*);
 	template <typename C>
 	static false_type v_type(...);
 
 	// does not have key_type
 	template <typename C>
-	static false_type k_type(typename C::key_type *);
+	static false_type k_type(typename C::key_type*);
 	template <typename C>
 	static true_type k_type(...);
 
 	// does not have mapped_type
 	template <typename C>
-	static false_type m_type(typename C::mapped_type *);
+	static false_type m_type(typename C::mapped_type*);
 	template <typename C>
 	static true_type m_type(...);
 
@@ -145,25 +145,25 @@ struct is_map_like
   private:
 	// has const iterator
 	template <typename C>
-	static true_type c_iter(typename C::const_iterator *);
+	static true_type c_iter(typename C::const_iterator*);
 	template <typename C>
 	static false_type c_iter(...);
 
 	// has value_type
 	template <typename C>
-	static true_type v_type(typename C::value_type *);
+	static true_type v_type(typename C::value_type*);
 	template <typename C>
 	static false_type v_type(...);
 
 	// has key_type
 	template <typename C>
-	static true_type k_type(typename C::key_type *);
+	static true_type k_type(typename C::key_type*);
 	template <typename C>
 	static false_type k_type(...);
 
 	// has mapped_type
 	template <typename C>
-	static true_type m_type(typename C::mapped_type *);
+	static true_type m_type(typename C::mapped_type*);
 	template <typename C>
 	static false_type m_type(...);
 

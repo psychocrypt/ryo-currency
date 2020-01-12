@@ -50,7 +50,7 @@ TEST(varint, equal)
 	for(uint64_t idx = 0; idx < 65537; ++idx)
 	{
 		char buf[12];
-		char *bufptr = buf;
+		char* bufptr = buf;
 		tools::write_varint(bufptr, idx);
 		uint64_t bytes = bufptr - buf;
 		ASSERT_TRUE(bytes > 0 && bytes <= sizeof(buf));

@@ -69,14 +69,14 @@ using std::uint64_t;
 using std::vector;
 
 #if defined(__x86_64__)
-static inline void mul(uint64_t a, uint64_t b, uint64_t &low, uint64_t &high)
+static inline void mul(uint64_t a, uint64_t b, uint64_t& low, uint64_t& high)
 {
 	low = mul128(a, b, &high);
 }
 
 #else
 
-static inline void mul(uint64_t a, uint64_t b, uint64_t &low, uint64_t &high)
+static inline void mul(uint64_t a, uint64_t b, uint64_t& low, uint64_t& high)
 {
 	// __int128 isn't part of the standard, so the previous function wasn't portable. mul128() in Windows is fine,
 	// but this portable function should be used elsewhere. Credit for this function goes to latexi95.
@@ -126,20 +126,20 @@ static inline bool cadc(uint64_t a, uint64_t b, bool c)
 	return a + b < a || (c && a + b == (uint64_t)-1);
 }
 
-bool check_hash(const crypto::hash &hash, difficulty_type difficulty)
+bool check_hash(const crypto::hash& hash, difficulty_type difficulty)
 {
 	uint64_t low, high, top, cur;
 	// First check the highest word, this will most likely fail for a random hash.
-	mul(swap64le(((const uint64_t *)&hash)[3]), difficulty, top, high);
+	mul(swap64le(((const uint64_t*)&hash)[3]), difficulty, top, high);
 	if(high != 0)
 	{
 		return false;
 	}
-	mul(swap64le(((const uint64_t *)&hash)[0]), difficulty, low, cur);
-	mul(swap64le(((const uint64_t *)&hash)[1]), difficulty, low, high);
+	mul(swap64le(((const uint64_t*)&hash)[0]), difficulty, low, cur);
+	mul(swap64le(((const uint64_t*)&hash)[1]), difficulty, low, high);
 	bool carry = cadd(cur, low);
 	cur = high;
-	mul(swap64le(((const uint64_t *)&hash)[2]), difficulty, low, high);
+	mul(swap64le(((const uint64_t*)&hash)[2]), difficulty, low, high);
 	carry = cadc(cur, low, carry);
 	carry = cadc(high, top, carry);
 	return !carry;
@@ -244,8 +244,7 @@ difficulty_type next_difficulty_v2(std::vector<std::uint64_t> timestamps, std::v
 			}
 			time_spans.push_back(time_span);
 
-			GULPSF_LOG_L3("Timespan {}: {}:{}:{} ({})", i, (time_span / 60) / 60, (time_span > 3600 ? (time_span % 3600) / 60 : time_span / 60), time_span % 60, time_span );
-
+			GULPSF_LOG_L3("Timespan {}: {}:{}:{} ({})", i, (time_span / 60) / 60, (time_span > 3600 ? (time_span % 3600) / 60 : time_span / 60), time_span % 60, time_span);
 		}
 		timespan_median = epee::misc_utils::median(time_spans);
 	}
@@ -292,7 +291,7 @@ inline T clamp(T lo, T v, T hi)
 // BSD-3 Licensed
 // https://github.com/zawy12/difficulty-algorithms/issues/3
 
-difficulty_type next_difficulty_v3(const std::vector<std::uint64_t> &timestamps, const std::vector<difficulty_type> &cumulative_difficulties)
+difficulty_type next_difficulty_v3(const std::vector<std::uint64_t>& timestamps, const std::vector<difficulty_type>& cumulative_difficulties)
 {
 	constexpr int64_t T = common_config::DIFFICULTY_TARGET;
 	constexpr int64_t N = common_config::DIFFICULTY_WINDOW_V3;
@@ -320,7 +319,7 @@ difficulty_type next_difficulty_v3(const std::vector<std::uint64_t> &timestamps,
 	// 99/100 adds a small bias towards decreasing diff, unlike zawy we do it in a separate step to avoid an overflow at 6GH/s
 	next_D = (next_D * 99ull) / 100ull;
 
-	GULPSF_LOG_L2("diff sum: {} L {} sizes {} {} next_D {}",(cumulative_difficulties[N] - cumulative_difficulties[0]), L, timestamps.size(), cumulative_difficulties.size(), next_D);
+	GULPSF_LOG_L2("diff sum: {} L {} sizes {} {} next_D {}", (cumulative_difficulties[N] - cumulative_difficulties[0]), L, timestamps.size(), cumulative_difficulties.size(), next_D);
 	return next_D;
 }
 
@@ -336,7 +335,7 @@ inline uint64_t findLastValid(const std::vector<uint64_t>& timestamps, size_t i)
 	return timestamps[0];
 }
 
-template<size_t N>
+template <size_t N>
 void interpolate_timestamps(std::vector<uint64_t>& timestamps)
 {
 	uint64_t maxValid = timestamps[N];
@@ -349,7 +348,7 @@ void interpolate_timestamps(std::vector<uint64_t>& timestamps)
 		if(timestamps[i] <= findLastValid(timestamps, i) || timestamps[i] >= maxValid)
 		{
 			if(i != 1)
-				timestamps[i-1] = 0;
+				timestamps[i - 1] = 0;
 			timestamps[i] = 0;
 		}
 	}
@@ -365,7 +364,7 @@ void interpolate_timestamps(std::vector<uint64_t>& timestamps)
 	}
 
 	// interpolate timestamps of masked times
-	for(uint64_t i = N-1; i > 0; i--)
+	for(uint64_t i = N - 1; i > 0; i--)
 	{
 		if(timestamps[i] <= N)
 		{
@@ -373,9 +372,9 @@ void interpolate_timestamps(std::vector<uint64_t>& timestamps)
 			uint64_t den = timestamps[i] + 1;
 			// numerator
 			uint64_t num = timestamps[i];
-			uint64_t delta = timestamps[i+1] - timestamps[i-num];
+			uint64_t delta = timestamps[i + 1] - timestamps[i - num];
 
-			timestamps[i] = timestamps[i-num] + (delta * num) / den;
+			timestamps[i] = timestamps[i - num] + (delta * num) / den;
 		}
 	}
 }
@@ -428,4 +427,4 @@ difficulty_type next_difficulty_v4(std::vector<uint64_t> timestamps, const std::
 
 	return next_D;
 }
-}
+} // namespace cryptonote

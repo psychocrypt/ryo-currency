@@ -19,50 +19,51 @@
 #define UPNPCOMMAND_MEM_ALLOC_ERROR (-5)
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-struct PortMappingParserData;
+	struct PortMappingParserData;
 
-MINIUPNP_LIBSPEC UNSIGNED_INTEGER
-UPNP_GetTotalBytesSent(const char * controlURL,
-					const char * servicetype);
+	MINIUPNP_LIBSPEC UNSIGNED_INTEGER
+	UPNP_GetTotalBytesSent(const char* controlURL,
+		const char* servicetype);
 
-MINIUPNP_LIBSPEC UNSIGNED_INTEGER
-UPNP_GetTotalBytesReceived(const char * controlURL,
-						const char * servicetype);
+	MINIUPNP_LIBSPEC UNSIGNED_INTEGER
+	UPNP_GetTotalBytesReceived(const char* controlURL,
+		const char* servicetype);
 
-MINIUPNP_LIBSPEC UNSIGNED_INTEGER
-UPNP_GetTotalPacketsSent(const char * controlURL,
-					const char * servicetype);
+	MINIUPNP_LIBSPEC UNSIGNED_INTEGER
+	UPNP_GetTotalPacketsSent(const char* controlURL,
+		const char* servicetype);
 
-MINIUPNP_LIBSPEC UNSIGNED_INTEGER
-UPNP_GetTotalPacketsReceived(const char * controlURL,
-					const char * servicetype);
+	MINIUPNP_LIBSPEC UNSIGNED_INTEGER
+	UPNP_GetTotalPacketsReceived(const char* controlURL,
+		const char* servicetype);
 
-/* UPNP_GetStatusInfo()
+	/* UPNP_GetStatusInfo()
  * status and lastconnerror are 64 byte buffers
  * Return values :
  * UPNPCOMMAND_SUCCESS, UPNPCOMMAND_INVALID_ARGS, UPNPCOMMAND_UNKNOWN_ERROR
  * or a UPnP Error code */
-MINIUPNP_LIBSPEC int
-UPNP_GetStatusInfo(const char * controlURL,
-			       const char * servicetype,
-				   char * status,
-				   unsigned int * uptime,
-                   char * lastconnerror);
+	MINIUPNP_LIBSPEC int
+	UPNP_GetStatusInfo(const char* controlURL,
+		const char* servicetype,
+		char* status,
+		unsigned int* uptime,
+		char* lastconnerror);
 
-/* UPNP_GetConnectionTypeInfo()
+	/* UPNP_GetConnectionTypeInfo()
  * argument connectionType is a 64 character buffer
  * Return Values :
  * UPNPCOMMAND_SUCCESS, UPNPCOMMAND_INVALID_ARGS, UPNPCOMMAND_UNKNOWN_ERROR
  * or a UPnP Error code */
-MINIUPNP_LIBSPEC int
-UPNP_GetConnectionTypeInfo(const char * controlURL,
-                           const char * servicetype,
-						   char * connectionType);
+	MINIUPNP_LIBSPEC int
+	UPNP_GetConnectionTypeInfo(const char* controlURL,
+		const char* servicetype,
+		char* connectionType);
 
-/* UPNP_GetExternalIPAddress() call the corresponding UPNP method.
+	/* UPNP_GetExternalIPAddress() call the corresponding UPNP method.
  * if the third arg is not null the value is copied to it.
  * at least 16 bytes must be available
  *
@@ -73,24 +74,24 @@ UPNP_GetConnectionTypeInfo(const char * controlURL,
  * possible UPnP Errors :
  * 402 Invalid Args - See UPnP Device Architecture section on Control.
  * 501 Action Failed - See UPnP Device Architecture section on Control. */
-MINIUPNP_LIBSPEC int
-UPNP_GetExternalIPAddress(const char * controlURL,
-                          const char * servicetype,
-                          char * extIpAdd);
+	MINIUPNP_LIBSPEC int
+	UPNP_GetExternalIPAddress(const char* controlURL,
+		const char* servicetype,
+		char* extIpAdd);
 
-/* UPNP_GetLinkLayerMaxBitRates()
+	/* UPNP_GetLinkLayerMaxBitRates()
  * call WANCommonInterfaceConfig:1#GetCommonLinkProperties
  *
  * return values :
  * UPNPCOMMAND_SUCCESS, UPNPCOMMAND_INVALID_ARGS, UPNPCOMMAND_UNKNOWN_ERROR
  * or a UPnP Error Code. */
-MINIUPNP_LIBSPEC int
-UPNP_GetLinkLayerMaxBitRates(const char* controlURL,
-							const char* servicetype,
-							unsigned int * bitrateDown,
-							unsigned int * bitrateUp);
+	MINIUPNP_LIBSPEC int
+	UPNP_GetLinkLayerMaxBitRates(const char* controlURL,
+		const char* servicetype,
+		unsigned int* bitrateDown,
+		unsigned int* bitrateUp);
 
-/* UPNP_AddPortMapping()
+	/* UPNP_AddPortMapping()
  * if desc is NULL, it will be defaulted to "libminiupnpc"
  * remoteHost is usually NULL because IGD don't support it.
  *
@@ -123,17 +124,17 @@ UPNP_GetLinkLayerMaxBitRates(const char* controlURL,
  *                                   due to conflict with other mechanisms.
  * 732 WildCardNotPermittedInIntPort - The internal port cannot be wild-carded
  */
-MINIUPNP_LIBSPEC int
-UPNP_AddPortMapping(const char * controlURL, const char * servicetype,
-		    const char * extPort,
-		    const char * inPort,
-		    const char * inClient,
-		    const char * desc,
-		    const char * proto,
-		    const char * remoteHost,
-		    const char * leaseDuration);
+	MINIUPNP_LIBSPEC int
+	UPNP_AddPortMapping(const char* controlURL, const char* servicetype,
+		const char* extPort,
+		const char* inPort,
+		const char* inClient,
+		const char* desc,
+		const char* proto,
+		const char* remoteHost,
+		const char* leaseDuration);
 
-/* UPNP_AddAnyPortMapping()
+	/* UPNP_AddAnyPortMapping()
  * if desc is NULL, it will be defaulted to "libminiupnpc"
  * remoteHost is usually NULL because IGD don't support it.
  *
@@ -156,18 +157,18 @@ UPNP_AddPortMapping(const char * controlURL, const char * servicetype,
  *                                   due to conflict with other mechanisms.
  * 732 WildCardNotPermittedInIntPort - The internal port cannot be wild-carded
  */
-MINIUPNP_LIBSPEC int
-UPNP_AddAnyPortMapping(const char * controlURL, const char * servicetype,
-		       const char * extPort,
-		       const char * inPort,
-		       const char * inClient,
-		       const char * desc,
-		       const char * proto,
-		       const char * remoteHost,
-		       const char * leaseDuration,
-		       char * reservedPort);
+	MINIUPNP_LIBSPEC int
+	UPNP_AddAnyPortMapping(const char* controlURL, const char* servicetype,
+		const char* extPort,
+		const char* inPort,
+		const char* inClient,
+		const char* desc,
+		const char* proto,
+		const char* remoteHost,
+		const char* leaseDuration,
+		char* reservedPort);
 
-/* UPNP_DeletePortMapping()
+	/* UPNP_DeletePortMapping()
  * Use same argument values as what was used for AddPortMapping().
  * remoteHost is usually NULL because IGD don't support it.
  * Return Values :
@@ -179,12 +180,12 @@ UPNP_AddAnyPortMapping(const char * controlURL, const char * servicetype,
  * 606 Action not authorized - The action requested REQUIRES authorization
  *                             and the sender was not authorized.
  * 714 NoSuchEntryInArray - The specified value does not exist in the array */
-MINIUPNP_LIBSPEC int
-UPNP_DeletePortMapping(const char * controlURL, const char * servicetype,
-		       const char * extPort, const char * proto,
-		       const char * remoteHost);
+	MINIUPNP_LIBSPEC int
+	UPNP_DeletePortMapping(const char* controlURL, const char* servicetype,
+		const char* extPort, const char* proto,
+		const char* remoteHost);
 
-/* UPNP_DeletePortRangeMapping()
+	/* UPNP_DeletePortRangeMapping()
  * Use same argument values as what was used for AddPortMapping().
  * remoteHost is usually NULL because IGD don't support it.
  * Return Values :
@@ -197,20 +198,20 @@ UPNP_DeletePortMapping(const char * controlURL, const char * servicetype,
  * 730 PortMappingNotFound - This error message is returned if no port
  *			     mapping is found in the specified range.
  * 733 InconsistentParameters - NewStartPort and NewEndPort values are not consistent. */
-MINIUPNP_LIBSPEC int
-UPNP_DeletePortMappingRange(const char * controlURL, const char * servicetype,
-        		    const char * extPortStart, const char * extPortEnd,
-        		    const char * proto,
-        		    const char * manage);
+	MINIUPNP_LIBSPEC int
+	UPNP_DeletePortMappingRange(const char* controlURL, const char* servicetype,
+		const char* extPortStart, const char* extPortEnd,
+		const char* proto,
+		const char* manage);
 
-/* UPNP_GetPortMappingNumberOfEntries()
+	/* UPNP_GetPortMappingNumberOfEntries()
  * not supported by all routers */
-MINIUPNP_LIBSPEC int
-UPNP_GetPortMappingNumberOfEntries(const char* controlURL,
-                                   const char* servicetype,
-                                   unsigned int * num);
+	MINIUPNP_LIBSPEC int
+	UPNP_GetPortMappingNumberOfEntries(const char* controlURL,
+		const char* servicetype,
+		unsigned int* num);
 
-/* UPNP_GetSpecificPortMappingEntry()
+	/* UPNP_GetSpecificPortMappingEntry()
  *    retrieves an existing port mapping
  * params :
  *  in   extPort
@@ -233,19 +234,19 @@ UPNP_GetPortMappingNumberOfEntries(const char* controlURL,
  *                             and the sender was not authorized.
  * 714 NoSuchEntryInArray - The specified value does not exist in the array.
  */
-MINIUPNP_LIBSPEC int
-UPNP_GetSpecificPortMappingEntry(const char * controlURL,
-                                 const char * servicetype,
-                                 const char * extPort,
-                                 const char * proto,
-                                 const char * remoteHost,
-                                 char * intClient,
-                                 char * intPort,
-                                 char * desc,
-                                 char * enabled,
-                                 char * leaseDuration);
+	MINIUPNP_LIBSPEC int
+	UPNP_GetSpecificPortMappingEntry(const char* controlURL,
+		const char* servicetype,
+		const char* extPort,
+		const char* proto,
+		const char* remoteHost,
+		char* intClient,
+		char* intPort,
+		char* desc,
+		char* enabled,
+		char* leaseDuration);
 
-/* UPNP_GetGenericPortMappingEntry()
+	/* UPNP_GetGenericPortMappingEntry()
  * params :
  *  in   index
  *  out  extPort (6 bytes)
@@ -267,20 +268,20 @@ UPNP_GetSpecificPortMappingEntry(const char * controlURL,
  *                             and the sender was not authorized.
  * 713 SpecifiedArrayIndexInvalid - The specified array index is out of bounds
  */
-MINIUPNP_LIBSPEC int
-UPNP_GetGenericPortMappingEntry(const char * controlURL,
-                                const char * servicetype,
-								const char * index,
-								char * extPort,
-								char * intClient,
-								char * intPort,
-								char * protocol,
-								char * desc,
-								char * enabled,
-								char * rHost,
-								char * duration);
+	MINIUPNP_LIBSPEC int
+	UPNP_GetGenericPortMappingEntry(const char* controlURL,
+		const char* servicetype,
+		const char* index,
+		char* extPort,
+		char* intClient,
+		char* intPort,
+		char* protocol,
+		char* desc,
+		char* enabled,
+		char* rHost,
+		char* duration);
 
-/* UPNP_GetListOfPortMappings()      Available in IGD v2
+	/* UPNP_GetListOfPortMappings()      Available in IGD v2
  *
  *
  * Possible UPNP Error codes :
@@ -289,60 +290,59 @@ UPNP_GetGenericPortMappingEntry(const char * controlURL,
  * 733 InconsistantParameters - NewStartPort and NewEndPort values are not
  *                              consistent.
  */
-MINIUPNP_LIBSPEC int
-UPNP_GetListOfPortMappings(const char * controlURL,
-                           const char * servicetype,
-                           const char * startPort,
-                           const char * endPort,
-                           const char * protocol,
-                           const char * numberOfPorts,
-                           struct PortMappingParserData * data);
+	MINIUPNP_LIBSPEC int
+	UPNP_GetListOfPortMappings(const char* controlURL,
+		const char* servicetype,
+		const char* startPort,
+		const char* endPort,
+		const char* protocol,
+		const char* numberOfPorts,
+		struct PortMappingParserData* data);
 
-/* IGD:2, functions for service WANIPv6FirewallControl:1 */
-MINIUPNP_LIBSPEC int
-UPNP_GetFirewallStatus(const char * controlURL,
-				const char * servicetype,
-				int * firewallEnabled,
-				int * inboundPinholeAllowed);
+	/* IGD:2, functions for service WANIPv6FirewallControl:1 */
+	MINIUPNP_LIBSPEC int
+	UPNP_GetFirewallStatus(const char* controlURL,
+		const char* servicetype,
+		int* firewallEnabled,
+		int* inboundPinholeAllowed);
 
-MINIUPNP_LIBSPEC int
-UPNP_GetOutboundPinholeTimeout(const char * controlURL, const char * servicetype,
-                    const char * remoteHost,
-                    const char * remotePort,
-                    const char * intClient,
-                    const char * intPort,
-                    const char * proto,
-                    int * opTimeout);
+	MINIUPNP_LIBSPEC int
+	UPNP_GetOutboundPinholeTimeout(const char* controlURL, const char* servicetype,
+		const char* remoteHost,
+		const char* remotePort,
+		const char* intClient,
+		const char* intPort,
+		const char* proto,
+		int* opTimeout);
 
-MINIUPNP_LIBSPEC int
-UPNP_AddPinhole(const char * controlURL, const char * servicetype,
-                    const char * remoteHost,
-                    const char * remotePort,
-                    const char * intClient,
-                    const char * intPort,
-                    const char * proto,
-                    const char * leaseTime,
-                    char * uniqueID);
+	MINIUPNP_LIBSPEC int
+	UPNP_AddPinhole(const char* controlURL, const char* servicetype,
+		const char* remoteHost,
+		const char* remotePort,
+		const char* intClient,
+		const char* intPort,
+		const char* proto,
+		const char* leaseTime,
+		char* uniqueID);
 
-MINIUPNP_LIBSPEC int
-UPNP_UpdatePinhole(const char * controlURL, const char * servicetype,
-                    const char * uniqueID,
-                    const char * leaseTime);
+	MINIUPNP_LIBSPEC int
+	UPNP_UpdatePinhole(const char* controlURL, const char* servicetype,
+		const char* uniqueID,
+		const char* leaseTime);
 
-MINIUPNP_LIBSPEC int
-UPNP_DeletePinhole(const char * controlURL, const char * servicetype, const char * uniqueID);
+	MINIUPNP_LIBSPEC int
+	UPNP_DeletePinhole(const char* controlURL, const char* servicetype, const char* uniqueID);
 
-MINIUPNP_LIBSPEC int
-UPNP_CheckPinholeWorking(const char * controlURL, const char * servicetype,
-                                 const char * uniqueID, int * isWorking);
+	MINIUPNP_LIBSPEC int
+	UPNP_CheckPinholeWorking(const char* controlURL, const char* servicetype,
+		const char* uniqueID, int* isWorking);
 
-MINIUPNP_LIBSPEC int
-UPNP_GetPinholePackets(const char * controlURL, const char * servicetype,
-                                 const char * uniqueID, int * packets);
+	MINIUPNP_LIBSPEC int
+	UPNP_GetPinholePackets(const char* controlURL, const char* servicetype,
+		const char* uniqueID, int* packets);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

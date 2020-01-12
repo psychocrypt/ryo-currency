@@ -78,7 +78,7 @@ bool test_transaction_generation_and_ring_signature()
 	typedef tx_source_entry::output_entry tx_output_entry;
 	std::vector<tx_source_entry> sources;
 	sources.resize(sources.size() + 1);
-	tx_source_entry &src = sources.back();
+	tx_source_entry& src = sources.back();
 	src.amount = 70368744177663;
 	{
 		tx_output_entry oe;
@@ -112,7 +112,7 @@ bool test_transaction_generation_and_ring_signature()
 	GULPS_CHECK_AND_ASSERT_MES(r, false, "failed to construct transaction");
 
 	crypto::hash pref_hash = get_transaction_prefix_hash(tx_rc1);
-	std::vector<const crypto::public_key *> output_keys;
+	std::vector<const crypto::public_key*> output_keys;
 	output_keys.push_back(&boost::get<txout_to_key>(tx_mine_1.vout[0].target).key);
 	output_keys.push_back(&boost::get<txout_to_key>(tx_mine_2.vout[0].target).key);
 	output_keys.push_back(&boost::get<txout_to_key>(tx_mine_3.vout[0].target).key);

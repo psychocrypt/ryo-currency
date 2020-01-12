@@ -9,38 +9,41 @@
 #define UPNPREPLYPARSE_H_INCLUDED
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-struct NameValue {
-	struct NameValue * l_next;
-	char name[64];
-	char value[128];
-};
+	struct NameValue
+	{
+		struct NameValue* l_next;
+		char name[64];
+		char value[128];
+	};
 
-struct NameValueParserData {
-	struct NameValue * l_head;
-	char curelt[64];
-	char * portListing;
-	int portListingLength;
-	int topelt;
-	const char * cdata;
-	int cdatalen;
-};
+	struct NameValueParserData
+	{
+		struct NameValue* l_head;
+		char curelt[64];
+		char* portListing;
+		int portListingLength;
+		int topelt;
+		const char* cdata;
+		int cdatalen;
+	};
 
-/* ParseNameValue() */
-void
-ParseNameValue(const char * buffer, int bufsize,
-               struct NameValueParserData * data);
+	/* ParseNameValue() */
+	void
+	ParseNameValue(const char* buffer, int bufsize,
+		struct NameValueParserData* data);
 
-/* ClearNameValueList() */
-void
-ClearNameValueList(struct NameValueParserData * pdata);
+	/* ClearNameValueList() */
+	void
+	ClearNameValueList(struct NameValueParserData* pdata);
 
-/* GetValueFromNameValueList() */
-char *
-GetValueFromNameValueList(struct NameValueParserData * pdata,
-                          const char * Name);
+	/* GetValueFromNameValueList() */
+	char*
+	GetValueFromNameValueList(struct NameValueParserData* pdata,
+		const char* Name);
 
 #if 0
 /* GetValueFromNameValueListIgnoreNS() */
@@ -51,8 +54,8 @@ GetValueFromNameValueListIgnoreNS(struct NameValueParserData * pdata,
 
 /* DisplayNameValueList() */
 #ifdef DEBUG
-void
-DisplayNameValueList(char * buffer, int bufsize);
+	void
+	DisplayNameValueList(char* buffer, int bufsize);
 #endif
 
 #ifdef __cplusplus
@@ -60,4 +63,3 @@ DisplayNameValueList(char * buffer, int bufsize);
 #endif
 
 #endif
-

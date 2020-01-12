@@ -42,30 +42,30 @@
 
 #define CATCH_TRY_SECTION(ret_val) CATCH_TRY_SECTION_MESS(ret_val, "")
 
-#define CATCH_TRY_SECTION_MESS(ret_val, mess_where)                                                                                                                                             \
-	}                                                                                                                                                                                           \
-	catch(const std::exception &ex)                                                                                                                                                             \
-	{                                                                                                                                                                                           \
-		GULPS_CAT_MAJOR("epee_ado_db_help");                                                                                                                                                         \
+#define CATCH_TRY_SECTION_MESS(ret_val, mess_where)                                                                                                               \
+	}                                                                                                                                                             \
+	catch(const std::exception& ex)                                                                                                                               \
+	{                                                                                                                                                             \
+		GULPS_CAT_MAJOR("epee_ado_db_help");                                                                                                                      \
 		GULPSF_ERROR("DB_ERROR: {}", ex.what();                                                                                                                                                 \
-		return ret_val;                                                                                                                                                                         \
-	}                                                                                                                                                                                           \
-	catch(const _com_error &comm_err)                                                                                                                                                           \
-	{                                                                                                                                                                                           \
-		const TCHAR *pstr = comm_err.Description();                                                                                                                                             \
-		std::string descr = string_encoding::convert_to_ansii(pstr ? pstr : TEXT(""));                                                                                                          \
-		const TCHAR *pmessage = comm_err.ErrorMessage();                                                                                                                                        \
-		pstr = comm_err.Source();                                                                                                                                                               \
-		GULPS_CAT_MAJOR("epee_ado_db_help");                                                                                                                                                         \
-		std::string source = string_encoding::convert_to_ansii(pstr ? pstr : TEXT(""));                                                                                                         \
-		GULPSF_ERROR("COM_ERROR {}:\n\tDescriprion:{}, \n\t Message: {}\n\t Source: {}", mess_where, descr, string_encoding::convert_to_ansii(pmessage), source);                               \
-		return ret_val;                                                                                                                                                                         \
-	}                                                                                                                                                                                           \
-	catch(...)                                                                                                                                                                                  \
-	{                                                                                                                                                                                           \
-		GULPS_CAT_MAJOR("epee_ado_db_help");                                                                                                                                                         \
-		GULPS_ERROR("..._ERROR: Unknown error.");                                                                                                                                               \
-		return ret_val;                                                                                                                                                                         \
+		return ret_val;                                                                                                                                           \
+	}                                                                                                                                                             \
+	catch(const _com_error& comm_err)                                                                                                                             \
+	{                                                                                                                                                             \
+		const TCHAR* pstr = comm_err.Description();                                                                                                               \
+		std::string descr = string_encoding::convert_to_ansii(pstr ? pstr : TEXT(""));                                                                            \
+		const TCHAR* pmessage = comm_err.ErrorMessage();                                                                                                          \
+		pstr = comm_err.Source();                                                                                                                                 \
+		GULPS_CAT_MAJOR("epee_ado_db_help");                                                                                                                      \
+		std::string source = string_encoding::convert_to_ansii(pstr ? pstr : TEXT(""));                                                                           \
+		GULPSF_ERROR("COM_ERROR {}:\n\tDescriprion:{}, \n\t Message: {}\n\t Source: {}", mess_where, descr, string_encoding::convert_to_ansii(pmessage), source); \
+		return ret_val;                                                                                                                                           \
+	}                                                                                                                                                             \
+	catch(...)                                                                                                                                                    \
+	{                                                                                                                                                             \
+		GULPS_CAT_MAJOR("epee_ado_db_help");                                                                                                                      \
+		GULPS_ERROR("..._ERROR: Unknown error.");                                                                                                                 \
+		return ret_val;                                                                                                                                           \
 	}
 
 namespace epee
@@ -75,7 +75,10 @@ namespace ado_db_helper
 
 struct profile_entry
 {
-	profile_entry() : m_call_count(0), m_max_time(0), m_min_time(0)
+	profile_entry() :
+		m_call_count(0),
+		m_max_time(0),
+		m_min_time(0)
 	{
 	}
 	//std::string m_sql;
@@ -88,16 +91,17 @@ struct profile_entry
 class profiler_manager
 {
 	GULPS_CAT_MAJOR("epee_ado_db_help");
+
   public:
 	typedef std::map<std::string, profile_entry> sqls_map;
 	profiler_manager() {}
 
-	static bool sort_by_timing(const sqls_map::iterator &a, const sqls_map::iterator &b)
+	static bool sort_by_timing(const sqls_map::iterator& a, const sqls_map::iterator& b)
 	{
 		return a->second.m_avrg.get_avg() > b->second.m_avrg.get_avg();
 	}
 
-	bool flush_log(const std::string &path)
+	bool flush_log(const std::string& path)
 	{
 		CRITICAL_REGION_BEGIN(m_sqls_lock);
 		std::stringstream strm;
@@ -121,7 +125,7 @@ class profiler_manager
 	bool push_entry(const std::string sql, DWORD time)
 	{
 		CRITICAL_REGION_BEGIN(m_sqls_lock);
-		profile_entry &entry_ref = m_sqls[sql];
+		profile_entry& entry_ref = m_sqls[sql];
 		entry_ref.m_avrg.push(time);
 		entry_ref.m_call_count++;
 		if(time > entry_ref.m_max_time)
@@ -132,7 +136,7 @@ class profiler_manager
 		return true;
 	}
 
-	bool get_entry_avarege(const std::string sql, DWORD &time)
+	bool get_entry_avarege(const std::string sql, DWORD& time)
 	{
 		CRITICAL_REGION_BEGIN(m_sqls_lock);
 		sqls_map::iterator it = m_sqls.find(sql);
@@ -148,9 +152,9 @@ class profiler_manager
 	sqls_map m_sqls;
 	critical_section m_sqls_lock;
 };
-inline profiler_manager *get_set_profiler(bool need_to_set = false, profiler_manager **pprofiler = NULL)
+inline profiler_manager* get_set_profiler(bool need_to_set = false, profiler_manager** pprofiler = NULL)
 {
-	static profiler_manager *pmanager = NULL;
+	static profiler_manager* pmanager = NULL;
 	if(need_to_set)
 		pmanager = *pprofiler;
 	//else
@@ -160,13 +164,13 @@ inline profiler_manager *get_set_profiler(bool need_to_set = false, profiler_man
 }
 inline bool init() // INIT and DEINIT are NOT THREAD SAFE operations, CALL it BEFOR u start using this wrapper.
 {
-	profiler_manager *pmanager = new profiler_manager();
+	profiler_manager* pmanager = new profiler_manager();
 	get_set_profiler(true, &pmanager);
 	return true;
 }
 inline bool deinit()
 {
-	profiler_manager *pmanager = get_set_profiler();
+	profiler_manager* pmanager = get_set_profiler();
 	//get_set_profiler(false, &pmanager);
 	if(pmanager)
 		delete pmanager;
@@ -174,7 +178,7 @@ inline bool deinit()
 }
 inline bool push_timing(const std::string sql, DWORD time)
 {
-	profiler_manager *pmanager = get_set_profiler();
+	profiler_manager* pmanager = get_set_profiler();
 	//get_set_profiler(false, &pmanager);
 	if(pmanager)
 		return pmanager->push_entry(sql, time);
@@ -183,7 +187,7 @@ inline bool push_timing(const std::string sql, DWORD time)
 
 inline bool flush_profiler(const std::string path)
 {
-	profiler_manager *pmanager = get_set_profiler();
+	profiler_manager* pmanager = get_set_profiler();
 	//get_set_profiler(false, &pmanager);
 	if(pmanager)
 		return pmanager->flush_log(path);
@@ -196,7 +200,7 @@ class timing_guard
 	std::string m_sql;
 
   public:
-	timing_guard(const std::string &sql)
+	timing_guard(const std::string& sql)
 	{
 		m_start_time = ::GetTickCount();
 		m_sql = sql;
@@ -212,7 +216,7 @@ class timing_guard
 
 typedef std::vector<std::vector<_variant_t>> table;
 
-inline bool add_parametr(ADODB::_CommandPtr cmd, const std::string &parametr)
+inline bool add_parametr(ADODB::_CommandPtr cmd, const std::string& parametr)
 {
 	_variant_t param(parametr.c_str());
 	ADODB::ADO_LONGPTR size = sizeof(parametr);
@@ -221,7 +225,7 @@ inline bool add_parametr(ADODB::_CommandPtr cmd, const std::string &parametr)
 	return true;
 }
 
-inline bool add_parametr(ADODB::_CommandPtr cmd, const std::wstring &parametr)
+inline bool add_parametr(ADODB::_CommandPtr cmd, const std::wstring& parametr)
 {
 	_variant_t param(parametr.c_str());
 	ADODB::ADO_LONGPTR size = sizeof(parametr);
@@ -339,7 +343,7 @@ inline bool add_parametr(ADODB::_CommandPtr cmd, const DATE parametr)
 	return true;
 }
 
-inline bool execute_helper(ADODB::_CommandPtr cmd, _variant_t *pcount_processed = NULL)
+inline bool execute_helper(ADODB::_CommandPtr cmd, _variant_t* pcount_processed = NULL)
 {
 	//BEGIN_TRY_SECTION();
 
@@ -350,7 +354,7 @@ inline bool execute_helper(ADODB::_CommandPtr cmd, _variant_t *pcount_processed 
 	return true;
 }
 
-inline bool select_helper(ADODB::_CommandPtr cmd, table &result_vector)
+inline bool select_helper(ADODB::_CommandPtr cmd, table& result_vector)
 {
 	result_vector.clear();
 	//BEGIN_TRY_SECTION();
@@ -481,19 +485,19 @@ struct adapter_nine
 };
 
 template <typename TParam1>
-bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_zero<TParam1> &params)
+bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_zero<TParam1>& params)
 {
 	return true;
 }
 
 template <typename TParam1>
-bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_single<TParam1> &params)
+bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_single<TParam1>& params)
 {
 	return add_parametr(cmd, params.tparam1);
 }
 
 template <typename TParam1, typename TParam2>
-bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_double<TParam1, TParam2> &params)
+bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_double<TParam1, TParam2>& params)
 {
 	if(!add_parametr(cmd, params.tparam1))
 		return false;
@@ -501,7 +505,7 @@ bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_double<TParam1, T
 }
 
 template <typename TParam1, typename TParam2, typename TParam3>
-bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_triple<TParam1, TParam2, TParam3> &params)
+bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_triple<TParam1, TParam2, TParam3>& params)
 {
 	if(!add_parametr(cmd, params.tparam1))
 		return false;
@@ -511,7 +515,7 @@ bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_triple<TParam1, T
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4>
-bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_quad<TParam1, TParam2, TParam3, TParam4> &params)
+bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_quad<TParam1, TParam2, TParam3, TParam4>& params)
 {
 	if(!add_parametr(cmd, params.tparam1))
 		return false;
@@ -523,7 +527,7 @@ bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_quad<TParam1, TPa
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5>
-bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_quanto<TParam1, TParam2, TParam3, TParam4, TParam5> &params)
+bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_quanto<TParam1, TParam2, TParam3, TParam4, TParam5>& params)
 {
 	if(!add_parametr(cmd, params.tparam1))
 		return false;
@@ -537,7 +541,7 @@ bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_quanto<TParam1, T
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5, typename TParam6>
-bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_sixto<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> &params)
+bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_sixto<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>& params)
 {
 	if(!add_parametr(cmd, params.tparam1))
 		return false;
@@ -553,7 +557,7 @@ bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_sixto<TParam1, TP
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5, typename TParam6, typename TParam7>
-bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_sevento<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7> &params)
+bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_sevento<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7>& params)
 {
 	if(!add_parametr(cmd, params.tparam1))
 		return false;
@@ -571,7 +575,7 @@ bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_sevento<TParam1, 
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5, typename TParam6, typename TParam7, typename TParam8, typename TParam9>
-bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_nine<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8, TParam9> &params)
+bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_nine<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8, TParam9>& params)
 {
 	if(!add_parametr(cmd, params.tparam1))
 		return false;
@@ -593,7 +597,7 @@ bool add_parametrs_multi(ADODB::_CommandPtr cmd, const adapter_nine<TParam1, TPa
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5, typename TParam6, typename TParam7>
-std::string print_parameters_multi(const adapter_sevento<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7> &params)
+std::string print_parameters_multi(const adapter_sevento<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7>& params)
 {
 	std::stringstream strm;
 	strm << params.tparam1 << ", " << params.tparam2 << ", " << params.tparam3 << ", " << params.tparam4 << ", " << params.tparam5 << ", " << params.tparam6 << ", " << params.tparam7;
@@ -601,7 +605,7 @@ std::string print_parameters_multi(const adapter_sevento<TParam1, TParam2, TPara
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5, typename TParam6, typename TParam7, typename TParam8, typename TParam9>
-std::string print_parameters_multi(const adapter_nine<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8, TParam9> &params)
+std::string print_parameters_multi(const adapter_nine<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8, TParam9>& params)
 {
 	std::stringstream strm;
 	strm << params.tparam1 << ", " << params.tparam2 << ", " << params.tparam3 << ", " << params.tparam4 << ", " << params.tparam5 << ", " << params.tparam6 << ", " << params.tparam7 << ", " << params.tparam8 << ", " << params.tparam9;
@@ -609,7 +613,7 @@ std::string print_parameters_multi(const adapter_nine<TParam1, TParam2, TParam3,
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5, typename TParam6>
-std::string print_parameters_multi(const adapter_sixto<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> &params)
+std::string print_parameters_multi(const adapter_sixto<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6>& params)
 {
 	std::stringstream strm;
 	strm << params.tparam1 << ", " << params.tparam2 << ", " << params.tparam3 << ", " << params.tparam4 << ", " << params.tparam5 << ", " << params.tparam6;
@@ -617,7 +621,7 @@ std::string print_parameters_multi(const adapter_sixto<TParam1, TParam2, TParam3
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5>
-std::string print_parameters_multi(const adapter_quanto<TParam1, TParam2, TParam3, TParam4, TParam5> &params)
+std::string print_parameters_multi(const adapter_quanto<TParam1, TParam2, TParam3, TParam4, TParam5>& params)
 {
 	std::stringstream strm;
 	strm << params.tparam1 << ", " << params.tparam2 << ", " << params.tparam3 << ", " << params.tparam4 << ", " << params.tparam5;
@@ -625,7 +629,7 @@ std::string print_parameters_multi(const adapter_quanto<TParam1, TParam2, TParam
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4>
-std::string print_parameters_multi(const adapter_quad<TParam1, TParam2, TParam3, TParam4> &params)
+std::string print_parameters_multi(const adapter_quad<TParam1, TParam2, TParam3, TParam4>& params)
 {
 	std::stringstream strm;
 	strm << params.tparam1 << ", " << params.tparam2 << ", " << params.tparam3 << ", " << params.tparam4;
@@ -633,7 +637,7 @@ std::string print_parameters_multi(const adapter_quad<TParam1, TParam2, TParam3,
 }
 
 template <typename TParam1, typename TParam2, typename TParam3>
-std::string print_parameters_multi(const adapter_triple<TParam1, TParam2, TParam3> &params)
+std::string print_parameters_multi(const adapter_triple<TParam1, TParam2, TParam3>& params)
 {
 	std::stringstream strm;
 	strm << params.tparam1 << ", " << params.tparam2 << ", " << params.tparam3;
@@ -641,7 +645,7 @@ std::string print_parameters_multi(const adapter_triple<TParam1, TParam2, TParam
 }
 
 template <typename TParam>
-std::string get_str_param(const TParam &prm)
+std::string get_str_param(const TParam& prm)
 {
 	std::stringstream strm;
 	strm << prm;
@@ -649,7 +653,7 @@ std::string get_str_param(const TParam &prm)
 }
 
 template <typename TParam>
-std::string get_str_param(const std::list<TParam> &prm_lst)
+std::string get_str_param(const std::list<TParam>& prm_lst)
 {
 	std::stringstream strm;
 	for(std::list<TParam>::const_iterator it = prm_lst.begin(); it != prm_lst.end(); it++)
@@ -658,7 +662,7 @@ std::string get_str_param(const std::list<TParam> &prm_lst)
 }
 
 template <typename TParam1, typename TParam2>
-std::string print_parameters_multi(const adapter_double<TParam1, TParam2> &params)
+std::string print_parameters_multi(const adapter_double<TParam1, TParam2>& params)
 {
 	std::stringstream strm;
 	strm << get_str_param(params.tparam1) << ", " << get_str_param(params.tparam2);
@@ -666,7 +670,7 @@ std::string print_parameters_multi(const adapter_double<TParam1, TParam2> &param
 }
 
 template <typename TParam1>
-std::string print_parameters_multi(const adapter_single<TParam1> &params)
+std::string print_parameters_multi(const adapter_single<TParam1>& params)
 {
 	std::stringstream strm;
 	strm << get_str_param(params.tparam1);
@@ -674,7 +678,7 @@ std::string print_parameters_multi(const adapter_single<TParam1> &params)
 }
 
 template <typename TParam1>
-std::string print_parameters_multi(const adapter_zero<TParam1> &params)
+std::string print_parameters_multi(const adapter_zero<TParam1>& params)
 {
 	std::stringstream strm;
 	strm << "(no parametrs)";
@@ -682,7 +686,7 @@ std::string print_parameters_multi(const adapter_zero<TParam1> &params)
 }
 
 template <typename TParams>
-bool execute_helper_multiparam(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParams &parametrs, _variant_t *pcount_processed = NULL)
+bool execute_helper_multiparam(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParams& parametrs, _variant_t* pcount_processed = NULL)
 {
 	PROFILE_SQL(sql_statment);
 	bool res = false;
@@ -703,7 +707,7 @@ bool execute_helper_multiparam(ADODB::_ConnectionPtr pconnection, const std::str
 }
 
 template <typename TParams>
-inline bool select_helper_multiparam(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParams &parametrs, table &result_vector)
+inline bool select_helper_multiparam(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParams& parametrs, table& result_vector)
 {
 	PROFILE_SQL(sql_statment);
 	bool res = false;
@@ -722,7 +726,7 @@ inline bool select_helper_multiparam(ADODB::_ConnectionPtr pconnection, const st
 }
 
 template <typename TParams>
-inline bool select_helper_param_container(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParams &parametrs, table &result_vector)
+inline bool select_helper_param_container(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParams& parametrs, table& result_vector)
 {
 	PROFILE_SQL(sql_statment);
 	bool res = false;
@@ -743,14 +747,14 @@ inline bool select_helper_param_container(ADODB::_ConnectionPtr pconnection, con
 	return res;
 }
 
-inline bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, _variant_t *pvt = NULL)
+inline bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, _variant_t* pvt = NULL)
 {
 	adapter_zero<int> params;
 	return execute_helper_multiparam(pconnection, sql_statment, params, pvt);
 }
 
 template <typename TParam>
-bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam &parametr)
+bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam& parametr)
 {
 	adapter_single<TParam> params;
 	params.tparam1 = parametr;
@@ -758,7 +762,7 @@ bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_st
 }
 
 template <typename TParam1, typename TParam2>
-bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam1 &parametr1, const TParam2 &parametr2)
+bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam1& parametr1, const TParam2& parametr2)
 {
 	adapter_double<TParam1, TParam2> params;
 	params.tparam1 = parametr1;
@@ -767,7 +771,7 @@ bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_st
 }
 
 template <typename TParam1, typename TParam2, typename TParam3>
-bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam1 &parametr1, const TParam2 &parametr2, const TParam3 &parametr3)
+bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam1& parametr1, const TParam2& parametr2, const TParam3& parametr3)
 {
 	adapter_triple<TParam1, TParam2, typename TParam3> params;
 	params.tparam1 = parametr1;
@@ -777,7 +781,7 @@ bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_st
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4>
-bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam1 &parametr1, const TParam2 &parametr2, const TParam3 &parametr3, const TParam4 &parametr4)
+bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam1& parametr1, const TParam2& parametr2, const TParam3& parametr3, const TParam4& parametr4)
 {
 	adapter_quad<TParam1, TParam2, TParam3, TParam4> params;
 	params.tparam1 = parametr1;
@@ -788,7 +792,7 @@ bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_st
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5>
-bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam1 &parametr1, const TParam2 &parametr2, const TParam3 &parametr3, const TParam4 &parametr4, const TParam5 &parametr5)
+bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam1& parametr1, const TParam2& parametr2, const TParam3& parametr3, const TParam4& parametr4, const TParam5& parametr5)
 {
 	adapter_quanto<TParam1, TParam2, TParam3, TParam4, TParam5> params;
 	params.tparam1 = parametr1;
@@ -800,7 +804,7 @@ bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_st
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5, typename TParam6>
-bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam1 &parametr1, const TParam2 &parametr2, const TParam3 &parametr3, const TParam4 &parametr4, const TParam5 &parametr5, const TParam6 &parametr6)
+bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam1& parametr1, const TParam2& parametr2, const TParam3& parametr3, const TParam4& parametr4, const TParam5& parametr5, const TParam6& parametr6)
 {
 	adapter_sixto<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> params;
 	params.tparam1 = parametr1;
@@ -813,7 +817,7 @@ bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_st
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5, typename TParam6, typename TParam7>
-bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam1 &parametr1, const TParam2 &parametr2, const TParam3 &parametr3, const TParam4 &parametr4, const TParam5 &parametr5, const TParam6 &parametr6, const TParam7 &parametr7)
+bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam1& parametr1, const TParam2& parametr2, const TParam3& parametr3, const TParam4& parametr4, const TParam5& parametr5, const TParam6& parametr6, const TParam7& parametr7)
 {
 	adapter_sevento<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7> params;
 	params.tparam1 = parametr1;
@@ -826,14 +830,14 @@ bool execute_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_st
 	return execute_helper_multiparam(pconnection, sql_statment, params);
 }
 
-inline bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, table &result_vector)
+inline bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, table& result_vector)
 {
 	adapter_zero<int> params;
 	return select_helper_multiparam(pconnection, sql_statment, params, result_vector);
 }
 
 template <typename TParam>
-bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam &parametr, table &result_vector)
+bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam& parametr, table& result_vector)
 {
 	adapter_single<TParam> params;
 	params.tparam1 = parametr;
@@ -841,7 +845,7 @@ bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_sta
 }
 
 template <typename TParam1, typename TParam2>
-bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam1 parametr1, const TParam2 parametr2, table &result_vector)
+bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam1 parametr1, const TParam2 parametr2, table& result_vector)
 {
 	adapter_double<TParam1, TParam2> params;
 	params.tparam1 = parametr1;
@@ -850,7 +854,7 @@ bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_sta
 }
 
 template <typename TParam1, typename TParam2, typename TParam3>
-bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam1 parametr1, const TParam2 parametr2, const TParam3 parametr3, table &result_vector)
+bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam1 parametr1, const TParam2 parametr2, const TParam3 parametr3, table& result_vector)
 {
 	adapter_triple<TParam1, TParam2, typename TParam3> params;
 	params.tparam1 = parametr1;
@@ -860,7 +864,7 @@ bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_sta
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4>
-bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam1 parametr1, const TParam2 parametr2, const TParam3 parametr3, const TParam4 parametr4, table &result_vector)
+bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam1 parametr1, const TParam2 parametr2, const TParam3 parametr3, const TParam4 parametr4, table& result_vector)
 {
 	adapter_quad<TParam1, TParam2, TParam3, TParam4> params;
 	params.tparam1 = parametr1;
@@ -871,7 +875,7 @@ bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_sta
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5>
-bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam1 parametr1, const TParam2 parametr2, const TParam3 parametr3, const TParam4 parametr4, const TParam5 parametr5, table &result_vector)
+bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam1 parametr1, const TParam2 parametr2, const TParam3 parametr3, const TParam4 parametr4, const TParam5 parametr5, table& result_vector)
 {
 	adapter_quanto<TParam1, TParam2, TParam3, TParam4, TParam5> params;
 	params.tparam1 = parametr1;
@@ -883,7 +887,7 @@ bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_sta
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5, typename TParam6>
-bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam1 parametr1, const TParam2 parametr2, const TParam3 parametr3, const TParam4 parametr4, const TParam5 parametr5, const TParam6 parametr6, table &result_vector)
+bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam1 parametr1, const TParam2 parametr2, const TParam3 parametr3, const TParam4 parametr4, const TParam5 parametr5, const TParam6 parametr6, table& result_vector)
 {
 	adapter_sixto<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6> params;
 	params.tparam1 = parametr1;
@@ -896,7 +900,7 @@ bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_sta
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5, typename TParam6, typename TParam7>
-bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam1 parametr1, const TParam2 parametr2, const TParam3 parametr3, const TParam4 parametr4, const TParam5 parametr5, const TParam6 parametr6, const TParam7 parametr7, table &result_vector)
+bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam1 parametr1, const TParam2 parametr2, const TParam3 parametr3, const TParam4 parametr4, const TParam5 parametr5, const TParam6 parametr6, const TParam7 parametr7, table& result_vector)
 {
 	adapter_sevento<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7> params;
 	params.tparam1 = parametr1;
@@ -910,7 +914,7 @@ bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_sta
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename TParam5, typename TParam6, typename TParam7, typename TParam8, typename TParam9>
-bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_statment, const TParam1 parametr1, const TParam2 parametr2, const TParam3 parametr3, const TParam4 parametr4, const TParam5 parametr5, const TParam6 parametr6, const TParam7 parametr7, const TParam8 parametr8, const TParam9 parametr9, table &result_vector)
+bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string& sql_statment, const TParam1 parametr1, const TParam2 parametr2, const TParam3 parametr3, const TParam4 parametr4, const TParam5 parametr5, const TParam6 parametr6, const TParam7 parametr7, const TParam8 parametr8, const TParam9 parametr9, table& result_vector)
 {
 	adapter_nine<TParam1, TParam2, TParam3, TParam4, TParam5, TParam6, TParam7, TParam8, TParam9> params;
 	params.tparam1 = parametr1;
@@ -932,7 +936,7 @@ bool select_helper(ADODB::_ConnectionPtr pconnection, const std::string &sql_sta
 class per_thread_connection_pool
 {
   public:
-	bool init(const std::string &connection_string, const std::string &login, const std::string &pass)
+	bool init(const std::string& connection_string, const std::string& login, const std::string& pass)
 	{
 		m_connection_string = connection_string;
 		m_login = login;
@@ -943,18 +947,18 @@ class per_thread_connection_pool
 		return true;
 	}
 
-	ADODB::_ConnectionPtr &get_db_connection()
+	ADODB::_ConnectionPtr& get_db_connection()
 	{
 
 		//soci::session
 
 		m_db_connections_lock.lock();
-		boost::shared_ptr<ADODB::_ConnectionPtr> &conn_ptr = m_db_connections[ ::GetCurrentThreadId()];
+		boost::shared_ptr<ADODB::_ConnectionPtr>& conn_ptr = m_db_connections[::GetCurrentThreadId()];
 		m_db_connections_lock.unlock();
 		if(!conn_ptr.get())
 		{
 			conn_ptr.reset(new ADODB::_ConnectionPtr());
-			ADODB::_ConnectionPtr &conn = *conn_ptr.get();
+			ADODB::_ConnectionPtr& conn = *conn_ptr.get();
 			//init new connection
 
 			BEGIN_TRY_SECTION();
@@ -984,7 +988,7 @@ class per_thread_connection_pool
 	//----------------------------------------------------------------------------------------------
 	bool check_status()
 	{
-		ADODB::_ConnectionPtr &rconn = get_db_connection();
+		ADODB::_ConnectionPtr& rconn = get_db_connection();
 		if(!ado_db_helper::execute_helper(rconn, "SET CLIENT_ENCODING TO 'SQL_ASCII'"))
 		{
 
@@ -1019,7 +1023,7 @@ class per_thread_connection_pool
 };
 
 template <typename TParam1, typename default_id_type, typename t_conn>
-bool find_or_add_t(const std::string &sql_select_statment, const std::string &sql_insert_statment, OUT default_id_type &id, OUT bool &new_object_added, TParam1 parametr_1, t_conn &c)
+bool find_or_add_t(const std::string& sql_select_statment, const std::string& sql_insert_statment, OUT default_id_type& id, OUT bool& new_object_added, TParam1 parametr_1, t_conn& c)
 {
 	ado_db_helper::adapter_single<TParam1> params;
 	params.tparam1 = parametr_1;
@@ -1027,7 +1031,7 @@ bool find_or_add_t(const std::string &sql_select_statment, const std::string &sq
 }
 
 template <typename TParam1, typename TParam2, typename default_id_type, typename t_conn>
-bool find_or_add_t(const std::string &sql_select_statment, const std::string &sql_insert_statment, OUT default_id_type &id, OUT bool &new_object_added, TParam1 parametr_1, TParam2 parametr_2, t_conn &c)
+bool find_or_add_t(const std::string& sql_select_statment, const std::string& sql_insert_statment, OUT default_id_type& id, OUT bool& new_object_added, TParam1 parametr_1, TParam2 parametr_2, t_conn& c)
 {
 	ado_db_helper::adapter_double<TParam1, TParam2> params;
 	params.tparam1 = parametr_1;
@@ -1036,7 +1040,7 @@ bool find_or_add_t(const std::string &sql_select_statment, const std::string &sq
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename default_id_type, typename t_conn>
-bool find_or_add_t(const std::string &sql_select_statment, const std::string &sql_insert_statment, OUT default_id_type &id, OUT bool &new_object_added, TParam1 parametr_1, TParam2 parametr_2, TParam3 parametr_3, t_conn &c)
+bool find_or_add_t(const std::string& sql_select_statment, const std::string& sql_insert_statment, OUT default_id_type& id, OUT bool& new_object_added, TParam1 parametr_1, TParam2 parametr_2, TParam3 parametr_3, t_conn& c)
 {
 	ado_db_helper::adapter_triple<TParam1, TParam2, TParam3> params;
 	params.tparam1 = parametr_1;
@@ -1046,7 +1050,7 @@ bool find_or_add_t(const std::string &sql_select_statment, const std::string &sq
 }
 
 template <typename TParam1, typename TParam2, typename TParam3, typename TParam4, typename default_id_type, typename t_conn>
-bool find_or_add_t(const std::string &sql_select_statment, const std::string &sql_insert_statment, OUT default_id_type &id, OUT bool &new_object_added, TParam1 parametr_1, TParam2 parametr_2, TParam3 parametr_3, TParam4 parametr_4, t_conn &c)
+bool find_or_add_t(const std::string& sql_select_statment, const std::string& sql_insert_statment, OUT default_id_type& id, OUT bool& new_object_added, TParam1 parametr_1, TParam2 parametr_2, TParam3 parametr_3, TParam4 parametr_4, t_conn& c)
 {
 	ado_db_helper::adapter_quad<TParam1, TParam2, TParam3, TParam4> params;
 	params.tparam1 = parametr_1;
@@ -1057,7 +1061,7 @@ bool find_or_add_t(const std::string &sql_select_statment, const std::string &sq
 }
 
 template <typename TParams, typename default_id_type, typename t_conn>
-bool find_or_add_t_multiparametred(const std::string &sql_select_statment, const std::string &sql_insert_statment, OUT default_id_type &id, OUT bool &new_object_added, TParams params, t_conn &c)
+bool find_or_add_t_multiparametred(const std::string& sql_select_statment, const std::string& sql_insert_statment, OUT default_id_type& id, OUT bool& new_object_added, TParams params, t_conn& c)
 {
 	GULPS_CAT_MAJOR("epee_ado_db_help");
 	//CHECK_CONNECTION(false);
@@ -1073,8 +1077,8 @@ bool find_or_add_t_multiparametred(const std::string &sql_select_statment, const
 		{
 			//last time try to select
 			res = select_helper_multiparam(c.get_db_connection(), sql_select_statment, params, result_table);
-			GULPS_CHECK_AND_ASSERT_MES(res, false, "Failed to execute statment: " , sql_select_statment);
-			GULPS_CHECK_AND_ASSERT_MES(result_table.size(), false, "No records returned from statment: " , sql_select_statment);
+			GULPS_CHECK_AND_ASSERT_MES(res, false, "Failed to execute statment: ", sql_select_statment);
+			GULPS_CHECK_AND_ASSERT_MES(result_table.size(), false, "No records returned from statment: ", sql_select_statment);
 		}
 		else
 		{
@@ -1088,6 +1092,6 @@ bool find_or_add_t_multiparametred(const std::string &sql_select_statment, const
 
 	return true;
 }
-}
-}
+} // namespace ado_db_helper
+} // namespace epee
 #endif //!_DB_HELPER_H_

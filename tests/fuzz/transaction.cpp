@@ -36,12 +36,12 @@
 class TransactionFuzzer : public Fuzzer
 {
   public:
-	virtual int run(const std::string &filename);
+	virtual int run(const std::string& filename);
 
   private:
 };
 
-int TransactionFuzzer::run(const std::string &filename)
+int TransactionFuzzer::run(const std::string& filename)
 {
 	std::string s;
 
@@ -59,7 +59,7 @@ int TransactionFuzzer::run(const std::string &filename)
 	return 0;
 }
 
-int main(int argc, const char **argv)
+int main(int argc, const char** argv)
 {
 	TransactionFuzzer fuzzer;
 	return run_fuzzer(argc, argv, fuzzer);

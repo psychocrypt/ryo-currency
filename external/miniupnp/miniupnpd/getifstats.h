@@ -7,7 +7,8 @@
 #ifndef GETIFSTATS_H_INCLUDED
 #define GETIFSTATS_H_INCLUDED
 
-struct ifdata {
+struct ifdata
+{
 	unsigned long opackets;
 	unsigned long ipackets;
 	unsigned long obytes;
@@ -18,8 +19,6 @@ struct ifdata {
 /* getifstats()
  * Fill the ifdata structure with statistics for network interface ifname.
  * Return 0 in case of success, -1 for bad arguments or any error */
-int
-getifstats(const char * ifname, struct ifdata * data);
+int getifstats(const char* ifname, struct ifdata* data);
 
 #endif
-

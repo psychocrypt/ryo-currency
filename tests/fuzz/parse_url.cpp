@@ -36,7 +36,7 @@ class ParseURLFuzzer : public Fuzzer
   public:
 	ParseURLFuzzer() {}
 	virtual int init();
-	virtual int run(const std::string &filename);
+	virtual int run(const std::string& filename);
 };
 
 int ParseURLFuzzer::init()
@@ -44,7 +44,7 @@ int ParseURLFuzzer::init()
 	return 0;
 }
 
-int ParseURLFuzzer::run(const std::string &filename)
+int ParseURLFuzzer::run(const std::string& filename)
 {
 	std::string s;
 
@@ -58,7 +58,7 @@ int ParseURLFuzzer::run(const std::string &filename)
 		epee::net_utils::http::url_content url;
 		epee::net_utils::parse_url(s, url);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		std::cerr << "Failed to load from binary: " << e.what() << std::endl;
 		return 1;
@@ -66,7 +66,7 @@ int ParseURLFuzzer::run(const std::string &filename)
 	return 0;
 }
 
-int main(int argc, const char **argv)
+int main(int argc, const char** argv)
 {
 	ParseURLFuzzer fuzzer;
 	return run_fuzzer(argc, argv, fuzzer);

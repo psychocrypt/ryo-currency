@@ -46,7 +46,7 @@ namespace tools
 {
 GULPS_CAT_MAJOR("wallet_tx_scan");
 
-std::unique_ptr<wallet2::wallet_rpc_scan_data> wallet2::pull_blocks(uint64_t start_height, const std::list<crypto::hash> &short_chain_history)
+std::unique_ptr<wallet2::wallet_rpc_scan_data> wallet2::pull_blocks(uint64_t start_height, const std::list<crypto::hash>& short_chain_history)
 {
 	cryptonote::COMMAND_RPC_GET_BLOCKS_FAST::request req = AUTO_VAL_INIT(req);
 	cryptonote::COMMAND_RPC_GET_BLOCKS_FAST::response res = AUTO_VAL_INIT(res);
@@ -60,10 +60,10 @@ std::unique_ptr<wallet2::wallet_rpc_scan_data> wallet2::pull_blocks(uint64_t sta
 	THROW_WALLET_EXCEPTION_IF(res.status == CORE_RPC_STATUS_BUSY, error::daemon_busy, "getblocks.bin");
 	THROW_WALLET_EXCEPTION_IF(res.status != CORE_RPC_STATUS_OK, error::get_blocks_error, res.status);
 	THROW_WALLET_EXCEPTION_IF(res.blocks.size() != res.output_indices.size(), error::wallet_internal_error,
-							  "mismatched blocks (" + boost::lexical_cast<std::string>(res.blocks.size()) + ") and output_indices (" +
-								  boost::lexical_cast<std::string>(res.output_indices.size()) + ") sizes from daemon");
+		"mismatched blocks (" + boost::lexical_cast<std::string>(res.blocks.size()) + ") and output_indices (" +
+			boost::lexical_cast<std::string>(res.output_indices.size()) + ") sizes from daemon");
 
-	GULPSF_LOG_L1("Pulled blocks {}-{} / {}.", res.start_height, std::max(res.start_height+res.blocks.size()-1, res.start_height), res.current_height);
+	GULPSF_LOG_L1("Pulled blocks {}-{} / {}.", res.start_height, std::max(res.start_height + res.blocks.size() - 1, res.start_height), res.current_height);
 
 	std::unique_ptr<wallet2::wallet_rpc_scan_data> ret(new wallet_rpc_scan_data);
 	ret->blocks_start_height = res.start_height;
@@ -99,7 +99,7 @@ void wallet2::block_download_thd(wallet2::wallet_block_dl_ctx& ctx)
 				throw std::exception();
 			}
 
-			current_top_height = pull_res->blocks_start_height + pull_res->blocks_bin.size()-1;
+			current_top_height = pull_res->blocks_start_height + pull_res->blocks_bin.size() - 1;
 			if(last_top_height == current_top_height)
 			{
 				GULPS_LOG_L1("No more blocks from daemon.");
@@ -120,7 +120,7 @@ void wallet2::block_download_thd(wallet2::wallet_block_dl_ctx& ctx)
 			drop_from_short_history(ctx.short_chain_history, 3);
 			// prepend the last 3 blocks, should be enough to guard against a block or two's reorg
 			cryptonote::block bl;
-			for(auto it=pull_res->blocks_bin.rbegin(); it != pull_res->blocks_bin.rend() && std::distance(pull_res->blocks_bin.rbegin(), it) < 3; ++it)
+			for(auto it = pull_res->blocks_bin.rbegin(); it != pull_res->blocks_bin.rend() && std::distance(pull_res->blocks_bin.rbegin(), it) < 3; ++it)
 			{
 				bool ok = cryptonote::parse_and_validate_block_from_blob(it->block, bl);
 				THROW_WALLET_EXCEPTION_IF(!ok, error::block_parse_error, it->block);
@@ -165,7 +165,7 @@ void wallet2::block_download_thd(wallet2::wallet_block_dl_ctx& ctx)
 bool wallet2::block_scan_tx(const wallet_scan_ctx& ctx, const crypto::hash& txid, const cryptonote::transaction& tx, bloom_filter& in_kimg, std::unordered_set<crypto::key_image>& inc_kimg)
 {
 	hw::core::device_default dummy_dev;
-	const cryptonote::account_keys &keys = ctx.account.get_keys();
+	const cryptonote::account_keys& keys = ctx.account.get_keys();
 	GULPS_LOG_L2("Scanning tx ", txid);
 	for(const auto& tx_in : tx.vin)
 	{
@@ -253,7 +253,7 @@ bool wallet2::block_scan_tx(const wallet_scan_ctx& ctx, const crypto::hash& txid
 				bool r = cryptonote::generate_key_image_helper_precomp(keys, out_pubkey, derivation, out_idx, found->second, eph, ki, dummy_dev);
 				THROW_WALLET_EXCEPTION_IF(!r, error::wallet_internal_error, "Failed to generate key image");
 				THROW_WALLET_EXCEPTION_IF(eph.pub != out_pubkey,
-									error::wallet_internal_error, "key_image generated ephemeral public key not matched with output_key");
+					error::wallet_internal_error, "key_image generated ephemeral public key not matched with output_key");
 				THROW_WALLET_EXCEPTION_IF(!inc_kimg.insert(ki).second, error::wallet_internal_error, "Duplicate key image");
 			}
 			ret = true;
@@ -283,7 +283,7 @@ bool wallet2::block_scan_tx(const wallet_scan_ctx& ctx, const crypto::hash& txid
 					bool r = cryptonote::generate_key_image_helper_precomp(keys, out_pubkey, derivation, out_idx, found->second, eph, ki, dummy_dev);
 					THROW_WALLET_EXCEPTION_IF(!r, error::wallet_internal_error, "Failed to generate key image");
 					THROW_WALLET_EXCEPTION_IF(eph.pub != out_pubkey,
-										error::wallet_internal_error, "key_image generated ephemeral public key not matched with output_key");
+						error::wallet_internal_error, "key_image generated ephemeral public key not matched with output_key");
 					THROW_WALLET_EXCEPTION_IF(!inc_kimg.insert(ki).second, error::wallet_internal_error, "Duplicate key image");
 				}
 				ret = true;
@@ -304,7 +304,7 @@ void wallet2::block_scan_thd(const wallet_scan_ctx& ctx)
 		{
 			std::unique_ptr<wallet2::wallet_rpc_scan_data> pull_res = ctx.refresh_ctx.m_scan_in_queue.pop(lck);
 
-			GULPSF_LOG_L1("Scanning blocks {} - {}", pull_res->blocks_start_height, pull_res->blocks_start_height+pull_res->blocks_bin.size()-1);
+			GULPSF_LOG_L1("Scanning blocks {} - {}", pull_res->blocks_start_height, pull_res->blocks_start_height + pull_res->blocks_bin.size() - 1);
 
 			if(ctx.refresh_ctx.m_scan_error)
 			{
@@ -314,7 +314,7 @@ void wallet2::block_scan_thd(const wallet_scan_ctx& ctx)
 
 			THROW_WALLET_EXCEPTION_IF(pull_res->blocks_bin.size() != pull_res->o_indices.size(), error::wallet_internal_error, "size mismatch");
 
-			size_t blk_i=0;
+			size_t blk_i = 0;
 			size_t in_count = 0;
 			pull_res->blocks_parsed.resize(pull_res->blocks_bin.size());
 			for(const cryptonote::block_complete_entry_v& bl : pull_res->blocks_bin)
@@ -328,23 +328,23 @@ void wallet2::block_scan_thd(const wallet_scan_ctx& ctx)
 				blke.block_hash = get_block_hash(blke.block);
 				THROW_WALLET_EXCEPTION_IF(bl.txs.size() + 1 != blk_o_idx.indices.size(), error::wallet_internal_error,
 					"block transactions=" + std::to_string(bl.txs.size()) + " not match with daemon response size=" +
-					std::to_string(blk_o_idx.indices.size()) + " for block " + std::to_string(blke.block_height));
+						std::to_string(blk_o_idx.indices.size()) + " for block " + std::to_string(blke.block_height));
 				THROW_WALLET_EXCEPTION_IF(bl.txs.size() != blke.block.tx_hashes.size(), error::wallet_internal_error,
-										  "Wrong amount of transactions for block");
+					"Wrong amount of transactions for block");
 
 				blk_i++;
-				if(!ctx.explicit_refresh && (blke.block.timestamp + 60 * 60 * 24 <= ctx.wallet_create_time || blke.block_height  < ctx.refresh_height))
+				if(!ctx.explicit_refresh && (blke.block.timestamp + 60 * 60 * 24 <= ctx.wallet_create_time || blke.block_height < ctx.refresh_height))
 				{
 					if(blke.block_height % 100 == 0)
 						GULPS_LOG_L2("Skipped block by timestamp, height: ", blke.block_height, ", block time ",
-									 blke.block.timestamp, ", account time ", ctx.wallet_create_time);
+							blke.block.timestamp, ", account time ", ctx.wallet_create_time);
 					blke.skipped = true;
 					continue;
 				}
 				blke.skipped = false;
 
 				blke.miner_tx_hash = cryptonote::get_transaction_hash(blke.block.miner_tx);
-				size_t tx_i =0;
+				size_t tx_i = 0;
 				blke.txes.resize(bl.txs.size());
 				for(const cryptonote::blobdata& tx_blob : bl.txs)
 				{
@@ -357,7 +357,7 @@ void wallet2::block_scan_thd(const wallet_scan_ctx& ctx)
 			}
 
 			pull_res->key_images.init(in_count);
-			for(size_t i=0; i < blk_i; i++)
+			for(size_t i = 0; i < blk_i; i++)
 			{
 				wallet_rpc_scan_data::block_complete_entry_parsed& blke = pull_res->blocks_parsed[i];
 
@@ -370,10 +370,10 @@ void wallet2::block_scan_thd(const wallet_scan_ctx& ctx)
 						pull_res->indices_found.emplace_back(i, 0);
 				}
 
-				for(size_t txi=0; txi < blke.txes.size(); txi++)
+				for(size_t txi = 0; txi < blke.txes.size(); txi++)
 				{
 					if(block_scan_tx(ctx, blke.block.tx_hashes[txi], blke.txes[txi], pull_res->key_images, pull_res->incoming_kimg))
-						pull_res->indices_found.emplace_back(i, txi+1);
+						pull_res->indices_found.emplace_back(i, txi + 1);
 				}
 			}
 
@@ -387,7 +387,7 @@ void wallet2::block_scan_thd(const wallet_scan_ctx& ctx)
 		GULPSF_LOG_ERROR("Blocks scanning thread exception: {}", e.what());
 	}
 
-	if(ctx.refresh_ctx.m_running_scan_thd_cnt.fetch_sub(1)-1 == 0)
+	if(ctx.refresh_ctx.m_running_scan_thd_cnt.fetch_sub(1) - 1 == 0)
 	{
 		GULPS_LOG_L1("Blocks scanning threads complete");
 		ctx.refresh_ctx.m_scan_out_queue.set_finish_flag();
@@ -399,4 +399,4 @@ void wallet2::block_scan_thd(const wallet_scan_ctx& ctx)
 		GULPSF_LOG_L1("block_scan_thd exits {} left, m_scan_error state", left, error);
 	}
 }
-}
+} // namespace tools

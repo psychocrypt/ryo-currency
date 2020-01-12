@@ -67,7 +67,7 @@ namespace ledger
 /* ===                           Debug                              ==== */
 /* ===================================================================== */
 #ifdef WIN32
-static char *pcsc_stringify_error(LONG rv)
+static char* pcsc_stringify_error(LONG rv)
 {
 	static __thread char out[20];
 	sprintf_s(out, sizeof(out), "0x%08lX", rv);
@@ -96,7 +96,7 @@ crypto::secret_key dbg_spendkey;
 /* ===                        Keymap                                ==== */
 /* ===================================================================== */
 
-ABPkeys::ABPkeys(const rct::key &A, const rct::key &B, const bool is_subaddr, const size_t real_output_index, const rct::key &P, const rct::key &AK)
+ABPkeys::ABPkeys(const rct::key& A, const rct::key& B, const bool is_subaddr, const size_t real_output_index, const rct::key& P, const rct::key& AK)
 {
 	Aout = A;
 	Bout = B;
@@ -106,7 +106,7 @@ ABPkeys::ABPkeys(const rct::key &A, const rct::key &B, const bool is_subaddr, co
 	AKout = AK;
 }
 
-ABPkeys::ABPkeys(const ABPkeys &keys)
+ABPkeys::ABPkeys(const ABPkeys& keys)
 {
 	Aout = keys.Aout;
 	Bout = keys.Bout;
@@ -116,7 +116,7 @@ ABPkeys::ABPkeys(const ABPkeys &keys)
 	AKout = keys.AKout;
 }
 
-bool Keymap::find(const rct::key &P, ABPkeys &keys) const
+bool Keymap::find(const rct::key& P, ABPkeys& keys) const
 {
 	size_t sz = ABP.size();
 	for(size_t i = 0; i < sz; i++)
@@ -130,7 +130,7 @@ bool Keymap::find(const rct::key &P, ABPkeys &keys) const
 	return false;
 }
 
-void Keymap::add(const ABPkeys &keys)
+void Keymap::add(const ABPkeys& keys)
 {
 	ABP.push_back(keys);
 }
@@ -148,11 +148,11 @@ void Keymap::log()
 	for(size_t i = 0; i < sz; i++)
 	{
 		log_message("  keymap", std::to_string(i));
-		log_hexbuffer("    Aout", (char *)ABP[i].Aout.bytes, 32);
-		log_hexbuffer("    Bout", (char *)ABP[i].Bout.bytes, 32);
+		log_hexbuffer("    Aout", (char*)ABP[i].Aout.bytes, 32);
+		log_hexbuffer("    Bout", (char*)ABP[i].Bout.bytes, 32);
 		log_message("  is_sub", std::to_string(ABP[i].is_subaddress));
 		log_message("   index", std::to_string(ABP[i].index));
-		log_hexbuffer("    Pout", (char *)ABP[i].Pout.bytes, 32);
+		log_hexbuffer("    Pout", (char*)ABP[i].Pout.bytes, 32);
 	}
 }
 #endif
@@ -160,12 +160,12 @@ void Keymap::log()
 /* ===================================================================== */
 /* ===                       Internal Helpers                       ==== */
 /* ===================================================================== */
-static bool is_fake_view_key(const crypto::secret_key &sec)
+static bool is_fake_view_key(const crypto::secret_key& sec)
 {
 	return sec == crypto::null_skey;
 }
 
-bool operator==(const crypto::key_derivation &d0, const crypto::key_derivation &d1)
+bool operator==(const crypto::key_derivation& d0, const crypto::key_derivation& d1)
 {
 	return !memcmp(&d0, &d1, sizeof(d0));
 }
@@ -219,12 +219,12 @@ void device_ledger::logCMD()
 	{
 		char strbuffer[1024];
 		sprintf(strbuffer, "%.02x %.02x %.02x %.02x %.02x ",
-				this->buffer_send[0],
-				this->buffer_send[1],
-				this->buffer_send[2],
-				this->buffer_send[3],
-				this->buffer_send[4]);
-		buffer_to_str(strbuffer + strlen(strbuffer), sizeof(strbuffer), (char *)(this->buffer_send + 5), this->length_send - 5);
+			this->buffer_send[0],
+			this->buffer_send[1],
+			this->buffer_send[2],
+			this->buffer_send[3],
+			this->buffer_send[4]);
+		buffer_to_str(strbuffer + strlen(strbuffer), sizeof(strbuffer), (char*)(this->buffer_send + 5), this->length_send - 5);
 		MDEBUG("CMD  :" << strbuffer);
 	}
 }
@@ -235,9 +235,9 @@ void device_ledger::logRESP()
 	{
 		char strbuffer[1024];
 		sprintf(strbuffer, "%.02x%.02x ",
-				this->buffer_recv[this->length_recv - 2],
-				this->buffer_recv[this->length_recv - 1]);
-		buffer_to_str(strbuffer + strlen(strbuffer), sizeof(strbuffer), (char *)(this->buffer_recv), this->length_recv - 2);
+			this->buffer_recv[this->length_recv - 2],
+			this->buffer_recv[this->length_recv - 1]);
+		buffer_to_str(strbuffer + strlen(strbuffer), sizeof(strbuffer), (char*)(this->buffer_recv), this->length_recv - 2);
 		MDEBUG("RESP :" << strbuffer);
 	}
 }
@@ -342,8 +342,8 @@ unsigned int device_ledger::exchange(unsigned int ok, unsigned int mask)
 	logCMD();
 	this->length_recv = BUFFER_RECV_SIZE;
 	rv = SCardTransmit(this->hCard,
-					   SCARD_PCI_T0, this->buffer_send, this->length_send,
-					   NULL, this->buffer_recv, &this->length_recv);
+		SCARD_PCI_T0, this->buffer_send, this->length_send,
+		NULL, this->buffer_recv, &this->length_recv);
 	ASSERT_RV(rv);
 	ASSERT_T0(this->length_recv <= BUFFER_RECV_SIZE);
 	logRESP();
@@ -365,7 +365,7 @@ void device_ledger::reset_buffer()
 /*                              SETUP/TEARDOWN                             */
 /* ======================================================================= */
 
-bool device_ledger::set_name(const std::string &name)
+bool device_ledger::set_name(const std::string& name)
 {
 	this->name = name;
 	return true;
@@ -429,8 +429,8 @@ bool device_ledger::connect(void)
 #endif
 	if(rv == SCARD_S_SUCCESS)
 	{
-		char *p;
-		const char *prefix = this->name.c_str();
+		char* p;
+		const char* prefix = this->name.c_str();
 
 		p = mszReaders;
 		MDEBUG("Looking for " << std::string(prefix));
@@ -441,8 +441,8 @@ bool device_ledger::connect(void)
 			{
 				MDEBUG("Device Match: " << std::string(p));
 				if((rv = SCardConnect(this->hContext,
-									  p, SCARD_SHARE_EXCLUSIVE, SCARD_PROTOCOL_T0,
-									  &this->hCard, &dwProtocol)) != SCARD_S_SUCCESS)
+						p, SCARD_SHARE_EXCLUSIVE, SCARD_PROTOCOL_T0,
+						&this->hCard, &dwProtocol)) != SCARD_S_SUCCESS)
 				{
 					break;
 				}
@@ -551,7 +551,7 @@ bool device_ledger::set_mode(device_mode mode)
 /*                             WALLET & ADDRESS                            */
 /* ======================================================================= */
 
-bool device_ledger::get_public_address(cryptonote::account_public_address &pubkey)
+bool device_ledger::get_public_address(cryptonote::account_public_address& pubkey)
 {
 	AUTO_LOCK_CMD();
 
@@ -578,7 +578,7 @@ bool device_ledger::get_public_address(cryptonote::account_public_address &pubke
 	return true;
 }
 
-bool device_ledger::get_secret_keys(crypto::secret_key &vkey, crypto::secret_key &skey)
+bool device_ledger::get_secret_keys(crypto::secret_key& vkey, crypto::secret_key& skey)
 {
 	AUTO_LOCK_CMD();
 
@@ -625,7 +625,7 @@ bool device_ledger::get_secret_keys(crypto::secret_key &vkey, crypto::secret_key
 	return true;
 }
 
-bool device_ledger::generate_chacha_key(const cryptonote::account_keys &keys, crypto::chacha_key &key)
+bool device_ledger::generate_chacha_key(const cryptonote::account_keys& keys, crypto::chacha_key& key)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -656,7 +656,7 @@ bool device_ledger::generate_chacha_key(const cryptonote::account_keys &keys, cr
 	crypto::generate_chacha_key_prehashed(&prekey[0], sizeof(prekey), key);
 
 #ifdef DEBUG_HWDEVICE
-	hw::ledger::check32("generate_chacha_key_prehashed", "key", (char *)key_x.data(), (char *)key.data());
+	hw::ledger::check32("generate_chacha_key_prehashed", "key", (char*)key_x.data(), (char*)key.data());
 #endif
 
 	return true;
@@ -666,7 +666,7 @@ bool device_ledger::generate_chacha_key(const cryptonote::account_keys &keys, cr
 /*                               SUB ADDRESS                               */
 /* ======================================================================= */
 
-bool device_ledger::derive_subaddress_public_key(const crypto::public_key &pub, const crypto::key_derivation &derivation, const std::size_t output_index, crypto::public_key &derived_pub)
+bool device_ledger::derive_subaddress_public_key(const crypto::public_key& pub, const crypto::key_derivation& derivation, const std::size_t output_index, crypto::public_key& derived_pub)
 {
 	AUTO_LOCK_CMD();
 #ifdef DEBUG_HWDEVICE
@@ -739,7 +739,7 @@ bool device_ledger::derive_subaddress_public_key(const crypto::public_key &pub, 
 	return true;
 }
 
-crypto::public_key device_ledger::get_subaddress_spend_public_key(const cryptonote::account_keys &keys, const cryptonote::subaddress_index &index)
+crypto::public_key device_ledger::get_subaddress_spend_public_key(const cryptonote::account_keys& keys, const cryptonote::subaddress_index& index)
 {
 	AUTO_LOCK_CMD();
 	crypto::public_key D;
@@ -793,7 +793,7 @@ crypto::public_key device_ledger::get_subaddress_spend_public_key(const cryptono
 	return D;
 }
 
-std::vector<crypto::public_key> device_ledger::get_subaddress_spend_public_keys(const cryptonote::account_keys &keys, uint32_t account, uint32_t begin, uint32_t end)
+std::vector<crypto::public_key> device_ledger::get_subaddress_spend_public_keys(const cryptonote::account_keys& keys, uint32_t account, uint32_t begin, uint32_t end)
 {
 	std::vector<crypto::public_key> pkeys;
 	cryptonote::subaddress_index index = {account, begin};
@@ -807,7 +807,7 @@ std::vector<crypto::public_key> device_ledger::get_subaddress_spend_public_keys(
 	return pkeys;
 }
 
-cryptonote::account_public_address device_ledger::get_subaddress(const cryptonote::account_keys &keys, const cryptonote::subaddress_index &index)
+cryptonote::account_public_address device_ledger::get_subaddress(const cryptonote::account_keys& keys, const cryptonote::subaddress_index& index)
 {
 	AUTO_LOCK_CMD();
 	cryptonote::account_public_address address;
@@ -865,7 +865,7 @@ cryptonote::account_public_address device_ledger::get_subaddress(const cryptonot
 	return address;
 }
 
-crypto::secret_key device_ledger::get_subaddress_secret_key(const crypto::secret_key &sec, const cryptonote::subaddress_index &index)
+crypto::secret_key device_ledger::get_subaddress_secret_key(const crypto::secret_key& sec, const cryptonote::subaddress_index& index)
 {
 	AUTO_LOCK_CMD();
 	crypto::secret_key sub_sec;
@@ -918,7 +918,7 @@ crypto::secret_key device_ledger::get_subaddress_secret_key(const crypto::secret
 /*                            DERIVATION & KEY                             */
 /* ======================================================================= */
 
-bool device_ledger::verify_keys(const crypto::secret_key &secret_key, const crypto::public_key &public_key)
+bool device_ledger::verify_keys(const crypto::secret_key& secret_key, const crypto::public_key& public_key)
 {
 	AUTO_LOCK_CMD();
 	int offset, sw;
@@ -953,7 +953,7 @@ bool device_ledger::verify_keys(const crypto::secret_key &secret_key, const cryp
 	return verified == 1;
 }
 
-bool device_ledger::scalarmultKey(rct::key &aP, const rct::key &P, const rct::key &a)
+bool device_ledger::scalarmultKey(rct::key& aP, const rct::key& P, const rct::key& a)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -962,10 +962,10 @@ bool device_ledger::scalarmultKey(rct::key &aP, const rct::key &P, const rct::ke
 	const rct::key P_x = P;
 	const rct::key a_x = hw::ledger::decrypt(a);
 	rct::key aP_x;
-	hw::ledger::log_hexbuffer("scalarmultKey: [[IN]]  P ", (char *)P_x.bytes, 32);
-	hw::ledger::log_hexbuffer("scalarmultKey: [[IN]]  a ", (char *)a_x.bytes, 32);
+	hw::ledger::log_hexbuffer("scalarmultKey: [[IN]]  P ", (char*)P_x.bytes, 32);
+	hw::ledger::log_hexbuffer("scalarmultKey: [[IN]]  a ", (char*)a_x.bytes, 32);
 	this->controle_device->scalarmultKey(aP_x, P_x, a_x);
-	hw::ledger::log_hexbuffer("scalarmultKey: [[OUT]] aP", (char *)aP_x.bytes, 32);
+	hw::ledger::log_hexbuffer("scalarmultKey: [[OUT]] aP", (char*)aP_x.bytes, 32);
 #endif
 
 	reset_buffer();
@@ -994,13 +994,13 @@ bool device_ledger::scalarmultKey(rct::key &aP, const rct::key &P, const rct::ke
 	memmove(aP.bytes, &this->buffer_recv[0], 32);
 
 #ifdef DEBUG_HWDEVICE
-	hw::ledger::check32("scalarmultKey", "mulkey", (char *)aP_x.bytes, (char *)aP.bytes);
+	hw::ledger::check32("scalarmultKey", "mulkey", (char*)aP_x.bytes, (char*)aP.bytes);
 #endif
 
 	return true;
 }
 
-bool device_ledger::scalarmultBase(rct::key &aG, const rct::key &a)
+bool device_ledger::scalarmultBase(rct::key& aG, const rct::key& a)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -1008,9 +1008,9 @@ bool device_ledger::scalarmultBase(rct::key &aG, const rct::key &a)
 #ifdef DEBUG_HWDEVICE
 	const rct::key a_x = hw::ledger::decrypt(a);
 	rct::key aG_x;
-	hw::ledger::log_hexbuffer("scalarmultKey: [[IN]]  a ", (char *)a_x.bytes, 32);
+	hw::ledger::log_hexbuffer("scalarmultKey: [[IN]]  a ", (char*)a_x.bytes, 32);
 	this->controle_device->scalarmultBase(aG_x, a_x);
-	hw::ledger::log_hexbuffer("scalarmultKey: [[OUT]] aG", (char *)aG_x.bytes, 32);
+	hw::ledger::log_hexbuffer("scalarmultKey: [[OUT]] aG", (char*)aG_x.bytes, 32);
 #endif
 
 	reset_buffer();
@@ -1036,13 +1036,13 @@ bool device_ledger::scalarmultBase(rct::key &aG, const rct::key &a)
 	memmove(aG.bytes, &this->buffer_recv[0], 32);
 
 #ifdef DEBUG_HWDEVICE
-	hw::ledger::check32("scalarmultBase", "mulkey", (char *)aG_x.bytes, (char *)aG.bytes);
+	hw::ledger::check32("scalarmultBase", "mulkey", (char*)aG_x.bytes, (char*)aG.bytes);
 #endif
 
 	return true;
 }
 
-bool device_ledger::sc_secret_add(crypto::secret_key &r, const crypto::secret_key &a, const crypto::secret_key &b)
+bool device_ledger::sc_secret_add(crypto::secret_key& r, const crypto::secret_key& a, const crypto::secret_key& b)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -1087,7 +1087,7 @@ bool device_ledger::sc_secret_add(crypto::secret_key &r, const crypto::secret_ke
 	return true;
 }
 
-crypto::secret_key device_ledger::generate_legacy_keys(crypto::public_key &pub, crypto::secret_key &sec, const crypto::secret_key &recovery_key, bool recover)
+crypto::secret_key device_ledger::generate_legacy_keys(crypto::public_key& pub, crypto::secret_key& sec, const crypto::secret_key& recovery_key, bool recover)
 {
 	AUTO_LOCK_CMD();
 	if(recover)
@@ -1134,7 +1134,7 @@ crypto::secret_key device_ledger::generate_legacy_keys(crypto::public_key &pub, 
 	return sec;
 }
 
-bool device_ledger::generate_key_derivation(const crypto::public_key &pub, const crypto::secret_key &sec, crypto::key_derivation &derivation)
+bool device_ledger::generate_key_derivation(const crypto::public_key& pub, const crypto::secret_key& sec, crypto::key_derivation& derivation)
 {
 	AUTO_LOCK_CMD();
 	bool r = false;
@@ -1205,9 +1205,9 @@ bool device_ledger::generate_key_derivation(const crypto::public_key &pub, const
 	return r;
 }
 
-bool device_ledger::conceal_derivation(crypto::key_derivation &derivation, const crypto::public_key &tx_pub_key, const std::vector<crypto::public_key> &additional_tx_pub_keys, const crypto::key_derivation &main_derivation, const std::vector<crypto::key_derivation> &additional_derivations)
+bool device_ledger::conceal_derivation(crypto::key_derivation& derivation, const crypto::public_key& tx_pub_key, const std::vector<crypto::public_key>& additional_tx_pub_keys, const crypto::key_derivation& main_derivation, const std::vector<crypto::key_derivation>& additional_derivations)
 {
-	const crypto::public_key *pkey = NULL;
+	const crypto::public_key* pkey = NULL;
 	if(derivation == main_derivation)
 	{
 		pkey = &tx_pub_key;
@@ -1229,7 +1229,7 @@ bool device_ledger::conceal_derivation(crypto::key_derivation &derivation, const
 	return this->generate_key_derivation(*pkey, crypto::null_skey, derivation);
 }
 
-bool device_ledger::derivation_to_scalar(const crypto::key_derivation &derivation, const size_t output_index, crypto::ec_scalar &res)
+bool device_ledger::derivation_to_scalar(const crypto::key_derivation& derivation, const size_t output_index, crypto::ec_scalar& res)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -1280,7 +1280,7 @@ bool device_ledger::derivation_to_scalar(const crypto::key_derivation &derivatio
 	return true;
 }
 
-bool device_ledger::derive_secret_key(const crypto::key_derivation &derivation, const std::size_t output_index, const crypto::secret_key &sec, crypto::secret_key &derived_sec)
+bool device_ledger::derive_secret_key(const crypto::key_derivation& derivation, const std::size_t output_index, const crypto::secret_key& sec, crypto::secret_key& derived_sec)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -1336,7 +1336,7 @@ bool device_ledger::derive_secret_key(const crypto::key_derivation &derivation, 
 	return true;
 }
 
-bool device_ledger::derive_public_key(const crypto::key_derivation &derivation, const std::size_t output_index, const crypto::public_key &pub, crypto::public_key &derived_pub)
+bool device_ledger::derive_public_key(const crypto::key_derivation& derivation, const std::size_t output_index, const crypto::public_key& pub, crypto::public_key& derived_pub)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -1391,7 +1391,7 @@ bool device_ledger::derive_public_key(const crypto::key_derivation &derivation, 
 	return true;
 }
 
-bool device_ledger::secret_key_to_public_key(const crypto::secret_key &sec, crypto::public_key &pub)
+bool device_ledger::secret_key_to_public_key(const crypto::secret_key& sec, crypto::public_key& pub)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -1437,7 +1437,7 @@ bool device_ledger::secret_key_to_public_key(const crypto::secret_key &sec, cryp
 	return true;
 }
 
-bool device_ledger::generate_key_image(const crypto::public_key &pub, const crypto::secret_key &sec, crypto::key_image &image)
+bool device_ledger::generate_key_image(const crypto::public_key& pub, const crypto::secret_key& sec, crypto::key_image& image)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -1488,7 +1488,7 @@ bool device_ledger::generate_key_image(const crypto::public_key &pub, const cryp
 /*                               TRANSACTION                               */
 /* ======================================================================= */
 
-bool device_ledger::open_tx(crypto::secret_key &tx_key)
+bool device_ledger::open_tx(crypto::secret_key& tx_key)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -1521,7 +1521,7 @@ bool device_ledger::open_tx(crypto::secret_key &tx_key)
 	return true;
 }
 
-bool device_ledger::encrypt_payment_id(crypto::hash8 &payment_id, const crypto::public_key &public_key, const crypto::secret_key &secret_key)
+bool device_ledger::encrypt_payment_id(crypto::hash8& payment_id, const crypto::public_key& public_key, const crypto::secret_key& secret_key)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -1566,15 +1566,15 @@ bool device_ledger::encrypt_payment_id(crypto::hash8 &payment_id, const crypto::
 	return true;
 }
 
-bool device_ledger::add_output_key_mapping(const crypto::public_key &Aout, const crypto::public_key &Bout, const bool is_subaddress, const size_t real_output_index,
-										   const rct::key &amount_key, const crypto::public_key &out_eph_public_key)
+bool device_ledger::add_output_key_mapping(const crypto::public_key& Aout, const crypto::public_key& Bout, const bool is_subaddress, const size_t real_output_index,
+	const rct::key& amount_key, const crypto::public_key& out_eph_public_key)
 {
 	AUTO_LOCK_CMD();
 	key_map.add(ABPkeys(rct::pk2rct(Aout), rct::pk2rct(Bout), is_subaddress, real_output_index, rct::pk2rct(out_eph_public_key), amount_key));
 	return true;
 }
 
-bool device_ledger::ecdhEncode(rct::ecdhTuple &unmasked, const rct::key &AKout)
+bool device_ledger::ecdhEncode(rct::ecdhTuple& unmasked, const rct::key& AKout)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -1614,16 +1614,16 @@ bool device_ledger::ecdhEncode(rct::ecdhTuple &unmasked, const rct::key &AKout)
 	memmove(unmasked.mask.bytes, &this->buffer_recv[32], 32);
 
 #ifdef DEBUG_HWDEVICE
-	hw::ledger::check32("ecdhEncode", "amount", (char *)unmasked_x.amount.bytes, (char *)unmasked.amount.bytes);
-	hw::ledger::check32("ecdhEncode", "mask", (char *)unmasked_x.mask.bytes, (char *)unmasked.mask.bytes);
+	hw::ledger::check32("ecdhEncode", "amount", (char*)unmasked_x.amount.bytes, (char*)unmasked.amount.bytes);
+	hw::ledger::check32("ecdhEncode", "mask", (char*)unmasked_x.mask.bytes, (char*)unmasked.mask.bytes);
 
-	hw::ledger::log_hexbuffer("Blind AKV input", (char *)&this->buffer_recv[64], 3 * 32);
+	hw::ledger::log_hexbuffer("Blind AKV input", (char*)&this->buffer_recv[64], 3 * 32);
 #endif
 
 	return true;
 }
 
-bool device_ledger::ecdhDecode(rct::ecdhTuple &masked, const rct::key &AKout)
+bool device_ledger::ecdhDecode(rct::ecdhTuple& masked, const rct::key& AKout)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -1663,20 +1663,20 @@ bool device_ledger::ecdhDecode(rct::ecdhTuple &masked, const rct::key &AKout)
 	memmove(masked.mask.bytes, &this->buffer_recv[32], 32);
 
 #ifdef DEBUG_HWDEVICE
-	hw::ledger::check32("ecdhDecode", "amount", (char *)masked_x.amount.bytes, (char *)masked.amount.bytes);
-	hw::ledger::check32("ecdhDecode", "mask", (char *)masked_x.mask.bytes, (char *)masked.mask.bytes);
+	hw::ledger::check32("ecdhDecode", "amount", (char*)masked_x.amount.bytes, (char*)masked.amount.bytes);
+	hw::ledger::check32("ecdhDecode", "mask", (char*)masked_x.mask.bytes, (char*)masked.mask.bytes);
 #endif
 
 	return true;
 }
 
-bool device_ledger::mlsag_prehash(const std::string &blob, size_t inputs_size, size_t outputs_size,
-								  const rct::keyV &hashes, const rct::ctkeyV &outPk,
-								  rct::key &prehash)
+bool device_ledger::mlsag_prehash(const std::string& blob, size_t inputs_size, size_t outputs_size,
+	const rct::keyV& hashes, const rct::ctkeyV& outPk,
+	rct::key& prehash)
 {
 	AUTO_LOCK_CMD();
 	unsigned int data_offset, C_offset, kv_offset, i;
-	const char *data;
+	const char* data;
 
 #ifdef DEBUG_HWDEVICE
 	const std::string blob_x = blob;
@@ -1768,7 +1768,7 @@ bool device_ledger::mlsag_prehash(const std::string &blob, size_t inputs_size, s
 		found = this->key_map.find(outPk[i].dest, outKeys);
 		if(!found)
 		{
-			log_hexbuffer("Pout not found", (char *)outPk[i].dest.bytes, 32);
+			log_hexbuffer("Pout not found", (char*)outPk[i].dest.bytes, 32);
 			CHECK_AND_ASSERT_THROW_MES(found, "Pout not found");
 		}
 		reset_buffer();
@@ -1819,7 +1819,7 @@ bool device_ledger::mlsag_prehash(const std::string &blob, size_t inputs_size, s
 		this->length_send = offset;
 		this->exchange();
 #ifdef DEBUG_HWDEVICE
-		hw::ledger::log_hexbuffer("Prehash AKV input", (char *)&this->buffer_recv[64], 3 * 32);
+		hw::ledger::log_hexbuffer("Prehash AKV input", (char*)&this->buffer_recv[64], 3 * 32);
 #endif
 	}
 
@@ -1873,14 +1873,14 @@ bool device_ledger::mlsag_prehash(const std::string &blob, size_t inputs_size, s
 	memmove(prehash.bytes, this->buffer_recv, 32);
 
 #ifdef DEBUG_HWDEVICE
-	hw::ledger::check32("mlsag_prehash", "prehash", (char *)prehash_x.bytes, (char *)prehash.bytes);
+	hw::ledger::check32("mlsag_prehash", "prehash", (char*)prehash_x.bytes, (char*)prehash.bytes);
 #endif
 
 	return true;
 }
 
-bool device_ledger::mlsag_prepare(const rct::key &H, const rct::key &xx,
-								  rct::key &a, rct::key &aG, rct::key &aHP, rct::key &II)
+bool device_ledger::mlsag_prepare(const rct::key& H, const rct::key& xx,
+	rct::key& a, rct::key& aG, rct::key& aHP, rct::key& II)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -1928,15 +1928,15 @@ bool device_ledger::mlsag_prepare(const rct::key &H, const rct::key &xx,
 	rct::scalarmultBase(aG_x, a_x);
 	rct::scalarmultKey(aHP_x, H_x, a_x);
 	rct::scalarmultKey(II_x, H_x, xx_x);
-	hw::ledger::check32("mlsag_prepare", "AG", (char *)aG_x.bytes, (char *)aG.bytes);
-	hw::ledger::check32("mlsag_prepare", "aHP", (char *)aHP_x.bytes, (char *)aHP.bytes);
-	hw::ledger::check32("mlsag_prepare", "II", (char *)II_x.bytes, (char *)II.bytes);
+	hw::ledger::check32("mlsag_prepare", "AG", (char*)aG_x.bytes, (char*)aG.bytes);
+	hw::ledger::check32("mlsag_prepare", "aHP", (char*)aHP_x.bytes, (char*)aHP.bytes);
+	hw::ledger::check32("mlsag_prepare", "II", (char*)II_x.bytes, (char*)II.bytes);
 #endif
 
 	return true;
 }
 
-bool device_ledger::mlsag_prepare(rct::key &a, rct::key &aG)
+bool device_ledger::mlsag_prepare(rct::key& a, rct::key& aG)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -1969,13 +1969,13 @@ bool device_ledger::mlsag_prepare(rct::key &a, rct::key &aG)
 #ifdef DEBUG_HWDEVICE
 	a_x = hw::ledger::decrypt(a);
 	rct::scalarmultBase(aG_x, a_x);
-	hw::ledger::check32("mlsag_prepare", "AG", (char *)aG_x.bytes, (char *)aG.bytes);
+	hw::ledger::check32("mlsag_prepare", "AG", (char*)aG_x.bytes, (char*)aG.bytes);
 #endif
 
 	return true;
 }
 
-bool device_ledger::mlsag_hash(const rct::keyV &long_message, rct::key &c)
+bool device_ledger::mlsag_hash(const rct::keyV& long_message, rct::key& c)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -2015,13 +2015,13 @@ bool device_ledger::mlsag_hash(const rct::keyV &long_message, rct::key &c)
 	memmove(c.bytes, &this->buffer_recv[0], 32);
 
 #ifdef DEBUG_HWDEVICE
-	hw::ledger::check32("mlsag_hash", "c", (char *)c_x.bytes, (char *)c.bytes);
+	hw::ledger::check32("mlsag_hash", "c", (char*)c_x.bytes, (char*)c.bytes);
 #endif
 
 	return true;
 }
 
-bool device_ledger::mlsag_sign(const rct::key &c, const rct::keyV &xx, const rct::keyV &alpha, const size_t rows, const size_t dsRows, rct::keyV &ss)
+bool device_ledger::mlsag_sign(const rct::key& c, const rct::keyV& xx, const rct::keyV& alpha, const size_t rows, const size_t dsRows, rct::keyV& ss)
 {
 	AUTO_LOCK_CMD();
 	int offset;
@@ -2081,7 +2081,7 @@ bool device_ledger::mlsag_sign(const rct::key &c, const rct::keyV &xx, const rct
 #ifdef DEBUG_HWDEVICE
 	for(size_t j = 0; j < rows; j++)
 	{
-		hw::ledger::check32("mlsag_sign", "ss[" + std::to_string(j) + "]", (char *)ss_x[j].bytes, (char *)ss[j].bytes);
+		hw::ledger::check32("mlsag_sign", "ss[" + std::to_string(j) + "]", (char*)ss_x[j].bytes, (char*)ss[j].bytes);
 	}
 #endif
 
@@ -2114,8 +2114,8 @@ bool device_ledger::close_tx()
 
 /* ---------------------------------------------------------- */
 
-static device_ledger *legder_device = NULL;
-void register_all(std::map<std::string, std::unique_ptr<device>> &registry)
+static device_ledger* legder_device = NULL;
+void register_all(std::map<std::string, std::unique_ptr<device>>& registry)
 {
 	if(!legder_device)
 	{
@@ -2127,10 +2127,10 @@ void register_all(std::map<std::string, std::unique_ptr<device>> &registry)
 
 #else //WITH_DEVICE_LEDGER
 
-void register_all(std::map<std::string, std::unique_ptr<device>> &registry)
+void register_all(std::map<std::string, std::unique_ptr<device>>& registry)
 {
 }
 
 #endif //WITH_DEVICE_LEDGER
-}
-}
+} // namespace ledger
+} // namespace hw

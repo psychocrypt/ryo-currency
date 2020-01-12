@@ -86,7 +86,8 @@ extern time_t MAX_NEG_TTL;
  * Data stored in scratch pad memory during parsing.
  * Stores the data that will enter into the msgreply and packet result.
  */
-struct msg_parse {
+struct msg_parse
+{
 	/** id from message, network format. */
 	uint16_t id;
 	/** flags from message, host format. */
@@ -102,7 +103,7 @@ struct msg_parse {
 	/** count of RRsets per section. */
 	size_t an_rrsets;
 	/** count of RRsets per section. */
-	size_t ns_rrsets; 
+	size_t ns_rrsets;
 	/** count of RRsets per section. */
 	size_t ar_rrsets;
 	/** total number of rrsets found. */
@@ -122,7 +123,7 @@ struct msg_parse {
 	 * Based on name, type, class.  Same hash value as in rrset cache.
 	 */
 	struct rrset_parse* hashtable[PARSE_TABLE_SIZE];
-	
+
 	/** linked list of rrsets that have been found (in order). */
 	struct rrset_parse* rrset_first;
 	/** last element of rrset list. */
@@ -132,7 +133,8 @@ struct msg_parse {
 /**
  * Data stored for an rrset during parsing.
  */
-struct rrset_parse {
+struct rrset_parse
+{
 	/** next in hash bucket */
 	struct rrset_parse* rrset_bucket_next;
 	/** next in list of all rrsets */
@@ -172,7 +174,8 @@ struct rrset_parse {
 /**
  * Data stored for an RR during parsing.
  */
-struct rr_parse {
+struct rr_parse
+{
 	/** 
 	 * Pointer to the RR. Points to start of TTL value in the packet.
 	 * Rdata length and rdata follow it.
@@ -189,24 +192,25 @@ struct rr_parse {
 };
 
 /** Check if label length is first octet of a compression pointer, pass u8. */
-#define LABEL_IS_PTR(x) ( ((x)&0xc0) == 0xc0 )
+#define LABEL_IS_PTR(x) (((x)&0xc0) == 0xc0)
 /** Calculate destination offset of a compression pointer. pass first and
  * second octets of the compression pointer. */
-#define PTR_OFFSET(x, y) ( ((x)&0x3f)<<8 | (y) )
+#define PTR_OFFSET(x, y) (((x)&0x3f) << 8 | (y))
 /** create a compression pointer to the given offset. */
 #define PTR_CREATE(offset) ((uint16_t)(0xc000 | (offset)))
 
 /** error codes, extended with EDNS, so > 15. */
-#define EDNS_RCODE_BADVERS	16	/** bad EDNS version */
+#define EDNS_RCODE_BADVERS 16 /** bad EDNS version */
 /** largest valid compression offset */
-#define PTR_MAX_OFFSET 	0x3fff
+#define PTR_MAX_OFFSET 0x3fff
 
 /**
  * EDNS data storage
  * rdata is parsed in a list (has accessor functions). allocated in a
  * region.
  */
-struct edns_data {
+struct edns_data
+{
 	/** if EDNS OPT record was present */
 	int edns_present;
 	/** Extended RCODE */
@@ -224,7 +228,8 @@ struct edns_data {
 /**
  * EDNS option
  */
-struct edns_option {
+struct edns_option
+{
 	/** next item in list */
 	struct edns_option* next;
 	/** type of this edns option */
@@ -251,7 +256,7 @@ size_t get_rdf_size(sldns_rdf_type rdf);
  * @param region: how to alloc results.
  * @return: 0 if OK, or rcode on error.
  */
-int parse_packet(struct sldns_buffer* pkt, struct msg_parse* msg, 
+int parse_packet(struct sldns_buffer* pkt, struct msg_parse* msg,
 	struct regional* region);
 
 /**
@@ -311,8 +316,8 @@ hashvalue_type pkt_hash_rrset(struct sldns_buffer* pkt, uint8_t* dname,
  * @param dclass: rrset class, network order.
  * @return NULL or the rrset_parse if found.
  */
-struct rrset_parse* msgparse_hashtable_lookup(struct msg_parse* msg, 
-	struct sldns_buffer* pkt, hashvalue_type h, uint32_t rrset_flags, 
+struct rrset_parse* msgparse_hashtable_lookup(struct msg_parse* msg,
+	struct sldns_buffer* pkt, hashvalue_type h, uint32_t rrset_flags,
 	uint8_t* dname, size_t dnamelen, uint16_t type, uint16_t dclass);
 
 /**

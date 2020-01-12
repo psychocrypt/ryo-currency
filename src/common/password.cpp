@@ -74,7 +74,7 @@ bool is_cin_tty() noexcept
 	return 0 != _isatty(_fileno(stdin));
 }
 
-bool read_from_tty(epee::wipeable_string &pass)
+bool read_from_tty(epee::wipeable_string& pass)
 {
 	static constexpr const char BACKSPACE = 8;
 
@@ -144,7 +144,7 @@ int getch() noexcept
 	return ch;
 }
 
-bool read_from_tty(epee::wipeable_string &aPass)
+bool read_from_tty(epee::wipeable_string& aPass)
 {
 	static constexpr const char BACKSPACE = 127;
 
@@ -179,7 +179,7 @@ bool read_from_tty(epee::wipeable_string &aPass)
 
 #endif // end !WIN32
 
-bool read_from_tty(const bool verify, const char *message, epee::wipeable_string &pass1, epee::wipeable_string &pass2)
+bool read_from_tty(const bool verify, const char* message, epee::wipeable_string& pass1, epee::wipeable_string& pass2)
 {
 	while(true)
 	{
@@ -209,7 +209,7 @@ bool read_from_tty(const bool verify, const char *message, epee::wipeable_string
 	return false;
 }
 
-bool read_from_file(epee::wipeable_string &pass)
+bool read_from_file(epee::wipeable_string& pass)
 {
 	pass.reserve(tools::password_container::max_password_size);
 	for(size_t i = 0; i < tools::password_container::max_password_size; ++i)
@@ -236,9 +236,10 @@ bool read_from_file(epee::wipeable_string &pass)
 namespace tools
 {
 // deleted via private member
-password_container::password_container() noexcept : m_password() {}
-password_container::password_container(std::string &&password) noexcept
-	: m_password(std::move(password))
+password_container::password_container() noexcept :
+	m_password() {}
+password_container::password_container(std::string&& password) noexcept :
+	m_password(std::move(password))
 {
 }
 
@@ -249,7 +250,7 @@ password_container::~password_container() noexcept
 
 std::atomic<bool> password_container::is_prompting(false);
 
-boost::optional<password_container> password_container::prompt(const bool verify, const char *message)
+boost::optional<password_container> password_container::prompt(const bool verify, const char* message)
 {
 	is_prompting = true;
 	password_container pass1{};
@@ -264,7 +265,7 @@ boost::optional<password_container> password_container::prompt(const bool verify
 	return boost::none;
 }
 
-boost::optional<login> login::parse(std::string &&userpass, bool verify, const std::function<boost::optional<password_container>(bool)> &prompt)
+boost::optional<login> login::parse(std::string&& userpass, bool verify, const std::function<boost::optional<password_container>(bool)>& prompt)
 {
 	login out{};
 
@@ -286,4 +287,4 @@ boost::optional<login> login::parse(std::string &&userpass, bool verify, const s
 	password_container wipe{std::move(userpass)};
 	return {std::move(out)};
 }
-}
+} // namespace tools

@@ -52,7 +52,7 @@ namespace md5
 #endif
 
 /* POINTER defines a generic pointer type */
-typedef unsigned char *POINTER;
+typedef unsigned char* POINTER;
 
 /* UINT2 defines a two byte word */
 typedef unsigned short int UINT2;
@@ -70,6 +70,6 @@ typedef unsigned int UINT4;
 #else
 #define PROTO_LIST(list) ()
 #endif
-}
+} // namespace md5
 
 #endif

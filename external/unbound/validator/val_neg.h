@@ -64,7 +64,8 @@ struct ub_packed_rrset_key;
  * It contains a tree of zones, every zone has a tree of data elements.
  * The data elements are part of one big LRU list, with one memory counter.
  */
-struct val_neg_cache {
+struct val_neg_cache
+{
 	/** the big lock on the negative cache.  Because we use a rbtree 
 	 * for the data (quick lookup), we need a big lock */
 	lock_basic_type lock;
@@ -85,7 +86,8 @@ struct val_neg_cache {
 /**
  * Per Zone aggressive negative caching data.
  */
-struct val_neg_zone {
+struct val_neg_zone
+{
 	/** rbtree node element, key is this struct: the name, class */
 	rbnode_type node;
 	/** name; the key */
@@ -133,7 +135,8 @@ struct val_neg_zone {
  * There is no actual data stored in this data element, if it is in_use,
  * then the data can (possibly) be found in the rrset cache.
  */
-struct val_neg_data {
+struct val_neg_data
+{
 	/** rbtree node element, key is this struct: the name */
 	rbnode_type node;
 	/** name; the key */
@@ -255,11 +258,10 @@ int val_neg_dlvlookup(struct val_neg_cache* neg, uint8_t* qname, size_t len,
  * 	This reply may still need validation.
  * 	NULL if nothing found (or out of memory).
  */
-struct dns_msg* val_neg_getmsg(struct val_neg_cache* neg, 
-	struct query_info* qinfo, struct regional* region, 
+struct dns_msg* val_neg_getmsg(struct val_neg_cache* neg,
+	struct query_info* qinfo, struct regional* region,
 	struct rrset_cache* rrset_cache, struct sldns_buffer* buf, time_t now,
 	int addsoa, uint8_t* topname, struct config_file* cfg);
-
 
 /**** functions exposed for unit test ****/
 /**
@@ -270,7 +272,7 @@ struct dns_msg* val_neg_getmsg(struct val_neg_cache* neg,
  * @param nsec: record to insert.
  */
 void neg_insert_data(struct val_neg_cache* neg,
-        struct val_neg_zone* zone, struct ub_packed_rrset_key* nsec);
+	struct val_neg_zone* zone, struct ub_packed_rrset_key* nsec);
 
 /**
  * Delete a data element from the negative cache.
@@ -292,7 +294,7 @@ void neg_delete_data(struct val_neg_cache* neg, struct val_neg_data* el);
  * @return zone or NULL if not found.
  */
 struct val_neg_zone* neg_find_zone(struct val_neg_cache* neg,
-        uint8_t* nm, size_t len, uint16_t dclass);
+	uint8_t* nm, size_t len, uint16_t dclass);
 
 /**
  * Create a new zone.
@@ -304,7 +306,7 @@ struct val_neg_zone* neg_find_zone(struct val_neg_cache* neg,
  * @return zone or NULL if out of memory.
  */
 struct val_neg_zone* neg_create_zone(struct val_neg_cache* neg,
-        uint8_t* nm, size_t nm_len, uint16_t dclass);
+	uint8_t* nm, size_t nm_len, uint16_t dclass);
 
 /**
  * take a zone into use. increases counts of parents.

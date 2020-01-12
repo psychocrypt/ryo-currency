@@ -52,7 +52,8 @@ struct sldns_buffer;
  * Listening for queries structure.
  * Contains list of query-listen sockets.
  */
-struct listen_dnsport {
+struct listen_dnsport
+{
 	/** Base for select calls */
 	struct comm_base* base;
 
@@ -69,7 +70,8 @@ struct listen_dnsport {
 /**
  * Single linked list to store event points.
  */
-struct listen_list {
+struct listen_list
+{
 	/** next in list */
 	struct listen_list* next;
 	/** event info */
@@ -79,7 +81,8 @@ struct listen_list {
 /**
  * type of ports
  */
-enum listen_type {
+enum listen_type
+{
 	/** udp type */
 	listen_type_udp,
 	/** tcp type */
@@ -101,7 +104,8 @@ enum listen_type {
  * Single linked list to store shared ports that have been 
  * opened for use by all threads.
  */
-struct listen_port {
+struct listen_port
+{
 	/** next in list */
 	struct listen_port* next;
 	/** file descriptor, open and ready for use */
@@ -146,7 +150,7 @@ void listening_ports_free(struct listen_port* list);
  */
 struct listen_dnsport* listen_create(struct comm_base* base,
 	struct listen_port* ports, size_t bufsize, int tcp_accept_count,
-	void* sslctx, struct dt_env *dtenv, comm_point_callback_type* cb,
+	void* sslctx, struct dt_env* dtenv, comm_point_callback_type* cb,
 	void* cb_arg);
 
 /**
@@ -203,7 +207,7 @@ void listen_start_accept(struct listen_dnsport* listen);
  * @param use_systemd: if true, fetch sockets from systemd.
  * @return: the socket. -1 on error.
  */
-int create_udp_sock(int family, int socktype, struct sockaddr* addr, 
+int create_udp_sock(int family, int socktype, struct sockaddr* addr,
 	socklen_t addrlen, int v6only, int* inuse, int* noproto, int rcv,
 	int snd, int listen, int* reuseport, int transparent, int freebind, int use_systemd);
 
@@ -220,7 +224,7 @@ int create_udp_sock(int family, int socktype, struct sockaddr* addr,
  * @param use_systemd: if true, fetch sockets from systemd.
  * @return: the socket. -1 on error.
  */
-int create_tcp_accept_sock(struct addrinfo *addr, int v6only, int* noproto,
+int create_tcp_accept_sock(struct addrinfo* addr, int v6only, int* noproto,
 	int* reuseport, int transparent, int mss, int freebind, int use_systemd);
 
 /**

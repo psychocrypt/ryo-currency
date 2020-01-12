@@ -17,7 +17,7 @@
 namespace
 {
 cryptonote::transaction
-make_miner_transaction(cryptonote::account_public_address const &to)
+make_miner_transaction(cryptonote::account_public_address const& to)
 {
 	cryptonote::transaction tx{};
 	if(!cryptonote::construct_miner_tx(cryptonote::MAINNET, 0, 0, 5000, 500, 500, to, tx))
@@ -32,15 +32,15 @@ make_miner_transaction(cryptonote::account_public_address const &to)
 
 cryptonote::transaction
 make_transaction(
-	cryptonote::account_keys const &from,
-	std::vector<cryptonote::transaction> const &sources,
-	std::vector<cryptonote::account_public_address> const &destinations,
+	cryptonote::account_keys const& from,
+	std::vector<cryptonote::transaction> const& sources,
+	std::vector<cryptonote::account_public_address> const& destinations,
 	bool rct,
 	bool bulletproof)
 {
 	std::uint64_t source_amount = 0;
 	std::vector<cryptonote::tx_source_entry> actual_sources;
-	for(auto const &source : sources)
+	for(auto const& source : sources)
 	{
 		std::vector<cryptonote::tx_extra_field> extra_fields;
 		if(!cryptonote::parse_tx_extra(source.extra, extra_fields))
@@ -50,10 +50,10 @@ make_transaction(
 		if(!cryptonote::find_tx_extra_field_by_type(extra_fields, key_field))
 			throw std::runtime_error{"invalid transaction"};
 
-		for(auto const &input : boost::adaptors::index(source.vout))
+		for(auto const& input : boost::adaptors::index(source.vout))
 		{
 			source_amount += input.value().amount;
-			auto const &key = boost::get<cryptonote::txout_to_key>(input.value().target);
+			auto const& key = boost::get<cryptonote::txout_to_key>(input.value().target);
 
 			actual_sources.push_back(
 				{{}, 0, key_field.pub_key, {}, std::size_t(input.index()), input.value().amount, rct, rct::identity()});
@@ -64,7 +64,7 @@ make_transaction(
 	}
 
 	std::vector<cryptonote::tx_destination_entry> to;
-	for(auto const &destination : destinations)
+	for(auto const& destination : destinations)
 		to.push_back({(source_amount / destinations.size()), destination, false});
 
 	cryptonote::transaction tx{};
@@ -80,7 +80,7 @@ make_transaction(
 
 	return tx;
 }
-} // anonymous
+} // namespace
 
 TEST(JsonSerialization, MinerTransaction)
 {

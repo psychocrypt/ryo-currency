@@ -35,6 +35,6 @@ namespace net_utils
 {
 typedef cp_server_impl<levin::protocol_handler> cp_levin_server;
 }
-}
+} // namespace epee
 
 #endif

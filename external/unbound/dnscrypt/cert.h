@@ -14,19 +14,19 @@
 
 #define CERT_FILE_EXPIRE_DAYS 365
 
-struct SignedCert {
-    uint8_t magic_cert[4];
-    uint8_t version_major[2];
-    uint8_t version_minor[2];
+struct SignedCert
+{
+	uint8_t magic_cert[4];
+	uint8_t version_major[2];
+	uint8_t version_minor[2];
 
-    // Signed Content
-    uint8_t signed_content[64];
-    uint8_t server_publickey[crypto_box_PUBLICKEYBYTES];
-    uint8_t magic_query[8];
-    uint8_t serial[4];
-    uint8_t ts_begin[4];
-    uint8_t ts_end[4];
+	// Signed Content
+	uint8_t signed_content[64];
+	uint8_t server_publickey[crypto_box_PUBLICKEYBYTES];
+	uint8_t magic_query[8];
+	uint8_t serial[4];
+	uint8_t ts_begin[4];
+	uint8_t ts_end[4];
 };
-
 
 #endif

@@ -116,7 +116,7 @@ inline void soft_aes_genkey_sub(aeskeydata& xout0, aeskeydata& xout2)
 }
 
 inline void aes_genkey(const uint8_t* memory, uint8x16_t& k0, uint8x16_t& k1, uint8x16_t& k2, uint8x16_t& k3, uint8x16_t& k4,
-					   uint8x16_t& k5, uint8x16_t& k6, uint8x16_t& k7, uint8x16_t& k8, uint8x16_t& k9)
+	uint8x16_t& k5, uint8x16_t& k6, uint8x16_t& k7, uint8x16_t& k8, uint8x16_t& k9)
 {
 	aeskeydata xout0(memory);
 	aeskeydata xout2(memory + 16);
@@ -142,7 +142,7 @@ inline void aes_genkey(const uint8_t* memory, uint8x16_t& k0, uint8x16_t& k1, ui
 }
 
 inline void aes_round10(uint8x16_t& x, const uint8x16_t& k0, const uint8x16_t& k1, const uint8x16_t& k2, const uint8x16_t& k3,
-						const uint8x16_t& k4, const uint8x16_t& k5, const uint8x16_t& k6, const uint8x16_t& k7, const uint8x16_t& k8, const uint8x16_t& k9)
+	const uint8x16_t& k4, const uint8x16_t& k5, const uint8x16_t& k6, const uint8x16_t& k7, const uint8x16_t& k8, const uint8x16_t& k9)
 {
 	x = vaesmcq_u8(vaeseq_u8(x, vdupq_n_u8(0)));
 	x = vaesmcq_u8(vaeseq_u8(x, k0));
@@ -410,7 +410,7 @@ inline void prep_dv(cn_sptr& idx, int32x4_t& v, float32x4_t& n)
 
 // 14
 inline void sub_round(const float32x4_t& n0, const float32x4_t& n1, const float32x4_t& n2, const float32x4_t& n3,
-					  const float32x4_t& rnd_c, float32x4_t& n, float32x4_t& d, float32x4_t& c)
+	const float32x4_t& rnd_c, float32x4_t& n, float32x4_t& d, float32x4_t& c)
 {
 	float32x4_t ln1 = vaddq_f32(n1, c);
 	float32x4_t nn = vmulq_f32(n0, c);
@@ -436,7 +436,7 @@ inline void sub_round(const float32x4_t& n0, const float32x4_t& n1, const float3
 }
 
 inline void round_compute(const float32x4_t& n0, const float32x4_t& n1, const float32x4_t& n2, const float32x4_t& n3,
-						  const float32x4_t& rnd_c, float32x4_t& c, float32x4_t& r)
+	const float32x4_t& rnd_c, float32x4_t& c, float32x4_t& r)
 {
 	float32x4_t n = vdupq_n_f32(0.0f), d = vdupq_n_f32(0.0f);
 
@@ -457,7 +457,7 @@ inline void round_compute(const float32x4_t& n0, const float32x4_t& n1, const fl
 
 template <bool add>
 inline int32x4_t single_comupte(const float32x4_t& n0, const float32x4_t& n1, const float32x4_t& n2, const float32x4_t& n3,
-								float cnt, const float32x4_t& rnd_c, float32x4_t& sum)
+	float cnt, const float32x4_t& rnd_c, float32x4_t& sum)
 {
 	float32x4_t c = vdupq_n_f32(cnt);
 	float32x4_t r = vdupq_n_f32(0.0f);
@@ -483,7 +483,7 @@ inline int32x4_t single_comupte(const float32x4_t& n0, const float32x4_t& n1, co
 
 template <size_t rot>
 inline void single_comupte_wrap(const float32x4_t& n0, const float32x4_t& n1, const float32x4_t& n2, const float32x4_t& n3,
-								float cnt, const float32x4_t& rnd_c, float32x4_t& sum, int32x4_t& out)
+	float cnt, const float32x4_t& rnd_c, float32x4_t& sum, int32x4_t& out)
 {
 	int32x4_t r = single_comupte<rot % 2 != 0>(n0, n1, n2, n3, cnt, rnd_c, sum);
 	vrot_si32<rot>(r);

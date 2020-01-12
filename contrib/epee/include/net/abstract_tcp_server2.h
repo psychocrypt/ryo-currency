@@ -54,8 +54,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/thread.hpp>
 
-
-
 #define ABSTRACT_SERVER_SEND_QUE_MAX_COUNT 1000
 
 namespace epee
@@ -65,7 +63,7 @@ namespace net_utils
 
 struct i_connection_filter
 {
-	virtual bool is_remote_host_allowed(const epee::net_utils::network_address &address) = 0;
+	virtual bool is_remote_host_allowed(const epee::net_utils::network_address& address) = 0;
 
   protected:
 	virtual ~i_connection_filter() {}
@@ -83,24 +81,25 @@ class connection
 	  public connection_basic
 {
 	GULPS_CAT_MAJOR("epee_tcp_srv");
+
   public:
 	typedef typename t_protocol_handler::connection_context t_connection_context;
 	/// Construct a connection with the given io_service.
 
-	explicit connection(boost::asio::io_service &io_service,
-						typename t_protocol_handler::config_type &config,
-						std::atomic<long> &ref_sock_count, // the ++/-- counter
-						std::atomic<long> &sock_number,	// the only increasing ++ number generator
-						i_connection_filter *&pfilter, t_connection_type connection_type);
+	explicit connection(boost::asio::io_service& io_service,
+		typename t_protocol_handler::config_type& config,
+		std::atomic<long>& ref_sock_count, // the ++/-- counter
+		std::atomic<long>& sock_number,	// the only increasing ++ number generator
+		i_connection_filter*& pfilter, t_connection_type connection_type);
 
 	virtual ~connection() noexcept(false);
 	/// Get the socket associated with the connection.
-	boost::asio::ip::tcp::socket &socket();
+	boost::asio::ip::tcp::socket& socket();
 
 	/// Start the first asynchronous operation for the connection.
 	bool start(bool is_income, bool is_multithreaded);
 
-	void get_context(t_connection_context &context_) { context_ = context; }
+	void get_context(t_connection_context& context_) { context_ = context; }
 
 	void call_back_starter();
 
@@ -112,23 +111,23 @@ class connection
 
   private:
 	//----------------- i_service_endpoint ---------------------
-	virtual bool do_send(const void *ptr, size_t cb);		///< (see do_send from i_service_endpoint)
-	virtual bool do_send_chunk(const void *ptr, size_t cb); ///< will send (or queue) a part of data
+	virtual bool do_send(const void* ptr, size_t cb);		///< (see do_send from i_service_endpoint)
+	virtual bool do_send_chunk(const void* ptr, size_t cb); ///< will send (or queue) a part of data
 	virtual bool close();
 	virtual bool call_run_once_service_io();
 	virtual bool request_callback();
-	virtual boost::asio::io_service &get_io_service();
+	virtual boost::asio::io_service& get_io_service();
 	virtual bool add_ref();
 	virtual bool release();
 	//------------------------------------------------------
 	boost::shared_ptr<connection<t_protocol_handler>> safe_shared_from_this();
 	bool shutdown();
 	/// Handle completion of a read operation.
-	void handle_read(const boost::system::error_code &e,
-					 std::size_t bytes_transferred);
+	void handle_read(const boost::system::error_code& e,
+		std::size_t bytes_transferred);
 
 	/// Handle completion of a write operation.
-	void handle_write(const boost::system::error_code &e, size_t cb);
+	void handle_write(const boost::system::error_code& e, size_t cb);
 
 	/// reset connection timeout timer and callback
 	void reset_timer(boost::posix_time::milliseconds ms, bool add);
@@ -140,7 +139,7 @@ class connection
 	//boost::array<char, 1024> buffer_;
 
 	t_connection_context context;
-	i_connection_filter *&m_pfilter;
+	i_connection_filter*& m_pfilter;
 
 	// TODO what do they mean about wait on destructor?? --rfree :
 	//this should be the last one, because it could be wait on destructor, while other activities possible on other threads
@@ -179,17 +178,17 @@ class boosted_tcp_server
 	/// serve up files from the given directory.
 
 	boosted_tcp_server(t_connection_type connection_type);
-	explicit boosted_tcp_server(boost::asio::io_service &external_io_service, t_connection_type connection_type);
+	explicit boosted_tcp_server(boost::asio::io_service& external_io_service, t_connection_type connection_type);
 	~boosted_tcp_server();
 
 	std::map<std::string, t_connection_type> server_type_map;
 	void create_server_type_map();
 
 	bool init_server(uint32_t port, const std::string address = "0.0.0.0");
-	bool init_server(const std::string port, const std::string &address = "0.0.0.0");
+	bool init_server(const std::string port, const std::string& address = "0.0.0.0");
 
 	/// Run the server's io_service loop.
-	bool run_server(size_t threads_count, bool wait = true, const boost::thread::attributes &attrs = boost::thread::attributes());
+	bool run_server(size_t threads_count, bool wait = true, const boost::thread::attributes& attrs = boost::thread::attributes());
 
 	/// wait for service workers stop
 	bool timed_wait_server_stop(uint64_t wait_mseconds);
@@ -199,19 +198,19 @@ class boosted_tcp_server
 
 	bool is_stop_signal_sent();
 
-	void set_threads_prefix(const std::string &prefix_name);
+	void set_threads_prefix(const std::string& prefix_name);
 
 	bool deinit_server() { return true; }
 
 	size_t get_threads_count() { return m_threads_count; }
 
-	void set_connection_filter(i_connection_filter *pfilter);
+	void set_connection_filter(i_connection_filter* pfilter);
 
-	bool connect(const std::string &adr, const std::string &port, uint32_t conn_timeot, t_connection_context &cn, const std::string &bind_ip = "0.0.0.0");
+	bool connect(const std::string& adr, const std::string& port, uint32_t conn_timeot, t_connection_context& cn, const std::string& bind_ip = "0.0.0.0");
 	template <class t_callback>
-	bool connect_async(const std::string &adr, const std::string &port, uint32_t conn_timeot, const t_callback &cb, const std::string &bind_ip = "0.0.0.0");
+	bool connect_async(const std::string& adr, const std::string& port, uint32_t conn_timeot, const t_callback& cb, const std::string& bind_ip = "0.0.0.0");
 
-	typename t_protocol_handler::config_type &get_config_object() { return m_config; }
+	typename t_protocol_handler::config_type& get_config_object() { return m_config; }
 
 	int get_binded_port() { return m_port; }
 
@@ -221,7 +220,7 @@ class boosted_tcp_server
 		return connections_count;
 	}
 
-	boost::asio::io_service &get_io_service() { return io_service_; }
+	boost::asio::io_service& get_io_service() { return io_service_; }
 
 	struct idle_callback_conext_base
 	{
@@ -229,7 +228,8 @@ class boosted_tcp_server
 
 		virtual bool call_handler() { return true; }
 
-		idle_callback_conext_base(boost::asio::io_service &io_serice) : m_timer(io_serice)
+		idle_callback_conext_base(boost::asio::io_service& io_serice) :
+			m_timer(io_serice)
 		{
 		}
 		boost::asio::deadline_timer m_timer;
@@ -239,8 +239,9 @@ class boosted_tcp_server
 	template <class t_handler>
 	struct idle_callback_conext : public idle_callback_conext_base
 	{
-		idle_callback_conext(boost::asio::io_service &io_serice, t_handler &h, uint64_t period) : idle_callback_conext_base(io_serice),
-																								  m_handler(h)
+		idle_callback_conext(boost::asio::io_service& io_serice, t_handler& h, uint64_t period) :
+			idle_callback_conext_base(io_serice),
+			m_handler(h)
 		{
 			this->m_period = period;
 		}
@@ -286,13 +287,13 @@ class boosted_tcp_server
 	/// Run the server's io_service loop.
 	bool worker_thread();
 	/// Handle completion of an asynchronous accept operation.
-	void handle_accept(const boost::system::error_code &e);
+	void handle_accept(const boost::system::error_code& e);
 
 	bool is_thread_worker();
 
 	/// The io_service used to perform asynchronous operations.
 	std::unique_ptr<boost::asio::io_service> m_io_service_local_instance;
-	boost::asio::io_service &io_service_;
+	boost::asio::io_service& io_service_;
 
 	/// Acceptor used to listen for incoming connections.
 	boost::asio::ip::tcp::acceptor acceptor_;
@@ -304,7 +305,7 @@ class boosted_tcp_server
 	std::string m_address;
 	std::string m_thread_name_prefix; //TODO: change to enum server_type, now used
 	size_t m_threads_count;
-	i_connection_filter *m_pfilter;
+	i_connection_filter* m_pfilter;
 	std::vector<boost::shared_ptr<boost::thread>> m_threads;
 	boost::thread::id m_main_thread_id;
 	critical_section m_threads_lock;
@@ -320,8 +321,8 @@ class boosted_tcp_server
 
 }; // class <>boosted_tcp_server
 
-} // namespace
-} // namespace
+} // namespace net_utils
+} // namespace epee
 
 #include "abstract_tcp_server2.inl"
 

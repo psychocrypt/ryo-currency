@@ -66,7 +66,9 @@ class writer
      * @param filename name of the file, if empty output is written to stdout
      * @param remove_spaces if true print data without spaces
      */
-	writer(const std::string &filename, const bool remove_spaces = false) : m_filename(filename), m_remove_spaces(remove_spaces)
+	writer(const std::string& filename, const bool remove_spaces = false) :
+		m_filename(filename),
+		m_remove_spaces(remove_spaces)
 	{
 		if(!m_filename.empty())
 		{
@@ -83,22 +85,22 @@ class writer
 
 	/*! print data */
 	template <typename T>
-	writer &operator<<(const T &value)
+	writer& operator<<(const T& value)
 	{
 		print(value);
 		return *this;
 	}
 
 	/*! print char arrays */
-	writer &operator<<(const char *value);
+	writer& operator<<(const char* value);
 
 	/*! print single characters */
-	writer &operator<<(const char value);
+	writer& operator<<(const char value);
 
   private:
 	/*! print data to file or stdout */
 	template <typename T>
-	void print(const T &value)
+	void print(const T& value)
 	{
 		if(!m_has_filestream)
 			std::cout << value;
@@ -111,4 +113,4 @@ class writer
 	std::ofstream m_out;
 	bool m_has_filestream = false;
 };
-}
+} // namespace cryptonote

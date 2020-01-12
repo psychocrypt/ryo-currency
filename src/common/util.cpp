@@ -78,17 +78,18 @@ using namespace epee;
 #include <boost/filesystem.hpp>
 #include <openssl/sha.h>
 
-
 namespace tools
 {
 GULPS_CAT_MAJOR("cmn_util");
 std::function<void(int)> signal_handler::m_handler;
 
-private_file::private_file() noexcept : m_handle(), m_filename() {}
+private_file::private_file() noexcept :
+	m_handle(),
+	m_filename() {}
 
-private_file::private_file(std::FILE *handle, std::string &&filename) noexcept
-	: m_handle(handle),
-	  m_filename(std::move(filename)) {}
+private_file::private_file(std::FILE* handle, std::string&& filename) noexcept :
+	m_handle(handle),
+	m_filename(std::move(filename)) {}
 
 private_file private_file::create(std::string name)
 {
@@ -151,7 +152,7 @@ private_file private_file::create(std::string name)
 		if(0 <= fd)
 		{
 			file.release();
-			std::FILE *real_file = _fdopen(fd, "w");
+			std::FILE* real_file = _fdopen(fd, "w");
 			if(!real_file)
 			{
 				_close(fd);
@@ -178,10 +179,10 @@ private_file private_file::create(std::string name)
 		{
 			struct stat wstats = {};
 			if(fstat(fdw, std::addressof(wstats)) == 0 &&
-			   rstats.st_dev == wstats.st_dev && rstats.st_ino == wstats.st_ino &&
-			   flock(fdw, (LOCK_EX | LOCK_NB)) == 0 && ftruncate(fdw, 0) == 0)
+				rstats.st_dev == wstats.st_dev && rstats.st_ino == wstats.st_ino &&
+				flock(fdw, (LOCK_EX | LOCK_NB)) == 0 && ftruncate(fdw, 0) == 0)
 			{
-				std::FILE *file = fdopen(fdw, "w");
+				std::FILE* file = fdopen(fdw, "w");
 				if(file)
 					return {file, std::move(name)};
 			}
@@ -223,7 +224,7 @@ std::string get_windows_version_display_string()
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-	bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *)&osvi);
+	bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO*)&osvi);
 
 	if(!bOsVersionInfoEx)
 		return pszOS;
@@ -239,7 +240,7 @@ std::string get_windows_version_display_string()
 		GetSystemInfo(&si);
 
 	if(VER_PLATFORM_WIN32_NT == osvi.dwPlatformId &&
-	   osvi.dwMajorVersion > 4)
+		osvi.dwMajorVersion > 4)
 	{
 		StringCchCopy(pszOS, BUFSIZE, TEXT("Microsoft "));
 
@@ -490,7 +491,7 @@ std::string get_default_data_dir()
 	config_folder = get_special_folder_path(CSIDL_COMMON_APPDATA, true) + "\\" + CRYPTONOTE_NAME;
 #else
 	std::string pathRet;
-	char *pszHome = getenv("HOME");
+	char* pszHome = getenv("HOME");
 	if(pszHome == NULL || strlen(pszHome) == 0)
 		pathRet = "/";
 	else
@@ -501,7 +502,7 @@ std::string get_default_data_dir()
 	return config_folder;
 }
 
-bool create_directories_if_necessary(const std::string &path)
+bool create_directories_if_necessary(const std::string& path)
 {
 	namespace fs = boost::filesystem;
 	boost::system::error_code ec;
@@ -524,7 +525,7 @@ bool create_directories_if_necessary(const std::string &path)
 	return res;
 }
 
-std::error_code replace_file(const std::string &replacement_name, const std::string &replaced_name)
+std::error_code replace_file(const std::string& replacement_name, const std::string& replaced_name)
 {
 	int code;
 #if defined(WIN32)
@@ -551,7 +552,7 @@ std::error_code replace_file(const std::string &replacement_name, const std::str
 
 static bool unbound_built_with_threads()
 {
-	ub_ctx *ctx = ub_ctx_create();
+	ub_ctx* ctx = ub_ctx_create();
 	if(!ctx)
 		return false; // cheat a bit, should not happen unless OOM
 	char *ryo = strdup("ryo"), *unbound = strdup("unbound");
@@ -561,7 +562,7 @@ static bool unbound_built_with_threads()
 	// if no threads, bails out early with UB_NOERROR, otherwise fails with UB_AFTERFINAL id already finalized
 	bool with_threads = ub_ctx_async(ctx, 1) != 0; // UB_AFTERFINAL is not defined in public headers, check any error
 	ub_ctx_delete(ctx);
-	GULPSF_LOG_L0("libunbound was built {} threads",  (with_threads ? "with" : "without") );
+	GULPSF_LOG_L0("libunbound was built {} threads", (with_threads ? "with" : "without"));
 	return with_threads;
 }
 
@@ -632,7 +633,7 @@ bool on_startup()
 	sanitize_locale();
 
 #ifdef __GLIBC__
-	const char *ver = gnu_get_libc_version();
+	const char* ver = gnu_get_libc_version();
 	if(!strcmp(ver, "2.25"))
 		GULPS_CAT_WARN("global", "Running with glibc ", ver, " hangs may occur - change glibc version if possible");
 #endif
@@ -661,7 +662,7 @@ namespace
 {
 boost::mutex max_concurrency_lock;
 unsigned max_concurrency = boost::thread::hardware_concurrency();
-}
+} // namespace
 
 void set_max_concurrency(unsigned n)
 {
@@ -680,18 +681,18 @@ unsigned get_max_concurrency()
 	return max_concurrency;
 }
 
-bool is_local_address(const std::string &address)
+bool is_local_address(const std::string& address)
 {
 	// extract host
 	epee::net_utils::http::url_content u_c;
 	if(!epee::net_utils::parse_url(address, u_c))
 	{
-		GULPSF_WARN("Failed to determine whether address '{}' is local, assuming not",  address );
+		GULPSF_WARN("Failed to determine whether address '{}' is local, assuming not", address);
 		return false;
 	}
 	if(u_c.host.empty())
 	{
-		GULPSF_WARN("Failed to determine whether address '{}' is local, assuming not",  address );
+		GULPSF_WARN("Failed to determine whether address '{}' is local, assuming not", address);
 		return false;
 	}
 
@@ -702,19 +703,19 @@ bool is_local_address(const std::string &address)
 	boost::asio::ip::tcp::resolver::iterator i = resolver.resolve(query);
 	while(i != boost::asio::ip::tcp::resolver::iterator())
 	{
-		const boost::asio::ip::tcp::endpoint &ep = *i;
+		const boost::asio::ip::tcp::endpoint& ep = *i;
 		if(ep.address().is_loopback())
 		{
-			GULPSF_LOG_L0("Address '{}' is local",  address );
+			GULPSF_LOG_L0("Address '{}' is local", address);
 			return true;
 		}
 		++i;
 	}
 
-	GULPSF_LOG_L0("Address '{}' is not local",  address );
+	GULPSF_LOG_L0("Address '{}' is not local", address);
 	return false;
 }
-int vercmp(const char *v0, const char *v1)
+int vercmp(const char* v0, const char* v1)
 {
 	std::vector<std::string> f0, f1;
 	boost::split(f0, v0, boost::is_any_of(".-"));
@@ -733,19 +734,19 @@ int vercmp(const char *v0, const char *v1)
 	return 0;
 }
 
-bool sha256sum(const uint8_t *data, size_t len, crypto::hash &hash)
+bool sha256sum(const uint8_t* data, size_t len, crypto::hash& hash)
 {
 	SHA256_CTX ctx;
 	if(!SHA256_Init(&ctx))
 		return false;
 	if(!SHA256_Update(&ctx, data, len))
 		return false;
-	if(!SHA256_Final((unsigned char *)hash.data, &ctx))
+	if(!SHA256_Final((unsigned char*)hash.data, &ctx))
 		return false;
 	return true;
 }
 
-bool sha256sum(const std::string &filename, crypto::hash &hash)
+bool sha256sum(const std::string& filename, crypto::hash& hash)
 {
 	if(!epee::file_io_utils::is_file_exist(filename))
 		return false;
@@ -772,8 +773,8 @@ bool sha256sum(const std::string &filename, crypto::hash &hash)
 		size_left -= read_size;
 	}
 	f.close();
-	if(!SHA256_Final((unsigned char *)hash.data, &ctx))
+	if(!SHA256_Final((unsigned char*)hash.data, &ctx))
 		return false;
 	return true;
 }
-}
+} // namespace tools

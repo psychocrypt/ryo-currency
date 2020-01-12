@@ -36,7 +36,7 @@ class Base58Fuzzer : public Fuzzer
   public:
 	Base58Fuzzer() {}
 	virtual int init();
-	virtual int run(const std::string &filename);
+	virtual int run(const std::string& filename);
 };
 
 int Base58Fuzzer::init()
@@ -44,7 +44,7 @@ int Base58Fuzzer::init()
 	return 0;
 }
 
-int Base58Fuzzer::run(const std::string &filename)
+int Base58Fuzzer::run(const std::string& filename)
 {
 	std::string s;
 
@@ -58,7 +58,7 @@ int Base58Fuzzer::run(const std::string &filename)
 		std::string data;
 		tools::base58::decode(s, data);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		std::cerr << "Failed to load from binary: " << e.what() << std::endl;
 		return 1;
@@ -66,7 +66,7 @@ int Base58Fuzzer::run(const std::string &filename)
 	return 0;
 }
 
-int main(int argc, const char **argv)
+int main(int argc, const char** argv)
 {
 	Base58Fuzzer fuzzer;
 	return run_fuzzer(argc, argv, fuzzer);

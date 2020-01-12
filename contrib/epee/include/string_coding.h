@@ -33,7 +33,7 @@ namespace epee
 {
 namespace string_encoding
 {
-inline std::string convert_to_ansii(const std::wstring &str_from)
+inline std::string convert_to_ansii(const std::wstring& str_from)
 {
 
 	std::string res(str_from.begin(), str_from.end());
@@ -62,12 +62,12 @@ inline std::string convert_to_ansii(const std::wstring &str_from)
 		return str_trgt;*/
 }
 
-inline std::string convert_to_ansii(const std::string &str_from)
+inline std::string convert_to_ansii(const std::string& str_from)
 {
 	return str_from;
 }
 
-inline std::wstring convert_to_unicode(const std::string &str_from)
+inline std::wstring convert_to_unicode(const std::string& str_from)
 {
 	std::wstring result;
 	std::locale loc;
@@ -92,42 +92,42 @@ inline std::wstring convert_to_unicode(const std::string &str_from)
 								(wchar_t*)str_trgt.data(),(int)str_trgt.size());
 		return str_trgt;*/
 }
-inline std::wstring convert_to_unicode(const std::wstring &str_from)
+inline std::wstring convert_to_unicode(const std::wstring& str_from)
 {
 	return str_from;
 }
 
 template <class target_string>
-inline target_string convert_to_t(const std::wstring &str_from);
+inline target_string convert_to_t(const std::wstring& str_from);
 
 template <>
-inline std::string convert_to_t<std::string>(const std::wstring &str_from)
+inline std::string convert_to_t<std::string>(const std::wstring& str_from)
 {
 	return convert_to_ansii(str_from);
 }
 
 template <>
-inline std::wstring convert_to_t<std::wstring>(const std::wstring &str_from)
+inline std::wstring convert_to_t<std::wstring>(const std::wstring& str_from)
 {
 	return str_from;
 }
 
 template <class target_string>
-inline target_string convert_to_t(const std::string &str_from);
+inline target_string convert_to_t(const std::string& str_from);
 
 template <>
-inline std::string convert_to_t<std::string>(const std::string &str_from)
+inline std::string convert_to_t<std::string>(const std::string& str_from)
 {
 	return str_from;
 }
 
 template <>
-inline std::wstring convert_to_t<std::wstring>(const std::string &str_from)
+inline std::wstring convert_to_t<std::wstring>(const std::string& str_from)
 {
 	return convert_to_unicode(str_from);
 }
 
-inline std::string &base64_chars()
+inline std::string& base64_chars()
 {
 
 	static std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -137,7 +137,7 @@ inline std::string &base64_chars()
 	return chars;
 }
 
-inline std::string base64_encode(unsigned char const *bytes_to_encode, size_t in_len)
+inline std::string base64_encode(unsigned char const* bytes_to_encode, size_t in_len)
 {
 	std::string ret;
 	int i = 0;
@@ -181,9 +181,9 @@ inline std::string base64_encode(unsigned char const *bytes_to_encode, size_t in
 	return ret;
 }
 
-inline std::string base64_encode(const std::string &str)
+inline std::string base64_encode(const std::string& str)
 {
-	return base64_encode((unsigned char const *)str.data(), str.size());
+	return base64_encode((unsigned char const*)str.data(), str.size());
 }
 
 inline bool is_base64(unsigned char c)
@@ -191,7 +191,7 @@ inline bool is_base64(unsigned char c)
 	return (isalnum(c) || (c == '+') || (c == '/'));
 }
 
-inline std::string base64_decode(std::string const &encoded_string)
+inline std::string base64_decode(std::string const& encoded_string)
 {
 	size_t in_len = encoded_string.size();
 	size_t i = 0;
@@ -237,7 +237,7 @@ inline std::string base64_decode(std::string const &encoded_string)
 
 	return ret;
 }
-}
-}
+} // namespace string_encoding
+} // namespace epee
 
 #endif //_STRING_CODING_H_

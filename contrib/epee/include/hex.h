@@ -44,7 +44,7 @@ struct to_hex
 
 	//! \return An array containing hex of `src`.
 	template <std::size_t N>
-	static std::array<char, N * 2> array(const std::array<std::uint8_t, N> &src) noexcept
+	static std::array<char, N * 2> array(const std::array<std::uint8_t, N>& src) noexcept
 	{
 		std::array<char, N * 2> out{{}};
 		static_assert(N <= 128, "keep the stack size down");
@@ -53,13 +53,13 @@ struct to_hex
 	}
 
 	//! Append `src` as hex to `out`.
-	static void buffer(std::ostream &out, const span<const std::uint8_t> src);
+	static void buffer(std::ostream& out, const span<const std::uint8_t> src);
 
 	//! Append `< + src + >` as hex to `out`.
-	static void formatted(std::ostream &out, const span<const std::uint8_t> src);
+	static void formatted(std::ostream& out, const span<const std::uint8_t> src);
 
   private:
 	//! Write `src` bytes as hex to `out`. `out` must be twice the length
-	static void buffer_unchecked(char *out, const span<const std::uint8_t> src) noexcept;
+	static void buffer_unchecked(char* out, const span<const std::uint8_t> src) noexcept;
 };
-}
+} // namespace epee

@@ -11,13 +11,14 @@
 #include "miniupnpc_declspec.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/* strupnperror()
+	/* strupnperror()
  * Return a string description of the UPnP error code
  * or NULL for undefinded errors */
-MINIUPNP_LIBSPEC const char * strupnperror(int err);
+	MINIUPNP_LIBSPEC const char* strupnperror(int err);
 
 #ifdef __cplusplus
 }

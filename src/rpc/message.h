@@ -57,7 +57,7 @@
 	if(runtime_str == type::name)                                                   \
 	{                                                                               \
 		type::Request reqvar;                                                       \
-		type::Response *respvar = new type::Response();                             \
+		type::Response* respvar = new type::Response();                             \
                                                                                     \
 		reqvar.fromJson(reqjson);                                                   \
                                                                                     \
@@ -75,19 +75,20 @@ namespace rpc
 class Message
 {
   public:
-	static const char *STATUS_OK;
-	static const char *STATUS_RETRY;
-	static const char *STATUS_FAILED;
-	static const char *STATUS_BAD_REQUEST;
-	static const char *STATUS_BAD_JSON;
+	static const char* STATUS_OK;
+	static const char* STATUS_RETRY;
+	static const char* STATUS_FAILED;
+	static const char* STATUS_BAD_REQUEST;
+	static const char* STATUS_BAD_JSON;
 
-	Message() : status(STATUS_OK) {}
+	Message() :
+		status(STATUS_OK) {}
 
 	virtual ~Message() {}
 
-	virtual rapidjson::Value toJson(rapidjson::Document &doc) const;
+	virtual rapidjson::Value toJson(rapidjson::Document& doc) const;
 
-	virtual void fromJson(rapidjson::Value &val);
+	virtual void fromJson(rapidjson::Value& val);
 
 	std::string status;
 	std::string error_details;
@@ -99,46 +100,47 @@ class FullMessage
   public:
 	~FullMessage() {}
 
-	FullMessage(FullMessage &&rhs) noexcept : doc(std::move(rhs.doc)) {}
+	FullMessage(FullMessage&& rhs) noexcept :
+		doc(std::move(rhs.doc)) {}
 
-	FullMessage(const std::string &json_string, bool request = false);
+	FullMessage(const std::string& json_string, bool request = false);
 
 	std::string getJson();
 
 	std::string getRequestType() const;
 
-	rapidjson::Value &getMessage();
+	rapidjson::Value& getMessage();
 
 	rapidjson::Value getMessageCopy();
 
-	rapidjson::Value &getID();
+	rapidjson::Value& getID();
 
-	void setID(rapidjson::Value &id);
+	void setID(rapidjson::Value& id);
 
 	cryptonote::rpc::error getError();
 
-	static FullMessage requestMessage(const std::string &request, Message *message);
-	static FullMessage requestMessage(const std::string &request, Message *message, rapidjson::Value &id);
+	static FullMessage requestMessage(const std::string& request, Message* message);
+	static FullMessage requestMessage(const std::string& request, Message* message, rapidjson::Value& id);
 
-	static FullMessage responseMessage(Message *message);
-	static FullMessage responseMessage(Message *message, rapidjson::Value &id);
+	static FullMessage responseMessage(Message* message);
+	static FullMessage responseMessage(Message* message, rapidjson::Value& id);
 
-	static FullMessage *timeoutMessage();
+	static FullMessage* timeoutMessage();
 
   private:
 	FullMessage() = default;
 
-	FullMessage(const std::string &request, Message *message);
-	FullMessage(Message *message);
+	FullMessage(const std::string& request, Message* message);
+	FullMessage(Message* message);
 
 	rapidjson::Document doc;
 };
 
 // convenience functions for bad input
-std::string BAD_REQUEST(const std::string &request);
-std::string BAD_REQUEST(const std::string &request, rapidjson::Value &id);
+std::string BAD_REQUEST(const std::string& request);
+std::string BAD_REQUEST(const std::string& request, rapidjson::Value& id);
 
-std::string BAD_JSON(const std::string &error_details);
+std::string BAD_JSON(const std::string& error_details);
 
 } // namespace rpc
 

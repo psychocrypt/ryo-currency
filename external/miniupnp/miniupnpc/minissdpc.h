@@ -20,39 +20,39 @@
 #define MINISSDPC_INVALID_SERVER_REPLY (-104)
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #if !(defined(_WIN32) || defined(__amigaos__) || defined(__amigaos4__))
 
-MINIUPNP_LIBSPEC struct UPNPDev *
-getDevicesFromMiniSSDPD(const char * devtype, const char * socketpath, int * error);
+	MINIUPNP_LIBSPEC struct UPNPDev*
+	getDevicesFromMiniSSDPD(const char* devtype, const char* socketpath, int* error);
 
-MINIUPNP_LIBSPEC int
-connectToMiniSSDPD(const char * socketpath);
+	MINIUPNP_LIBSPEC int
+	connectToMiniSSDPD(const char* socketpath);
 
-MINIUPNP_LIBSPEC int
-disconnectFromMiniSSDPD(int fd);
+	MINIUPNP_LIBSPEC int
+	disconnectFromMiniSSDPD(int fd);
 
-MINIUPNP_LIBSPEC int
-requestDevicesFromMiniSSDPD(int fd, const char * devtype);
+	MINIUPNP_LIBSPEC int
+	requestDevicesFromMiniSSDPD(int fd, const char* devtype);
 
-MINIUPNP_LIBSPEC struct UPNPDev *
-receiveDevicesFromMiniSSDPD(int fd, int * error);
+	MINIUPNP_LIBSPEC struct UPNPDev*
+	receiveDevicesFromMiniSSDPD(int fd, int* error);
 
 #endif /* !(defined(_WIN32) || defined(__amigaos__) || defined(__amigaos4__)) */
 
-MINIUPNP_LIBSPEC struct UPNPDev *
-ssdpDiscoverDevices(const char * const deviceTypes[],
-                    int delay, const char * multicastif,
-                    int localport,
-                    int ipv6, unsigned char ttl,
-                    int * error,
-                    int searchalltypes);
+	MINIUPNP_LIBSPEC struct UPNPDev*
+	ssdpDiscoverDevices(const char* const deviceTypes[],
+		int delay, const char* multicastif,
+		int localport,
+		int ipv6, unsigned char ttl,
+		int* error,
+		int searchalltypes);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

@@ -87,7 +87,7 @@ struct sldns_buffer;
  * If enabled, there can be zero or more unsigned delegations in the span.
  * If disabled, there are zero unsigned delegations in the span.
  */
-#define NSEC3_OPTOUT	0x01
+#define NSEC3_OPTOUT 0x01
 /**
  * The unknown flags in the NSEC3 flags field.
  * They must be zero, or the NSEC3 is ignored.
@@ -95,7 +95,7 @@ struct sldns_buffer;
 #define NSEC3_UNKNOWN_FLAGS 0xFE
 
 /** The SHA1 hash algorithm for NSEC3 */
-#define NSEC3_HASH_SHA1	0x01
+#define NSEC3_HASH_SHA1 0x01
 
 /**
  * Determine if the set of NSEC3 records provided with a response prove NAME
@@ -115,7 +115,7 @@ struct sldns_buffer;
  */
 enum sec_status
 nsec3_prove_nameerror(struct module_env* env, struct val_env* ve,
-	struct ub_packed_rrset_key** list, size_t num, 
+	struct ub_packed_rrset_key** list, size_t num,
 	struct query_info* qinfo, struct key_entry_key* kkey);
 
 /**
@@ -149,9 +149,8 @@ nsec3_prove_nameerror(struct module_env* env, struct val_env* ve,
  */
 enum sec_status
 nsec3_prove_nodata(struct module_env* env, struct val_env* ve,
-	struct ub_packed_rrset_key** list, size_t num, 
+	struct ub_packed_rrset_key** list, size_t num,
 	struct query_info* qinfo, struct key_entry_key* kkey);
-
 
 /**
  * Prove that a positive wildcard match was appropriate (no direct match
@@ -171,7 +170,7 @@ nsec3_prove_nodata(struct module_env* env, struct val_env* ve,
  */
 enum sec_status
 nsec3_prove_wildcard(struct module_env* env, struct val_env* ve,
-	struct ub_packed_rrset_key** list, size_t num, 
+	struct ub_packed_rrset_key** list, size_t num,
 	struct query_info* qinfo, struct key_entry_key* kkey, uint8_t* wc);
 
 /**
@@ -195,7 +194,7 @@ nsec3_prove_wildcard(struct module_env* env, struct val_env* ve,
  */
 enum sec_status
 nsec3_prove_nods(struct module_env* env, struct val_env* ve,
-	struct ub_packed_rrset_key** list, size_t num, 
+	struct ub_packed_rrset_key** list, size_t num,
 	struct query_info* qinfo, struct key_entry_key* kkey, char** reason,
 	struct module_qstate* qstate);
 
@@ -216,7 +215,7 @@ nsec3_prove_nods(struct module_env* env, struct val_env* ve,
  */
 enum sec_status
 nsec3_prove_nxornodata(struct module_env* env, struct val_env* ve,
-	struct ub_packed_rrset_key** list, size_t num, 
+	struct ub_packed_rrset_key** list, size_t num,
 	struct query_info* qinfo, struct key_entry_key* kkey, int* nodata);
 
 /**
@@ -225,7 +224,8 @@ nsec3_prove_nxornodata(struct module_env* env, struct val_env* ve,
  * The nodes detail how a set of parameters (from nsec3 rr) plus
  * a dname result in a hash.
  */
-struct nsec3_cached_hash {
+struct nsec3_cached_hash
+{
 	/** rbtree node, key is this structure */
 	rbnode_type node;
 	/** where are the parameters for conversion, in this rrset data */

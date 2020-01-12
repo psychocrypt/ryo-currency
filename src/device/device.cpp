@@ -57,13 +57,14 @@ namespace hw
 /* ======================================================================= */
 /*  SETUP                                                                  */
 /* ======================================================================= */
-device &get_device(const std::string device_descriptor)
+device& get_device(const std::string device_descriptor)
 {
 
 	struct s_devices
 	{
 		std::map<std::string, std::unique_ptr<device>> registry;
-		s_devices() : registry()
+		s_devices() :
+			registry()
 		{
 			hw::core::register_all(registry);
 #ifdef HAVE_PCSC
@@ -80,12 +81,12 @@ device &get_device(const std::string device_descriptor)
 		GULPS_CAT_MAJOR("device");
 		GULPS_ERROR("device not found in registry: '", device_descriptor, "'\nknown devices:");
 
-		for(const auto &sm_pair : devices.registry)
+		for(const auto& sm_pair : devices.registry)
 		{
-			GULPS_ERROR(" - " , sm_pair.first);
+			GULPS_ERROR(" - ", sm_pair.first);
 		}
 		throw std::runtime_error("device not found: " + device_descriptor);
 	}
 	return *device->second;
 }
-}
+} // namespace hw

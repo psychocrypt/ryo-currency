@@ -62,12 +62,12 @@
 #include "random.hpp"
 
 #ifdef HAVE_EC_64
-#	include "ecops64/ecops64.h"
+#include "ecops64/ecops64.h"
 #endif
 
 namespace
 {
-static void local_abort(const char *msg)
+static void local_abort(const char* msg)
 {
 	fprintf(stderr, "%s\n", msg);
 #ifdef NDEBUG
@@ -76,7 +76,7 @@ static void local_abort(const char *msg)
 	abort();
 #endif
 }
-}
+} // namespace
 
 namespace crypto
 {
@@ -88,31 +88,32 @@ using std::size_t;
 using std::uint32_t;
 using std::uint64_t;
 
-extern "C" {
+extern "C"
+{
 #include "crypto-ops.h"
 }
 
-static inline unsigned char *operator&(ec_point &point)
+static inline unsigned char* operator&(ec_point& point)
 {
-	return &reinterpret_cast<unsigned char &>(point);
+	return &reinterpret_cast<unsigned char&>(point);
 }
 
-static inline const unsigned char *operator&(const ec_point &point)
+static inline const unsigned char* operator&(const ec_point& point)
 {
-	return &reinterpret_cast<const unsigned char &>(point);
+	return &reinterpret_cast<const unsigned char&>(point);
 }
 
-static inline unsigned char *operator&(ec_scalar &scalar)
+static inline unsigned char* operator&(ec_scalar& scalar)
 {
-	return &reinterpret_cast<unsigned char &>(scalar);
+	return &reinterpret_cast<unsigned char&>(scalar);
 }
 
-static inline const unsigned char *operator&(const ec_scalar &scalar)
+static inline const unsigned char* operator&(const ec_scalar& scalar)
 {
-	return &reinterpret_cast<const unsigned char &>(scalar);
+	return &reinterpret_cast<const unsigned char&>(scalar);
 }
 
-static inline bool scalar_ok(const unsigned char *k)
+static inline bool scalar_ok(const unsigned char* k)
 {
 	// l = 2^252 + 27742317777372353535851937790883648493
 	// l15 = 15*l
@@ -152,25 +153,24 @@ void random_scalar(unsigned char* v32)
 	do
 	{
 		prng::inst().generate_random(v32, 32);
-	}
-	while(!scalar_ok(v32));
+	} while(!scalar_ok(v32));
 	sc_reduce32(v32);
 }
 
 /* generate a random 32-byte (256-bit) integer and copy it to res */
-static inline void random_scalar(ec_scalar &res)
+static inline void random_scalar(ec_scalar& res)
 {
 	random_scalar(reinterpret_cast<unsigned char*>(res.data));
 }
 
-static inline void random_scalar(scalar_16 &res)
+static inline void random_scalar(scalar_16& res)
 {
 	prng::inst().generate_random(res.data, sizeof(res.data));
 }
 
-void hash_to_scalar(const void *data, size_t length, ec_scalar &res)
+void hash_to_scalar(const void* data, size_t length, ec_scalar& res)
 {
-	cn_fast_hash(data, length, reinterpret_cast<hash &>(res));
+	cn_fast_hash(data, length, reinterpret_cast<hash&>(res));
 	sc_reduce32(&res);
 }
 
@@ -179,7 +179,7 @@ void hash_to_scalar(const void *data, size_t length, ec_scalar &res)
    * TODO: allow specifying random value (for wallet recovery)
    *
    */
-secret_key crypto_ops::generate_legacy_keys(public_key &pub, secret_key &sec, const secret_key &recovery_key, bool recover)
+secret_key crypto_ops::generate_legacy_keys(public_key& pub, secret_key& sec, const secret_key& recovery_key, bool recover)
 {
 	ge_p3 point;
 
@@ -202,12 +202,12 @@ secret_key crypto_ops::generate_legacy_keys(public_key &pub, secret_key &sec, co
 	return rng;
 }
 
-void generate_wallet_secret(secret_key_16 &wallet_secret)
+void generate_wallet_secret(secret_key_16& wallet_secret)
 {
 	random_scalar(unwrap(wallet_secret));
 }
 
-void generate_wallet_keys(public_key &pub, secret_key &sec, const secret_key_16 &wallet_secret, uint32_t key_variant)
+void generate_wallet_keys(public_key& pub, secret_key& sec, const secret_key_16& wallet_secret, uint32_t key_variant)
 {
 #pragma pack(push, 1)
 	struct hash_secret
@@ -228,13 +228,13 @@ void generate_wallet_keys(public_key &pub, secret_key &sec, const secret_key_16 
 	ge_p3_tobytes(&pub, &point);
 }
 
-bool crypto_ops::check_key(const public_key &key)
+bool crypto_ops::check_key(const public_key& key)
 {
 	ge_p3 point;
 	return ge_frombytes_vartime(&point, &key) == 0;
 }
 
-bool crypto_ops::secret_key_to_public_key(const secret_key &sec, public_key &pub)
+bool crypto_ops::secret_key_to_public_key(const secret_key& sec, public_key& pub)
 {
 	ge_p3 point;
 	if(sc_check(&unwrap(sec)) != 0)
@@ -246,7 +246,7 @@ bool crypto_ops::secret_key_to_public_key(const secret_key &sec, public_key &pub
 	return true;
 }
 
-bool crypto_ops::generate_key_derivation(const public_key &key1, const secret_key &key2, key_derivation &derivation)
+bool crypto_ops::generate_key_derivation(const public_key& key1, const secret_key& key2, key_derivation& derivation)
 {
 	ge_p3 point;
 	ge_p2 point2;
@@ -263,22 +263,22 @@ bool crypto_ops::generate_key_derivation(const public_key &key1, const secret_ke
 	return true;
 }
 
-void crypto_ops::derivation_to_scalar(const key_derivation &derivation, size_t output_index, ec_scalar &res)
+void crypto_ops::derivation_to_scalar(const key_derivation& derivation, size_t output_index, ec_scalar& res)
 {
 	struct
 	{
 		key_derivation derivation;
 		char output_index[(sizeof(size_t) * 8 + 6) / 7];
 	} buf;
-	char *end = buf.output_index;
+	char* end = buf.output_index;
 	buf.derivation = derivation;
 	tools::write_varint(end, output_index);
 	assert(end <= buf.output_index + sizeof buf.output_index);
-	hash_to_scalar(&buf, end - reinterpret_cast<char *>(&buf), res);
+	hash_to_scalar(&buf, end - reinterpret_cast<char*>(&buf), res);
 }
 
-bool crypto_ops::derive_public_key(const key_derivation &derivation, size_t output_index,
-								   const public_key &base, public_key &derived_key)
+bool crypto_ops::derive_public_key(const key_derivation& derivation, size_t output_index,
+	const public_key& base, public_key& derived_key)
 {
 	ec_scalar scalar;
 	ge_p3 point1;
@@ -299,8 +299,8 @@ bool crypto_ops::derive_public_key(const key_derivation &derivation, size_t outp
 	return true;
 }
 
-void crypto_ops::derive_secret_key(const key_derivation &derivation, size_t output_index,
-								   const secret_key &base, secret_key &derived_key)
+void crypto_ops::derive_secret_key(const key_derivation& derivation, size_t output_index,
+	const secret_key& base, secret_key& derived_key)
 {
 	ec_scalar scalar;
 	assert(sc_check(&base) == 0);
@@ -308,7 +308,7 @@ void crypto_ops::derive_secret_key(const key_derivation &derivation, size_t outp
 	sc_add(&unwrap(derived_key), &unwrap(base), &scalar);
 }
 
-bool crypto_ops::derive_subaddress_public_key(const public_key &out_key, const key_derivation &derivation, std::size_t output_index, public_key &derived_key)
+bool crypto_ops::derive_subaddress_public_key(const public_key& out_key, const key_derivation& derivation, std::size_t output_index, public_key& derived_key)
 {
 	ec_scalar scalar;
 	ge_p3 point1;
@@ -331,7 +331,7 @@ bool crypto_ops::derive_subaddress_public_key(const public_key &out_key, const k
 
 #ifdef HAVE_EC_64
 
-bool crypto_ops::generate_key_derivation_64(const public_key &key1, const secret_key &key2, key_derivation &derivation)
+bool crypto_ops::generate_key_derivation_64(const public_key& key1, const secret_key& key2, key_derivation& derivation)
 {
 	ge64_p3 point;
 	ge64_p2 point2;
@@ -348,7 +348,7 @@ bool crypto_ops::generate_key_derivation_64(const public_key &key1, const secret
 	return true;
 }
 
-bool crypto_ops::derive_subaddress_public_key_64(const public_key& out_key, const key_derivation& derivation, const std::size_t output_index, public_key &derived_key)
+bool crypto_ops::derive_subaddress_public_key_64(const public_key& out_key, const key_derivation& derivation, const std::size_t output_index, public_key& derived_key)
 {
 	ec_scalar scalar;
 	ge64_p3 point1;
@@ -384,7 +384,7 @@ struct s_comm_2
 	ec_point Y;
 };
 
-void crypto_ops::generate_signature(const hash &prefix_hash, const public_key &pub, const secret_key &sec, signature &sig)
+void crypto_ops::generate_signature(const hash& prefix_hash, const public_key& pub, const secret_key& sec, signature& sig)
 {
 	ge_p3 tmp3;
 	ec_scalar k;
@@ -408,7 +408,7 @@ void crypto_ops::generate_signature(const hash &prefix_hash, const public_key &p
 	sc_mulsub(&sig.r, &sig.c, &unwrap(sec), &k);
 }
 
-bool crypto_ops::check_signature(const hash &prefix_hash, const public_key &pub, const signature &sig)
+bool crypto_ops::check_signature(const hash& prefix_hash, const public_key& pub, const signature& sig)
 {
 	ge_p2 tmp2;
 	ge_p3 tmp3;
@@ -432,7 +432,7 @@ bool crypto_ops::check_signature(const hash &prefix_hash, const public_key &pub,
 	return sc_isnonzero(&c) == 0;
 }
 
-void crypto_ops::generate_tx_proof(const hash &prefix_hash, const public_key &R, const public_key &A, const boost::optional<public_key> &B, const public_key &D, const secret_key &r, signature &sig)
+void crypto_ops::generate_tx_proof(const hash& prefix_hash, const public_key& R, const public_key& A, const boost::optional<public_key>& B, const public_key& D, const secret_key& r, signature& sig)
 {
 	// sanity check
 	ge_p3 R_p3;
@@ -509,7 +509,7 @@ void crypto_ops::generate_tx_proof(const hash &prefix_hash, const public_key &R,
 	sc_mulsub(&sig.r, &sig.c, &unwrap(r), &k);
 }
 
-bool crypto_ops::check_tx_proof(const hash &prefix_hash, const public_key &R, const public_key &A, const boost::optional<public_key> &B, const public_key &D, const signature &sig)
+bool crypto_ops::check_tx_proof(const hash& prefix_hash, const public_key& R, const public_key& A, const boost::optional<public_key>& B, const public_key& D, const signature& sig)
 {
 	// sanity check
 	ge_p3 R_p3;
@@ -605,18 +605,18 @@ bool crypto_ops::check_tx_proof(const hash &prefix_hash, const public_key &R, co
 	return sc_isnonzero(&c2) == 0;
 }
 
-static void hash_to_ec(const public_key &key, ge_p3 &res)
+static void hash_to_ec(const public_key& key, ge_p3& res)
 {
 	hash h;
 	ge_p2 point;
 	ge_p1p1 point2;
 	cn_fast_hash(std::addressof(key), sizeof(public_key), h);
-	ge_fromfe_frombytes_vartime(&point, reinterpret_cast<const unsigned char *>(&h));
+	ge_fromfe_frombytes_vartime(&point, reinterpret_cast<const unsigned char*>(&h));
 	ge_mul8(&point2, &point);
 	ge_p1p1_to_p3(&res, &point2);
 }
 
-void crypto_ops::generate_key_image(const public_key &pub, const secret_key &sec, key_image &image)
+void crypto_ops::generate_key_image(const public_key& pub, const secret_key& sec, key_image& image)
 {
 	ge_p3 point;
 	ge_p2 point2;
@@ -644,16 +644,16 @@ static inline size_t rs_comm_size(size_t pubs_count)
 	return sizeof(rs_comm) + pubs_count * sizeof(ec_point_pair);
 }
 
-void crypto_ops::generate_ring_signature(const hash &prefix_hash, const key_image &image,
-										 const public_key *const *pubs, size_t pubs_count,
-										 const secret_key &sec, size_t sec_index,
-										 signature *sig)
+void crypto_ops::generate_ring_signature(const hash& prefix_hash, const key_image& image,
+	const public_key* const* pubs, size_t pubs_count,
+	const secret_key& sec, size_t sec_index,
+	signature* sig)
 {
 	size_t i;
 	ge_p3 image_unp;
 	ge_dsmp image_pre;
 	ec_scalar sum, k, h;
-	boost::shared_ptr<rs_comm> buf(reinterpret_cast<rs_comm *>(malloc(rs_comm_size(pubs_count))), free);
+	boost::shared_ptr<rs_comm> buf(reinterpret_cast<rs_comm*>(malloc(rs_comm_size(pubs_count))), free);
 	if(!buf)
 		local_abort("malloc failure");
 	assert(sec_index < pubs_count);
@@ -715,15 +715,15 @@ void crypto_ops::generate_ring_signature(const hash &prefix_hash, const key_imag
 	sc_mulsub(&sig[sec_index].r, &sig[sec_index].c, &unwrap(sec), &k);
 }
 
-bool crypto_ops::check_ring_signature(const hash &prefix_hash, const key_image &image,
-									  const public_key *const *pubs, size_t pubs_count,
-									  const signature *sig)
+bool crypto_ops::check_ring_signature(const hash& prefix_hash, const key_image& image,
+	const public_key* const* pubs, size_t pubs_count,
+	const signature* sig)
 {
 	size_t i;
 	ge_p3 image_unp;
 	ge_dsmp image_pre;
 	ec_scalar sum, h;
-	boost::shared_ptr<rs_comm> buf(reinterpret_cast<rs_comm *>(malloc(rs_comm_size(pubs_count))), free);
+	boost::shared_ptr<rs_comm> buf(reinterpret_cast<rs_comm*>(malloc(rs_comm_size(pubs_count))), free);
 	if(!buf)
 		return false;
 #if !defined(NDEBUG)
@@ -762,4 +762,4 @@ bool crypto_ops::check_ring_signature(const hash &prefix_hash, const key_image &
 	sc_sub(&h, &h, &sum);
 	return sc_isnonzero(&h) == 0;
 }
-}
+} // namespace crypto

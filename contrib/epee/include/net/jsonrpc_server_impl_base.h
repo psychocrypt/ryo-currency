@@ -17,23 +17,24 @@ template <class t_child_class, class t_connection_context = epee::net_utils::con
 class jsonrpc_server_impl_base : public net_utils::jsonrpc2::i_jsonrpc2_server_handler<t_connection_context>
 {
 	GULPS_CAT_MAJOR("epee_jsrpc_serv");
+
   public:
-	jsonrpc_server_impl_base()
-		: m_net_server()
+	jsonrpc_server_impl_base() :
+		m_net_server()
 	{
 	}
 
-	explicit jsonrpc_server_impl_base(boost::asio::io_service &external_io_service)
-		: m_net_server(external_io_service)
+	explicit jsonrpc_server_impl_base(boost::asio::io_service& external_io_service) :
+		m_net_server(external_io_service)
 	{
 	}
 
-	bool init(const std::string &bind_port = "0", const std::string &bind_ip = "0.0.0.0")
+	bool init(const std::string& bind_port = "0", const std::string& bind_ip = "0.0.0.0")
 	{
 		//set self as callback handler
-		m_net_server.get_config_object().m_phandler = static_cast<t_child_class *>(this);
+		m_net_server.get_config_object().m_phandler = static_cast<t_child_class*>(this);
 
-		GULPSF_PRINT("Binding on {}:{}", bind_ip , bind_port);
+		GULPSF_PRINT("Binding on {}:{}", bind_ip, bind_port);
 		bool res = m_net_server.init_server(bind_port, bind_ip);
 		if(!res)
 		{
@@ -46,7 +47,7 @@ class jsonrpc_server_impl_base : public net_utils::jsonrpc2::i_jsonrpc2_server_h
 	bool run(size_t threads_count, bool wait = true)
 	{
 		//go to loop
-		GULPSF_PRINT("Run net_service loop( {} threads)...", threads_count );
+		GULPSF_PRINT("Run net_service loop( {} threads)...", threads_count);
 		if(!m_net_server.run_server(threads_count, wait))
 		{
 			GULPS_ERROR("Failed to run net tcp server!");
@@ -81,6 +82,6 @@ class jsonrpc_server_impl_base : public net_utils::jsonrpc2::i_jsonrpc2_server_h
   protected:
 	net_utils::boosted_tcp_server<net_utils::jsonrpc2::jsonrpc2_connection_handler<t_connection_context>> m_net_server;
 };
-}
+} // namespace epee
 
 #endif /* JSONRPC_SERVER_IMPL_BASE_H */

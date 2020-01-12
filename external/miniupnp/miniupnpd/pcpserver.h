@@ -33,8 +33,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef PCPSERVER_H_INCLUDED
 #define PCPSERVER_H_INCLUDED
 
-#define PCP_MIN_LEN           24
-#define PCP_MAX_LEN           1100
+#define PCP_MIN_LEN 24
+#define PCP_MAX_LEN 1100
 
 struct sockaddr;
 
@@ -43,23 +43,22 @@ struct sockaddr;
  *
  * returns 0 upon success 1 otherwise
  */
-int ProcessIncomingPCPPacket(int s, unsigned char *msg_buff, int len,
-                             const struct sockaddr *senderaddr,
-                             const struct sockaddr_in6 *receiveraddr);
+int ProcessIncomingPCPPacket(int s, unsigned char* msg_buff, int len,
+	const struct sockaddr* senderaddr,
+	const struct sockaddr_in6* receiveraddr);
 
 /*
  * returns the socket
  */
 int OpenAndConfPCPv6Socket(void);
 
-
 /*
  * To be called when Public IP address changed (IPv4)
  */
 #ifdef ENABLE_IPV6
-void PCPPublicAddressChanged(int * sockets, int n_sockets, int socket6);
+void PCPPublicAddressChanged(int* sockets, int n_sockets, int socket6);
 #else /* IPV4 Only */
-void PCPPublicAddressChanged(int * sockets, int n_sockets);
+void PCPPublicAddressChanged(int* sockets, int n_sockets);
 #endif
 
 #endif /* PCPSERVER_H_INCLUDED */

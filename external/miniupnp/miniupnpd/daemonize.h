@@ -14,22 +14,18 @@
 /* daemonize()
  * "fork" to background, detach from terminal, etc...
  * returns: pid of the daemon, exits upon failure */
-int
-daemonize(void);
+int daemonize(void);
 #endif
 
 /* writepidfile()
  * write the pid to a file */
-int
-writepidfile(const char * fname, int pid);
+int writepidfile(const char* fname, int pid);
 
 /* checkforrunning()
  * check for another instance running
  * returns: 0 only instance
  *          -1 invalid filename
  *          -2 another instance running  */
-int
-checkforrunning(const char * fname);
+int checkforrunning(const char* fname);
 
 #endif
-

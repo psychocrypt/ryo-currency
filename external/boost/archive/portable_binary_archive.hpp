@@ -42,12 +42,12 @@ enum portable_binary_archive_flags
 //#endif
 
 inline void
-reverse_bytes(signed char size, char *address)
+reverse_bytes(signed char size, char* address)
 {
 	if(size <= 0)
 		throw archive_exception(archive_exception::other_exception);
-	char *first = address;
-	char *last = first + size - 1;
+	char* first = address;
+	char* last = first + size - 1;
 	for(; first < last; ++first, --last)
 	{
 		char x = *last;
@@ -55,7 +55,7 @@ reverse_bytes(signed char size, char *address)
 		*first = x;
 	}
 }
-}
-}
+} // namespace archive
+} // namespace boost
 
 #endif // PORTABLE_BINARY_ARCHIVE_HPP

@@ -42,9 +42,9 @@ namespace serialization
 namespace json
 {
 GULPS_CAT_MAJOR("epee_ptb_stg_jsn");
-#define CHECK_ISSPACE()                                                                \
-	if(!isspace(*it))                                                                  \
-	{                                                                                  \
+#define CHECK_ISSPACE()                                                                    \
+	if(!isspace(*it))                                                                      \
+	{                                                                                      \
 		GULPS_ASSERT_MES_AND_THROW("Wrong JSON character at: ", std::string(it, buf_end)); \
 	}
 
@@ -407,7 +407,7 @@ inline void run_handler(typename t_storage::hsection current_section,
 }
 */
 template <class t_storage>
-inline bool load_from_json(const std::string &buff_json, t_storage &stg)
+inline bool load_from_json(const std::string& buff_json, t_storage& stg)
 {
 	std::string::const_iterator sec_buf_begin = buff_json.begin();
 	try
@@ -415,7 +415,7 @@ inline bool load_from_json(const std::string &buff_json, t_storage &stg)
 		run_handler(nullptr, sec_buf_begin, buff_json.end(), stg, 0);
 		return true;
 	}
-	catch(const std::exception &ex)
+	catch(const std::exception& ex)
 	{
 		GULPSF_ERROR("Failed to parse json, what: {}", ex.what());
 		return false;
@@ -426,6 +426,6 @@ inline bool load_from_json(const std::string &buff_json, t_storage &stg)
 		return false;
 	}
 }
-}
-}
-}
+} // namespace json
+} // namespace serialization
+} // namespace epee

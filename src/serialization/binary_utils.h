@@ -54,7 +54,7 @@ namespace serialization
 /*! creates a new archive with the passed blob and serializes it into v
    */
 template <class T>
-bool parse_binary(const std::string &blob, T &v)
+bool parse_binary(const std::string& blob, T& v)
 {
 	std::istringstream istr(blob);
 	binary_archive<false> iar(istr);
@@ -64,7 +64,7 @@ bool parse_binary(const std::string &blob, T &v)
 /*! dumps the data in v into the blob string
    */
 template <class T>
-bool dump_binary(T &v, std::string &blob)
+bool dump_binary(T& v, std::string& blob)
 {
 	std::stringstream ostr;
 	binary_archive<true> oar(ostr);
@@ -72,4 +72,4 @@ bool dump_binary(T &v, std::string &blob)
 	blob = ostr.str();
 	return success && ostr.good();
 };
-}
+} // namespace serialization

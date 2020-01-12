@@ -90,7 +90,7 @@ struct response<dummy_result, t_error>
 };
 
 typedef response<dummy_result, error> error_response;
-}
-}
+} // namespace json_rpc
+} // namespace epee
 
 #endif /* JSONRPC_STRUCTS_H */

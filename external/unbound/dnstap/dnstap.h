@@ -44,18 +44,19 @@ struct fstrm_io;
 struct fstrm_queue;
 struct sldns_buffer;
 
-struct dt_env {
+struct dt_env
+{
 	/** dnstap I/O thread */
-	struct fstrm_iothr *iothr;
+	struct fstrm_iothr* iothr;
 
 	/** dnstap I/O thread input queue */
-	struct fstrm_iothr_queue *ioq;
+	struct fstrm_iothr_queue* ioq;
 
 	/** dnstap "identity" field, NULL if disabled */
-	char *identity;
+	char* identity;
 
 	/** dnstap "version" field, NULL if disabled */
-	char *version;
+	char* version;
 
 	/** length of "identity" field */
 	unsigned len_identity;
@@ -88,31 +89,28 @@ struct dt_env {
  * @param num_workers: number of worker threads, must be > 0.
  * @return dt_env object, NULL on failure.
  */
-struct dt_env *
-dt_create(const char *socket_path, unsigned num_workers);
+struct dt_env*
+dt_create(const char* socket_path, unsigned num_workers);
 
 /**
  * Apply config settings.
  * @param env: dnstap environment object.
  * @param cfg: new config settings.
  */
-void
-dt_apply_cfg(struct dt_env *env, struct config_file *cfg);
+void dt_apply_cfg(struct dt_env* env, struct config_file* cfg);
 
 /**
  * Initialize per-worker state in dnstap environment object.
  * @param env: dnstap environment object to initialize, created with dt_create().
  * @return: true on success, false on failure.
  */
-int
-dt_init(struct dt_env *env);
+int dt_init(struct dt_env* env);
 
 /**
  * Delete dnstap environment object. Closes dnstap I/O socket and deletes all
  * per-worker I/O queues.
  */
-void
-dt_delete(struct dt_env *env);
+void dt_delete(struct dt_env* env);
 
 /**
  * Create and send a new dnstap "Message" event of type CLIENT_QUERY.
@@ -121,11 +119,10 @@ dt_delete(struct dt_env *env);
  * @param cptype: comm_udp or comm_tcp.
  * @param qmsg: query message.
  */
-void
-dt_msg_send_client_query(struct dt_env *env,
-			 struct sockaddr_storage *qsock,
-			 enum comm_point_type cptype,
-			 struct sldns_buffer *qmsg);
+void dt_msg_send_client_query(struct dt_env* env,
+	struct sockaddr_storage* qsock,
+	enum comm_point_type cptype,
+	struct sldns_buffer* qmsg);
 
 /**
  * Create and send a new dnstap "Message" event of type CLIENT_RESPONSE.
@@ -134,11 +131,10 @@ dt_msg_send_client_query(struct dt_env *env,
  * @param cptype: comm_udp or comm_tcp.
  * @param rmsg: response message.
  */
-void
-dt_msg_send_client_response(struct dt_env *env,
-			    struct sockaddr_storage *qsock,
-			    enum comm_point_type cptype,
-			    struct sldns_buffer *rmsg);
+void dt_msg_send_client_response(struct dt_env* env,
+	struct sockaddr_storage* qsock,
+	enum comm_point_type cptype,
+	struct sldns_buffer* rmsg);
 
 /**
  * Create and send a new dnstap "Message" event of type RESOLVER_QUERY or
@@ -151,12 +147,11 @@ dt_msg_send_client_response(struct dt_env *env,
  * @param zone_len: length of zone.
  * @param qmsg: query message.
  */
-void
-dt_msg_send_outside_query(struct dt_env *env,
-			  struct sockaddr_storage *rsock,
-			  enum comm_point_type cptype,
-			  uint8_t *zone, size_t zone_len,
-			  struct sldns_buffer *qmsg);
+void dt_msg_send_outside_query(struct dt_env* env,
+	struct sockaddr_storage* rsock,
+	enum comm_point_type cptype,
+	uint8_t* zone, size_t zone_len,
+	struct sldns_buffer* qmsg);
 
 /**
  * Create and send a new dnstap "Message" event of type RESOLVER_RESPONSE or
@@ -173,15 +168,14 @@ dt_msg_send_outside_query(struct dt_env *env,
  * @param rtime: time response message was sent.
  * @param rmsg: response message.
  */
-void
-dt_msg_send_outside_response(struct dt_env *env,
-			     struct sockaddr_storage *rsock,
-			     enum comm_point_type cptype,
-			     uint8_t *zone, size_t zone_len,
-			     uint8_t *qbuf, size_t qbuf_len,
-			     const struct timeval *qtime,
-			     const struct timeval *rtime,
-			     struct sldns_buffer *rmsg);
+void dt_msg_send_outside_response(struct dt_env* env,
+	struct sockaddr_storage* rsock,
+	enum comm_point_type cptype,
+	uint8_t* zone, size_t zone_len,
+	uint8_t* qbuf, size_t qbuf_len,
+	const struct timeval* qtime,
+	const struct timeval* rtime,
+	struct sldns_buffer* rmsg);
 
 #endif /* USE_DNSTAP */
 

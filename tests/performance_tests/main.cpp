@@ -64,14 +64,12 @@
 
 namespace po = boost::program_options;
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 	//GULPS_TRY_ENTRY();
 	tools::on_startup();
 	set_process_affinity(1);
 	set_thread_high_priority();
-
-	
 
 	po::options_description desc_options("Command line options");
 	const command_line::arg_descriptor<std::string> arg_filter = {"filter", "Regular expression filter for which tests to run"};
@@ -221,7 +219,7 @@ int main(int argc, char **argv)
 	//TEST_PERFORMANCE1(filter, p, test_crypto_ops, op_isInMainSubgroup); - only used in tests
 	TEST_PERFORMANCE1(filter, p, test_crypto_ops, op_zeroCommitUncached);
 	TEST_PERFORMANCE1(filter, p, test_crypto_ops, op_zeroCommitCached);
-/*
+	/*
 	TEST_PERFORMANCE2(filter, p, test_multiexp, multiexp_bos_coster, 2);
 	TEST_PERFORMANCE2(filter, p, test_multiexp, multiexp_bos_coster, 4);
 	TEST_PERFORMANCE2(filter, p, test_multiexp, multiexp_bos_coster, 8);

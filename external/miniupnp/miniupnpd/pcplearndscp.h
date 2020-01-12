@@ -33,8 +33,9 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef PCPLEARNDSCP_H_INCLUDED
 #define PCPLEARNDSCP_H_INCLUDED
 
-struct dscp_values {
-	char *app_name;
+struct dscp_values
+{
+	char* app_name;
 	unsigned int app_name_len;
 	unsigned char delay;
 	unsigned char loss;
@@ -42,10 +43,7 @@ struct dscp_values {
 	unsigned char dscp_value;
 };
 
-
-
 /* #set_learn_dscp "Webex" 1 1 1 34 */
-int
-read_learn_dscp_line(struct dscp_values *dscpvalues, char *p);
+int read_learn_dscp_line(struct dscp_values* dscpvalues, char* p);
 
 #endif /* PCPLEARNDSCP_H_INCLUDED */

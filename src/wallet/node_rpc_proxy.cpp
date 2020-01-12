@@ -54,8 +54,18 @@ namespace tools
 
 static const std::chrono::seconds rpc_timeout = std::chrono::minutes(3) + std::chrono::seconds(30);
 
-NodeRPCProxy::NodeRPCProxy(epee::net_utils::http::http_simple_client &http_client, boost::mutex &mutex)
-	: m_http_client(http_client), m_daemon_rpc_mutex(mutex), m_height(0), m_height_time(0), m_earliest_height(), m_dynamic_per_kb_fee_estimate(0), m_dynamic_per_kb_fee_estimate_cached_height(0), m_dynamic_per_kb_fee_estimate_grace_blocks(0), m_rpc_version(0), m_target_height(0), m_target_height_time(0)
+NodeRPCProxy::NodeRPCProxy(epee::net_utils::http::http_simple_client& http_client, boost::mutex& mutex) :
+	m_http_client(http_client),
+	m_daemon_rpc_mutex(mutex),
+	m_height(0),
+	m_height_time(0),
+	m_earliest_height(),
+	m_dynamic_per_kb_fee_estimate(0),
+	m_dynamic_per_kb_fee_estimate_cached_height(0),
+	m_dynamic_per_kb_fee_estimate_grace_blocks(0),
+	m_rpc_version(0),
+	m_target_height(0),
+	m_target_height_time(0)
 {
 }
 
@@ -73,7 +83,7 @@ void NodeRPCProxy::invalidate()
 	m_target_height_time = 0;
 }
 
-boost::optional<std::string> NodeRPCProxy::get_rpc_version(uint32_t &rpc_version) const
+boost::optional<std::string> NodeRPCProxy::get_rpc_version(uint32_t& rpc_version) const
 {
 	if(m_rpc_version == 0)
 	{
@@ -91,7 +101,7 @@ boost::optional<std::string> NodeRPCProxy::get_rpc_version(uint32_t &rpc_version
 	return boost::optional<std::string>();
 }
 
-boost::optional<std::string> NodeRPCProxy::get_height(uint64_t &height) const
+boost::optional<std::string> NodeRPCProxy::get_height(uint64_t& height) const
 {
 	const time_t now = time(NULL);
 	if(m_height == 0 || now >= m_height_time + 30) // re-cache every 30 seconds
@@ -117,7 +127,7 @@ void NodeRPCProxy::set_height(uint64_t h)
 	m_height = h;
 }
 
-boost::optional<std::string> NodeRPCProxy::get_target_height(uint64_t &height) const
+boost::optional<std::string> NodeRPCProxy::get_target_height(uint64_t& height) const
 {
 	const time_t now = time(NULL);
 	if(m_target_height == 0 || now >= m_target_height_time + 30) // re-cache every 30 seconds
@@ -139,7 +149,7 @@ boost::optional<std::string> NodeRPCProxy::get_target_height(uint64_t &height) c
 	return boost::optional<std::string>();
 }
 
-boost::optional<std::string> NodeRPCProxy::get_earliest_height(uint8_t version, uint64_t &earliest_height) const
+boost::optional<std::string> NodeRPCProxy::get_earliest_height(uint8_t version, uint64_t& earliest_height) const
 {
 	if(m_earliest_height[version] == 0)
 	{
@@ -159,4 +169,4 @@ boost::optional<std::string> NodeRPCProxy::get_earliest_height(uint8_t version, 
 	earliest_height = m_earliest_height[version];
 	return boost::optional<std::string>();
 }
-}
+} // namespace tools

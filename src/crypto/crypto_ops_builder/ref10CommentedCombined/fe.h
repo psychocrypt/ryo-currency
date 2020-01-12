@@ -32,8 +32,8 @@ Bounds on each t[i] vary depending on context.
 #define fe_invert crypto_sign_ed25519_ref10_fe_invert
 #define fe_pow22523 crypto_sign_ed25519_ref10_fe_pow22523
 
-extern void fe_frombytes(fe, const unsigned char *);
-extern void fe_tobytes(unsigned char *, const fe);
+extern void fe_frombytes(fe, const unsigned char*);
+extern void fe_tobytes(unsigned char*, const fe);
 
 extern void fe_copy(fe, const fe);
 extern int fe_isnonzero(const fe);

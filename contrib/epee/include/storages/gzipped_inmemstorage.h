@@ -37,7 +37,7 @@ template <class t_base_storage>
 class gziped_storage : public t_base_storage
 {
   public:
-	size_t PackToSolidBuffer(std::string &targetObj)
+	size_t PackToSolidBuffer(std::string& targetObj)
 	{
 		size_t res = t_base_storage::PackToSolidBuffer(targetObj);
 		if(res <= 0)
@@ -49,7 +49,7 @@ class gziped_storage : public t_base_storage
 		return targetObj.size();
 	}
 
-	size_t LoadFromSolidBuffer(const std::string &pTargetObj)
+	size_t LoadFromSolidBuffer(const std::string& pTargetObj)
 	{
 		std::string buff_to_ungzip = pTargetObj;
 		if(zlib_helper::unpack(buff_to_ungzip))
@@ -60,7 +60,7 @@ class gziped_storage : public t_base_storage
 
   private:
 };
-}
-}
+} // namespace StorageNamed
+} // namespace epee
 
 #endif

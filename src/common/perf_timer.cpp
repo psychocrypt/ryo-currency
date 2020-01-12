@@ -94,14 +94,14 @@ uint64_t ticks_to_ns(uint64_t ticks)
 	return ticks;
 #endif
 }
-}
+} // namespace tools
 
 namespace tools
 {
 
 gulps::level performance_timer_log_level = gulps::LEVEL_DEBUG;
 
-static __thread std::vector<LoggingPerformanceTimer *> *performance_timers = NULL;
+static __thread std::vector<LoggingPerformanceTimer*>* performance_timers = NULL;
 
 void set_performance_timer_log_level(gulps::level level)
 {
@@ -113,7 +113,9 @@ void set_performance_timer_log_level(gulps::level level)
 	performance_timer_log_level = level;
 }
 
-PerformanceTimer::PerformanceTimer(bool paused) : started(true), paused(paused)
+PerformanceTimer::PerformanceTimer(bool paused) :
+	started(true),
+	paused(paused)
 {
 	if(paused)
 		ticks = 0;
@@ -121,22 +123,26 @@ PerformanceTimer::PerformanceTimer(bool paused) : started(true), paused(paused)
 		ticks = get_tick_count();
 }
 
-LoggingPerformanceTimer::LoggingPerformanceTimer(const std::string &s, const std::string &cat, uint64_t unit, gulps::level l) : PerformanceTimer(), name(s), cat(cat), unit(unit)
+LoggingPerformanceTimer::LoggingPerformanceTimer(const std::string& s, const std::string& cat, uint64_t unit, gulps::level l) :
+	PerformanceTimer(),
+	name(s),
+	cat(cat),
+	unit(unit)
 {
 	if(!performance_timers)
 	{
 		//TODO LOG BASED ON GIVEN LEVEL "level"
 		GULPS_CAT_LOG_L1(cat.c_str(), "PERF             ----------");
-		performance_timers = new std::vector<LoggingPerformanceTimer *>();
+		performance_timers = new std::vector<LoggingPerformanceTimer*>();
 		performance_timers->reserve(16); // how deep before realloc
 	}
 	else
 	{
-		LoggingPerformanceTimer *pt = performance_timers->back();
+		LoggingPerformanceTimer* pt = performance_timers->back();
 		if(!pt->started && !pt->paused)
 		{
 			size_t size = 0;
-			for(const auto *tmp : *performance_timers)
+			for(const auto* tmp : *performance_timers)
 				if(!tmp->paused)
 					++size;
 			GULPS_CAT_LOG_L1(cat.c_str(), "PERF           ", std::string((size - 1) * 2, ' '), "  ", pt->name);
@@ -159,7 +165,7 @@ LoggingPerformanceTimer::~LoggingPerformanceTimer()
 	char s[12];
 	snprintf(s, sizeof(s), "%8llu  ", (unsigned long long)(ticks_to_ns(ticks) / (1000000000 / unit)));
 	size_t size = 0;
-	for(const auto *tmp : *performance_timers)
+	for(const auto* tmp : *performance_timers)
 		if(!tmp->paused || tmp == this)
 			++size;
 	//TODO LOG BASED ON GIVEN LEVEL "level"
@@ -186,4 +192,4 @@ void PerformanceTimer::resume()
 	ticks = get_tick_count() - ticks;
 	paused = false;
 }
-}
+} // namespace tools

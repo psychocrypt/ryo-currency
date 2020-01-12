@@ -93,12 +93,12 @@ inline uint64_t get_tick_count()
 	return get_ns_count() / 1000000;
 }
 
-inline int call_sys_cmd(const std::string &cmd)
+inline int call_sys_cmd(const std::string& cmd)
 {
 	GULPS_CAT_MAJOR("epee_msc_os_dep");
 	GULPS_PRINT("# {}", cmd);
 
-	FILE *fp;
+	FILE* fp;
 	//char tstCommand[] ="ls *";
 	char path[1000] = {0};
 #if !defined(__GNUC__)
@@ -125,5 +125,5 @@ inline std::string get_thread_string_id()
 	return boost::lexical_cast<std::string>(pthread_self());
 #endif
 }
-}
-}
+} // namespace misc_utils
+} // namespace epee

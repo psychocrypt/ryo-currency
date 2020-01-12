@@ -50,8 +50,8 @@
 namespace tools
 {
 
-void set_stack_trace_log(const std::string &log);
-void log_stack_trace(const char *msg);
+void set_stack_trace_log(const std::string& log);
+void log_stack_trace(const char* msg);
 
 } // namespace tools
 

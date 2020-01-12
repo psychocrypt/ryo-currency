@@ -59,7 +59,6 @@
 
 #include "common/gulps.hpp"
 
-
 namespace nodetool
 {
 GULPS_CAT_MAJOR("p2p_proto_defs");
@@ -77,7 +76,9 @@ static inline std::string peerid_to_string(peerid_type peer_id)
 
 struct network_address_old
 {
-	network_address_old(uint32_t ip, uint32_t port) : ip(ip), port(port)  {}
+	network_address_old(uint32_t ip, uint32_t port) :
+		ip(ip),
+		port(port) {}
 
 	uint32_t ip;
 	uint32_t port;
@@ -91,7 +92,10 @@ struct network_address_old
 template <typename AddressType>
 struct peerlist_entry_base
 {
-	peerlist_entry_base(AddressType adr, const peerid_type id, const int64_t last_seen) : adr(adr), id(id), last_seen(last_seen) {}
+	peerlist_entry_base(AddressType adr, const peerid_type id, const int64_t last_seen) :
+		adr(adr),
+		id(id),
+		last_seen(last_seen) {}
 
 	AddressType adr;
 	peerid_type id;
@@ -137,13 +141,13 @@ typedef connection_entry_base<epee::net_utils::network_address> connection_entry
 
 #pragma pack(pop)
 
-inline std::string print_peerlist_to_string(const std::list<peerlist_entry> &pl)
+inline std::string print_peerlist_to_string(const std::list<peerlist_entry>& pl)
 {
 	time_t now_time = 0;
 	time(&now_time);
 	std::stringstream ss;
 	ss << std::setfill('0') << std::setw(8) << std::hex << std::noshowbase;
-	for(const peerlist_entry &pe : pl)
+	for(const peerlist_entry& pe : pl)
 	{
 		ss << pe.id << "\t" << pe.adr.str() << " \tlast_seen: " << epee::misc_utils::get_time_interval_string(now_time - pe.last_seen) << std::endl;
 	}
@@ -220,12 +224,12 @@ struct COMMAND_HANDSHAKE_T
 			// saving: save both, so old and new peers can understand it
 			KV_SERIALIZE(local_peerlist_new)
 			std::list<peerlist_entry_base<network_address_old>> local_peerlist;
-			for(const auto &p : this_ref.local_peerlist_new)
+			for(const auto& p : this_ref.local_peerlist_new)
 			{
 				if(p.adr.get_type_id() == epee::net_utils::ipv4_network_address::ID)
 				{
-					const epee::net_utils::network_address &na = p.adr;
-					const epee::net_utils::ipv4_network_address &ipv4 = na.as<const epee::net_utils::ipv4_network_address>();
+					const epee::net_utils::network_address& na = p.adr;
+					const epee::net_utils::ipv4_network_address& ipv4 = na.as<const epee::net_utils::ipv4_network_address>();
 					local_peerlist.push_back(peerlist_entry_base<network_address_old>({{ipv4.ip(), ipv4.port()}, p.id, p.last_seen}));
 				}
 				else
@@ -240,8 +244,8 @@ struct COMMAND_HANDSHAKE_T
 			{
 				std::list<peerlist_entry_base<network_address_old>> local_peerlist;
 				epee::serialization::selector<is_store>::serialize_stl_container_pod_val_as_blob(local_peerlist, stg, hparent_section, "local_peerlist");
-				for(const auto &p : local_peerlist)
-					((response &)this_ref).local_peerlist_new.push_back(peerlist_entry({epee::net_utils::ipv4_network_address(p.adr.ip, p.adr.port), p.id, p.last_seen}));
+				for(const auto& p : local_peerlist)
+					((response&)this_ref).local_peerlist_new.push_back(peerlist_entry({epee::net_utils::ipv4_network_address(p.adr.ip, p.adr.port), p.id, p.last_seen}));
 			}
 		}
 		END_KV_SERIALIZE_MAP()
@@ -278,12 +282,12 @@ struct COMMAND_TIMED_SYNC_T
 			// saving: save both, so old and new peers can understand it
 			KV_SERIALIZE(local_peerlist_new)
 			std::list<peerlist_entry_base<network_address_old>> local_peerlist;
-			for(const auto &p : this_ref.local_peerlist_new)
+			for(const auto& p : this_ref.local_peerlist_new)
 			{
 				if(p.adr.get_type_id() == epee::net_utils::ipv4_network_address::ID)
 				{
-					const epee::net_utils::network_address &na = p.adr;
-					const epee::net_utils::ipv4_network_address &ipv4 = na.as<const epee::net_utils::ipv4_network_address>();
+					const epee::net_utils::network_address& na = p.adr;
+					const epee::net_utils::ipv4_network_address& ipv4 = na.as<const epee::net_utils::ipv4_network_address>();
 					local_peerlist.push_back(peerlist_entry_base<network_address_old>({{ipv4.ip(), ipv4.port()}, p.id, p.last_seen}));
 				}
 				else
@@ -298,8 +302,8 @@ struct COMMAND_TIMED_SYNC_T
 			{
 				std::list<peerlist_entry_base<network_address_old>> local_peerlist;
 				epee::serialization::selector<is_store>::serialize_stl_container_pod_val_as_blob(local_peerlist, stg, hparent_section, "local_peerlist");
-				for(const auto &p : local_peerlist)
-					((response &)this_ref).local_peerlist_new.emplace_back(peerlist_entry{epee::net_utils::ipv4_network_address(p.adr.ip, p.adr.port), p.id, p.last_seen});
+				for(const auto& p : local_peerlist)
+					((response&)this_ref).local_peerlist_new.emplace_back(peerlist_entry{epee::net_utils::ipv4_network_address(p.adr.ip, p.adr.port), p.id, p.last_seen});
 			}
 		}
 		END_KV_SERIALIZE_MAP()
@@ -469,11 +473,11 @@ struct COMMAND_REQUEST_SUPPORT_FLAGS
 
 #endif
 
-inline crypto::hash get_proof_of_trust_hash(const nodetool::proof_of_trust &pot)
+inline crypto::hash get_proof_of_trust_hash(const nodetool::proof_of_trust& pot)
 {
 	std::string s;
-	s.append(reinterpret_cast<const char *>(&pot.peer_id), sizeof(pot.peer_id));
-	s.append(reinterpret_cast<const char *>(&pot.time), sizeof(pot.time));
+	s.append(reinterpret_cast<const char*>(&pot.peer_id), sizeof(pot.peer_id));
+	s.append(reinterpret_cast<const char*>(&pot.time), sizeof(pot.time));
 	return crypto::cn_fast_hash(s.data(), s.size());
 }
-}
+} // namespace nodetool

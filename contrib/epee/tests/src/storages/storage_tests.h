@@ -54,7 +54,7 @@ struct test_struct
 	END_NAMED_SERIALIZE_MAP()
 };
 
-bool operator==(const test_struct &a, const test_struct &b)
+bool operator==(const test_struct& a, const test_struct& b)
 {
 	if(b.m_str != a.m_str || b.m_uint != a.m_uint || b.m_bool != a.m_bool || b.m_list_of_str != a.m_list_of_str || b.m_list_of_int != a.m_list_of_int || b.m_list_of_self != a.m_list_of_self)
 		return false;
@@ -80,7 +80,7 @@ inline test_struct get_test_struct()
 	return t;
 }
 
-bool test_storages(const std::string &tests_folder)
+bool test_storages(const std::string& tests_folder)
 {
 
 	epee::serialization::portable_storage ps;
@@ -122,5 +122,5 @@ bool test_storages(const std::string &tests_folder)
 
 	return true;
 }
-}
-}
+} // namespace tests
+} // namespace epee

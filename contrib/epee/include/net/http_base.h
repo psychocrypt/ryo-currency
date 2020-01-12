@@ -33,8 +33,6 @@
 
 #include "string_tools.h"
 
-
-
 namespace epee
 {
 namespace net_utils
@@ -63,7 +61,7 @@ enum http_content_type
 
 typedef std::list<std::pair<std::string, std::string>> fields_list;
 
-inline std::string get_value_from_fields_list(const std::string &param_name, const net_utils::http::fields_list &fields)
+inline std::string get_value_from_fields_list(const std::string& param_name, const net_utils::http::fields_list& fields)
 {
 	fields_list::const_iterator it = fields.begin();
 	for(; it != fields.end(); it++)
@@ -76,7 +74,7 @@ inline std::string get_value_from_fields_list(const std::string &param_name, con
 	return it->second;
 }
 
-inline std::string get_value_from_uri_line(const std::string &param_name, const std::string &uri)
+inline std::string get_value_from_uri_line(const std::string& param_name, const std::string& uri)
 {
 	std::string buff = "([\\?|&])";
 	buff += param_name + "=([^&]*)";
@@ -89,12 +87,12 @@ inline std::string get_value_from_uri_line(const std::string &param_name, const 
 	return std::string();
 }
 
-static inline void add_field(std::string &out, const boost::string_ref name, const boost::string_ref value)
+static inline void add_field(std::string& out, const boost::string_ref name, const boost::string_ref value)
 {
 	out.append(name.data(), name.size()).append(": ");
 	out.append(value.data(), value.size()).append("\r\n");
 }
-static inline void add_field(std::string &out, const std::pair<std::string, std::string> &field)
+static inline void add_field(std::string& out, const std::pair<std::string, std::string>& field)
 {
 	add_field(out, field.first, field.second);
 }
@@ -148,11 +146,12 @@ struct url_content
 
 struct http_request_info
 {
-	http_request_info() : m_http_method(http_method_unknown),
-						  m_http_ver_hi(0),
-						  m_http_ver_lo(0),
-						  m_have_to_block(false),
-						  m_full_request_buf_size(0)
+	http_request_info() :
+		m_http_method(http_method_unknown),
+		m_http_ver_hi(0),
+		m_http_ver_lo(0),
+		m_have_to_block(false),
+		m_full_request_buf_size(0)
 	{
 	}
 
@@ -194,6 +193,6 @@ struct http_response_info
 		new(this) http_response_info();
 	}
 };
-}
-}
-}
+} // namespace http
+} // namespace net_utils
+} // namespace epee

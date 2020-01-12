@@ -44,11 +44,11 @@ using namespace cryptonote;
 //----------------------------------------------------------------------------------------------------------------------
 // Tests
 
-bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry> &events,
-													size_t inputs, size_t mixin, uint64_t amount_paid, bool valid,
-													size_t threshold, size_t total, size_t creator, std::vector<size_t> signers,
-													const std::function<void(std::vector<tx_source_entry> &sources, std::vector<tx_destination_entry> &destinations)> &pre_tx,
-													const std::function<void(transaction &tx)> &post_tx) const
+bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry>& events,
+	size_t inputs, size_t mixin, uint64_t amount_paid, bool valid,
+	size_t threshold, size_t total, size_t creator, std::vector<size_t> signers,
+	const std::function<void(std::vector<tx_source_entry>& sources, std::vector<tx_destination_entry>& destinations)>& pre_tx,
+	const std::function<void(transaction& tx)>& post_tx) const
 {
 	uint64_t ts_start = 1338224400;
 	bool r;
@@ -63,7 +63,7 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 
 	// given as 1 based for clarity
 	--creator;
-	for(size_t &signer : signers)
+	for(size_t& signer : signers)
 		--signer;
 
 	GULPS_CHECK_AND_ASSERT_MES(creator < total, false, "invalid creator");
@@ -87,18 +87,18 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 	// they will have a coinbase with a single out that's pseudo rct
 	constexpr size_t n_coinbases = 8;
 	cryptonote::account_base miner_accounts[n_coinbases];
-	const cryptonote::block *prev_block = &blk_0;
+	const cryptonote::block* prev_block = &blk_0;
 	cryptonote::block blocks[n_coinbases];
 	for(size_t n = 0; n < n_coinbases; ++n)
 	{
 		// the first block goes to the multisig account
 		miner_accounts[n].generate_new(false);
-		account_base &account = n < inputs ? miner_account[creator] : miner_accounts[n];
+		account_base& account = n < inputs ? miner_account[creator] : miner_accounts[n];
 		GULPS_CHECK_AND_ASSERT_MES(generator.construct_block_manually(blocks[n], *prev_block, account,
-																test_generator::bf_major_ver | test_generator::bf_minor_ver | test_generator::bf_timestamp | test_generator::bf_hf_version | test_generator::bf_max_outs,
-																4, 4, prev_block->timestamp + DIFFICULTY_BLOCKS_ESTIMATE_TIMESPAN * 2, // v2 has blocks twice as long
-																crypto::hash(), 0, transaction(), std::vector<crypto::hash>(), 0, 1, 4),
-							 false, "Failed to generate block");
+									   test_generator::bf_major_ver | test_generator::bf_minor_ver | test_generator::bf_timestamp | test_generator::bf_hf_version | test_generator::bf_max_outs,
+									   4, 4, prev_block->timestamp + DIFFICULTY_BLOCKS_ESTIMATE_TIMESPAN * 2, // v2 has blocks twice as long
+									   crypto::hash(), 0, transaction(), std::vector<crypto::hash>(), 0, 1, 4),
+			false, "Failed to generate block");
 		events.push_back(blocks[n]);
 		prev_block = blocks + n;
 		std::cout << "Initial miner tx " << n << ": " << obj_to_json_str(blocks[n].miner_tx) << std::endl;
@@ -113,10 +113,10 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 		{
 			cryptonote::block blk;
 			GULPS_CHECK_AND_ASSERT_MES(generator.construct_block_manually(blk, blk_last, miner_accounts[0],
-																	test_generator::bf_major_ver | test_generator::bf_minor_ver | test_generator::bf_timestamp | test_generator::bf_hf_version | test_generator::bf_max_outs,
-																	4, 4, blk_last.timestamp + DIFFICULTY_BLOCKS_ESTIMATE_TIMESPAN * 2, // v2 has blocks twice as long
-																	crypto::hash(), 0, transaction(), std::vector<crypto::hash>(), 0, 1, 4),
-								 false, "Failed to generate block");
+										   test_generator::bf_major_ver | test_generator::bf_minor_ver | test_generator::bf_timestamp | test_generator::bf_hf_version | test_generator::bf_max_outs,
+										   4, 4, blk_last.timestamp + DIFFICULTY_BLOCKS_ESTIMATE_TIMESPAN * 2, // v2 has blocks twice as long
+										   crypto::hash(), 0, transaction(), std::vector<crypto::hash>(), 0, 1, 4),
+				false, "Failed to generate block");
 			events.push_back(blk);
 			blk_last = blk;
 		}
@@ -147,7 +147,7 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 	for(size_t msidx = 0; msidx < total; ++msidx)
 	{
 		GULPS_CHECK_AND_ASSERT_MES(miner_account[msidx].get_keys().m_account_address.m_spend_public_key == miner_account[0].get_keys().m_account_address.m_spend_public_key,
-							 false, "Mismatched spend public keys");
+			false, "Mismatched spend public keys");
 
 		size_t nlr = threshold < total ? threshold - 1 : 1;
 		account_k[msidx].resize(inputs);
@@ -173,7 +173,7 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 			std::cout << "Party " << msidx << ":" << std::endl;
 			std::cout << "spend: sec " << miner_account[msidx].get_keys().m_spend_secret_key << ", pub " << miner_account[msidx].get_keys().m_account_address.m_spend_public_key << std::endl;
 			std::cout << "view: sec " << miner_account[msidx].get_keys().m_view_secret_key << ", pub " << miner_account[msidx].get_keys().m_account_address.m_view_public_key << std::endl;
-			for(const auto &k : miner_account[msidx].get_multisig_keys())
+			for(const auto& k : miner_account[msidx].get_multisig_keys())
 				std::cout << "msk: " << k << std::endl;
 			for(size_t n = 0; n < account_k[msidx][tdidx].size(); ++n)
 			{
@@ -181,7 +181,7 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 				std::cout << "L: " << account_L[msidx][tdidx][n] << std::endl;
 				std::cout << "R: " << account_R[msidx][tdidx][n] << std::endl;
 			}
-			for(const auto &ki : account_ki[msidx][tdidx])
+			for(const auto& ki : account_ki[msidx][tdidx])
 				std::cout << "ki: " << ki << std::endl;
 		}
 	}
@@ -193,7 +193,7 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 	for(size_t tdidx = 0; tdidx < inputs; ++tdidx)
 	{
 		kLRkis.push_back(rct::multisig_kLRki());
-		rct::multisig_kLRki &kLRki = kLRkis.back();
+		rct::multisig_kLRki& kLRki = kLRkis.back();
 #ifdef NO_MULTISIG
 		kLRki = {rct::zero(), rct::zero(), rct::zero(), rct::zero()};
 #else
@@ -216,8 +216,8 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 					used_L.insert(account_L[msidx][tdidx][lr]);
 					std::cout << "Adding L " << account_L[msidx][tdidx][lr] << " (for k " << account_k[msidx][tdidx][lr] << ")" << std::endl;
 					std::cout << "Adding R " << account_R[msidx][tdidx][lr] << std::endl;
-					rct::addKeys((rct::key &)kLRki.L, kLRki.L, rct::pk2rct(account_L[msidx][tdidx][lr]));
-					rct::addKeys((rct::key &)kLRki.R, kLRki.R, rct::pk2rct(account_R[msidx][tdidx][lr]));
+					rct::addKeys((rct::key&)kLRki.L, kLRki.L, rct::pk2rct(account_L[msidx][tdidx][lr]));
+					rct::addKeys((rct::key&)kLRki.R, kLRki.R, rct::pk2rct(account_R[msidx][tdidx][lr]));
 					break;
 				}
 			}
@@ -226,7 +226,7 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 		for(size_t msidx = 0; msidx < total; ++msidx)
 			for(size_t n = 0; n < account_ki[msidx][tdidx].size(); ++n)
 				pkis.push_back(account_ki[msidx][tdidx][n]);
-		r = cryptonote::generate_multisig_composite_key_image(miner_account[0].get_keys(), subaddresses, output_pub_key[tdidx], tx_pub_key[tdidx], additional_tx_keys, 0, pkis, (crypto::key_image &)kLRki.ki);
+		r = cryptonote::generate_multisig_composite_key_image(miner_account[0].get_keys(), subaddresses, output_pub_key[tdidx], tx_pub_key[tdidx], additional_tx_keys, 0, pkis, (crypto::key_image&)kLRki.ki);
 		GULPS_CHECK_AND_ASSERT_MES(r, false, "Failed to generate composite key image");
 		std::cout << "composite ki: " << kLRki.ki << std::endl;
 		std::cout << "L: " << kLRki.L << std::endl;
@@ -234,7 +234,7 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 		for(size_t n = 1; n < total; ++n)
 		{
 			rct::key ki;
-			r = cryptonote::generate_multisig_composite_key_image(miner_account[n].get_keys(), subaddresses, output_pub_key[tdidx], tx_pub_key[tdidx], additional_tx_keys, 0, pkis, (crypto::key_image &)ki);
+			r = cryptonote::generate_multisig_composite_key_image(miner_account[n].get_keys(), subaddresses, output_pub_key[tdidx], tx_pub_key[tdidx], additional_tx_keys, 0, pkis, (crypto::key_image&)ki);
 			GULPS_CHECK_AND_ASSERT_MES(r, false, "Failed to generate composite key image");
 			GULPS_CHECK_AND_ASSERT_MES(kLRki.ki == ki, false, "Composite key images do not match");
 		}
@@ -246,7 +246,7 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 		for(size_t n = 0; n < inputs; ++n)
 		{
 			sources.resize(sources.size() + 1);
-			tx_source_entry &src = sources.back();
+			tx_source_entry& src = sources.back();
 
 			src.real_output = n;
 			src.amount = blocks[n].miner_tx.vout[0].amount;
@@ -279,10 +279,10 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 		transaction tx;
 		crypto::secret_key tx_key;
 #ifdef NO_MULTISIG
-		rct::multisig_out *msoutp = NULL;
+		rct::multisig_out* msoutp = NULL;
 #else
 	rct::multisig_out msout;
-	rct::multisig_out *msoutp = &msout;
+	rct::multisig_out* msoutp = &msout;
 #endif
 		std::vector<crypto::secret_key> additional_tx_secret_keys;
 		auto sources_copy = sources;
@@ -297,7 +297,7 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 			for(size_t idx = 0; idx < sources_copy.size(); ++idx)
 			{
 				GULPS_CHECK_AND_ASSERT_MES((size_t)sources_copy[idx].real_output < sources_copy[idx].outputs.size(),
-									 false, "Invalid real_output");
+					false, "Invalid real_output");
 				if(sources_copy[idx].outputs[sources_copy[idx].real_output].second.dest == sources[n].outputs[sources[n].real_output].second.dest)
 					ins_order.push_back(idx);
 			}
@@ -308,16 +308,16 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 #ifndef NO_MULTISIG
 		// sign
 		std::unordered_set<crypto::secret_key> used_keys;
-		const std::vector<crypto::secret_key> &msk0 = miner_account[creator].get_multisig_keys();
-		for(const auto &sk : msk0)
+		const std::vector<crypto::secret_key>& msk0 = miner_account[creator].get_multisig_keys();
+		for(const auto& sk : msk0)
 			used_keys.insert(sk);
 		for(size_t signer : signers)
 		{
 			rct::key skey = rct::zero();
-			const std::vector<crypto::secret_key> &msk1 = miner_account[signer].get_multisig_keys();
+			const std::vector<crypto::secret_key>& msk1 = miner_account[signer].get_multisig_keys();
 			for(size_t n = 0; n < msk1.size(); ++n)
 			{
-				const crypto::secret_key &sk1 = msk1[n];
+				const crypto::secret_key& sk1 = msk1[n];
 				if(used_keys.find(sk1) == used_keys.end())
 				{
 					used_keys.insert(sk1);
@@ -326,7 +326,7 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 			}
 			GULPS_CHECK_AND_ASSERT_MES(!(skey == rct::zero()), false, "failed to find secret multisig key to sign transaction");
 			std::vector<unsigned int> indices;
-			for(const auto &src : sources_copy)
+			for(const auto& src : sources_copy)
 				indices.push_back(src.real_output);
 			rct::keyV k;
 			for(size_t tdidx = 0; tdidx < inputs; ++tdidx)
@@ -335,7 +335,7 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 				for(size_t n = 0; n < account_k[signer][tdidx].size(); ++n)
 				{
 					crypto::public_key L;
-					rct::scalarmultBase((rct::key &)L, rct::sk2rct(account_k[signer][tdidx][n]));
+					rct::scalarmultBase((rct::key&)L, rct::sk2rct(account_k[signer][tdidx][n]));
 					if(used_L.find(L) != used_L.end())
 					{
 						sc_add(k.back().bytes, k.back().bytes, rct::sk2rct(account_k[signer][tdidx][n]).bytes);
@@ -349,7 +349,7 @@ bool gen_multisig_tx_validation_base::generate_with(std::vector<test_event_entry
 			std::cout << "signing with k size " << k.size() << std::endl;
 			std::cout << "signing with k " << k.back() << std::endl;
 			std::cout << "signing with sk " << skey << std::endl;
-			for(const auto &sk : used_keys)
+			for(const auto& sk : used_keys)
 				std::cout << "  created with sk " << sk << std::endl;
 			std::cout << "signing with c size " << msout.c.size() << std::endl;
 			std::cout << "signing with c " << msout.c.back() << std::endl;

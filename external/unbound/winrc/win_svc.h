@@ -52,13 +52,13 @@ struct worker;
 #define SERVICE_NAME "unbound"
 
 /** from gen_msg.h - success message record for windows message log */
-#define MSG_GENERIC_SUCCESS              ((DWORD)0x20010001L)
+#define MSG_GENERIC_SUCCESS ((DWORD)0x20010001L)
 /** from gen_msg.h - informational message record for windows message log */
-#define MSG_GENERIC_INFO                 ((DWORD)0x60010002L)
+#define MSG_GENERIC_INFO ((DWORD)0x60010002L)
 /** from gen_msg.h - warning message record for windows message log */
-#define MSG_GENERIC_WARN                 ((DWORD)0xA0010003L)
+#define MSG_GENERIC_WARN ((DWORD)0xA0010003L)
 /** from gen_msg.h - error message record for windows message log */
-#define MSG_GENERIC_ERR                  ((DWORD)0xE0010004L)
+#define MSG_GENERIC_ERR ((DWORD)0xE0010004L)
 
 /**
  * Handle commandline service for windows.

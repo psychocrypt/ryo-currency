@@ -58,11 +58,12 @@ struct delegpt;
 /**
  * Region allocated message reply
  */
-struct dns_msg {
+struct dns_msg
+{
 	/** query info */
 	struct query_info qinfo;
 	/** reply info - ptr to packed repinfo structure */
-	struct reply_info *rep;
+	struct reply_info* rep;
 };
 
 /**
@@ -91,7 +92,7 @@ struct dns_msg {
  * @return 0 on alloc error (out of memory).
  */
 int dns_cache_store(struct module_env* env, struct query_info* qinf,
-        struct reply_info* rep, int is_referral, time_t leeway, int pside,
+	struct reply_info* rep, int is_referral, time_t leeway, int pside,
 	struct regional* region, uint32_t flags);
 
 /**
@@ -131,8 +132,8 @@ void dns_cache_store_msg(struct module_env* env, struct query_info* qinfo,
  * @param timenow: the time now, for checking if TTL on cache entries is OK.
  * @return new delegation or NULL on error or if not found in cache.
  */
-struct delegpt* dns_cache_find_delegation(struct module_env* env, 
-	uint8_t* qname, size_t qnamelen, uint16_t qtype, uint16_t qclass, 
+struct delegpt* dns_cache_find_delegation(struct module_env* env,
+	uint8_t* qname, size_t qnamelen, uint16_t qtype, uint16_t qclass,
 	struct regional* region, struct dns_msg** msg, time_t timenow);
 
 /**
@@ -178,7 +179,7 @@ struct dns_msg* dns_cache_lookup(struct module_env* env,
  * @param dp: delegation point to fill missing entries.
  * @return false on alloc failure.
  */
-int cache_fill_missing(struct module_env* env, uint16_t qclass, 
+int cache_fill_missing(struct module_env* env, uint16_t qclass,
 	struct regional* region, struct delegpt* dp);
 
 /**
@@ -192,7 +193,7 @@ int cache_fill_missing(struct module_env* env, uint16_t qclass,
  * @param capacity: number of rrsets space to create in the array.
  * @return new dns_msg struct or NULL on mem fail.
  */
-struct dns_msg* dns_msg_create(uint8_t* qname, size_t qnamelen, uint16_t qtype, 
+struct dns_msg* dns_msg_create(uint8_t* qname, size_t qnamelen, uint16_t qtype,
 	uint16_t qclass, struct regional* region, size_t capacity);
 
 /**
@@ -204,7 +205,7 @@ struct dns_msg* dns_msg_create(uint8_t* qname, size_t qnamelen, uint16_t qtype,
  * @param now: now.
  * @return true if worked, false on fail
  */
-int dns_msg_authadd(struct dns_msg* msg, struct regional* region, 
+int dns_msg_authadd(struct dns_msg* msg, struct regional* region,
 	struct ub_packed_rrset_key* rrset, time_t now);
 
 /**
@@ -216,7 +217,7 @@ int dns_msg_authadd(struct dns_msg* msg, struct regional* region,
  * @param now: now.
  * @return true if worked, false on fail
  */
-int dns_msg_ansadd(struct dns_msg* msg, struct regional* region, 
+int dns_msg_ansadd(struct dns_msg* msg, struct regional* region,
 	struct ub_packed_rrset_key* rrset, time_t now);
 
 /**
@@ -230,7 +231,7 @@ int dns_msg_ansadd(struct dns_msg* msg, struct regional* region,
  * @return false if not in cache. true if added.
  */
 int dns_cache_prefetch_adjust(struct module_env* env, struct query_info* qinfo,
-        time_t adjust, uint16_t flags);
+	time_t adjust, uint16_t flags);
 
 /** lookup message in message cache
  * the returned nonNULL entry is locked and has to be unlocked by the caller */

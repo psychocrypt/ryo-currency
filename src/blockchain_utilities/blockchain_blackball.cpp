@@ -42,7 +42,6 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #include "cryptonote_core/blockchain.h"
 #include "blockchain_db/blockchain_db.h"
 #include "blockchain_db/db_types.h"
@@ -67,23 +66,25 @@ struct output_data
 {
 	uint64_t amount;
 	uint64_t index;
-	output_data(uint64_t a, uint64_t i) : amount(a), index(i) {}
-	bool operator==(const output_data &other) const { return other.amount == amount && other.index == index; }
+	output_data(uint64_t a, uint64_t i) :
+		amount(a),
+		index(i) {}
+	bool operator==(const output_data& other) const { return other.amount == amount && other.index == index; }
 };
 namespace std
 {
 template <>
 struct hash<output_data>
 {
-	size_t operator()(const output_data &od) const
+	size_t operator()(const output_data& od) const
 	{
 		const uint64_t data[2] = {od.amount, od.index};
 		crypto::hash h;
 		crypto::cn_fast_hash(data, 2 * sizeof(uint64_t), h);
-		return reinterpret_cast<const std::size_t &>(h);
+		return reinterpret_cast<const std::size_t&>(h);
 	}
 };
-}
+} // namespace std
 
 static std::string get_default_db_path()
 {
@@ -94,12 +95,12 @@ static std::string get_default_db_path()
 	return dir.string();
 }
 
-static bool for_all_transactions(const std::string &filename, const std::function<bool(const cryptonote::transaction_prefix &)> &f)
+static bool for_all_transactions(const std::string& filename, const std::function<bool(const cryptonote::transaction_prefix&)>& f)
 {
-	MDB_env *env;
+	MDB_env* env;
 	MDB_dbi dbi;
-	MDB_txn *txn;
-	MDB_cursor *cur;
+	MDB_txn* txn;
+	MDB_cursor* cur;
 	int dbr;
 	bool tx_active = false;
 
@@ -145,7 +146,7 @@ static bool for_all_transactions(const std::string &filename, const std::functio
 
 		cryptonote::transaction_prefix tx;
 		blobdata bd;
-		bd.assign(reinterpret_cast<char *>(v.mv_data), v.mv_size);
+		bd.assign(reinterpret_cast<char*>(v.mv_data), v.mv_size);
 		std::stringstream ss;
 		ss << bd;
 		binary_archive<false> ba(ss);
@@ -169,7 +170,7 @@ static bool for_all_transactions(const std::string &filename, const std::functio
 
 gulps_log_level log_scr;
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 #ifdef WIN32
 	std::vector<char*> argptrs;
@@ -266,12 +267,12 @@ int main(int argc, char *argv[])
 	{
 		std::unique_ptr<gulps::gulps_output> out(new gulps::gulps_print_output(gulps::COLOR_WHITE, gulps::TEXT_ONLY));
 		out->add_filter([](const gulps::message& msg, bool printed, bool logged) -> bool {
-				if(msg.out != gulps::OUT_LOG_0 && msg.out != gulps::OUT_USER_0)
-					return false;
-				if(printed)
-					return false;
-				return log_scr.match_msg(msg);
-				});
+			if(msg.out != gulps::OUT_LOG_0 && msg.out != gulps::OUT_USER_0)
+				return false;
+			if(printed)
+				return false;
+			return log_scr.match_msg(msg);
+		});
 		gulps::inst().add_output(std::move(out));
 	}
 
@@ -316,32 +317,32 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	std::vector<std::unique_ptr<Blockchain>> core_storage(inputs.size());
-	Blockchain *blockchain = NULL;
+	Blockchain* blockchain = NULL;
 	tx_memory_pool m_mempool(*blockchain);
 	for(size_t n = 0; n < inputs.size(); ++n)
 	{
 		core_storage[n].reset(new Blockchain(m_mempool));
 
-		BlockchainDB *db = new_db(db_type);
+		BlockchainDB* db = new_db(db_type);
 		if(db == NULL)
 		{
 			GULPS_ERROR("Attempted to use non-existent database type: ", db_type);
 			throw std::runtime_error("Attempting to use non-existent database type");
 		}
-		GULPS_PRINT("database: " , db_type);
+		GULPS_PRINT("database: ", db_type);
 
 		std::string filename = inputs[n];
 		while(boost::ends_with(filename, "/") || boost::ends_with(filename, "\\"))
 			filename.pop_back();
-		GULPSF_PRINT("Loading blockchain from folder {} ..." , filename);
+		GULPSF_PRINT("Loading blockchain from folder {} ...", filename);
 
 		try
 		{
 			db->open(filename, DBF_RDONLY);
 		}
-		catch(const std::exception &e)
+		catch(const std::exception& e)
 		{
-			GULPS_PRINT("Error opening database: " , e.what());
+			GULPS_PRINT("Error opening database: ", e.what());
 			return 1;
 		}
 		r = core_storage[n]->init(db, net_type);
@@ -355,7 +356,7 @@ int main(int argc, char *argv[])
 	{
 		if(!boost::filesystem::is_directory(direc))
 		{
-			GULPS_ERROR("LMDB needs a directory path, but a file was passed: " , output_file_path.string());
+			GULPS_ERROR("LMDB needs a directory path, but a file was passed: ", output_file_path.string());
 			return 1;
 		}
 	}
@@ -363,7 +364,7 @@ int main(int argc, char *argv[])
 	{
 		if(!boost::filesystem::create_directories(direc))
 		{
-			GULPS_ERROR("Failed to create directory: " , output_file_path.string());
+			GULPS_ERROR("Failed to create directory: ", output_file_path.string());
 			return 1;
 		}
 	}
@@ -380,13 +381,13 @@ int main(int argc, char *argv[])
 
 	for(size_t n = 0; n < inputs.size(); ++n)
 	{
-		GULPS_PRINT("Reading blockchain from " , inputs[n]);
-		for_all_transactions(inputs[n], [&](const cryptonote::transaction_prefix &tx) -> bool {
-			for(const auto &in : tx.vin)
+		GULPS_PRINT("Reading blockchain from ", inputs[n]);
+		for_all_transactions(inputs[n], [&](const cryptonote::transaction_prefix& tx) -> bool {
+			for(const auto& in : tx.vin)
 			{
 				if(in.type() != typeid(txin_to_key))
 					continue;
-				const auto &txin = boost::get<txin_to_key>(in);
+				const auto& txin = boost::get<txin_to_key>(in);
 				if(opt_rct_only && txin.amount != 0)
 					continue;
 
@@ -427,7 +428,7 @@ int main(int argc, char *argv[])
 						else if(common.size() == 1)
 						{
 							const crypto::public_key pkey = core_storage[n]->get_output_key(txin.amount, common[0]);
-							GULPSF_INFO("Blackballing output {}, due to being used in rings with a single common element" , pkey);
+							GULPSF_INFO("Blackballing output {}, due to being used in rings with a single common element", pkey);
 							ringdb.blackball(pkey);
 							newly_spent.insert(output_data(txin.amount, common[0]));
 							spent.insert(output_data(txin.amount, common[0]));
@@ -435,7 +436,7 @@ int main(int argc, char *argv[])
 						else
 						{
 							GULPS_INFO("The intersection has more than one element, it's still ok");
-							for(const auto &out : r0)
+							for(const auto& out : r0)
 								if(std::find(common.begin(), common.end(), out) != common.end())
 									new_ring.push_back(out);
 							new_ring = cryptonote::absolute_output_offsets_to_relative(new_ring);
@@ -450,13 +451,13 @@ int main(int argc, char *argv[])
 
 	while(!newly_spent.empty())
 	{
-		GULPSF_PRINT("Secondary pass due to {} newly found spent outputs" , newly_spent.size());
+		GULPSF_PRINT("Secondary pass due to {} newly found spent outputs", newly_spent.size());
 		std::unordered_set<output_data> work_spent = std::move(newly_spent);
 		newly_spent.clear();
 
-		for(const output_data &od : work_spent)
+		for(const output_data& od : work_spent)
 		{
-			for(const crypto::key_image &ki : outputs[od])
+			for(const crypto::key_image& ki : outputs[od])
 			{
 				std::vector<uint64_t> absolute = cryptonote::relative_output_offsets_to_absolute(relative_rings[ki]);
 				size_t known = 0;

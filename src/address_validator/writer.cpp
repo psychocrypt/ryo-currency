@@ -58,7 +58,7 @@ namespace cryptonote
 //----------------------------------------------------------------------------------------------------
 // overloaded method to remove spaces within the string
 template <>
-writer &writer::operator<<(const std::string &value)
+writer& writer::operator<<(const std::string& value)
 {
 	if(!m_remove_spaces)
 		print(value);
@@ -72,7 +72,7 @@ writer &writer::operator<<(const std::string &value)
 }
 
 //----------------------------------------------------------------------------------------------------
-writer &writer::operator<<(const char *value)
+writer& writer::operator<<(const char* value)
 {
 	// call string method to filter out spaces if needed
 	this->operator<<(std::string(value));
@@ -80,10 +80,10 @@ writer &writer::operator<<(const char *value)
 }
 
 //----------------------------------------------------------------------------------------------------
-writer &writer::operator<<(const char value)
+writer& writer::operator<<(const char value)
 {
 	// call string method to filter out spaces if needed
 	this->operator<<(std::string(1, value));
 	return *this;
 }
-}
+} // namespace cryptonote

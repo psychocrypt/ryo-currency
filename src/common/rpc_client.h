@@ -66,8 +66,8 @@ class t_rpc_client final
 
   public:
 	t_rpc_client(
-		uint32_t ip, uint16_t port, boost::optional<epee::net_utils::http::login> user)
-		: m_http_client{}
+		uint32_t ip, uint16_t port, boost::optional<epee::net_utils::http::login> user) :
+		m_http_client{}
 	{
 		m_http_client.set_server(
 			epee::string_tools::get_ip_string_from_int32(ip), std::to_string(port), std::move(user));
@@ -75,7 +75,7 @@ class t_rpc_client final
 
 	template <typename T_req, typename T_res>
 	bool basic_json_rpc_request(
-		T_req &req, T_res &res, std::string const &method_name)
+		T_req& req, T_res& res, std::string const& method_name)
 	{
 		t_http_connection connection(&m_http_client);
 
@@ -99,7 +99,7 @@ class t_rpc_client final
 
 	template <typename T_req, typename T_res>
 	bool json_rpc_request(
-		T_req &req, T_res &res, std::string const &method_name, std::string const &fail_msg)
+		T_req& req, T_res& res, std::string const& method_name, std::string const& fail_msg)
 	{
 		t_http_connection connection(&m_http_client);
 
@@ -123,7 +123,7 @@ class t_rpc_client final
 
 	template <typename T_req, typename T_res>
 	bool rpc_request(
-		T_req &req, T_res &res, std::string const &relative_url, std::string const &fail_msg)
+		T_req& req, T_res& res, std::string const& relative_url, std::string const& fail_msg)
 	{
 		t_http_connection connection(&m_http_client);
 
@@ -136,7 +136,7 @@ class t_rpc_client final
 		ok = epee::net_utils::invoke_http_json(relative_url, req, res, m_http_client, t_http_connection::TIMEOUT());
 		if(!ok || res.status != CORE_RPC_STATUS_OK) // TODO - handle CORE_RPC_STATUS_BUSY ?
 		{
-		GULPSF_ERROR("{}-- rpc_request: {}", fail_msg, res.status);
+			GULPSF_ERROR("{}-- rpc_request: {}", fail_msg, res.status);
 			return false;
 		}
 		else
@@ -151,4 +151,4 @@ class t_rpc_client final
 		return connection.is_open();
 	}
 };
-}
+} // namespace tools

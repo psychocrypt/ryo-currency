@@ -56,10 +56,10 @@ namespace Language
    * \param  count           How many characters to return.
    * \return                 A string consisting of the first count characters in s.
    */
-inline std::string utf8prefix(const std::string &s, size_t count)
+inline std::string utf8prefix(const std::string& s, size_t count)
 {
 	std::string prefix = "";
-	const char *ptr = s.c_str();
+	const char* ptr = s.c_str();
 	while(count-- && *ptr)
 	{
 		prefix += *ptr++;
@@ -77,6 +77,7 @@ inline std::string utf8prefix(const std::string &s, size_t count)
 class Base
 {
 	GULPS_CAT_MAJOR("lan_base");
+
   protected:
 	enum
 	{
@@ -104,7 +105,7 @@ class Base
 			if((*it).size() < unique_prefix_length)
 			{
 				if(flags & ALLOW_SHORT_WORDS)
-					GULPS_LOG_L2("{} word {}' is shorter than its prefix length, {}'", language_name,  *it, unique_prefix_length);
+					GULPS_LOG_L2("{} word {}' is shorter than its prefix length, {}'", language_name, *it, unique_prefix_length);
 				else
 					throw std::runtime_error("Too short word in " + language_name + " word list: " + *it);
 			}
@@ -129,10 +130,11 @@ class Base
 	}
 
   public:
-	Base(const char *language_name, const char *english_language_name, const std::vector<std::string> &words, uint32_t prefix_length) : word_list(words),
-																																		unique_prefix_length(prefix_length),
-																																		language_name(language_name),
-																																		english_language_name(english_language_name)
+	Base(const char* language_name, const char* english_language_name, const std::vector<std::string>& words, uint32_t prefix_length) :
+		word_list(words),
+		unique_prefix_length(prefix_length),
+		language_name(language_name),
+		english_language_name(english_language_name)
 	{
 	}
 	virtual ~Base()
@@ -142,7 +144,7 @@ class Base
      * \brief Returns a pointer to the word list.
      * \return A pointer to the word list.
      */
-	const std::vector<std::string> &get_word_list() const
+	const std::vector<std::string>& get_word_list() const
 	{
 		return word_list;
 	}
@@ -150,7 +152,7 @@ class Base
      * \brief Returns a pointer to the word map.
      * \return A pointer to the word map.
      */
-	const std::unordered_map<std::string, uint32_t> &get_word_map() const
+	const std::unordered_map<std::string, uint32_t>& get_word_map() const
 	{
 		return word_map;
 	}
@@ -158,7 +160,7 @@ class Base
      * \brief Returns a pointer to the trimmed word map.
      * \return A pointer to the trimmed word map.
      */
-	const std::unordered_map<std::string, uint32_t> &get_trimmed_word_map() const
+	const std::unordered_map<std::string, uint32_t>& get_trimmed_word_map() const
 	{
 		return trimmed_word_map;
 	}
@@ -166,7 +168,7 @@ class Base
      * \brief Returns the name of the language.
      * \return Name of the language.
      */
-	const std::string &get_language_name() const
+	const std::string& get_language_name() const
 	{
 		return language_name;
 	}
@@ -174,7 +176,7 @@ class Base
      * \brief Returns the name of the language in English.
      * \return Name of the language.
      */
-	const std::string &get_english_language_name() const
+	const std::string& get_english_language_name() const
 	{
 		return english_language_name;
 	}
@@ -187,6 +189,6 @@ class Base
 		return unique_prefix_length;
 	}
 };
-}
+} // namespace Language
 
 #endif

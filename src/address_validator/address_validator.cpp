@@ -79,7 +79,7 @@ void address_validator::evaluate()
 	for(size_t i = 0; i < m_address_strs.size(); ++i)
 	{
 		// check all network types
-		for(const auto &net : net_types)
+		for(const auto& net : net_types)
 		{
 			bool result = evaluate_address_attributes(net, m_address_strs[i], m_address_attributes[i]);
 			if(result)
@@ -96,7 +96,7 @@ void address_validator::evaluate()
 }
 
 //----------------------------------------------------------------------------------------------------
-bool address_validator::evaluate_address_attributes(const std::string &net_type, const std::string &addr_str, address_attributes &attr)
+bool address_validator::evaluate_address_attributes(const std::string& net_type, const std::string& addr_str, address_attributes& attr)
 {
 	bool valid = false;
 	if(net_type == "mainnet")
@@ -123,16 +123,12 @@ bool address_validator::evaluate_address_attributes(const std::string &net_type,
 
 //----------------------------------------------------------------------------------------------------
 void address_validator::init_options(
-	boost::program_options::options_description &desc,
-	boost::program_options::positional_options_description &pos_option)
+	boost::program_options::options_description& desc,
+	boost::program_options::positional_options_description& pos_option)
 {
 	namespace po = boost::program_options;
 
-	desc.add_options()
-		("network,n", po::value<std::string>(&m_network)->default_value("auto"), "network type (auto, mainnet, testnet, stagenet)")
-		("filename,f", po::value<std::string>(&m_filename), "json file name, if not set result is printed to terminal")
-		("human", po::value<bool>(&m_human)->zero_tokens()->default_value(false)->default_value(false), "human readable output")
-		("address", po::value<std::vector<std::string>>(&m_address_strs), "ryo-currency address");
+	desc.add_options()("network,n", po::value<std::string>(&m_network)->default_value("auto"), "network type (auto, mainnet, testnet, stagenet)")("filename,f", po::value<std::string>(&m_filename), "json file name, if not set result is printed to terminal")("human", po::value<bool>(&m_human)->zero_tokens()->default_value(false)->default_value(false), "human readable output")("address", po::value<std::vector<std::string>>(&m_address_strs), "ryo-currency address");
 
 	pos_option.add("address", -1);
 }
@@ -175,7 +171,7 @@ void address_validator::print()
 }
 
 //----------------------------------------------------------------------------------------------------
-void address_validator::print(writer &out, const std::string &addr_str, const address_attributes &attr, const char separator)
+void address_validator::print(writer& out, const std::string& addr_str, const address_attributes& attr, const char separator)
 {
 	out << "  {\n";
 	out << "    \"valid\" : " << (attr.is_valid ? "true" : "false") << "," << separator;
@@ -192,7 +188,7 @@ void address_validator::print(writer &out, const std::string &addr_str, const ad
 } // namespace cryptonote
 
 //----------------------------------------------------------------------------------------------------
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 #ifdef WIN32
 	std::vector<char*> argptrs;

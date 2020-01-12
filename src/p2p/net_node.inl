@@ -73,8 +73,6 @@
 
 #define contextx_str(x) std::string("[" + epee::net_utils::print_connection_context_short(x) + "]")
 
-
-
 #define NET_MAKE_IP(b1, b2, b3, b4) ((LPARAM)(((DWORD)(b1) << 24) + ((DWORD)(b2) << 16) + ((DWORD)(b3) << 8) + ((DWORD)(b4))))
 
 #define MIN_WANTED_SEED_NODES 12
@@ -83,7 +81,7 @@ namespace nodetool
 {
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-void node_server<t_payload_net_handler>::init_options(boost::program_options::options_description &desc)
+void node_server<t_payload_net_handler>::init_options(boost::program_options::options_description& desc)
 {
 	command_line::add_arg(desc, arg_p2p_bind_ip);
 	command_line::add_arg(desc, arg_p2p_bind_port, false);
@@ -132,7 +130,7 @@ bool node_server<t_payload_net_handler>::init_config()
 					boost::archive::binary_iarchive a(p2p_data);
 					a >> *this;
 				}
-				catch(const std::exception &e)
+				catch(const std::exception& e)
 				{
 					GULPS_WARN("Failed to load p2p config file, falling back to default config");
 					m_peerlist = peerlist_manager(); // it was probably half clobbered by the failed load
@@ -168,23 +166,23 @@ bool node_server<t_payload_net_handler>::init_config()
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-void node_server<t_payload_net_handler>::for_each_connection(std::function<bool(typename t_payload_net_handler::connection_context &, peerid_type, uint32_t)> f)
+void node_server<t_payload_net_handler>::for_each_connection(std::function<bool(typename t_payload_net_handler::connection_context&, peerid_type, uint32_t)> f)
 {
-	m_net_server.get_config_object().foreach_connection([&](p2p_connection_context &cntx) {
+	m_net_server.get_config_object().foreach_connection([&](p2p_connection_context& cntx) {
 		return f(cntx, cntx.peer_id, cntx.support_flags);
 	});
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::for_connection(const boost::uuids::uuid &connection_id, std::function<bool(typename t_payload_net_handler::connection_context &, peerid_type, uint32_t)> f)
+bool node_server<t_payload_net_handler>::for_connection(const boost::uuids::uuid& connection_id, std::function<bool(typename t_payload_net_handler::connection_context&, peerid_type, uint32_t)> f)
 {
-	return m_net_server.get_config_object().for_connection(connection_id, [&](p2p_connection_context &cntx) {
+	return m_net_server.get_config_object().for_connection(connection_id, [&](p2p_connection_context& cntx) {
 		return f(cntx, cntx.peer_id, cntx.support_flags);
 	});
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::is_remote_host_allowed(const epee::net_utils::network_address &address)
+bool node_server<t_payload_net_handler>::is_remote_host_allowed(const epee::net_utils::network_address& address)
 {
 	CRITICAL_REGION_LOCAL(m_blocked_hosts_lock);
 	auto it = m_blocked_hosts.find(address.host_str());
@@ -213,21 +211,21 @@ bool node_server<t_payload_net_handler>::make_default_config()
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::block_host(const epee::net_utils::network_address &addr, time_t seconds)
+bool node_server<t_payload_net_handler>::block_host(const epee::net_utils::network_address& addr, time_t seconds)
 {
 	CRITICAL_REGION_LOCAL(m_blocked_hosts_lock);
 	m_blocked_hosts[addr.host_str()] = time(nullptr) + seconds;
 
 	// drop any connection to that IP
 	std::list<boost::uuids::uuid> conns;
-	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context &cntxt) {
+	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt) {
 		if(cntxt.m_remote_address.is_same_host(addr))
 		{
 			conns.push_back(cntxt.m_connection_id);
 		}
 		return true;
 	});
-	for(const auto &c : conns)
+	for(const auto& c : conns)
 		m_net_server.get_config_object().close(c);
 
 	GULPSF_GLOBAL_PRINT_CLR(gulps::COLOR_CYAN, "Host {} blocked.", addr.host_str());
@@ -235,7 +233,7 @@ bool node_server<t_payload_net_handler>::block_host(const epee::net_utils::netwo
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::unblock_host(const epee::net_utils::network_address &address)
+bool node_server<t_payload_net_handler>::unblock_host(const epee::net_utils::network_address& address)
 {
 	CRITICAL_REGION_LOCAL(m_blocked_hosts_lock);
 	auto i = m_blocked_hosts.find(address.host_str());
@@ -247,11 +245,11 @@ bool node_server<t_payload_net_handler>::unblock_host(const epee::net_utils::net
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::add_host_fail(const epee::net_utils::network_address &address)
+bool node_server<t_payload_net_handler>::add_host_fail(const epee::net_utils::network_address& address)
 {
 	CRITICAL_REGION_LOCAL(m_host_fails_score_lock);
 	uint64_t fails = ++m_host_fails_score[address.host_str()];
-	GULPSF_LOG_L1("Host {} fail score={}", address.host_str() , fails);
+	GULPSF_LOG_L1("Host {} fail score={}", address.host_str(), fails);
 	if(fails > P2P_IP_FAILS_BEFORE_BLOCK)
 	{
 		auto it = m_host_fails_score.find(address.host_str());
@@ -263,14 +261,14 @@ bool node_server<t_payload_net_handler>::add_host_fail(const epee::net_utils::ne
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::parse_peer_from_string(epee::net_utils::network_address &pe, const std::string &node_addr, uint16_t default_port)
+bool node_server<t_payload_net_handler>::parse_peer_from_string(epee::net_utils::network_address& pe, const std::string& node_addr, uint16_t default_port)
 {
 	return epee::net_utils::create_network_address(pe, node_addr, default_port);
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
 bool node_server<t_payload_net_handler>::handle_command_line(
-	const boost::program_options::variables_map &vm)
+	const boost::program_options::variables_map& vm)
 {
 	bool testnet = command_line::get_arg(vm, cryptonote::arg_testnet_on);
 	bool stagenet = command_line::get_arg(vm, cryptonote::arg_stagenet_on);
@@ -286,13 +284,13 @@ bool node_server<t_payload_net_handler>::handle_command_line(
 	if(command_line::has_arg(vm, arg_p2p_add_peer))
 	{
 		std::vector<std::string> perrs = command_line::get_arg(vm, arg_p2p_add_peer);
-		for(const std::string &pr_str : perrs)
+		for(const std::string& pr_str : perrs)
 		{
 			nodetool::peerlist_entry pe = AUTO_VAL_INIT(pe);
 			pe.id = crypto::rand<uint64_t>();
 			const uint16_t default_port = config_get_p2p_port(m_nettype);
 			bool r = parse_peer_from_string(pe.adr, pr_str, default_port);
-			GULPS_CHECK_AND_ASSERT_MES(r, false, "Failed to parse address from string: " , pr_str);
+			GULPS_CHECK_AND_ASSERT_MES(r, false, "Failed to parse address from string: ", pr_str);
 			m_command_line_peers.push_back(pe);
 		}
 	}
@@ -340,12 +338,12 @@ bool node_server<t_payload_net_handler>::handle_command_line(
 }
 //-----------------------------------------------------------------------------------
 inline void append_net_address(
-	std::vector<epee::net_utils::network_address> &seed_nodes, std::string const &addr)
+	std::vector<epee::net_utils::network_address>& seed_nodes, std::string const& addr)
 {
 	using namespace boost::asio;
 
 	size_t pos = addr.find_last_of(':');
-	GULPS_CHECK_AND_ASSERT_MES_NO_RET(std::string::npos != pos && addr.length() - 1 != pos && 0 != pos, "Failed to parse seed address from string: '" , addr , '\'');
+	GULPS_CHECK_AND_ASSERT_MES_NO_RET(std::string::npos != pos && addr.length() - 1 != pos && 0 != pos, "Failed to parse seed address from string: '", addr, '\'');
 	std::string host = addr.substr(0, pos);
 	std::string port = addr.substr(pos + 1);
 
@@ -354,7 +352,7 @@ inline void append_net_address(
 	ip::tcp::resolver::query query(host, port, boost::asio::ip::tcp::resolver::query::canonical_name);
 	boost::system::error_code ec;
 	ip::tcp::resolver::iterator i = resolver.resolve(query, ec);
-	GULPS_CHECK_AND_ASSERT_MES_NO_RET(!ec, "Failed to resolve host name '" , host , "': " , ec.message() , ':' , ec.value());
+	GULPS_CHECK_AND_ASSERT_MES_NO_RET(!ec, "Failed to resolve host name '", host, "': ", ec.message(), ':', ec.value());
 
 	ip::tcp::resolver::iterator iend;
 	for(; i != iend; ++i)
@@ -368,7 +366,7 @@ inline void append_net_address(
 		}
 		else
 		{
-			GULPSF_WARN("IPv6 unsupported, skip '{}' -> {}", host , endpoint.address().to_v6().to_string(ec) );
+			GULPSF_WARN("IPv6 unsupported, skip '{}' -> {}", host, endpoint.address().to_v6().to_string(ec));
 			throw std::runtime_error("IPv6 unsupported");
 		}
 	}
@@ -399,7 +397,7 @@ std::set<std::string> node_server<t_payload_net_handler>::get_seed_nodes(crypton
 
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::init(const boost::program_options::variables_map &vm)
+bool node_server<t_payload_net_handler>::init(const boost::program_options::variables_map& vm)
 {
 	std::set<std::string> full_addrs;
 
@@ -431,10 +429,10 @@ bool node_server<t_payload_net_handler>::init(const boost::program_options::vari
 
 			std::list<boost::thread> dns_threads;
 			uint64_t result_index = 0;
-			for(const std::string &addr_str : m_seed_nodes_list)
+			for(const std::string& addr_str : m_seed_nodes_list)
 			{
 				boost::thread th = boost::thread([=, &dns_results, &addr_str] {
-					GULPSF_LOG_L1("dns_threads[{}] created for: {}", result_index , addr_str);
+					GULPSF_LOG_L1("dns_threads[{}] created for: {}", result_index, addr_str);
 					// TODO: care about dnssec avail/valid
 					bool avail, valid;
 					std::vector<std::string> addr_list;
@@ -442,19 +440,19 @@ bool node_server<t_payload_net_handler>::init(const boost::program_options::vari
 					try
 					{
 						addr_list = tools::DNSResolver::instance().get_ipv4(addr_str, avail, valid);
-						GULPSF_LOG_L1("dns_threads[{}] DNS resolve done", result_index );
+						GULPSF_LOG_L1("dns_threads[{}] DNS resolve done", result_index);
 						boost::this_thread::interruption_point();
 					}
-					catch(const boost::thread_interrupted &)
+					catch(const boost::thread_interrupted&)
 					{
 						// thread interruption request
 						// even if we now have results, finish thread without setting
 						// result variables, which are now out of scope in main thread
-						GULPSF_WARN("dns_threads[{}] interrupted", result_index );
+						GULPSF_WARN("dns_threads[{}] interrupted", result_index);
 						return;
 					}
 
-					GULPSF_INFO("dns_threads[{}] addr_str: {}", result_index , addr_str );
+					GULPSF_INFO("dns_threads[{}] addr_str: {}", result_index, addr_str);
 					dns_results[result_index] = addr_list;
 				});
 
@@ -462,27 +460,27 @@ bool node_server<t_payload_net_handler>::init(const boost::program_options::vari
 				++result_index;
 			}
 
-			GULPSF_LOG_L1("dns_threads created, now waiting for completion or timeout of {}ms", CRYPTONOTE_DNS_TIMEOUT_MS );
+			GULPSF_LOG_L1("dns_threads created, now waiting for completion or timeout of {}ms", CRYPTONOTE_DNS_TIMEOUT_MS);
 			boost::chrono::system_clock::time_point deadline = boost::chrono::system_clock::now() + boost::chrono::milliseconds(CRYPTONOTE_DNS_TIMEOUT_MS);
 			uint64_t i = 0;
-			for(boost::thread &th : dns_threads)
+			for(boost::thread& th : dns_threads)
 			{
 				if(!th.try_join_until(deadline))
 				{
-					GULPSF_WARN("dns_threads[{}] timed out, sending interrupt", i );
+					GULPSF_WARN("dns_threads[{}] timed out, sending interrupt", i);
 					th.interrupt();
 				}
 				++i;
 			}
 
 			i = 0;
-			for(const auto &result : dns_results)
+			for(const auto& result : dns_results)
 			{
-				GULPSF_LOG_L1("DNS lookup for {}: {} results", m_seed_nodes_list[i] , result.size() );
+				GULPSF_LOG_L1("DNS lookup for {}: {} results", m_seed_nodes_list[i], result.size());
 				// if no results for node, thread's lookup likely timed out
 				if(result.size())
 				{
-					for(const auto &addr_string : result)
+					for(const auto& addr_string : result)
 						full_addrs.insert(addr_string + ":" + std::to_string(config_get_p2p_port(m_nettype)));
 				}
 				++i;
@@ -496,13 +494,13 @@ bool node_server<t_payload_net_handler>::init(const boost::program_options::vari
 				else
 					GULPS_INFO("Not enough DNS seed nodes found, using fallback defaults too");
 
-				for(const auto &peer : get_seed_nodes(cryptonote::MAINNET))
+				for(const auto& peer : get_seed_nodes(cryptonote::MAINNET))
 					full_addrs.insert(peer);
 			}
 		}
 	}
 
-	for(const auto &full_addr : full_addrs)
+	for(const auto& full_addr : full_addrs)
 	{
 		GULPSF_LOG_L1("Seed node: {}", full_addr);
 		append_net_address(m_seed_nodes, full_addr);
@@ -522,7 +520,7 @@ bool node_server<t_payload_net_handler>::init(const boost::program_options::vari
 	res = m_peerlist.init(m_allow_local_ip);
 	GULPS_CHECK_AND_ASSERT_MES(res, false, "Failed to init peerlist.");
 
-	for(auto &p : m_command_line_peers)
+	for(auto& p : m_command_line_peers)
 		m_peerlist.append_with_peer_white(p);
 
 	//only in case if we really sure that we have external visible ip
@@ -541,7 +539,7 @@ bool node_server<t_payload_net_handler>::init(const boost::program_options::vari
 		return res;
 
 	//try to bind
-	GULPSF_INFO("Binding on {}:{}", m_bind_ip , m_port);
+	GULPSF_INFO("Binding on {}:{}", m_bind_ip, m_port);
 	res = m_net_server.init_server(m_port, m_bind_ip);
 	GULPS_CHECK_AND_ASSERT_MES(res, false, "Failed to bind server");
 
@@ -558,7 +556,7 @@ bool node_server<t_payload_net_handler>::init(const boost::program_options::vari
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-typename node_server<t_payload_net_handler>::payload_net_handler &node_server<t_payload_net_handler>::get_payload_object()
+typename node_server<t_payload_net_handler>::payload_net_handler& node_server<t_payload_net_handler>::get_payload_object()
 {
 	return m_payload_handler;
 }
@@ -574,7 +572,7 @@ bool node_server<t_payload_net_handler>::run()
 			//number_of_peers = m_net_server.get_config_object().get_connections_count();
 			unsigned int number_of_in_peers = 0;
 			unsigned int number_of_out_peers = 0;
-			m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context &cntxt) {
+			m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt) {
 				if(cntxt.m_is_income)
 				{
 					++number_of_in_peers;
@@ -604,7 +602,7 @@ bool node_server<t_payload_net_handler>::run()
 	attrs.set_stack_size(THREAD_STACK_SIZE);
 
 	//go to loop
-	GULPSF_INFO("Run net_service loop( {} threads)...", thrds_count );
+	GULPSF_INFO("Run net_service loop( {} threads)...", thrds_count);
 	if(!m_net_server.run_server(thrds_count, true, attrs))
 	{
 		GULPS_LOG_ERROR("Failed to run net tcp server!");
@@ -669,11 +667,11 @@ bool node_server<t_payload_net_handler>::send_stop_signal()
 	GULPS_LOG_L1("[node] Stop signal sent");
 
 	std::list<boost::uuids::uuid> connection_ids;
-	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context &cntxt) {
+	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt) {
 		connection_ids.push_back(cntxt.m_connection_id);
 		return true;
 	});
-	for(const auto &connection_id : connection_ids)
+	for(const auto& connection_id : connection_ids)
 		m_net_server.get_config_object().close(connection_id);
 
 	m_payload_handler.stop();
@@ -683,7 +681,7 @@ bool node_server<t_payload_net_handler>::send_stop_signal()
 //-----------------------------------------------------------------------------------
 
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::do_handshake_with_peer(peerid_type &pi, p2p_connection_context &context_, bool just_take_peerlist)
+bool node_server<t_payload_net_handler>::do_handshake_with_peer(peerid_type& pi, p2p_connection_context& context_, bool just_take_peerlist)
 {
 	typename COMMAND_HANDSHAKE::request arg;
 	typename COMMAND_HANDSHAKE::response rsp;
@@ -693,55 +691,56 @@ bool node_server<t_payload_net_handler>::do_handshake_with_peer(peerid_type &pi,
 	epee::simple_event ev;
 	std::atomic<bool> hsh_result(false);
 
-	bool r = epee::net_utils::async_invoke_remote_command2<typename COMMAND_HANDSHAKE::response>(context_.m_connection_id, COMMAND_HANDSHAKE::ID, arg, m_net_server.get_config_object(),
-																								 [this, &pi, &ev, &hsh_result, &just_take_peerlist](int code, const typename COMMAND_HANDSHAKE::response &rsp, p2p_connection_context &context) {
-																									 epee::misc_utils::auto_scope_leave_caller scope_exit_handler = epee::misc_utils::create_scope_leave_handler([&]() { ev.raise(); });
+	bool r = epee::net_utils::async_invoke_remote_command2<typename COMMAND_HANDSHAKE::response>(
+		context_.m_connection_id, COMMAND_HANDSHAKE::ID, arg, m_net_server.get_config_object(),
+		[this, &pi, &ev, &hsh_result, &just_take_peerlist](int code, const typename COMMAND_HANDSHAKE::response& rsp, p2p_connection_context& context) {
+			epee::misc_utils::auto_scope_leave_caller scope_exit_handler = epee::misc_utils::create_scope_leave_handler([&]() { ev.raise(); });
 
-																									 if(code < 0)
-																									 {
-																										 GULPSF_LOG_L1("{} COMMAND_HANDSHAKE invoke failed. ({}, {})", contextx_str(context), code , epee::levin::get_err_descr(code) );
-																										 return;
-																									 }
+			if(code < 0)
+			{
+				GULPSF_LOG_L1("{} COMMAND_HANDSHAKE invoke failed. ({}, {})", contextx_str(context), code, epee::levin::get_err_descr(code));
+				return;
+			}
 
-																									 if(rsp.node_data.network_id != m_network_id)
-																									 {
-																										 GULPSF_LOG_L1("{} COMMAND_HANDSHAKE Failed, wrong network!  ({}), closing connection.", contextx_str(context), epee::string_tools::get_str_from_guid_a(rsp.node_data.network_id));
-																										 return;
-																									 }
+			if(rsp.node_data.network_id != m_network_id)
+			{
+				GULPSF_LOG_L1("{} COMMAND_HANDSHAKE Failed, wrong network!  ({}), closing connection.", contextx_str(context), epee::string_tools::get_str_from_guid_a(rsp.node_data.network_id));
+				return;
+			}
 
-																									 if(!handle_remote_peerlist(rsp.local_peerlist_new, rsp.node_data.local_time, context))
-																									 {
-																										 GULPSF_LOG_L1("{} COMMAND_HANDSHAKE: failed to handle_remote_peerlist(...), closing connection.", contextx_str(context));
-																										 add_host_fail(context.m_remote_address);
-																										 return;
-																									 }
-																									 hsh_result = true;
-																									 if(!just_take_peerlist)
-																									 {
-																										 if(!m_payload_handler.process_payload_sync_data(rsp.payload_data, context, true))
-																										 {
-																											 GULPSF_LOG_L1("{} COMMAND_HANDSHAKE invoked, but process_payload_sync_data returned false, dropping connection.", contextx_str(context));
-																											 hsh_result = false;
-																											 return;
-																										 }
+			if(!handle_remote_peerlist(rsp.local_peerlist_new, rsp.node_data.local_time, context))
+			{
+				GULPSF_LOG_L1("{} COMMAND_HANDSHAKE: failed to handle_remote_peerlist(...), closing connection.", contextx_str(context));
+				add_host_fail(context.m_remote_address);
+				return;
+			}
+			hsh_result = true;
+			if(!just_take_peerlist)
+			{
+				if(!m_payload_handler.process_payload_sync_data(rsp.payload_data, context, true))
+				{
+					GULPSF_LOG_L1("{} COMMAND_HANDSHAKE invoked, but process_payload_sync_data returned false, dropping connection.", contextx_str(context));
+					hsh_result = false;
+					return;
+				}
 
-																										 pi = context.peer_id = rsp.node_data.peer_id;
-																										 m_peerlist.set_peer_just_seen(rsp.node_data.peer_id, context.m_remote_address);
+				pi = context.peer_id = rsp.node_data.peer_id;
+				m_peerlist.set_peer_just_seen(rsp.node_data.peer_id, context.m_remote_address);
 
-																										 if(rsp.node_data.peer_id == m_config.m_peer_id)
-																										 {
-																											 GULPSF_LOG_L1("{} Connection to self detected, dropping connection", contextx_str(context));
-																											 hsh_result = false;
-																											 return;
-																										 }
-																										 GULPSF_LOG_L1("{}  COMMAND_HANDSHAKE INVOKED OK", contextx_str(context));
-																									 }
-																									 else
-																									 {
-																										 GULPSF_LOG_L1("{}  COMMAND_HANDSHAKE(AND CLOSE) INVOKED OK", contextx_str(context));
-																									 }
-																								 },
-																								 P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT);
+				if(rsp.node_data.peer_id == m_config.m_peer_id)
+				{
+					GULPSF_LOG_L1("{} Connection to self detected, dropping connection", contextx_str(context));
+					hsh_result = false;
+					return;
+				}
+				GULPSF_LOG_L1("{}  COMMAND_HANDSHAKE INVOKED OK", contextx_str(context));
+			}
+			else
+			{
+				GULPSF_LOG_L1("{}  COMMAND_HANDSHAKE(AND CLOSE) INVOKED OK", contextx_str(context));
+			}
+		},
+		P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT);
 
 	if(r)
 	{
@@ -755,7 +754,7 @@ bool node_server<t_payload_net_handler>::do_handshake_with_peer(peerid_type &pi,
 	}
 	else
 	{
-		try_get_support_flags(context_, [](p2p_connection_context &flags_context, const uint32_t &support_flags) {
+		try_get_support_flags(context_, [](p2p_connection_context& flags_context, const uint32_t& support_flags) {
 			flags_context.support_flags = support_flags;
 		});
 	}
@@ -764,30 +763,30 @@ bool node_server<t_payload_net_handler>::do_handshake_with_peer(peerid_type &pi,
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::do_peer_timed_sync(const epee::net_utils::connection_context_base &context_, peerid_type peer_id)
+bool node_server<t_payload_net_handler>::do_peer_timed_sync(const epee::net_utils::connection_context_base& context_, peerid_type peer_id)
 {
 	typename COMMAND_TIMED_SYNC::request arg = AUTO_VAL_INIT(arg);
 	m_payload_handler.get_payload_sync_data(arg.payload_data);
 
 	bool r = epee::net_utils::async_invoke_remote_command2<typename COMMAND_TIMED_SYNC::response>(context_.m_connection_id, COMMAND_TIMED_SYNC::ID, arg, m_net_server.get_config_object(),
-																								  [this](int code, const typename COMMAND_TIMED_SYNC::response &rsp, p2p_connection_context &context) {
-																									  context.m_in_timedsync = false;
-																									  if(code < 0)
-																									  {
-																										  GULPSF_LOG_L1("{} COMMAND_TIMED_SYNC invoke failed. ({}, {})", contextx_str(context), code , epee::levin::get_err_descr(code) );
-																										  return;
-																									  }
+		[this](int code, const typename COMMAND_TIMED_SYNC::response& rsp, p2p_connection_context& context) {
+			context.m_in_timedsync = false;
+			if(code < 0)
+			{
+				GULPSF_LOG_L1("{} COMMAND_TIMED_SYNC invoke failed. ({}, {})", contextx_str(context), code, epee::levin::get_err_descr(code));
+				return;
+			}
 
-																									  if(!handle_remote_peerlist(rsp.local_peerlist_new, rsp.local_time, context))
-																									  {
-																										  GULPSF_LOG_L1("{} COMMAND_TIMED_SYNC: failed to handle_remote_peerlist(...), closing connection.", contextx_str(context));
-																										  m_net_server.get_config_object().close(context.m_connection_id);
-																										  add_host_fail(context.m_remote_address);
-																									  }
-																									  if(!context.m_is_income)
-																										  m_peerlist.set_peer_just_seen(context.peer_id, context.m_remote_address);
-																									  m_payload_handler.process_payload_sync_data(rsp.payload_data, context, false);
-																								  });
+			if(!handle_remote_peerlist(rsp.local_peerlist_new, rsp.local_time, context))
+			{
+				GULPSF_LOG_L1("{} COMMAND_TIMED_SYNC: failed to handle_remote_peerlist(...), closing connection.", contextx_str(context));
+				m_net_server.get_config_object().close(context.m_connection_id);
+				add_host_fail(context.m_remote_address);
+			}
+			if(!context.m_is_income)
+				m_peerlist.set_peer_just_seen(context.peer_id, context.m_remote_address);
+			m_payload_handler.process_payload_sync_data(rsp.payload_data, context, false);
+		});
 
 	if(!r)
 	{
@@ -806,19 +805,19 @@ size_t node_server<t_payload_net_handler>::get_random_index_with_fixed_probabili
 
 	size_t x = crypto::rand<size_t>() % (max_index + 1);
 	size_t res = (x * x * x) / (max_index * max_index); //parabola \/
-	GULPSF_LOG_L1("Random connection index={}(x={}, max_index={})", res , x , max_index );
+	GULPSF_LOG_L1("Random connection index={}(x={}, max_index={})", res, x, max_index);
 	return res;
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::is_peer_used(const peerlist_entry &peer)
+bool node_server<t_payload_net_handler>::is_peer_used(const peerlist_entry& peer)
 {
 
 	if(m_config.m_peer_id == peer.id)
 		return true; //dont make connections to ourself
 
 	bool used = false;
-	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context &cntxt) {
+	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt) {
 		if(cntxt.peer_id == peer.id || (!cntxt.m_is_income && peer.adr == cntxt.m_remote_address))
 		{
 			used = true;
@@ -831,7 +830,7 @@ bool node_server<t_payload_net_handler>::is_peer_used(const peerlist_entry &peer
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::is_peer_used(const anchor_peerlist_entry &peer)
+bool node_server<t_payload_net_handler>::is_peer_used(const anchor_peerlist_entry& peer)
 {
 	if(m_config.m_peer_id == peer.id)
 	{
@@ -840,7 +839,7 @@ bool node_server<t_payload_net_handler>::is_peer_used(const anchor_peerlist_entr
 
 	bool used = false;
 
-	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context &cntxt) {
+	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt) {
 		if(cntxt.peer_id == peer.id || (!cntxt.m_is_income && peer.adr == cntxt.m_remote_address))
 		{
 			used = true;
@@ -855,10 +854,10 @@ bool node_server<t_payload_net_handler>::is_peer_used(const anchor_peerlist_entr
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::is_addr_connected(const epee::net_utils::network_address &peer)
+bool node_server<t_payload_net_handler>::is_addr_connected(const epee::net_utils::network_address& peer)
 {
 	bool connected = false;
-	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context &cntxt) {
+	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt) {
 		if(!cntxt.m_is_income && peer == cntxt.m_remote_address)
 		{
 			connected = true;
@@ -873,7 +872,7 @@ bool node_server<t_payload_net_handler>::is_addr_connected(const epee::net_utils
 #define priority_str(x) x ? "[priority]" : ""
 
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::try_to_connect_and_handshake_with_new_peer(const epee::net_utils::network_address &na, bool just_take_peerlist, uint64_t last_seen_stamp, PeerType peer_type, uint64_t first_seen_stamp)
+bool node_server<t_payload_net_handler>::try_to_connect_and_handshake_with_new_peer(const epee::net_utils::network_address& na, bool just_take_peerlist, uint64_t last_seen_stamp, PeerType peer_type, uint64_t first_seen_stamp)
 {
 	if(m_current_number_of_out_peers == m_config.m_net_config.max_out_connection_count) // out peers limit
 	{
@@ -885,24 +884,23 @@ bool node_server<t_payload_net_handler>::try_to_connect_and_handshake_with_new_p
 		m_current_number_of_out_peers--; // atomic variable, update time = 1s
 		return false;
 	}
-	GULPSF_LOG_L1("Connecting to {}(peer_type={}, last_seen: {})...", na.str() , peer_type , (last_seen_stamp ? epee::misc_utils::get_time_interval_string(time(NULL) - last_seen_stamp) : "never")
-							);
+	GULPSF_LOG_L1("Connecting to {}(peer_type={}, last_seen: {})...", na.str(), peer_type, (last_seen_stamp ? epee::misc_utils::get_time_interval_string(time(NULL) - last_seen_stamp) : "never"));
 
 	GULPS_CHECK_AND_ASSERT_MES(na.get_type_id() == epee::net_utils::ipv4_network_address::ID, false,
-						 "Only IPv4 addresses are supported here");
-	const epee::net_utils::ipv4_network_address &ipv4 = na.as<const epee::net_utils::ipv4_network_address>();
+		"Only IPv4 addresses are supported here");
+	const epee::net_utils::ipv4_network_address& ipv4 = na.as<const epee::net_utils::ipv4_network_address>();
 
 	typename net_server::t_connection_context con = AUTO_VAL_INIT(con);
 	bool res = m_net_server.connect(epee::string_tools::get_ip_string_from_int32(ipv4.ip()),
-									epee::string_tools::num_to_string_fast(ipv4.port()),
-									m_config.m_net_config.connection_timeout,
-									con);
+		epee::string_tools::num_to_string_fast(ipv4.port()),
+		m_config.m_net_config.connection_timeout,
+		con);
 
 	if(!res)
 	{
 		bool is_priority = is_priority_node(na);
-		GULPS_INFO( "{} {} Connect failed to {}", contextx_str(con), priority_str(is_priority), na.str()
-								   /*<< ", try " << try_count*/);
+		GULPS_INFO("{} {} Connect failed to {}", contextx_str(con), priority_str(is_priority), na.str()
+			/*<< ", try " << try_count*/);
 		//m_peerlist.set_peer_unreachable(pe);
 		return false;
 	}
@@ -914,7 +912,7 @@ bool node_server<t_payload_net_handler>::try_to_connect_and_handshake_with_new_p
 	{
 		bool is_priority = is_priority_node(na);
 		GULPS_INFO("{} {} Failed to HANDSHAKE with peer {}", contextx_str(con), priority_str(is_priority), na.str()
-								   /*<< ", try " << try_count*/);
+			/*<< ", try " << try_count*/);
 		return false;
 	}
 
@@ -946,20 +944,19 @@ bool node_server<t_payload_net_handler>::try_to_connect_and_handshake_with_new_p
 }
 
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::check_connection_and_handshake_with_peer(const epee::net_utils::network_address &na, uint64_t last_seen_stamp)
+bool node_server<t_payload_net_handler>::check_connection_and_handshake_with_peer(const epee::net_utils::network_address& na, uint64_t last_seen_stamp)
 {
-	GULPSF_LOG_L1("Connecting to {}(last_seen: {})...", na.str() , (last_seen_stamp ? epee::misc_utils::get_time_interval_string(time(NULL) - last_seen_stamp) : "never")
-								  );
+	GULPSF_LOG_L1("Connecting to {}(last_seen: {})...", na.str(), (last_seen_stamp ? epee::misc_utils::get_time_interval_string(time(NULL) - last_seen_stamp) : "never"));
 
 	GULPS_CHECK_AND_ASSERT_MES(na.get_type_id() == epee::net_utils::ipv4_network_address::ID, false,
-						 "Only IPv4 addresses are supported here");
-	const epee::net_utils::ipv4_network_address &ipv4 = na.as<epee::net_utils::ipv4_network_address>();
+		"Only IPv4 addresses are supported here");
+	const epee::net_utils::ipv4_network_address& ipv4 = na.as<epee::net_utils::ipv4_network_address>();
 
 	typename net_server::t_connection_context con = AUTO_VAL_INIT(con);
 	bool res = m_net_server.connect(epee::string_tools::get_ip_string_from_int32(ipv4.ip()),
-									epee::string_tools::num_to_string_fast(ipv4.port()),
-									m_config.m_net_config.connection_timeout,
-									con);
+		epee::string_tools::num_to_string_fast(ipv4.port()),
+		m_config.m_net_config.connection_timeout,
+		con);
 
 	if(!res)
 	{
@@ -990,7 +987,7 @@ bool node_server<t_payload_net_handler>::check_connection_and_handshake_with_pee
 
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::is_addr_recently_failed(const epee::net_utils::network_address &addr)
+bool node_server<t_payload_net_handler>::is_addr_recently_failed(const epee::net_utils::network_address& addr)
 {
 	CRITICAL_REGION_LOCAL(m_conn_fails_cache_lock);
 	auto it = m_conn_fails_cache.find(addr);
@@ -1004,11 +1001,11 @@ bool node_server<t_payload_net_handler>::is_addr_recently_failed(const epee::net
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::make_new_connection_from_anchor_peerlist(const std::vector<anchor_peerlist_entry> &anchor_peerlist)
+bool node_server<t_payload_net_handler>::make_new_connection_from_anchor_peerlist(const std::vector<anchor_peerlist_entry>& anchor_peerlist)
 {
-	for(const auto &pe : anchor_peerlist)
+	for(const auto& pe : anchor_peerlist)
 	{
-		GULPSF_LOG_L1("Considering connecting (out) to peer: {} {}", peerid_type(pe.id) , pe.adr.str());
+		GULPSF_LOG_L1("Considering connecting (out) to peer: {} {}", peerid_type(pe.id), pe.adr.str());
 
 		if(is_peer_used(pe))
 		{
@@ -1026,9 +1023,7 @@ bool node_server<t_payload_net_handler>::make_new_connection_from_anchor_peerlis
 			continue;
 		}
 
-		GULPSF_LOG_L1("Selected peer: {} {}[peer_type={}] first_seen: {}", peerid_to_string(pe.id) , pe.adr.str()
-								 , anchor
-								 , epee::misc_utils::get_time_interval_string(time(NULL) - pe.first_seen));
+		GULPSF_LOG_L1("Selected peer: {} {}[peer_type={}] first_seen: {}", peerid_to_string(pe.id), pe.adr.str(), anchor, epee::misc_utils::get_time_interval_string(time(NULL) - pe.first_seen));
 
 		if(!try_to_connect_and_handshake_with_new_peer(pe.adr, false, 0, anchor, pe.first_seen))
 		{
@@ -1084,11 +1079,11 @@ bool node_server<t_payload_net_handler>::make_new_connection_from_peerlist(bool 
 		tried_peers.insert(random_index);
 		peerlist_entry pe = AUTO_VAL_INIT(pe);
 		bool r = use_white_list ? m_peerlist.get_white_peer_by_index(pe, random_index) : m_peerlist.get_gray_peer_by_index(pe, random_index);
-		GULPS_CHECK_AND_ASSERT_MES(r, false, "Failed to get random peer from peerlist(white:" , use_white_list , ")");
+		GULPS_CHECK_AND_ASSERT_MES(r, false, "Failed to get random peer from peerlist(white:", use_white_list, ")");
 
 		++try_count;
 
-		GULPSF_LOG_L1("Considering connecting (out) to peer: {} {}", peerid_to_string(pe.id) , pe.adr.str());
+		GULPSF_LOG_L1("Considering connecting (out) to peer: {} {}", peerid_to_string(pe.id), pe.adr.str());
 
 		if(is_peer_used(pe))
 		{
@@ -1102,9 +1097,7 @@ bool node_server<t_payload_net_handler>::make_new_connection_from_peerlist(bool 
 		if(is_addr_recently_failed(pe.adr))
 			continue;
 
-		GULPSF_LOG_L1("Selected peer: {} {}[peer_list={}] last_seen: {}", peerid_to_string(pe.id) , pe.adr.str()
-								 , (use_white_list ? white : gray)
-								 , (pe.last_seen ? epee::misc_utils::get_time_interval_string(time(NULL) - pe.last_seen) : "never"));
+		GULPSF_LOG_L1("Selected peer: {} {}[peer_list={}] last_seen: {}", peerid_to_string(pe.id), pe.adr.str(), (use_white_list ? white : gray), (pe.last_seen ? epee::misc_utils::get_time_interval_string(time(NULL) - pe.last_seen) : "never"));
 
 		if(!try_to_connect_and_handshake_with_new_peer(pe.adr, false, pe.last_seen, use_white_list ? white : gray))
 		{
@@ -1138,7 +1131,7 @@ bool node_server<t_payload_net_handler>::connect_to_seed()
 			if(!fallback_nodes_added)
 			{
 				GULPS_WARN("Failed to connect to any of seed peers, trying fallback seeds");
-				for(const auto &peer : get_seed_nodes(m_nettype))
+				for(const auto& peer : get_seed_nodes(m_nettype))
 				{
 					GULPSF_LOG_L1("Fallback seed node: {}", peer);
 					append_net_address(m_seed_nodes, peer);
@@ -1262,7 +1255,7 @@ template <class t_payload_net_handler>
 size_t node_server<t_payload_net_handler>::get_outgoing_connections_count()
 {
 	size_t count = 0;
-	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context &cntxt) {
+	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt) {
 		if(!cntxt.m_is_income)
 			++count;
 		return true;
@@ -1275,7 +1268,7 @@ template <class t_payload_net_handler>
 size_t node_server<t_payload_net_handler>::get_incoming_connections_count()
 {
 	size_t count = 0;
-	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context &cntxt) {
+	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt) {
 		if(cntxt.m_is_income)
 			++count;
 		return true;
@@ -1300,7 +1293,7 @@ bool node_server<t_payload_net_handler>::peer_sync_idle_maker()
 	GULPS_LOG_L1("STARTED PEERLIST IDLE HANDSHAKE");
 	typedef std::list<std::pair<epee::net_utils::connection_context_base, peerid_type>> local_connects_type;
 	local_connects_type cncts;
-	m_net_server.get_config_object().foreach_connection([&](p2p_connection_context &cntxt) {
+	m_net_server.get_config_object().foreach_connection([&](p2p_connection_context& cntxt) {
 		if(cntxt.peer_id && !cntxt.m_in_timedsync)
 		{
 			cntxt.m_in_timedsync = true;
@@ -1309,25 +1302,25 @@ bool node_server<t_payload_net_handler>::peer_sync_idle_maker()
 		return true;
 	});
 
-	std::for_each(cncts.begin(), cncts.end(), [&](const typename local_connects_type::value_type &vl) { do_peer_timed_sync(vl.first, vl.second); });
+	std::for_each(cncts.begin(), cncts.end(), [&](const typename local_connects_type::value_type& vl) { do_peer_timed_sync(vl.first, vl.second); });
 
 	GULPS_LOG_L1("FINISHED PEERLIST IDLE HANDSHAKE");
 	return true;
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::fix_time_delta(std::list<peerlist_entry> &local_peerlist, time_t local_time, int64_t &delta)
+bool node_server<t_payload_net_handler>::fix_time_delta(std::list<peerlist_entry>& local_peerlist, time_t local_time, int64_t& delta)
 {
 	//fix time delta
 	time_t now = 0;
 	time(&now);
 	delta = now - local_time;
 
-	for(peerlist_entry &be : local_peerlist)
+	for(peerlist_entry& be : local_peerlist)
 	{
 		if(be.last_seen > local_time)
 		{
-			GULPSF_WARN("FOUND FUTURE peerlist for entry {} last_seen: {}, local_time(on remote node):{}", be.adr.str() , be.last_seen , local_time);
+			GULPSF_WARN("FOUND FUTURE peerlist for entry {} last_seen: {}, local_time(on remote node):{}", be.adr.str(), be.last_seen, local_time);
 			return false;
 		}
 		be.last_seen += delta;
@@ -1336,19 +1329,19 @@ bool node_server<t_payload_net_handler>::fix_time_delta(std::list<peerlist_entry
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::handle_remote_peerlist(const std::list<peerlist_entry> &peerlist, time_t local_time, const epee::net_utils::connection_context_base &context)
+bool node_server<t_payload_net_handler>::handle_remote_peerlist(const std::list<peerlist_entry>& peerlist, time_t local_time, const epee::net_utils::connection_context_base& context)
 {
 	int64_t delta = 0;
 	std::list<peerlist_entry> peerlist_ = peerlist;
 	if(!fix_time_delta(peerlist_, local_time, delta))
 		return false;
-	GULPSF_LOG_L1("{} REMOTE PEERLIST: TIME_DELTA: {}, remote peerlist size={}",contextx_str(context), delta , peerlist_.size());
-	GULPSF_LOG_L1("{} REMOTE PEERLIST: {}",contextx_str(context), print_peerlist_to_string(peerlist_));
+	GULPSF_LOG_L1("{} REMOTE PEERLIST: TIME_DELTA: {}, remote peerlist size={}", contextx_str(context), delta, peerlist_.size());
+	GULPSF_LOG_L1("{} REMOTE PEERLIST: {}", contextx_str(context), print_peerlist_to_string(peerlist_));
 	return m_peerlist.merge_peerlist(peerlist_);
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::get_local_node_data(basic_node_data &node_data)
+bool node_server<t_payload_net_handler>::get_local_node_data(basic_node_data& node_data)
 {
 	time_t local_time;
 	time(&local_time);
@@ -1364,23 +1357,23 @@ bool node_server<t_payload_net_handler>::get_local_node_data(basic_node_data &no
 //-----------------------------------------------------------------------------------
 #ifdef ALLOW_DEBUG_COMMANDS
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::check_trust(const proof_of_trust &tr)
+bool node_server<t_payload_net_handler>::check_trust(const proof_of_trust& tr)
 {
 	uint64_t local_time = time(NULL);
 	uint64_t time_delata = local_time > tr.time ? local_time - tr.time : tr.time - local_time;
 	if(time_delata > 24 * 60 * 60)
 	{
-		GULPSF_WARN("check_trust failed to check time conditions, local_time={}, proof_time={}", local_time , tr.time);
+		GULPSF_WARN("check_trust failed to check time conditions, local_time={}, proof_time={}", local_time, tr.time);
 		return false;
 	}
 	if(m_last_stat_request_time >= tr.time)
 	{
-		GULPSF_WARN("check_trust failed to check time conditions, last_stat_request_time={}, proof_time={}", m_last_stat_request_time , tr.time);
+		GULPSF_WARN("check_trust failed to check time conditions, last_stat_request_time={}, proof_time={}", m_last_stat_request_time, tr.time);
 		return false;
 	}
 	if(m_config.m_peer_id != tr.peer_id)
 	{
-		GULPSF_WARN("check_trust failed: peer_id mismatch (passed {}, expected {})", tr.peer_id , m_config.m_peer_id );
+		GULPSF_WARN("check_trust failed: peer_id mismatch (passed {}, expected {})", tr.peer_id, m_config.m_peer_id);
 		return false;
 	}
 	crypto::public_key pk = AUTO_VAL_INIT(pk);
@@ -1397,7 +1390,7 @@ bool node_server<t_payload_net_handler>::check_trust(const proof_of_trust &tr)
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-int node_server<t_payload_net_handler>::handle_get_stat_info(int command, typename COMMAND_REQUEST_STAT_INFO::request &arg, typename COMMAND_REQUEST_STAT_INFO::response &rsp, p2p_connection_context &context)
+int node_server<t_payload_net_handler>::handle_get_stat_info(int command, typename COMMAND_REQUEST_STAT_INFO::request& arg, typename COMMAND_REQUEST_STAT_INFO::response& rsp, p2p_connection_context& context)
 {
 	if(!check_trust(arg.tr))
 	{
@@ -1413,14 +1406,14 @@ int node_server<t_payload_net_handler>::handle_get_stat_info(int command, typena
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-int node_server<t_payload_net_handler>::handle_get_network_state(int command, COMMAND_REQUEST_NETWORK_STATE::request &arg, COMMAND_REQUEST_NETWORK_STATE::response &rsp, p2p_connection_context &context)
+int node_server<t_payload_net_handler>::handle_get_network_state(int command, COMMAND_REQUEST_NETWORK_STATE::request& arg, COMMAND_REQUEST_NETWORK_STATE::response& rsp, p2p_connection_context& context)
 {
 	if(!check_trust(arg.tr))
 	{
 		drop_connection(context);
 		return 1;
 	}
-	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context &cntxt) {
+	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt) {
 		connection_entry ce;
 		ce.adr = cntxt.m_remote_address;
 		ce.id = cntxt.peer_id;
@@ -1436,7 +1429,7 @@ int node_server<t_payload_net_handler>::handle_get_network_state(int command, CO
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-int node_server<t_payload_net_handler>::handle_get_peer_id(int command, COMMAND_REQUEST_PEER_ID::request &arg, COMMAND_REQUEST_PEER_ID::response &rsp, p2p_connection_context &context)
+int node_server<t_payload_net_handler>::handle_get_peer_id(int command, COMMAND_REQUEST_PEER_ID::request& arg, COMMAND_REQUEST_PEER_ID::response& rsp, p2p_connection_context& context)
 {
 	rsp.my_id = m_config.m_peer_id;
 	return 1;
@@ -1444,22 +1437,22 @@ int node_server<t_payload_net_handler>::handle_get_peer_id(int command, COMMAND_
 #endif
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-int node_server<t_payload_net_handler>::handle_get_support_flags(int command, COMMAND_REQUEST_SUPPORT_FLAGS::request &arg, COMMAND_REQUEST_SUPPORT_FLAGS::response &rsp, p2p_connection_context &context)
+int node_server<t_payload_net_handler>::handle_get_support_flags(int command, COMMAND_REQUEST_SUPPORT_FLAGS::request& arg, COMMAND_REQUEST_SUPPORT_FLAGS::response& rsp, p2p_connection_context& context)
 {
 	rsp.support_flags = m_config.m_support_flags;
 	return 1;
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-void node_server<t_payload_net_handler>::request_callback(const epee::net_utils::connection_context_base &context)
+void node_server<t_payload_net_handler>::request_callback(const epee::net_utils::connection_context_base& context)
 {
 	m_net_server.get_config_object().request_callback(context.m_connection_id);
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::relay_notify_to_list(int command, const std::string &data_buff, const std::list<boost::uuids::uuid> &connections)
+bool node_server<t_payload_net_handler>::relay_notify_to_list(int command, const std::string& data_buff, const std::list<boost::uuids::uuid>& connections)
 {
-	for(const auto &c_id : connections)
+	for(const auto& c_id : connections)
 	{
 		m_net_server.get_config_object().notify(command, data_buff, c_id);
 	}
@@ -1467,10 +1460,10 @@ bool node_server<t_payload_net_handler>::relay_notify_to_list(int command, const
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::relay_notify_to_all(int command, const std::string &data_buff, const epee::net_utils::connection_context_base &context)
+bool node_server<t_payload_net_handler>::relay_notify_to_all(int command, const std::string& data_buff, const epee::net_utils::connection_context_base& context)
 {
 	std::list<boost::uuids::uuid> connections;
-	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context &cntxt) {
+	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt) {
 		if(cntxt.peer_id && context.m_connection_id != cntxt.m_connection_id)
 			connections.push_back(cntxt.m_connection_id);
 		return true;
@@ -1479,27 +1472,27 @@ bool node_server<t_payload_net_handler>::relay_notify_to_all(int command, const 
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-void node_server<t_payload_net_handler>::callback(p2p_connection_context &context)
+void node_server<t_payload_net_handler>::callback(p2p_connection_context& context)
 {
 	m_payload_handler.on_callback(context);
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::invoke_notify_to_peer(int command, const std::string &req_buff, const epee::net_utils::connection_context_base &context)
+bool node_server<t_payload_net_handler>::invoke_notify_to_peer(int command, const std::string& req_buff, const epee::net_utils::connection_context_base& context)
 {
 	int res = m_net_server.get_config_object().notify(command, req_buff, context.m_connection_id);
 	return res > 0;
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::invoke_command_to_peer(int command, const std::string &req_buff, std::string &resp_buff, const epee::net_utils::connection_context_base &context)
+bool node_server<t_payload_net_handler>::invoke_command_to_peer(int command, const std::string& req_buff, std::string& resp_buff, const epee::net_utils::connection_context_base& context)
 {
 	int res = m_net_server.get_config_object().invoke(command, req_buff, resp_buff, context.m_connection_id);
 	return res > 0;
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::drop_connection(const epee::net_utils::connection_context_base &context)
+bool node_server<t_payload_net_handler>::drop_connection(const epee::net_utils::connection_context_base& context)
 {
 	m_net_server.get_config_object().close(context.m_connection_id);
 	return true;
@@ -1507,13 +1500,13 @@ bool node_server<t_payload_net_handler>::drop_connection(const epee::net_utils::
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
 template <class t_callback>
-bool node_server<t_payload_net_handler>::try_ping(basic_node_data &node_data, p2p_connection_context &context, const t_callback &cb)
+bool node_server<t_payload_net_handler>::try_ping(basic_node_data& node_data, p2p_connection_context& context, const t_callback& cb)
 {
 	if(!node_data.my_port)
 		return false;
 
 	GULPS_CHECK_AND_ASSERT_MES(context.m_remote_address.get_type_id() == epee::net_utils::ipv4_network_address::ID, false,
-						 "Only IPv4 addresses are supported here");
+		"Only IPv4 addresses are supported here");
 
 	const epee::net_utils::network_address na = context.m_remote_address;
 	uint32_t actual_ip = na.as<const epee::net_utils::ipv4_network_address>().ip();
@@ -1523,12 +1516,10 @@ bool node_server<t_payload_net_handler>::try_ping(basic_node_data &node_data, p2
 	std::string port = epee::string_tools::num_to_string_fast(node_data.my_port);
 	epee::net_utils::network_address address{epee::net_utils::ipv4_network_address(actual_ip, node_data.my_port)};
 	peerid_type pr = node_data.peer_id;
-	bool r = m_net_server.connect_async(ip, port, m_config.m_net_config.ping_connection_timeout, [cb, /*context,*/ address, pr, this](
-																									 const typename net_server::t_connection_context &ping_context,
-																									 const boost::system::error_code &ec) -> bool {
+	bool r = m_net_server.connect_async(ip, port, m_config.m_net_config.ping_connection_timeout, [cb, /*context,*/ address, pr, this](const typename net_server::t_connection_context& ping_context, const boost::system::error_code& ec) -> bool {
 		if(ec)
 		{
-			GULPSF_LOG_L1("{} back ping connect failed to {}",contextx_str(ping_context),  address.str());
+			GULPSF_LOG_L1("{} back ping connect failed to {}", contextx_str(ping_context), address.str());
 			return false;
 		}
 		COMMAND_PING::request req;
@@ -1543,26 +1534,26 @@ bool node_server<t_payload_net_handler>::try_ping(basic_node_data &node_data, p2
 		peerid_type pr_ = pr;
 
 		bool inv_call_res = epee::net_utils::async_invoke_remote_command2<COMMAND_PING::response>(ping_context.m_connection_id, COMMAND_PING::ID, req, m_net_server.get_config_object(),
-																								  [=](int code, const COMMAND_PING::response &rsp, p2p_connection_context &context) {
-																									  if(code <= 0)
-																									  {
-																										  GULPSF_LOG_L1("{} Failed to invoke COMMAND_PING to {}({}, {})", contextx_str(ping_context), address.str() , code , epee::levin::get_err_descr(code) );
-																										  return;
-																									  }
+			[=](int code, const COMMAND_PING::response& rsp, p2p_connection_context& context) {
+				if(code <= 0)
+				{
+					GULPSF_LOG_L1("{} Failed to invoke COMMAND_PING to {}({}, {})", contextx_str(ping_context), address.str(), code, epee::levin::get_err_descr(code));
+					return;
+				}
 
-																									  if(rsp.status != PING_OK_RESPONSE_STATUS_TEXT || pr != rsp.peer_id)
-																									  {
-																										  GULPSF_LOG_L1("{} back ping invoke wrong response \"{}\" from {}, hsh_peer_id={}, rsp.peer_id={}", contextx_str(ping_context), rsp.status, address.str(), pr_ , rsp.peer_id);
-																										  m_net_server.get_config_object().close(ping_context.m_connection_id);
-																										  return;
-																									  }
-																									  m_net_server.get_config_object().close(ping_context.m_connection_id);
-																									  cb();
-																								  });
+				if(rsp.status != PING_OK_RESPONSE_STATUS_TEXT || pr != rsp.peer_id)
+				{
+					GULPSF_LOG_L1("{} back ping invoke wrong response \"{}\" from {}, hsh_peer_id={}, rsp.peer_id={}", contextx_str(ping_context), rsp.status, address.str(), pr_, rsp.peer_id);
+					m_net_server.get_config_object().close(ping_context.m_connection_id);
+					return;
+				}
+				m_net_server.get_config_object().close(ping_context.m_connection_id);
+				cb();
+			});
 
 		if(!inv_call_res)
 		{
-			GULPSF_LOG_L1("{} back ping invoke failed to {}",contextx_str(ping_context),  address.str());
+			GULPSF_LOG_L1("{} back ping invoke failed to {}", contextx_str(ping_context), address.str());
 			m_net_server.get_config_object().close(ping_context.m_connection_id);
 			return false;
 		}
@@ -1576,7 +1567,7 @@ bool node_server<t_payload_net_handler>::try_ping(basic_node_data &node_data, p2
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::try_get_support_flags(const p2p_connection_context &context, std::function<void(p2p_connection_context &, const uint32_t &)> f)
+bool node_server<t_payload_net_handler>::try_get_support_flags(const p2p_connection_context& context, std::function<void(p2p_connection_context&, const uint32_t&)> f)
 {
 	COMMAND_REQUEST_SUPPORT_FLAGS::request support_flags_request;
 	bool r = epee::net_utils::async_invoke_remote_command2<typename COMMAND_REQUEST_SUPPORT_FLAGS::response>(
@@ -1584,10 +1575,10 @@ bool node_server<t_payload_net_handler>::try_get_support_flags(const p2p_connect
 		COMMAND_REQUEST_SUPPORT_FLAGS::ID,
 		support_flags_request,
 		m_net_server.get_config_object(),
-		[=](int code, const typename COMMAND_REQUEST_SUPPORT_FLAGS::response &rsp, p2p_connection_context &context_) {
+		[=](int code, const typename COMMAND_REQUEST_SUPPORT_FLAGS::response& rsp, p2p_connection_context& context_) {
 			if(code < 0)
 			{
-				GULPSF_LOG_L1("{} COMMAND_REQUEST_SUPPORT_FLAGS invoke failed. ({}, {})", contextx_str(context_), code , epee::levin::get_err_descr(code) );
+				GULPSF_LOG_L1("{} COMMAND_REQUEST_SUPPORT_FLAGS invoke failed. ({}, {})", contextx_str(context_), code, epee::levin::get_err_descr(code));
 				return;
 			}
 
@@ -1599,7 +1590,7 @@ bool node_server<t_payload_net_handler>::try_get_support_flags(const p2p_connect
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-int node_server<t_payload_net_handler>::handle_timed_sync(int command, typename COMMAND_TIMED_SYNC::request &arg, typename COMMAND_TIMED_SYNC::response &rsp, p2p_connection_context &context)
+int node_server<t_payload_net_handler>::handle_timed_sync(int command, typename COMMAND_TIMED_SYNC::request& arg, typename COMMAND_TIMED_SYNC::response& rsp, p2p_connection_context& context)
 {
 	if(!m_payload_handler.process_payload_sync_data(arg.payload_data, context, false))
 	{
@@ -1617,7 +1608,7 @@ int node_server<t_payload_net_handler>::handle_timed_sync(int command, typename 
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-int node_server<t_payload_net_handler>::handle_handshake(int command, typename COMMAND_HANDSHAKE::request &arg, typename COMMAND_HANDSHAKE::response &rsp, p2p_connection_context &context)
+int node_server<t_payload_net_handler>::handle_handshake(int command, typename COMMAND_HANDSHAKE::request& arg, typename COMMAND_HANDSHAKE::response& rsp, p2p_connection_context& context)
 {
 	if(arg.node_data.network_id != m_network_id)
 	{
@@ -1675,7 +1666,7 @@ int node_server<t_payload_net_handler>::handle_handshake(int command, typename C
 		//try ping to be sure that we can add this peer to peer_list
 		try_ping(arg.node_data, context, [peer_id_l, port_l, context, this]() {
 			GULPS_CHECK_AND_ASSERT_MES(context.m_remote_address.get_type_id() == epee::net_utils::ipv4_network_address::ID, void(),
-								 "Only IPv4 addresses are supported here");
+				"Only IPv4 addresses are supported here");
 			//called only(!) if success pinged, update local peerlist
 			peerlist_entry pe;
 			const epee::net_utils::network_address na = context.m_remote_address;
@@ -1685,11 +1676,11 @@ int node_server<t_payload_net_handler>::handle_handshake(int command, typename C
 			pe.last_seen = static_cast<int64_t>(last_seen);
 			pe.id = peer_id_l;
 			this->m_peerlist.append_with_peer_white(pe);
-			GULPSF_LOG_L1("{} PING SUCCESS {}:{}",contextx_str(context), context.m_remote_address.host_str() , port_l);
+			GULPSF_LOG_L1("{} PING SUCCESS {}:{}", contextx_str(context), context.m_remote_address.host_str(), port_l);
 		});
 	}
 
-	try_get_support_flags(context, [](p2p_connection_context &flags_context, const uint32_t &support_flags) {
+	try_get_support_flags(context, [](p2p_connection_context& flags_context, const uint32_t& support_flags) {
 		flags_context.support_flags = support_flags;
 	});
 
@@ -1702,7 +1693,7 @@ int node_server<t_payload_net_handler>::handle_handshake(int command, typename C
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-int node_server<t_payload_net_handler>::handle_ping(int command, COMMAND_PING::request &arg, COMMAND_PING::response &rsp, p2p_connection_context &context)
+int node_server<t_payload_net_handler>::handle_ping(int command, COMMAND_PING::request& arg, COMMAND_PING::response& rsp, p2p_connection_context& context)
 {
 	GULPSF_LOG_L1("{} COMMAND_PING", contextx_str(context));
 	rsp.status = PING_OK_RESPONSE_STATUS_TEXT;
@@ -1732,7 +1723,7 @@ std::string node_server<t_payload_net_handler>::print_connections_container()
 {
 
 	std::stringstream ss;
-	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context &cntxt) {
+	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt) {
 		ss << cntxt.m_remote_address.str()
 		   << " \t\tpeer_id " << cntxt.peer_id
 		   << " \t\tconn_id " << epee::string_tools::get_str_from_guid_a(cntxt.m_connection_id) << (cntxt.m_is_income ? " INC" : " OUT")
@@ -1744,13 +1735,13 @@ std::string node_server<t_payload_net_handler>::print_connections_container()
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-void node_server<t_payload_net_handler>::on_connection_new(p2p_connection_context &context)
+void node_server<t_payload_net_handler>::on_connection_new(p2p_connection_context& context)
 {
-	GULPSF_INFO("[{}] NEW CONNECTION", epee::net_utils::print_connection_context(context) );
+	GULPSF_INFO("[{}] NEW CONNECTION", epee::net_utils::print_connection_context(context));
 }
 //-----------------------------------------------------------------------------------
 template <class t_payload_net_handler>
-void node_server<t_payload_net_handler>::on_connection_close(p2p_connection_context &context)
+void node_server<t_payload_net_handler>::on_connection_close(p2p_connection_context& context)
 {
 	if(!m_net_server.is_stop_signal_sent() && !context.m_is_income)
 	{
@@ -1762,20 +1753,20 @@ void node_server<t_payload_net_handler>::on_connection_close(p2p_connection_cont
 
 	m_payload_handler.on_connection_close(context);
 
-	GULPSF_INFO("[{}] CLOSE CONNECTION", epee::net_utils::print_connection_context(context) );
+	GULPSF_INFO("[{}] CLOSE CONNECTION", epee::net_utils::print_connection_context(context));
 }
 
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::is_priority_node(const epee::net_utils::network_address &na)
+bool node_server<t_payload_net_handler>::is_priority_node(const epee::net_utils::network_address& na)
 {
 	return (std::find(m_priority_peers.begin(), m_priority_peers.end(), na) != m_priority_peers.end()) || (std::find(m_exclusive_peers.begin(), m_exclusive_peers.end(), na) != m_exclusive_peers.end());
 }
 
 template <class t_payload_net_handler>
 template <class Container>
-bool node_server<t_payload_net_handler>::connect_to_peerlist(const Container &peers)
+bool node_server<t_payload_net_handler>::connect_to_peerlist(const Container& peers)
 {
-	for(const epee::net_utils::network_address &na : peers)
+	for(const epee::net_utils::network_address& na : peers)
 	{
 		if(m_net_server.is_stop_signal_sent())
 			return false;
@@ -1791,16 +1782,16 @@ bool node_server<t_payload_net_handler>::connect_to_peerlist(const Container &pe
 
 template <class t_payload_net_handler>
 template <class Container>
-bool node_server<t_payload_net_handler>::parse_peers_and_add_to_container(const boost::program_options::variables_map &vm, const command_line::arg_descriptor<std::vector<std::string>> &arg, Container &container)
+bool node_server<t_payload_net_handler>::parse_peers_and_add_to_container(const boost::program_options::variables_map& vm, const command_line::arg_descriptor<std::vector<std::string>>& arg, Container& container)
 {
 	std::vector<std::string> perrs = command_line::get_arg(vm, arg);
 
-	for(const std::string &pr_str : perrs)
+	for(const std::string& pr_str : perrs)
 	{
 		epee::net_utils::network_address na = AUTO_VAL_INIT(na);
 		const uint16_t default_port = config_get_p2p_port(m_nettype);
 		bool r = parse_peer_from_string(na, pr_str, default_port);
-		GULPS_CHECK_AND_ASSERT_MES(r, false, "Failed to parse address from string: " , pr_str);
+		GULPS_CHECK_AND_ASSERT_MES(r, false, "Failed to parse address from string: ", pr_str);
 		container.push_back(na);
 	}
 
@@ -1808,7 +1799,7 @@ bool node_server<t_payload_net_handler>::parse_peers_and_add_to_container(const 
 }
 
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::set_max_out_peers(const boost::program_options::variables_map &vm, int64_t max)
+bool node_server<t_payload_net_handler>::set_max_out_peers(const boost::program_options::variables_map& vm, int64_t max)
 {
 	if(max == -1)
 	{
@@ -1820,7 +1811,7 @@ bool node_server<t_payload_net_handler>::set_max_out_peers(const boost::program_
 }
 
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::set_max_in_peers(const boost::program_options::variables_map &vm, int64_t max)
+bool node_server<t_payload_net_handler>::set_max_in_peers(const boost::program_options::variables_map& vm, int64_t max)
 {
 	if(max == -1)
 	{
@@ -1844,7 +1835,7 @@ void node_server<t_payload_net_handler>::delete_in_connections(size_t count)
 }
 
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::set_tos_flag(const boost::program_options::variables_map &vm, int flag)
+bool node_server<t_payload_net_handler>::set_tos_flag(const boost::program_options::variables_map& vm, int flag)
 {
 	if(flag == -1)
 	{
@@ -1856,7 +1847,7 @@ bool node_server<t_payload_net_handler>::set_tos_flag(const boost::program_optio
 }
 
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::set_rate_up_limit(const boost::program_options::variables_map &vm, int64_t limit)
+bool node_server<t_payload_net_handler>::set_rate_up_limit(const boost::program_options::variables_map& vm, int64_t limit)
 {
 	this->islimitup = true;
 
@@ -1867,12 +1858,12 @@ bool node_server<t_payload_net_handler>::set_rate_up_limit(const boost::program_
 	}
 
 	epee::net_utils::connection<epee::levin::async_protocol_handler<p2p_connection_context>>::set_rate_up_limit(limit);
-	GULPSF_INFO("Set limit-up to {} kB/s", limit );
+	GULPSF_INFO("Set limit-up to {} kB/s", limit);
 	return true;
 }
 
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::set_rate_down_limit(const boost::program_options::variables_map &vm, int64_t limit)
+bool node_server<t_payload_net_handler>::set_rate_down_limit(const boost::program_options::variables_map& vm, int64_t limit)
 {
 	this->islimitdown = true;
 	if(limit == -1)
@@ -1881,12 +1872,12 @@ bool node_server<t_payload_net_handler>::set_rate_down_limit(const boost::progra
 		this->islimitdown = false;
 	}
 	epee::net_utils::connection<epee::levin::async_protocol_handler<p2p_connection_context>>::set_rate_down_limit(limit);
-	GULPSF_INFO("Set limit-down to {} kB/s", limit );
+	GULPSF_INFO("Set limit-down to {} kB/s", limit);
 	return true;
 }
 
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::set_rate_limit(const boost::program_options::variables_map &vm, int64_t limit)
+bool node_server<t_payload_net_handler>::set_rate_limit(const boost::program_options::variables_map& vm, int64_t limit)
 {
 	int64_t limit_up = 0;
 	int64_t limit_down = 0;
@@ -1904,24 +1895,24 @@ bool node_server<t_payload_net_handler>::set_rate_limit(const boost::program_opt
 	if(!this->islimitup)
 	{
 		epee::net_utils::connection<epee::levin::async_protocol_handler<p2p_connection_context>>::set_rate_up_limit(limit_up);
-		GULPSF_INFO("Set limit-up to {} kB/s", limit_up );
+		GULPSF_INFO("Set limit-up to {} kB/s", limit_up);
 	}
 	if(!this->islimitdown)
 	{
 		epee::net_utils::connection<epee::levin::async_protocol_handler<p2p_connection_context>>::set_rate_down_limit(limit_down);
-		GULPSF_INFO("Set limit-down to {} kB/s", limit_down );
+		GULPSF_INFO("Set limit-down to {} kB/s", limit_down);
 	}
 
 	return true;
 }
 
 template <class t_payload_net_handler>
-bool node_server<t_payload_net_handler>::has_too_many_connections(const epee::net_utils::network_address &address)
+bool node_server<t_payload_net_handler>::has_too_many_connections(const epee::net_utils::network_address& address)
 {
 	const size_t max_connections = 1;
 	size_t count = 0;
 
-	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context &cntxt) {
+	m_net_server.get_config_object().foreach_connection([&](const p2p_connection_context& cntxt) {
 		if(cntxt.m_is_income && cntxt.m_remote_address.is_same_host(address))
 		{
 			count++;
@@ -1962,14 +1953,14 @@ bool node_server<t_payload_net_handler>::gray_peerlist_housekeeping()
 	{
 		m_peerlist.remove_from_peer_gray(pe);
 
-		GULPSF_LOG_L2("PEER EVICTED FROM GRAY PEER LIST IP address: {} Peer ID: {}", pe.adr.host_str() , peerid_type(pe.id));
+		GULPSF_LOG_L2("PEER EVICTED FROM GRAY PEER LIST IP address: {} Peer ID: {}", pe.adr.host_str(), peerid_type(pe.id));
 
 		return true;
 	}
 
 	m_peerlist.set_peer_just_seen(pe.id, pe.adr);
 
-	GULPSF_LOG_L2("PEER PROMOTED TO WHITE PEER LIST IP address: {} Peer ID: {}", pe.adr.host_str() , peerid_type(pe.id));
+	GULPSF_LOG_L2("PEER PROMOTED TO WHITE PEER LIST IP address: {} Peer ID: {}", pe.adr.host_str(), peerid_type(pe.id));
 
 	return true;
 }
@@ -1982,9 +1973,9 @@ void node_server<t_payload_net_handler>::add_upnp_port_mapping(uint32_t port)
 #if MINIUPNPC_API_VERSION > 13
 	// default according to miniupnpc.h
 	unsigned char ttl = 2;
-	UPNPDev *deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, ttl, &result);
+	UPNPDev* deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, ttl, &result);
 #else
-	UPNPDev *deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, &result);
+	UPNPDev* deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, &result);
 #endif
 	UPNPUrls urls;
 	IGDdatas igdData;
@@ -2041,9 +2032,9 @@ void node_server<t_payload_net_handler>::delete_upnp_port_mapping(uint32_t port)
 #if MINIUPNPC_API_VERSION > 13
 	// default according to miniupnpc.h
 	unsigned char ttl = 2;
-	UPNPDev *deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, ttl, &result);
+	UPNPDev* deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, ttl, &result);
 #else
-	UPNPDev *deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, &result);
+	UPNPDev* deviceList = upnpDiscover(1000, NULL, NULL, 0, 0, &result);
 #endif
 	UPNPUrls urls;
 	IGDdatas igdData;
@@ -2088,4 +2079,4 @@ void node_server<t_payload_net_handler>::delete_upnp_port_mapping(uint32_t port)
 		GULPS_INFO("No IGD was found.");
 	}
 }
-}
+} // namespace nodetool

@@ -56,7 +56,7 @@
 
 // read
 template <template <bool> class Archive>
-bool do_serialize(Archive<false> &ar, std::vector<crypto::signature> &v)
+bool do_serialize(Archive<false>& ar, std::vector<crypto::signature>& v)
 {
 	size_t cnt = v.size();
 	v.clear();
@@ -81,7 +81,7 @@ bool do_serialize(Archive<false> &ar, std::vector<crypto::signature> &v)
 
 // write
 template <template <bool> class Archive>
-bool do_serialize(Archive<true> &ar, std::vector<crypto::signature> &v)
+bool do_serialize(Archive<true>& ar, std::vector<crypto::signature>& v)
 {
 	if(0 == v.size())
 		return true;

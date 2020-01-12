@@ -12,12 +12,12 @@ namespace net_utils
 {
 const uint8_t ipv4_network_address::ID;
 
-bool ipv4_network_address::equal(const ipv4_network_address &other) const noexcept
+bool ipv4_network_address::equal(const ipv4_network_address& other) const noexcept
 {
 	return is_same_host(other) && port() == other.port();
 }
 
-bool ipv4_network_address::less(const ipv4_network_address &other) const noexcept
+bool ipv4_network_address::less(const ipv4_network_address& other) const noexcept
 {
 	return is_same_host(other) ? port() < other.port() : ip() < other.ip();
 }
@@ -31,11 +31,11 @@ std::string ipv4_network_address::host_str() const { return string_tools::get_ip
 bool ipv4_network_address::is_loopback() const { return net_utils::is_ip_loopback(ip()); }
 bool ipv4_network_address::is_local() const { return net_utils::is_ip_local(ip()); }
 
-bool network_address::equal(const network_address &other) const
+bool network_address::equal(const network_address& other) const
 {
 	// clang typeid workaround
-	network_address::interface const *const self_ = self.get();
-	network_address::interface const *const other_self = other.self.get();
+	network_address::interface const* const self_ = self.get();
+	network_address::interface const* const other_self = other.self.get();
 	if(self_ == other_self)
 		return true;
 	if(!self_ || !other_self)
@@ -45,11 +45,11 @@ bool network_address::equal(const network_address &other) const
 	return self_->equal(*other_self);
 }
 
-bool network_address::less(const network_address &other) const
+bool network_address::less(const network_address& other) const
 {
 	// clang typeid workaround
-	network_address::interface const *const self_ = self.get();
-	network_address::interface const *const other_self = other.self.get();
+	network_address::interface const* const self_ = self.get();
+	network_address::interface const* const other_self = other.self.get();
 	if(self_ == other_self)
 		return false;
 	if(!self_ || !other_self)
@@ -59,11 +59,11 @@ bool network_address::less(const network_address &other) const
 	return self_->less(*other_self);
 }
 
-bool network_address::is_same_host(const network_address &other) const
+bool network_address::is_same_host(const network_address& other) const
 {
 	// clang typeid workaround
-	network_address::interface const *const self_ = self.get();
-	network_address::interface const *const other_self = other.self.get();
+	network_address::interface const* const self_ = self.get();
+	network_address::interface const* const other_self = other.self.get();
 	if(self_ == other_self)
 		return true;
 	if(!self_ || !other_self)
@@ -73,7 +73,7 @@ bool network_address::is_same_host(const network_address &other) const
 	return self_->is_same_host(*other_self);
 }
 
-bool create_network_address(network_address &address, const std::string &string, uint16_t default_port)
+bool create_network_address(network_address& address, const std::string& string, uint16_t default_port)
 {
 	uint32_t ip;
 	uint16_t port;
@@ -87,18 +87,18 @@ bool create_network_address(network_address &address, const std::string &string,
 	return false;
 }
 
-std::string print_connection_context(const connection_context_base &ctx)
+std::string print_connection_context(const connection_context_base& ctx)
 {
 	std::stringstream ss;
 	ss << ctx.m_remote_address.str() << " " << epee::string_tools::get_str_from_guid_a(ctx.m_connection_id) << (ctx.m_is_income ? " INC" : " OUT");
 	return ss.str();
 }
 
-std::string print_connection_context_short(const connection_context_base &ctx)
+std::string print_connection_context_short(const connection_context_base& ctx)
 {
 	std::stringstream ss;
 	ss << ctx.m_remote_address.str() << (ctx.m_is_income ? " INC" : " OUT");
 	return ss.str();
 }
-}
-}
+} // namespace net_utils
+} // namespace epee

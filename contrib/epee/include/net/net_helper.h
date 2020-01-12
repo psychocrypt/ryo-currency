@@ -41,8 +41,6 @@
 
 #include "common/gulps.hpp"
 
-
-
 #ifndef MAKE_IP
 #define MAKE_IP(a1, a2, a3, a4) (a1 | (a2 << 8) | (a3 << 16) | (a4 << 24))
 #endif
@@ -57,19 +55,23 @@ class blocked_mode_client
 
 	struct handler_obj
 	{
-		handler_obj(boost::system::error_code &error, size_t &bytes_transferred) : ref_error(error), ref_bytes_transferred(bytes_transferred)
+		handler_obj(boost::system::error_code& error, size_t& bytes_transferred) :
+			ref_error(error),
+			ref_bytes_transferred(bytes_transferred)
 		{
 		}
-		handler_obj(const handler_obj &other_obj) : ref_error(other_obj.ref_error), ref_bytes_transferred(other_obj.ref_bytes_transferred)
+		handler_obj(const handler_obj& other_obj) :
+			ref_error(other_obj.ref_error),
+			ref_bytes_transferred(other_obj.ref_bytes_transferred)
 		{
 		}
 
-		boost::system::error_code &ref_error;
-		size_t &ref_bytes_transferred;
+		boost::system::error_code& ref_error;
+		size_t& ref_bytes_transferred;
 
-		void operator()(const boost::system::error_code &error, // Result of operation.
-						std::size_t bytes_transferred			// Number of bytes read.
-						)
+		void operator()(const boost::system::error_code& error, // Result of operation.
+			std::size_t bytes_transferred						// Number of bytes read.
+		)
 		{
 			ref_error = error;
 			ref_bytes_transferred = bytes_transferred;
@@ -77,13 +79,14 @@ class blocked_mode_client
 	};
 
   public:
-	inline blocked_mode_client() : m_initialized(false),
-								   m_connected(false),
-								   m_deadline(m_io_service),
-								   m_shutdowned(0),
-								   m_ssl(false),
-								   m_ctx(boost::asio::ssl::context::sslv23),
-								   m_ssl_socket(m_io_service, m_ctx)
+	inline blocked_mode_client() :
+		m_initialized(false),
+		m_connected(false),
+		m_deadline(m_io_service),
+		m_shutdowned(0),
+		m_ssl(false),
+		m_ctx(boost::asio::ssl::context::sslv23),
+		m_ssl_socket(m_io_service, m_ctx)
 	{
 
 		m_initialized = true;
@@ -102,12 +105,12 @@ class blocked_mode_client
 		shutdown();
 	}
 
-	inline bool connect(const std::string &addr, int port, std::chrono::milliseconds timeout, bool ssl = false, const std::string &bind_ip = "0.0.0.0")
+	inline bool connect(const std::string& addr, int port, std::chrono::milliseconds timeout, bool ssl = false, const std::string& bind_ip = "0.0.0.0")
 	{
 		return connect(addr, std::to_string(port), timeout, ssl, bind_ip);
 	}
 
-	inline bool connect(const std::string &addr, const std::string &port, std::chrono::milliseconds timeout, bool ssl = false, const std::string &bind_ip = "0.0.0.0")
+	inline bool connect(const std::string& addr, const std::string& port, std::chrono::milliseconds timeout, bool ssl = false, const std::string& bind_ip = "0.0.0.0")
 	{
 		m_connected = false;
 		m_ssl = ssl;
@@ -177,7 +180,7 @@ class blocked_mode_client
 				return false;
 			}
 		}
-		catch(const boost::system::system_error &er)
+		catch(const boost::system::system_error& er)
 		{
 			GULPSF_LOG_L1("Some problems at connect, message: {}", er.what());
 			return false;
@@ -204,7 +207,7 @@ class blocked_mode_client
 			}
 		}
 
-		catch(const boost::system::system_error & /*er*/)
+		catch(const boost::system::system_error& /*er*/)
 		{
 			//GULPSF_LOG_ERROR("Some problems at disconnect, message: {}", er.what());
 			return false;
@@ -217,7 +220,7 @@ class blocked_mode_client
 		return true;
 	}
 
-	inline bool send(const std::string &buff, std::chrono::milliseconds timeout)
+	inline bool send(const std::string& buff, std::chrono::milliseconds timeout)
 	{
 
 		try
@@ -255,7 +258,7 @@ class blocked_mode_client
 			}
 		}
 
-		catch(const boost::system::system_error &er)
+		catch(const boost::system::system_error& er)
 		{
 			GULPSF_LOG_ERROR("Some problems at connect, message: {}", er.what());
 			return false;
@@ -269,7 +272,7 @@ class blocked_mode_client
 		return true;
 	}
 
-	inline bool send(const void *data, size_t sz)
+	inline bool send(const void* data, size_t sz)
 	{
 		try
 		{
@@ -311,7 +314,7 @@ class blocked_mode_client
 			}
 		}
 
-		catch(const boost::system::system_error &er)
+		catch(const boost::system::system_error& er)
 		{
 			GULPSF_LOG_ERROR("Some problems at send, message: {}", er.what());
 			m_connected = false;
@@ -331,7 +334,7 @@ class blocked_mode_client
 		return m_connected && m_ssl_socket.next_layer().is_open();
 	}
 
-	inline bool recv(std::string &buff, std::chrono::milliseconds timeout)
+	inline bool recv(std::string& buff, std::chrono::milliseconds timeout)
 	{
 
 		try
@@ -395,7 +398,7 @@ class blocked_mode_client
 			return true;
 		}
 
-		catch(const boost::system::system_error &er)
+		catch(const boost::system::system_error& er)
 		{
 			GULPSF_LOG_ERROR("Some problems at read, message: {}", er.what());
 			m_connected = false;
@@ -410,7 +413,7 @@ class blocked_mode_client
 		return false;
 	}
 
-	inline bool recv_n(std::string &buff, int64_t sz, std::chrono::milliseconds timeout)
+	inline bool recv_n(std::string& buff, int64_t sz, std::chrono::milliseconds timeout)
 	{
 
 		try
@@ -437,7 +440,7 @@ class blocked_mode_client
 			size_t bytes_transfered = 0;
 
 			handler_obj hndlr(ec, bytes_transfered);
-			async_read((char *)buff.data(), buff.size(), boost::asio::transfer_at_least(buff.size()), hndlr);
+			async_read((char*)buff.data(), buff.size(), boost::asio::transfer_at_least(buff.size()), hndlr);
 
 			// Block until the asynchronous operation has completed.
 			while(ec == boost::asio::error::would_block && !boost::interprocess::ipcdetail::atomic_read32(&m_shutdowned))
@@ -458,14 +461,14 @@ class blocked_mode_client
 
 			if(bytes_transfered != buff.size())
 			{
-				GULPSF_LOG_ERROR("Transferred mismatch with transfer_at_least value: m_bytes_transferred={} at_least value={}", bytes_transfered , buff.size());
+				GULPSF_LOG_ERROR("Transferred mismatch with transfer_at_least value: m_bytes_transferred={} at_least value={}", bytes_transfered, buff.size());
 				return false;
 			}
 
 			return true;
 		}
 
-		catch(const boost::system::system_error &er)
+		catch(const boost::system::system_error& er)
 		{
 			GULPSF_LOG_ERROR("Some problems at read, message: {}", er.what());
 			m_connected = false;
@@ -504,12 +507,12 @@ class blocked_mode_client
 	{
 		m_connected = connected;
 	}
-	boost::asio::io_service &get_io_service()
+	boost::asio::io_service& get_io_service()
 	{
 		return m_io_service;
 	}
 
-	boost::asio::ip::tcp::socket &get_socket()
+	boost::asio::ip::tcp::socket& get_socket()
 	{
 		return m_ssl_socket.next_layer();
 	}
@@ -550,18 +553,18 @@ class blocked_mode_client
 		}
 		// Ignore "short read" error
 		if(ec.category() == boost::asio::error::get_ssl_category() &&
-		   ec.value() !=
+			ec.value() !=
 #if BOOST_VERSION >= 106200
-			   boost::asio::ssl::error::stream_truncated
+				boost::asio::ssl::error::stream_truncated
 #else // older Boost supports only OpenSSL 1.0, so 1.0-only macros are appropriate
-			   ERR_PACK(ERR_LIB_SSL, 0, SSL_R_SHORT_READ)
+				ERR_PACK(ERR_LIB_SSL, 0, SSL_R_SHORT_READ)
 #endif
-		   )
+		)
 			GULPSF_LOG_L1("Problems at ssl shutdown: {}", ec.message());
 	}
 
   protected:
-	bool write(const void *data, size_t sz, boost::system::error_code &ec)
+	bool write(const void* data, size_t sz, boost::system::error_code& ec)
 	{
 		bool success;
 		if(m_ssl)
@@ -571,7 +574,7 @@ class blocked_mode_client
 		return success;
 	}
 
-	void async_write(const void *data, size_t sz, boost::system::error_code &ec)
+	void async_write(const void* data, size_t sz, boost::system::error_code& ec)
 	{
 		if(m_ssl)
 			boost::asio::async_write(m_ssl_socket, boost::asio::buffer(data, sz), boost::lambda::var(ec) = boost::lambda::_1);
@@ -579,7 +582,7 @@ class blocked_mode_client
 			boost::asio::async_write(m_ssl_socket.next_layer(), boost::asio::buffer(data, sz), boost::lambda::var(ec) = boost::lambda::_1);
 	}
 
-	void async_read(char *buff, size_t sz, boost::asio::detail::transfer_at_least_t transfer_at_least, handler_obj &hndlr)
+	void async_read(char* buff, size_t sz, boost::asio::detail::transfer_at_least_t transfer_at_least, handler_obj& hndlr)
 	{
 		if(!m_ssl)
 			boost::asio::async_read(m_ssl_socket.next_layer(), boost::asio::buffer(buff, sz), transfer_at_least, hndlr);
@@ -604,7 +607,8 @@ class blocked_mode_client
 class async_blocked_mode_client : public blocked_mode_client
 {
   public:
-	async_blocked_mode_client() : m_send_deadline(blocked_mode_client::m_io_service)
+	async_blocked_mode_client() :
+		m_send_deadline(blocked_mode_client::m_io_service)
 	{
 
 		// No deadline is required until the first socket operation is started. We
@@ -627,7 +631,7 @@ class async_blocked_mode_client : public blocked_mode_client
 		return true;
 	}
 
-	inline bool send(const void *data, size_t sz)
+	inline bool send(const void* data, size_t sz)
 	{
 		try
 		{
@@ -668,7 +672,7 @@ class async_blocked_mode_client : public blocked_mode_client
 			}
 		}
 
-		catch(const boost::system::system_error &er)
+		catch(const boost::system::system_error& er)
 		{
 			GULPSF_LOG_ERROR("Some problems at connect, message: {}", er.what());
 			return false;
@@ -707,5 +711,5 @@ class async_blocked_mode_client : public blocked_mode_client
 		m_send_deadline.async_wait(boost::bind(&async_blocked_mode_client::check_send_deadline, this));
 	}
 };
-}
-}
+} // namespace net_utils
+} // namespace epee

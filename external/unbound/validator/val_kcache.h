@@ -51,7 +51,8 @@ struct module_qstate;
 /**
  * Key cache
  */
-struct key_cache {
+struct key_cache
+{
 	/** uses slabhash for storage, type key_entry_key, key_entry_data */
 	struct slabhash* slab;
 };
@@ -105,7 +106,7 @@ void key_cache_remove(struct key_cache* kcache,
  * 	Otherwise, NULL is returned.
  */
 struct key_entry_key* key_cache_obtain(struct key_cache* kcache,
-	uint8_t* name, size_t namelen, uint16_t key_class, 
+	uint8_t* name, size_t namelen, uint16_t key_class,
 	struct regional* region, time_t now);
 
 /**

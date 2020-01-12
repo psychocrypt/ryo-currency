@@ -129,8 +129,7 @@
 #define COIN_EMISSION_MONTH_INTERVAL 6																										// months to change emission speed
 #define COIN_EMISSION_HEIGHT_INTERVAL ((uint64_t)(COIN_EMISSION_MONTH_INTERVAL * (30.4375 * 24 * 3600) / common_config::DIFFICULTY_TARGET)) // calculated to # of heights to change emission speed
 
-static constexpr std::array<uint64_t, 48> COIN_EMISSION_STEPS = {{
-	32000000000, 36450000000, 41970000000, 48590000000, 56280000000,
+static constexpr std::array<uint64_t, 48> COIN_EMISSION_STEPS = {{32000000000, 36450000000, 41970000000, 48590000000, 56280000000,
 	65070000000, 65070000000, 60820000000, 56840000000, 53130000000,
 	49660000000, 46420000000, 43390000000, 40550000000, 37910000000,
 	35430000000, 33120000000, 30950000000, 28930000000, 27040000000,
@@ -139,8 +138,7 @@ static constexpr std::array<uint64_t, 48> COIN_EMISSION_STEPS = {{
 	12860000000, 12020000000, 11240000000, 10500000000, 9820000000,
 	9180000000, 8580000000, 8020000000, 7490000000, 7000000000,
 	6540000000, 6120000000, 5720000000, 5340000000, 4990000000,
-	4670000000, 4360000000, 4080000000
-}};
+	4670000000, 4360000000, 4080000000}};
 
 #define TX_FORK_ID_STR "ryo-currency"
 
@@ -208,11 +206,10 @@ static constexpr hardfork_conf FORK_CONFIG[] = {
 	{FORK_BULLETPROOFS, 6, 8, 1},
 	{FORK_BULLETPROOFS_REQ, 7, 9, 1},
 	{FORK_UNIFORM_IDS, 6, 7, 1},
-	{FORK_UNIFORM_IDS_REQ, 7, 8, 1}
-};
+	{FORK_UNIFORM_IDS_REQ, 7, 8, 1}};
 
 // COIN - number of smallest units in one coin
-inline constexpr uint64_t MK_COINS(uint64_t coins) { return coins * 1000000000ull; }  // pow(10, 9)
+inline constexpr uint64_t MK_COINS(uint64_t coins) { return coins * 1000000000ull; } // pow(10, 9)
 
 struct common_config
 {
@@ -220,7 +217,7 @@ struct common_config
 	static constexpr size_t MIN_MIXIN_V2 = 24;
 	static constexpr size_t MAX_MIXIN = 240;
 
-	static constexpr uint64_t POISSON_CHECK_TRIGGER = 10;  // Reorg size that triggers poisson timestamp check
+	static constexpr uint64_t POISSON_CHECK_TRIGGER = 10; // Reorg size that triggers poisson timestamp check
 	static constexpr uint64_t POISSON_CHECK_DEPTH = 60;   // Main-chain depth of the poisson check. The attacker will have to tamper 50% of those blocks
 	static constexpr double POISSON_LOG_P_REJECT = -75.0; // Reject reorg if the probablity that the timestamps are genuine is below e^x, -75 = 10^-33
 
@@ -297,9 +294,9 @@ struct config<MAINNET>
 	static constexpr uint16_t ZMQ_RPC_DEFAULT_PORT = 12212;
 
 	//Random UUID generated from radioactive cs-137 ( http://www.fourmilab.ch/hotbits/how3.html ) it gives me a nice warm feeling =)
-	static constexpr boost::uuids::uuid NETWORK_ID = { { 0xcd, 0xac, 0x50, 0x2e, 0xb3, 0x74, 0x8f, 0xf2, 0x0f, 0xb7, 0x72, 0x18, 0x0f, 0x73, 0x24, 0x13 } };
+	static constexpr boost::uuids::uuid NETWORK_ID = {{0xcd, 0xac, 0x50, 0x2e, 0xb3, 0x74, 0x8f, 0xf2, 0x0f, 0xb7, 0x72, 0x18, 0x0f, 0x73, 0x24, 0x13}};
 
-	static constexpr const char *GENESIS_TX =
+	static constexpr const char* GENESIS_TX =
 		"023c01ff0001808098d0daf1d00f028be379aa57a70fa19c0ee5765fdc3d2aae0b1034158f4963e157d9042c24fbec21013402fc7071230f1f86f33099119105a7b1f64a898526060ab871e685059c223100";
 	static constexpr uint32_t GENESIS_NONCE = 10000;
 
@@ -308,7 +305,7 @@ struct config<MAINNET>
 	static constexpr uint64_t DEV_FUND_PERIOD = 15 * 24 * 7; // 1 week
 	static constexpr uint64_t DEV_FUND_AMOUNT = MK_COINS(8000000);
 	static constexpr uint64_t DEV_FUND_LENGTH = 52 * 6; // 6 years
-	static constexpr uint64_t DEV_FUND_START  = 161500;
+	static constexpr uint64_t DEV_FUND_START = 161500;
 };
 
 template <>
@@ -328,9 +325,9 @@ struct config<TESTNET>
 	static constexpr uint16_t RPC_DEFAULT_PORT = 13311;
 	static constexpr uint16_t ZMQ_RPC_DEFAULT_PORT = 13312;
 
-	static constexpr boost::uuids::uuid NETWORK_ID = { { 0x6f, 0x81, 0x7d, 0x7e, 0xa2, 0x0b, 0x71, 0x77, 0x22, 0xc8, 0xd2, 0xff, 0x02, 0x5d, 0xe9, 0x92 } };
+	static constexpr boost::uuids::uuid NETWORK_ID = {{0x6f, 0x81, 0x7d, 0x7e, 0xa2, 0x0b, 0x71, 0x77, 0x22, 0xc8, 0xd2, 0xff, 0x02, 0x5d, 0xe9, 0x92}};
 
-	static constexpr const char *GENESIS_TX =
+	static constexpr const char* GENESIS_TX =
 		"023c01ff0001808098d0daf1d00f028be379aa57a70fa19c0ee5765fdc3d2aae0b1034158f4963e157d9042c24fbec21013402fc7071230f1f86f33099119105a7b1f64a898526060ab871e685059c223100";
 	static constexpr uint32_t GENESIS_NONCE = 10001;
 
@@ -339,7 +336,7 @@ struct config<TESTNET>
 	static constexpr uint64_t DEV_FUND_PERIOD = 15 * 24; // 1 day
 	static constexpr uint64_t DEV_FUND_AMOUNT = MK_COINS(8000000);
 	static constexpr uint64_t DEV_FUND_LENGTH = 7 * 52 * 6; // 6 years (one day period)
-	static constexpr uint64_t DEV_FUND_START  = 129750;
+	static constexpr uint64_t DEV_FUND_START = 129750;
 };
 
 template <>
@@ -359,9 +356,9 @@ struct config<STAGENET>
 	static constexpr uint16_t RPC_DEFAULT_PORT = 14411;
 	static constexpr uint16_t ZMQ_RPC_DEFAULT_PORT = 14412;
 
-	static constexpr boost::uuids::uuid NETWORK_ID = { { 0x15, 0x77, 0x3a, 0x26, 0x42, 0xa0, 0x3f, 0xf3, 0xe5, 0x79, 0x72, 0x8d, 0x4e, 0x5a, 0xf2, 0x98 } };
+	static constexpr boost::uuids::uuid NETWORK_ID = {{0x15, 0x77, 0x3a, 0x26, 0x42, 0xa0, 0x3f, 0xf3, 0xe5, 0x79, 0x72, 0x8d, 0x4e, 0x5a, 0xf2, 0x98}};
 
-	static constexpr const char *GENESIS_TX =
+	static constexpr const char* GENESIS_TX =
 		"013c01ff0001ffffffffffff0302df5d56da0c7d643ddd1ce61901c7bdc5fb1738bfe39fbe69c28a3a7032729c0f2101168d0c4ca86fb55a4cf6a36d31431be1c53a3bd7411bb24e8832410289fa6f3b";
 	static constexpr uint32_t GENESIS_NONCE = 10002;
 
@@ -370,7 +367,7 @@ struct config<STAGENET>
 	static constexpr uint64_t DEV_FUND_PERIOD = 15 * 24; // 1 day
 	static constexpr uint64_t DEV_FUND_AMOUNT = MK_COINS(8000000);
 	static constexpr uint64_t DEV_FUND_LENGTH = 7 * 52 * 6; // 6 years (one day period)
-	static constexpr uint64_t DEV_FUND_START  = 129750;
+	static constexpr uint64_t DEV_FUND_START = 129750;
 };
 
 extern template struct config<MAINNET>;
@@ -430,4 +427,4 @@ inline uint8_t get_fork_v(network_type nt, hard_fork_feature ft)
 	assert(false);
 	return hardfork_conf::FORK_ID_DISABLED;
 }
-}
+} // namespace cryptonote

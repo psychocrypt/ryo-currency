@@ -36,13 +36,13 @@
 struct memcmp32
 {
 	static const size_t loop_count = 1000000000;
-	static int call(const unsigned char *k0, const unsigned char *k1) { return memcmp(k0, k1, 32); }
+	static int call(const unsigned char* k0, const unsigned char* k1) { return memcmp(k0, k1, 32); }
 };
 
 struct verify32
 {
 	static const size_t loop_count = 10000000;
-	static int call(const unsigned char *k0, const unsigned char *k1) { return crypto_verify_32(k0, k1); }
+	static int call(const unsigned char* k0, const unsigned char* k1) { return crypto_verify_32(k0, k1); }
 };
 
 template <typename f, bool equal>

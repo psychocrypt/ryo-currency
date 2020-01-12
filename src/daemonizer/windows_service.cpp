@@ -61,10 +61,8 @@
 
 #include "common/gulps.hpp"
 
-
 #define GULPS_PRINT_FAIL(...) GULPS_ERROR("Error: ", __VA_ARGS__)
 #define GULPS_PRINT_OK(...) GULPS_PRINT(__VA_ARGS__)
-
 
 namespace windows
 {
@@ -93,7 +91,7 @@ std::string get_last_error()
 }
 
 bool relaunch_as_admin(
-	std::string const &command, std::string const &arguments)
+	std::string const& command, std::string const& arguments)
 {
 	SHELLEXECUTEINFO info{};
 	info.cbSize = sizeof(info);
@@ -120,9 +118,9 @@ void pause_to_display_admin_window_messages()
 	boost::chrono::milliseconds how_long{1500};
 	boost::this_thread::sleep_for(how_long);
 }
-}
+} // namespace
 
-bool check_admin(bool &result)
+bool check_admin(bool& result)
 {
 	BOOL is_admin = FALSE;
 	PSID p_administrators_group = nullptr;
@@ -149,7 +147,7 @@ bool check_admin(bool &result)
 }
 
 bool ensure_admin(
-	std::string const &arguments)
+	std::string const& arguments)
 {
 	bool admin;
 
@@ -171,7 +169,7 @@ bool ensure_admin(
 }
 
 bool install_service(
-	std::string const &service_name, std::string const &arguments)
+	std::string const& service_name, std::string const& arguments)
 {
 	std::string command = epee::string_tools::get_current_module_path();
 	std::string full_command = command + arguments;
@@ -212,7 +210,7 @@ bool install_service(
 }
 
 bool start_service(
-	std::string const &service_name)
+	std::string const& service_name)
 {
 	GULPS_INFO("Starting service");
 
@@ -257,7 +255,7 @@ bool start_service(
 }
 
 bool stop_service(
-	std::string const &service_name)
+	std::string const& service_name)
 {
 	GULPS_INFO("Stopping service");
 
@@ -296,7 +294,7 @@ bool stop_service(
 }
 
 bool uninstall_service(
-	std::string const &service_name)
+	std::string const& service_name)
 {
 	service_handle p_manager{
 		OpenSCManager(

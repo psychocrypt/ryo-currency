@@ -59,13 +59,13 @@ namespace windows
 {
 namespace
 {
-std::vector<char> vecstring(std::string const &str)
+std::vector<char> vecstring(std::string const& str)
 {
 	std::vector<char> result{str.begin(), str.end()};
 	result.push_back('\0');
 	return result;
 }
-}
+} // namespace
 
 template <typename T_handler>
 class t_service_runner final
@@ -81,8 +81,9 @@ class t_service_runner final
 
   public:
 	t_service_runner(
-		std::string name, T_handler handler)
-		: m_name{std::move(name)}, m_handler{std::move(handler)}
+		std::string name, T_handler handler) :
+		m_name{std::move(name)},
+		m_handler{std::move(handler)}
 	{
 		m_status.dwServiceType = SERVICE_WIN32;
 		m_status.dwCurrentState = SERVICE_STOPPED;
@@ -93,7 +94,7 @@ class t_service_runner final
 		m_status.dwWaitHint = 0;
 	}
 
-	t_service_runner &operator=(t_service_runner &&other)
+	t_service_runner& operator=(t_service_runner&& other)
 	{
 		if(this != &other)
 		{
@@ -138,12 +139,12 @@ class t_service_runner final
 		SetServiceStatus(m_status_handle, &m_status);
 	}
 
-	static void WINAPI service_main(DWORD argc, LPSTR *argv)
+	static void WINAPI service_main(DWORD argc, LPSTR* argv)
 	{
 		sp_instance->service_main_(argc, argv);
 	}
 
-	void service_main_(DWORD argc, LPSTR *argv)
+	void service_main_(DWORD argc, LPSTR* argv)
 	{
 		m_status_handle = RegisterServiceCtrlHandler(m_name.c_str(), &on_state_change_request);
 		if(m_status_handle == nullptr)
@@ -190,6 +191,6 @@ class t_service_runner final
 
 template <typename T_handler>
 std::unique_ptr<t_service_runner<T_handler>> t_service_runner<T_handler>::sp_instance;
-}
+} // namespace windows
 
 #endif

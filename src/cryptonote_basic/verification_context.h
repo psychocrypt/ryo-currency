@@ -74,4 +74,4 @@ struct block_verification_context
 	bool m_already_exists;
 	bool m_partial_block_reward;
 };
-}
+} // namespace cryptonote

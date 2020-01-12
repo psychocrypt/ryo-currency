@@ -61,7 +61,7 @@ bool is_formatted()
 	out << "BEGIN" << value << "END";
 	return out.str() == "BEGIN<" + std::string{expected, sizeof(T) * 2} + ">END";
 }
-}
+} // namespace
 
 TEST(Crypto, Ostream)
 {

@@ -46,7 +46,8 @@
 /**
  * RTT information. Keeps packet Round Trip Time.
  */
-struct rtt_info {
+struct rtt_info
+{
 	/** smoothed rtt estimator, in milliseconds */
 	int srtt;
 	/** smoothed mean deviation, in milliseconds */

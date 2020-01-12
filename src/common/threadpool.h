@@ -60,8 +60,9 @@ namespace tools
 class threadpool
 {
 	GULPS_CAT_MAJOR("thdpool");
+
   public:
-	static threadpool &getInstance()
+	static threadpool& getInstance()
 	{
 		static threadpool instance;
 		return instance;
@@ -79,14 +80,15 @@ class threadpool
 		void inc();
 		void dec();
 		void wait(); //! Wait for a set of tasks to finish.
-		waiter() : num(0) {}
+		waiter() :
+			num(0) {}
 		~waiter();
 	};
 
 	// Submit a task to the pool. The waiter pointer may be
 	// NULL if the caller doesn't care to wait for the
 	// task to finish.
-	void submit(waiter *waiter, std::function<void()> f);
+	void submit(waiter* waiter, std::function<void()> f);
 
 	int get_max_concurrency();
 
@@ -95,7 +97,7 @@ class threadpool
 	~threadpool();
 	typedef struct entry
 	{
-		waiter *wo;
+		waiter* wo;
 		std::function<void()> f;
 	} entry;
 	std::deque<entry> queue;
@@ -107,4 +109,4 @@ class threadpool
 	bool running;
 	void run();
 };
-}
+} // namespace tools

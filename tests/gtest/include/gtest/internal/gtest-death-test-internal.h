@@ -79,8 +79,8 @@ class GTEST_API_ DeathTest
 	// argument is set.  If the death test should be skipped, the pointer
 	// is set to NULL; otherwise, it is set to the address of a new concrete
 	// DeathTest object that controls the execution of the current test.
-	static bool Create(const char *statement, const RE *regex,
-					   const char *file, int line, DeathTest **test);
+	static bool Create(const char* statement, const RE* regex,
+		const char* file, int line, DeathTest** test);
 	DeathTest();
 	virtual ~DeathTest() {}
 
@@ -88,10 +88,12 @@ class GTEST_API_ DeathTest
 	class ReturnSentinel
 	{
 	  public:
-		explicit ReturnSentinel(DeathTest *test) : test_(test) {}
+		explicit ReturnSentinel(DeathTest* test) :
+			test_(test) {}
 		~ReturnSentinel() { test_->Abort(TEST_ENCOUNTERED_RETURN_STATEMENT); }
+
 	  private:
-		DeathTest *const test_;
+		DeathTest* const test_;
 		GTEST_DISALLOW_COPY_AND_ASSIGN_(ReturnSentinel);
 	} GTEST_ATTRIBUTE_UNUSED_;
 
@@ -134,9 +136,9 @@ class GTEST_API_ DeathTest
 
 	// Returns a human-readable outcome message regarding the outcome of
 	// the last death test.
-	static const char *LastMessage();
+	static const char* LastMessage();
 
-	static void set_last_death_test_message(const std::string &message);
+	static void set_last_death_test_message(const std::string& message);
 
   private:
 	// A string containing a description of the outcome of the last death test.
@@ -150,16 +152,16 @@ class DeathTestFactory
 {
   public:
 	virtual ~DeathTestFactory() {}
-	virtual bool Create(const char *statement, const RE *regex,
-						const char *file, int line, DeathTest **test) = 0;
+	virtual bool Create(const char* statement, const RE* regex,
+		const char* file, int line, DeathTest** test) = 0;
 };
 
 // A concrete DeathTestFactory implementation for normal use.
 class DefaultDeathTestFactory : public DeathTestFactory
 {
   public:
-	virtual bool Create(const char *statement, const RE *regex,
-						const char *file, int line, DeathTest **test);
+	virtual bool Create(const char* statement, const RE* regex,
+		const char* file, int line, DeathTest** test);
 };
 
 // Returns true if exit_status describes a process that was terminated
@@ -174,7 +176,7 @@ GTEST_API_ bool ExitedUnsuccessfully(int exit_status);
 	{                                                                            \
 		GTEST_SUPPRESS_UNREACHABLE_CODE_WARNING_BELOW_(statement);               \
 	}                                                                            \
-	catch(const ::std::exception &gtest_exception)                               \
+	catch(const ::std::exception& gtest_exception)                               \
 	{                                                                            \
 		fprintf(                                                                 \
 			stderr,                                                              \
@@ -202,10 +204,10 @@ GTEST_API_ bool ExitedUnsuccessfully(int exit_status);
 	GTEST_AMBIGUOUS_ELSE_BLOCKER_                                                  \
 	if(::testing::internal::AlwaysTrue())                                          \
 	{                                                                              \
-		const ::testing::internal::RE &gtest_regex = (regex);                      \
-		::testing::internal::DeathTest *gtest_dt;                                  \
+		const ::testing::internal::RE& gtest_regex = (regex);                      \
+		::testing::internal::DeathTest* gtest_dt;                                  \
 		if(!::testing::internal::DeathTest::Create(#statement, &gtest_regex,       \
-												   __FILE__, __LINE__, &gtest_dt)) \
+			   __FILE__, __LINE__, &gtest_dt))                                     \
 		{                                                                          \
 			goto GTEST_CONCAT_TOKEN_(gtest_label_, __LINE__);                      \
 		}                                                                          \
@@ -235,7 +237,7 @@ GTEST_API_ bool ExitedUnsuccessfully(int exit_status);
 		}                                                                          \
 	}                                                                              \
 	else                                                                           \
-	GTEST_CONCAT_TOKEN_(gtest_label_, __LINE__) : fail(::testing::internal::DeathTest::LastMessage())
+		GTEST_CONCAT_TOKEN_(gtest_label_, __LINE__) : fail(::testing::internal::DeathTest::LastMessage())
 // The symbol "fail" here expands to something into which a message
 // can be streamed.
 
@@ -250,7 +252,7 @@ GTEST_API_ bool ExitedUnsuccessfully(int exit_status);
 		GTEST_SUPPRESS_UNREACHABLE_CODE_WARNING_BELOW_(statement); \
 	}                                                              \
 	else                                                           \
-	::testing::Message()
+		::testing::Message()
 
 // A class representing the parsed contents of the
 // --gtest_internal_run_death_test flag, as it existed when
@@ -258,12 +260,14 @@ GTEST_API_ bool ExitedUnsuccessfully(int exit_status);
 class InternalRunDeathTestFlag
 {
   public:
-	InternalRunDeathTestFlag(const std::string &a_file,
-							 int a_line,
-							 int an_index,
-							 int a_write_fd)
-		: file_(a_file), line_(a_line), index_(an_index),
-		  write_fd_(a_write_fd) {}
+	InternalRunDeathTestFlag(const std::string& a_file,
+		int a_line,
+		int an_index,
+		int a_write_fd) :
+		file_(a_file),
+		line_(a_line),
+		index_(an_index),
+		write_fd_(a_write_fd) {}
 
 	~InternalRunDeathTestFlag()
 	{
@@ -271,7 +275,7 @@ class InternalRunDeathTestFlag
 			posix::Close(write_fd_);
 	}
 
-	const std::string &file() const { return file_; }
+	const std::string& file() const { return file_; }
 	int line() const { return line_; }
 	int index() const { return index_; }
 	int write_fd() const { return write_fd_; }
@@ -288,7 +292,7 @@ class InternalRunDeathTestFlag
 // Returns a newly created InternalRunDeathTestFlag object with fields
 // initialized from the GTEST_FLAG(internal_run_death_test) flag if
 // the flag is specified; otherwise returns NULL.
-InternalRunDeathTestFlag *ParseInternalRunDeathTestFlag();
+InternalRunDeathTestFlag* ParseInternalRunDeathTestFlag();
 
 #else // GTEST_HAS_DEATH_TEST
 
@@ -339,7 +343,7 @@ InternalRunDeathTestFlag *ParseInternalRunDeathTestFlag();
 		terminator;                                                 \
 	}                                                               \
 	else                                                            \
-	::testing::Message()
+		::testing::Message()
 
 #endif // GTEST_HAS_DEATH_TEST
 

@@ -112,13 +112,13 @@ const uint16_t crc12_table[256] = {
 	0xd0c, 0x48b, 0x785, 0xe02, 0x199, 0x81e, 0xb10, 0x297, 0xda1, 0x426, 0x728, 0xeaf, 0x134, 0x8b3, 0xbbd, 0x23a,
 	0xc56, 0x5d1, 0x6df, 0xf58, 0x0c3, 0x944, 0xa4a, 0x3cd, 0xcfb, 0x57c, 0x672, 0xff5, 0x06e, 0x9e9, 0xae7, 0x360};
 
-inline void update_crc12(uint32_t &crcv, uint8_t data)
+inline void update_crc12(uint32_t& crcv, uint8_t data)
 {
 	uint8_t idx = uint8_t((crcv >> 4) ^ data);
 	crcv = crc12_table[idx] ^ (crcv << 8);
 }
 
-uint32_t calc_crc12(const crypto::secret_key_16 &key, uint8_t extra)
+uint32_t calc_crc12(const crypto::secret_key_16& key, uint8_t extra)
 {
 	uint32_t crcv = 0;
 	for(size_t i = 0; i < 16; i++)
@@ -141,36 +141,36 @@ uint32_t calc_crc12(const crypto::secret_key_16 &key, uint8_t extra)
    * \param  language        Language instance pointer to write to after it is found.
    * \return                 true if all the words were present in some language false if not.
    */
-bool find_seed_language(const std::vector<std::string> &seed, Language::Base **language)
+bool find_seed_language(const std::vector<std::string>& seed, Language::Base** language)
 {
 	// Yes, I don't like std::pair
 	struct sort_pair
 	{
-		Language::Base *inst;
+		Language::Base* inst;
 		size_t score;
 
-		inline bool operator<(const sort_pair &oth) const { return score < oth.score; }
+		inline bool operator<(const sort_pair& oth) const { return score < oth.score; }
 	};
 
 	// If there's a new language added, add an instance of it here.
 	std::vector<sort_pair> language_instances({{Language::Singleton<Language::Chinese_Simplified>::instance(), 0},
-											   {Language::Singleton<Language::English>::instance(), 0},
-											   {Language::Singleton<Language::Dutch>::instance(), 0},
-											   {Language::Singleton<Language::French>::instance(), 0},
-											   {Language::Singleton<Language::Spanish>::instance(), 0},
-											   {Language::Singleton<Language::German>::instance(), 0},
-											   {Language::Singleton<Language::Italian>::instance(), 0},
-											   {Language::Singleton<Language::Portuguese>::instance(), 0},
-											   {Language::Singleton<Language::Japanese>::instance(), 0},
-											   {Language::Singleton<Language::Russian>::instance(), 0},
-											   {Language::Singleton<Language::Esperanto>::instance(), 0},
-											   {Language::Singleton<Language::Lojban>::instance(), 0}});
+		{Language::Singleton<Language::English>::instance(), 0},
+		{Language::Singleton<Language::Dutch>::instance(), 0},
+		{Language::Singleton<Language::French>::instance(), 0},
+		{Language::Singleton<Language::Spanish>::instance(), 0},
+		{Language::Singleton<Language::German>::instance(), 0},
+		{Language::Singleton<Language::Italian>::instance(), 0},
+		{Language::Singleton<Language::Portuguese>::instance(), 0},
+		{Language::Singleton<Language::Japanese>::instance(), 0},
+		{Language::Singleton<Language::Russian>::instance(), 0},
+		{Language::Singleton<Language::Esperanto>::instance(), 0},
+		{Language::Singleton<Language::Lojban>::instance(), 0}});
 
 	// Assumption here is that the end user will spell more words correctly than get at random in a foreign lang
-	for(sort_pair &pair : language_instances)
+	for(sort_pair& pair : language_instances)
 	{
-		const std::unordered_map<std::string, uint32_t> &word_map = pair.inst->get_word_map();
-		for(const std::string &word : seed)
+		const std::unordered_map<std::string, uint32_t>& word_map = pair.inst->get_word_map();
+		for(const std::string& word : seed)
 		{
 			if(word_map.count(word) > 0)
 				pair.score++;
@@ -188,13 +188,13 @@ bool find_seed_language(const std::vector<std::string> &seed, Language::Base **l
 	return false;
 }
 
-bool match_words(const Language::Base &lang, const std::vector<std::string> &seed, std::vector<uint32_t> &matched_indices)
+bool match_words(const Language::Base& lang, const std::vector<std::string>& seed, std::vector<uint32_t>& matched_indices)
 {
 	size_t trim_size = lang.get_unique_prefix_length();
-	const std::unordered_map<std::string, uint32_t> &trimmed_word_map = lang.get_trimmed_word_map();
+	const std::unordered_map<std::string, uint32_t>& trimmed_word_map = lang.get_trimmed_word_map();
 	matched_indices.reserve(seed.size());
 
-	for(const std::string &word : seed)
+	for(const std::string& word : seed)
 	{
 		std::string trimmed_word = Language::utf8prefix(word, trim_size);
 		if(trimmed_word_map.count(trimmed_word) > 0)
@@ -212,37 +212,37 @@ namespace Electrum
      * \brief Gets a list of seed languages that are supported.
      * \param languages The vector is set to the list of languages.
      */
-const std::vector<const Language::Base *> &get_language_list()
+const std::vector<const Language::Base*>& get_language_list()
 {
-	static const std::vector<const Language::Base *> language_instances({Language::Singleton<Language::German>::instance(),
-																		 Language::Singleton<Language::English>::instance(),
-																		 Language::Singleton<Language::Spanish>::instance(),
-																		 Language::Singleton<Language::French>::instance(),
-																		 Language::Singleton<Language::Italian>::instance(),
-																		 Language::Singleton<Language::Dutch>::instance(),
-																		 Language::Singleton<Language::Portuguese>::instance(),
-																		 Language::Singleton<Language::Russian>::instance(),
-																		 Language::Singleton<Language::Japanese>::instance(),
-																		 Language::Singleton<Language::Chinese_Simplified>::instance(),
-																		 Language::Singleton<Language::Esperanto>::instance(),
-																		 Language::Singleton<Language::Lojban>::instance()});
+	static const std::vector<const Language::Base*> language_instances({Language::Singleton<Language::German>::instance(),
+		Language::Singleton<Language::English>::instance(),
+		Language::Singleton<Language::Spanish>::instance(),
+		Language::Singleton<Language::French>::instance(),
+		Language::Singleton<Language::Italian>::instance(),
+		Language::Singleton<Language::Dutch>::instance(),
+		Language::Singleton<Language::Portuguese>::instance(),
+		Language::Singleton<Language::Russian>::instance(),
+		Language::Singleton<Language::Japanese>::instance(),
+		Language::Singleton<Language::Chinese_Simplified>::instance(),
+		Language::Singleton<Language::Esperanto>::instance(),
+		Language::Singleton<Language::Lojban>::instance()});
 	return language_instances;
 }
 
-void get_language_list(std::vector<std::string> &languages, bool english)
+void get_language_list(std::vector<std::string>& languages, bool english)
 {
-	const std::vector<const Language::Base *> language_instances = get_language_list();
-	for(std::vector<const Language::Base *>::const_iterator it = language_instances.begin();
+	const std::vector<const Language::Base*> language_instances = get_language_list();
+	for(std::vector<const Language::Base*>::const_iterator it = language_instances.begin();
 		it != language_instances.end(); it++)
 	{
 		languages.push_back(english ? (*it)->get_english_language_name() : (*it)->get_language_name());
 	}
 }
 
-std::string get_english_name_for(const std::string &name)
+std::string get_english_name_for(const std::string& name)
 {
-	const std::vector<const Language::Base *> language_instances = get_language_list();
-	for(std::vector<const Language::Base *>::const_iterator it = language_instances.begin();
+	const std::vector<const Language::Base*> language_instances = get_language_list();
+	for(std::vector<const Language::Base*>::const_iterator it = language_instances.begin();
 		it != language_instances.end(); it++)
 	{
 		if((*it)->get_language_name() == name)
@@ -260,17 +260,17 @@ std::string verify_language_input(std::string input)
 	{
 		if(lng->get_language_name() == input)
 			return lng->get_language_name();
-		
+
 		if(lng->get_english_language_name() == input)
 			return lng->get_language_name();
 	}
 	return "";
 }
-}
+} // namespace Electrum
 
 namespace Electrum14Words
 {
-bool words_to_bytes(std::string words, crypto::secret_key_16 &dst, uint8_t &extra, std::string &language_name)
+bool words_to_bytes(std::string words, crypto::secret_key_16& dst, uint8_t& extra, std::string& language_name)
 {
 	std::vector<std::string> seed;
 
@@ -280,7 +280,7 @@ bool words_to_bytes(std::string words, crypto::secret_key_16 &dst, uint8_t &extr
 	if(seed.size() != 14 && seed.size() != 12)
 		return false;
 
-	Language::Base *language;
+	Language::Base* language;
 	if(!find_seed_language(seed, &language))
 		return false;
 
@@ -291,7 +291,7 @@ bool words_to_bytes(std::string words, crypto::secret_key_16 &dst, uint8_t &extr
 	language_name = language->get_language_name();
 	uint32_t word_list_length = language->get_word_list().size();
 
-	uint32_t *out = (uint32_t *)tools::unwrap(dst).data;
+	uint32_t* out = (uint32_t*)tools::unwrap(dst).data;
 	for(unsigned int i = 0; i < seed.size() / 3; i++)
 	{
 		uint32_t val;
@@ -328,11 +328,11 @@ bool words_to_bytes(std::string words, crypto::secret_key_16 &dst, uint8_t &extr
 	return true;
 }
 
-bool bytes_to_words(const crypto::secret_key_16 &src, uint8_t extra, std::string &words, const std::string &language_name)
+bool bytes_to_words(const crypto::secret_key_16& src, uint8_t extra, std::string& words, const std::string& language_name)
 {
-	const std::vector<const Language::Base *> &lng_insts = Electrum::get_language_list();
-	const Language::Base *language = nullptr;
-	for(const Language::Base *b : lng_insts)
+	const std::vector<const Language::Base*>& lng_insts = Electrum::get_language_list();
+	const Language::Base* language = nullptr;
+	for(const Language::Base* b : lng_insts)
 	{
 		if(b->get_language_name() == language_name || b->get_english_language_name() == language_name)
 		{
@@ -344,10 +344,10 @@ bool bytes_to_words(const crypto::secret_key_16 &src, uint8_t extra, std::string
 	if(language == nullptr)
 		return false;
 
-	const std::vector<std::string> &word_list = language->get_word_list();
+	const std::vector<std::string>& word_list = language->get_word_list();
 
 	uint32_t word_list_length = word_list.size();
-	const uint32_t *psrc = (const uint32_t *)tools::unwrap(src).data;
+	const uint32_t* psrc = (const uint32_t*)tools::unwrap(src).data;
 	for(unsigned int i = 0; i < 4; i++, words += ' ')
 	{
 		uint32_t w1, w2, w3;
@@ -377,7 +377,7 @@ bool bytes_to_words(const crypto::secret_key_16 &src, uint8_t extra, std::string
 
 	return true;
 }
-}
+} // namespace Electrum14Words
 
 namespace Electrum25Words
 {
@@ -387,7 +387,7 @@ namespace Electrum25Words
    * \param unique_prefix_length  the prefix length of each word to use for checksum
    * \return                      Checksum index
    */
-uint32_t create_checksum_index(const std::vector<std::string> &word_list, uint32_t unique_prefix_length)
+uint32_t create_checksum_index(const std::vector<std::string>& word_list, uint32_t unique_prefix_length)
 {
 	std::string trimmed_words = "";
 
@@ -437,7 +437,7 @@ bool checksum_test(std::vector<std::string> seed, uint32_t unique_prefix_length)
      * \param  language_name   Language of the seed as found gets written here.
      * \return                 false if not a multiple of 3 words, or if word is not in the words list
      */
-bool words_to_bytes(std::string words, std::string &dst, size_t len, std::string &language_name)
+bool words_to_bytes(std::string words, std::string& dst, size_t len, std::string& language_name)
 {
 	std::vector<std::string> seed;
 
@@ -462,7 +462,7 @@ bool words_to_bytes(std::string words, std::string &dst, size_t len, std::string
 		has_checksum = seed.size() == (expected + 1);
 	}
 
-	Language::Base *language;
+	Language::Base* language;
 	if(!find_seed_language(seed, &language))
 		return false;
 
@@ -497,7 +497,7 @@ bool words_to_bytes(std::string words, std::string &dst, size_t len, std::string
 		if(!(val % word_list_length == w1))
 			return false;
 
-		dst.append((const char *)&val, 4); // copy 4 bytes to position
+		dst.append((const char*)&val, 4); // copy 4 bytes to position
 	}
 
 	return true;
@@ -510,14 +510,14 @@ bool words_to_bytes(std::string words, std::string &dst, size_t len, std::string
      * \param  language_name   Language of the seed as found gets written here.
      * \return                 false if not a multiple of 3 words, or if word is not in the words list
      */
-bool words_to_bytes(std::string words, crypto::secret_key &dst, std::string &language_name)
+bool words_to_bytes(std::string words, crypto::secret_key& dst, std::string& language_name)
 {
 	std::string s;
 	if(!words_to_bytes(words, s, sizeof(dst), language_name))
 		return false;
 	if(s.size() != sizeof(dst))
 		return false;
-	dst = *(const crypto::secret_key *)s.data();
+	dst = *(const crypto::secret_key*)s.data();
 	return true;
 }
 
@@ -528,14 +528,14 @@ bool words_to_bytes(std::string words, crypto::secret_key &dst, std::string &lan
      * \param  language_name Seed language name
      * \return               true if successful false if not. Unsuccessful if wrong key size.
      */
-bool bytes_to_words(const char *src, size_t len, std::string &words, const std::string &language_name)
+bool bytes_to_words(const char* src, size_t len, std::string& words, const std::string& language_name)
 {
 	if(len % 4 != 0 || len == 0)
 		return false;
 
-	const std::vector<const Language::Base *> &lng_insts = Electrum::get_language_list();
-	const Language::Base *language = nullptr;
-	for(const Language::Base *b : lng_insts)
+	const std::vector<const Language::Base*>& lng_insts = Electrum::get_language_list();
+	const Language::Base* language = nullptr;
+	for(const Language::Base* b : lng_insts)
 	{
 		if(b->get_language_name() == language_name || b->get_english_language_name() == language_name)
 		{
@@ -547,7 +547,7 @@ bool bytes_to_words(const char *src, size_t len, std::string &words, const std::
 	if(language == nullptr)
 		return false;
 
-	const std::vector<std::string> &word_list = language->get_word_list();
+	const std::vector<std::string>& word_list = language->get_word_list();
 	// To store the words for random access to add the checksum word later.
 	std::vector<std::string> words_store;
 
@@ -581,9 +581,9 @@ bool bytes_to_words(const char *src, size_t len, std::string &words, const std::
 	return true;
 }
 
-bool bytes_to_words(const crypto::secret_key &src, std::string &words, const std::string &language_name)
+bool bytes_to_words(const crypto::secret_key& src, std::string& words, const std::string& language_name)
 {
 	return bytes_to_words(src.data, sizeof(src), words, language_name);
 }
-}
-}
+} // namespace Electrum25Words
+} // namespace crypto

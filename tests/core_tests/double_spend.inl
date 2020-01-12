@@ -33,8 +33,9 @@
 //======================================================================================================================
 
 template <class concrete_test>
-gen_double_spend_base<concrete_test>::gen_double_spend_base()
-	: m_invalid_tx_index(invalid_index_value), m_invalid_block_index(invalid_index_value)
+gen_double_spend_base<concrete_test>::gen_double_spend_base() :
+	m_invalid_tx_index(invalid_index_value),
+	m_invalid_block_index(invalid_index_value)
 {
 	REGISTER_CALLBACK_METHOD(gen_double_spend_base<concrete_test>, mark_last_valid_block);
 	REGISTER_CALLBACK_METHOD(gen_double_spend_base<concrete_test>, mark_invalid_tx);
@@ -43,7 +44,7 @@ gen_double_spend_base<concrete_test>::gen_double_spend_base()
 }
 
 template <class concrete_test>
-bool gen_double_spend_base<concrete_test>::check_tx_verification_context(const cryptonote::tx_verification_context &tvc, bool tx_added, size_t event_idx, const cryptonote::transaction & /*tx*/)
+bool gen_double_spend_base<concrete_test>::check_tx_verification_context(const cryptonote::tx_verification_context& tvc, bool tx_added, size_t event_idx, const cryptonote::transaction& /*tx*/)
 {
 	if(m_invalid_tx_index == event_idx)
 		return tvc.m_verifivation_failed;
@@ -52,7 +53,7 @@ bool gen_double_spend_base<concrete_test>::check_tx_verification_context(const c
 }
 
 template <class concrete_test>
-bool gen_double_spend_base<concrete_test>::check_block_verification_context(const cryptonote::block_verification_context &bvc, size_t event_idx, const cryptonote::block & /*block*/)
+bool gen_double_spend_base<concrete_test>::check_block_verification_context(const cryptonote::block_verification_context& bvc, size_t event_idx, const cryptonote::block& /*block*/)
 {
 	if(m_invalid_block_index == event_idx)
 		return bvc.m_verifivation_failed;
@@ -61,7 +62,7 @@ bool gen_double_spend_base<concrete_test>::check_block_verification_context(cons
 }
 
 template <class concrete_test>
-bool gen_double_spend_base<concrete_test>::mark_last_valid_block(cryptonote::core &c, size_t /*ev_index*/, const std::vector<test_event_entry> & /*events*/)
+bool gen_double_spend_base<concrete_test>::mark_last_valid_block(cryptonote::core& c, size_t /*ev_index*/, const std::vector<test_event_entry>& /*events*/)
 {
 	std::list<cryptonote::block> block_list;
 	bool r = c.get_blocks(c.get_current_blockchain_height() - 1, 1, block_list);
@@ -71,21 +72,21 @@ bool gen_double_spend_base<concrete_test>::mark_last_valid_block(cryptonote::cor
 }
 
 template <class concrete_test>
-bool gen_double_spend_base<concrete_test>::mark_invalid_tx(cryptonote::core & /*c*/, size_t ev_index, const std::vector<test_event_entry> & /*events*/)
+bool gen_double_spend_base<concrete_test>::mark_invalid_tx(cryptonote::core& /*c*/, size_t ev_index, const std::vector<test_event_entry>& /*events*/)
 {
 	m_invalid_tx_index = ev_index + 1;
 	return true;
 }
 
 template <class concrete_test>
-bool gen_double_spend_base<concrete_test>::mark_invalid_block(cryptonote::core & /*c*/, size_t ev_index, const std::vector<test_event_entry> & /*events*/)
+bool gen_double_spend_base<concrete_test>::mark_invalid_block(cryptonote::core& /*c*/, size_t ev_index, const std::vector<test_event_entry>& /*events*/)
 {
 	m_invalid_block_index = ev_index + 1;
 	return true;
 }
 
 template <class concrete_test>
-bool gen_double_spend_base<concrete_test>::check_double_spend(cryptonote::core &c, size_t /*ev_index*/, const std::vector<test_event_entry> &events)
+bool gen_double_spend_base<concrete_test>::check_double_spend(cryptonote::core& c, size_t /*ev_index*/, const std::vector<test_event_entry>& events)
 {
 	DEFINE_TESTS_ERROR_CONTEXT("gen_double_spend_base::check_double_spend");
 
@@ -119,7 +120,7 @@ bool gen_double_spend_base<concrete_test>::check_double_spend(cryptonote::core &
 //======================================================================================================================
 
 template <bool txs_keeped_by_block>
-bool gen_double_spend_in_tx<txs_keeped_by_block>::generate(std::vector<test_event_entry> &events) const
+bool gen_double_spend_in_tx<txs_keeped_by_block>::generate(std::vector<test_event_entry>& events) const
 {
 	INIT_DOUBLE_SPEND_TEST();
 	DO_CALLBACK(events, "mark_last_valid_block");
@@ -157,7 +158,7 @@ bool gen_double_spend_in_tx<txs_keeped_by_block>::generate(std::vector<test_even
 }
 
 template <bool txs_keeped_by_block>
-bool gen_double_spend_in_the_same_block<txs_keeped_by_block>::generate(std::vector<test_event_entry> &events) const
+bool gen_double_spend_in_the_same_block<txs_keeped_by_block>::generate(std::vector<test_event_entry>& events) const
 {
 	INIT_DOUBLE_SPEND_TEST();
 
@@ -184,7 +185,7 @@ bool gen_double_spend_in_the_same_block<txs_keeped_by_block>::generate(std::vect
 }
 
 template <bool txs_keeped_by_block>
-bool gen_double_spend_in_different_blocks<txs_keeped_by_block>::generate(std::vector<test_event_entry> &events) const
+bool gen_double_spend_in_different_blocks<txs_keeped_by_block>::generate(std::vector<test_event_entry>& events) const
 {
 	INIT_DOUBLE_SPEND_TEST();
 
@@ -215,7 +216,7 @@ bool gen_double_spend_in_different_blocks<txs_keeped_by_block>::generate(std::ve
 }
 
 template <bool txs_keeped_by_block>
-bool gen_double_spend_in_alt_chain_in_the_same_block<txs_keeped_by_block>::generate(std::vector<test_event_entry> &events) const
+bool gen_double_spend_in_alt_chain_in_the_same_block<txs_keeped_by_block>::generate(std::vector<test_event_entry>& events) const
 {
 	INIT_DOUBLE_SPEND_TEST();
 
@@ -250,7 +251,7 @@ bool gen_double_spend_in_alt_chain_in_the_same_block<txs_keeped_by_block>::gener
 }
 
 template <bool txs_keeped_by_block>
-bool gen_double_spend_in_alt_chain_in_different_blocks<txs_keeped_by_block>::generate(std::vector<test_event_entry> &events) const
+bool gen_double_spend_in_alt_chain_in_different_blocks<txs_keeped_by_block>::generate(std::vector<test_event_entry>& events) const
 {
 	INIT_DOUBLE_SPEND_TEST();
 

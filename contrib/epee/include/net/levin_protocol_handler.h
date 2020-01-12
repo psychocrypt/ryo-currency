@@ -32,8 +32,6 @@
 
 #include "common/gulps.hpp"
 
-
-
 namespace epee
 {
 namespace levin
@@ -41,8 +39,8 @@ namespace levin
 template <class t_connection_context = net_utils::connection_context_base>
 struct protocl_handler_config
 {
-	levin_commands_handler<t_connection_context> *m_pcommands_handler;
-	void (*m_pcommands_handler_destroy)(levin_commands_handler<t_connection_context> *);
+	levin_commands_handler<t_connection_context>* m_pcommands_handler;
+	void (*m_pcommands_handler_destroy)(levin_commands_handler<t_connection_context>*);
 	~protocl_handler_config()
 	{
 		if(m_pcommands_handler && m_pcommands_handler_destroy)
@@ -54,16 +52,18 @@ template <class t_connection_context = net_utils::connection_context_base>
 class protocol_handler
 {
 	GULPS_CAT_MAJOR("epee_lev_proto");
+
   public:
 	typedef t_connection_context connection_context;
 	typedef protocl_handler_config<t_connection_context> config_type;
 
-	protocol_handler(net_utils::i_service_endpoint *psnd_hndlr, config_type &config, t_connection_context &conn_context);
+	protocol_handler(net_utils::i_service_endpoint* psnd_hndlr, config_type& config, t_connection_context& conn_context);
 	virtual ~protocol_handler() {}
 
-	virtual bool handle_recv(const void *ptr, size_t cb);
+	virtual bool handle_recv(const void* ptr, size_t cb);
 
 	bool after_init_connection() { return true; }
+
   private:
 	enum connection_data_state
 	{
@@ -71,32 +71,33 @@ class protocol_handler
 		conn_state_reading_body
 	};
 
-	config_type &m_config;
-	t_connection_context &m_conn_context;
-	net_utils::i_service_endpoint *m_psnd_hndlr;
+	config_type& m_config;
+	t_connection_context& m_conn_context;
+	net_utils::i_service_endpoint* m_psnd_hndlr;
 	std::string m_cach_in_buffer;
 	connection_data_state m_state;
 	bucket_head m_current_head;
 };
 
 template <class t_connection_context>
-protocol_handler<t_connection_context>::protocol_handler(net_utils::i_service_endpoint *psnd_hndlr, config_type &config, t_connection_context &conn_context) : m_config(config),
-																																							   m_conn_context(conn_context),
-																																							   m_psnd_hndlr(psnd_hndlr),
-																																							   m_state(conn_state_reading_head),
-																																							   m_current_head(bucket_head())
+protocol_handler<t_connection_context>::protocol_handler(net_utils::i_service_endpoint* psnd_hndlr, config_type& config, t_connection_context& conn_context) :
+	m_config(config),
+	m_conn_context(conn_context),
+	m_psnd_hndlr(psnd_hndlr),
+	m_state(conn_state_reading_head),
+	m_current_head(bucket_head())
 {
 }
 
 template <class t_connection_context>
-bool protocol_handler<t_connection_context>::handle_recv(const void *ptr, size_t cb)
+bool protocol_handler<t_connection_context>::handle_recv(const void* ptr, size_t cb)
 {
 	if(!m_config.m_pcommands_handler)
 	{
 		GULPS_ERROR(m_conn_context, "Command handler not set!");
 		return false;
 	}
-	m_cach_in_buffer.append((const char *)ptr, cb);
+	m_cach_in_buffer.append((const char*)ptr, cb);
 
 	bool is_continue = true;
 	while(is_continue)
@@ -106,7 +107,7 @@ bool protocol_handler<t_connection_context>::handle_recv(const void *ptr, size_t
 		case conn_state_reading_head:
 			if(m_cach_in_buffer.size() < sizeof(bucket_head))
 			{
-				if(m_cach_in_buffer.size() >= sizeof(uint64_t) && *((uint64_t *)m_cach_in_buffer.data()) != LEVIN_SIGNATURE)
+				if(m_cach_in_buffer.size() >= sizeof(uint64_t) && *((uint64_t*)m_cach_in_buffer.data()) != LEVIN_SIGNATURE)
 				{
 					GULPS_ERROR(m_conn_context, "Signature mismatch on accepted connection");
 					return false;
@@ -115,7 +116,7 @@ bool protocol_handler<t_connection_context>::handle_recv(const void *ptr, size_t
 				break;
 			}
 			{
-				bucket_head *phead = (bucket_head *)m_cach_in_buffer.data();
+				bucket_head* phead = (bucket_head*)m_cach_in_buffer.data();
 				if(LEVIN_SIGNATURE != phead->m_signature)
 				{
 					GULPS_ERROR(m_conn_context, "Signature mismatch on accepted connection");
@@ -148,7 +149,7 @@ bool protocol_handler<t_connection_context>::handle_recv(const void *ptr, size_t
 					m_current_head.m_return_code = m_config.m_pcommands_handler->invoke(m_current_head.m_command, buff_to_invoke, return_buff, m_conn_context);
 					m_current_head.m_cb = return_buff.size();
 					m_current_head.m_have_to_return_data = false;
-					std::string send_buff((const char *)&m_current_head, sizeof(m_current_head));
+					std::string send_buff((const char*)&m_current_head, sizeof(m_current_head));
 					send_buff += return_buff;
 
 					if(!m_psnd_hndlr->do_send(send_buff.data(), send_buff.size()))
@@ -167,7 +168,7 @@ bool protocol_handler<t_connection_context>::handle_recv(const void *ptr, size_t
 
 	return true;
 }
-}
-}
+} // namespace levin
+} // namespace epee
 
 #endif //_LEVIN_PROTOCOL_HANDLER_H_

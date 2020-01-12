@@ -46,18 +46,19 @@ struct sldns_buffer;
 /**
  * verbosity value:
  */
-enum verbosity_value {
- /** 0 - no verbose messages */
+enum verbosity_value
+{
+	/** 0 - no verbose messages */
 	NO_VERBOSE = 0,
- /** 1 - operational information */
- 	VERB_OPS,
- /** 2 - detailed information */
- 	VERB_DETAIL,
- /** 3 - query level information */
- 	VERB_QUERY,
- /** 4 - algorithm level information */
- 	VERB_ALGO,
- /** 5 - querier client information */
+	/** 1 - operational information */
+	VERB_OPS,
+	/** 2 - detailed information */
+	VERB_DETAIL,
+	/** 3 - query level information */
+	VERB_QUERY,
+	/** 4 - algorithm level information */
+	VERB_ALGO,
+	/** 5 - querier client information */
 	VERB_CLIENT
 };
 
@@ -71,7 +72,7 @@ extern enum verbosity_value verbosity;
  *	verbosity setting.
  * @param format: printf-style format string. Arguments follow.
  */
-void verbose(enum verbosity_value level, 
+void verbose(enum verbosity_value level,
 	const char* format, ...) ATTR_FORMAT(printf, 2, 3);
 
 /**
@@ -87,7 +88,7 @@ void log_init(const char* filename, int use_syslog, const char* chrootdir);
  * This setting does not affect the use_syslog setting.
  * @param f: to that file, or pass NULL to disable logging.
  */
-void log_file(FILE *f);
+void log_file(FILE* f);
 
 /**
  * Init a thread (will print this number for the thread log entries).
@@ -194,14 +195,16 @@ void log_vmsg(int pri, const char* type, const char* format, va_list args);
  * it could complain about the nullptr the assert is guarding against. */
 #define log_assert(x) assert(x)
 #else
-#  define log_assert(x) \
-	do { if(!(x)) \
-		fatal_exit("%s:%d: %s: assertion %s failed", \
-			__FILE__, __LINE__, __func__, #x); \
+#define log_assert(x)                                    \
+	do                                                   \
+	{                                                    \
+		if(!(x))                                         \
+			fatal_exit("%s:%d: %s: assertion %s failed", \
+				__FILE__, __LINE__, __func__, #x);       \
 	} while(0);
 #endif
 #else
-#  define log_assert(x) /*nothing*/
+#define log_assert(x) /*nothing*/
 #endif
 
 #ifdef USE_WINSOCK

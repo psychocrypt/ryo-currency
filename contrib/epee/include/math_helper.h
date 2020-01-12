@@ -63,7 +63,7 @@ class average
 
 	typedef val value_type;
 
-	void push(const value_type &vl)
+	void push(const value_type& vl)
 	{
 		CRITICAL_REGION_LOCAL(m_lock);
 
@@ -74,7 +74,7 @@ class average
 		//#endif
 	}
 
-	double update(const value_type &vl)
+	double update(const value_type& vl)
 	{
 		CRITICAL_REGION_LOCAL(m_lock);
 		//#ifndef DEBUG_STUB
@@ -126,7 +126,8 @@ template <class T>
 class timing_guard : public timing_guard_base
 {
   public:
-	timing_guard(T &avrg) : m_avrg(avrg)
+	timing_guard(T& avrg) :
+		m_avrg(avrg)
 	{
 		m_start_ticks = ::GetTickCount();
 	}
@@ -137,12 +138,12 @@ class timing_guard : public timing_guard_base
 	}
 
   private:
-	T &m_avrg;
+	T& m_avrg;
 	DWORD m_start_ticks;
 };
 
 template <class t_timing>
-timing_guard_base *create_timing_guard(t_timing &timing) { return new timing_guard<t_timing>(timing); }
+timing_guard_base* create_timing_guard(t_timing& timing) { return new timing_guard<t_timing>(timing); }
 
 #define BEGIN_TIMING_ZONE(timing_var) \
 	{                                 \
@@ -210,7 +211,7 @@ class speed
 //#endif
 
 template <class tlist>
-void randomize_list(tlist &t_list)
+void randomize_list(tlist& t_list)
 {
 	for(typename tlist::iterator it = t_list.begin(); it != t_list.end(); it++)
 	{
@@ -227,7 +228,8 @@ template <int default_interval, bool start_immediate = true>
 class once_a_time_seconds
 {
   public:
-	once_a_time_seconds() : m_interval(default_interval)
+	once_a_time_seconds() :
+		m_interval(default_interval)
 	{
 		m_last_worked_time = 0;
 		if(!start_immediate)
@@ -253,5 +255,5 @@ class once_a_time_seconds
 	time_t m_last_worked_time;
 	time_t m_interval;
 };
-}
-}
+} // namespace math_helper
+} // namespace epee

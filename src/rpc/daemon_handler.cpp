@@ -58,14 +58,14 @@ namespace cryptonote
 namespace rpc
 {
 GULPS_CAT_MAJOR("rpc_args");
-void DaemonHandler::handle(const GetHeight::Request &req, GetHeight::Response &res)
+void DaemonHandler::handle(const GetHeight::Request& req, GetHeight::Response& res)
 {
 	res.height = m_core.get_current_blockchain_height();
 
 	res.status = Message::STATUS_OK;
 }
 
-void DaemonHandler::handle(const GetBlocksFast::Request &req, GetBlocksFast::Response &res)
+void DaemonHandler::handle(const GetBlocksFast::Request& req, GetBlocksFast::Response& res)
 {
 	std::list<std::pair<blobdata, std::list<blobdata>>> blocks;
 
@@ -87,7 +87,7 @@ void DaemonHandler::handle(const GetBlocksFast::Request &req, GetBlocksFast::Res
 	uint64_t block_count = 0;
 	while(it != blocks.end())
 	{
-		cryptonote::rpc::block_with_transactions &bwt = res.blocks[block_count];
+		cryptonote::rpc::block_with_transactions& bwt = res.blocks[block_count];
 
 		if(!parse_and_validate_block_from_blob(it->first, bwt.block))
 		{
@@ -107,7 +107,7 @@ void DaemonHandler::handle(const GetBlocksFast::Request &req, GetBlocksFast::Res
 			return;
 		}
 		std::list<transaction> txs;
-		for(const auto &blob : it->second)
+		for(const auto& blob : it->second)
 		{
 			txs.resize(txs.size() + 1);
 			if(!parse_and_validate_tx_from_blob(blob, txs.back()))
@@ -120,7 +120,7 @@ void DaemonHandler::handle(const GetBlocksFast::Request &req, GetBlocksFast::Res
 			}
 		}
 
-		cryptonote::rpc::block_output_indices &indices = res.output_indices[block_count];
+		cryptonote::rpc::block_output_indices& indices = res.output_indices[block_count];
 
 		// miner tx output indices
 		{
@@ -138,7 +138,7 @@ void DaemonHandler::handle(const GetBlocksFast::Request &req, GetBlocksFast::Res
 		// assume each block returned is returned with all its transactions
 		// in the correct order.
 		auto tx_it = txs.begin();
-		for(const crypto::hash &h : bwt.block.tx_hashes)
+		for(const crypto::hash& h : bwt.block.tx_hashes)
 		{
 			bwt.transactions.emplace(h, *tx_it);
 			tx_it++;
@@ -162,11 +162,11 @@ void DaemonHandler::handle(const GetBlocksFast::Request &req, GetBlocksFast::Res
 	res.status = Message::STATUS_OK;
 }
 
-void DaemonHandler::handle(const GetHashesFast::Request &req, GetHashesFast::Response &res)
+void DaemonHandler::handle(const GetHashesFast::Request& req, GetHashesFast::Response& res)
 {
 	res.start_height = req.start_height;
 
-	auto &chain = m_core.get_blockchain_storage();
+	auto& chain = m_core.get_blockchain_storage();
 
 	if(!chain.find_blockchain_supplement(req.known_hashes, res.hashes, res.start_height, res.current_height))
 	{
@@ -178,7 +178,7 @@ void DaemonHandler::handle(const GetHashesFast::Request &req, GetHashesFast::Res
 	res.status = Message::STATUS_OK;
 }
 
-void DaemonHandler::handle(const GetTransactions::Request &req, GetTransactions::Response &res)
+void DaemonHandler::handle(const GetTransactions::Request& req, GetTransactions::Response& res)
 {
 	std::list<cryptonote::transaction> found_txs;
 	std::list<crypto::hash> missed_hashes;
@@ -221,7 +221,7 @@ void DaemonHandler::handle(const GetTransactions::Request &req, GetTransactions:
 
 		m_core.get_pool_transactions(pool_txs);
 
-		for(const auto &tx : pool_txs)
+		for(const auto& tx : pool_txs)
 		{
 			crypto::hash h = get_transaction_hash(tx);
 
@@ -252,7 +252,7 @@ void DaemonHandler::handle(const GetTransactions::Request &req, GetTransactions:
 	res.status = Message::STATUS_OK;
 }
 
-void DaemonHandler::handle(const KeyImagesSpent::Request &req, KeyImagesSpent::Response &res)
+void DaemonHandler::handle(const KeyImagesSpent::Request& req, KeyImagesSpent::Response& res)
 {
 	res.spent_status.resize(req.key_images.size(), KeyImagesSpent::STATUS::UNSPENT);
 
@@ -284,7 +284,7 @@ void DaemonHandler::handle(const KeyImagesSpent::Request &req, KeyImagesSpent::R
 	res.status = Message::STATUS_OK;
 }
 
-void DaemonHandler::handle(const GetTxGlobalOutputIndices::Request &req, GetTxGlobalOutputIndices::Response &res)
+void DaemonHandler::handle(const GetTxGlobalOutputIndices::Request& req, GetTxGlobalOutputIndices::Response& res)
 {
 	if(!m_core.get_tx_outputs_gindexs(req.tx_hash, res.output_indices))
 	{
@@ -297,13 +297,13 @@ void DaemonHandler::handle(const GetTxGlobalOutputIndices::Request &req, GetTxGl
 }
 
 //TODO: handle "restricted" RPC
-void DaemonHandler::handle(const GetRandomOutputsForAmounts::Request &req, GetRandomOutputsForAmounts::Response &res)
+void DaemonHandler::handle(const GetRandomOutputsForAmounts::Request& req, GetRandomOutputsForAmounts::Response& res)
 {
-	auto &chain = m_core.get_blockchain_storage();
+	auto& chain = m_core.get_blockchain_storage();
 
 	try
 	{
-		for(const uint64_t &amount : req.amounts)
+		for(const uint64_t& amount : req.amounts)
 		{
 			std::vector<uint64_t> indices = chain.get_random_outputs(amount, req.count);
 
@@ -327,14 +327,14 @@ void DaemonHandler::handle(const GetRandomOutputsForAmounts::Request &req, GetRa
 
 		res.status = Message::STATUS_OK;
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		res.status = Message::STATUS_FAILED;
 		res.error_details = e.what();
 	}
 }
 
-void DaemonHandler::handle(const SendRawTx::Request &req, SendRawTx::Response &res)
+void DaemonHandler::handle(const SendRawTx::Request& req, SendRawTx::Response& res)
 {
 	auto tx_blob = cryptonote::tx_to_blob(req.tx);
 
@@ -429,7 +429,7 @@ void DaemonHandler::handle(const SendRawTx::Request &req, SendRawTx::Response &r
 	return;
 }
 
-void DaemonHandler::handle(const StartMining::Request &req, StartMining::Response &res)
+void DaemonHandler::handle(const StartMining::Request& req, StartMining::Response& res)
 {
 	cryptonote::address_parse_info info;
 	if(!get_account_address_from_str(m_core.get_nettype(), info, req.miner_address))
@@ -479,7 +479,7 @@ void DaemonHandler::handle(const StartMining::Request &req, StartMining::Respons
 	res.error_details = "";
 }
 
-void DaemonHandler::handle(const GetInfo::Request &req, GetInfo::Response &res)
+void DaemonHandler::handle(const GetInfo::Request& req, GetInfo::Response& res)
 {
 	res.info.height = m_core.get_current_blockchain_height();
 
@@ -490,7 +490,7 @@ void DaemonHandler::handle(const GetInfo::Request &req, GetInfo::Response &res)
 		res.info.target_height = res.info.height;
 	}
 
-	auto &chain = m_core.get_blockchain_storage();
+	auto& chain = m_core.get_blockchain_storage();
 
 	res.info.difficulty = chain.get_difficulty_for_next_block();
 
@@ -521,7 +521,7 @@ void DaemonHandler::handle(const GetInfo::Request &req, GetInfo::Response &res)
 	res.error_details = "";
 }
 
-void DaemonHandler::handle(const StopMining::Request &req, StopMining::Response &res)
+void DaemonHandler::handle(const StopMining::Request& req, StopMining::Response& res)
 {
 	if(!m_core.get_miner().stop())
 	{
@@ -535,9 +535,9 @@ void DaemonHandler::handle(const StopMining::Request &req, StopMining::Response 
 	res.error_details = "";
 }
 
-void DaemonHandler::handle(const MiningStatus::Request &req, MiningStatus::Response &res)
+void DaemonHandler::handle(const MiningStatus::Request& req, MiningStatus::Response& res)
 {
-	const cryptonote::miner &lMiner = m_core.get_miner();
+	const cryptonote::miner& lMiner = m_core.get_miner();
 	res.active = lMiner.is_mining();
 	res.is_background_mining_enabled = lMiner.get_is_background_mining_enabled();
 
@@ -545,7 +545,7 @@ void DaemonHandler::handle(const MiningStatus::Request &req, MiningStatus::Respo
 	{
 		res.speed = lMiner.get_speed();
 		res.threads_count = lMiner.get_threads_count();
-		const account_public_address &lMiningAdr = lMiner.get_mining_address();
+		const account_public_address& lMiningAdr = lMiner.get_mining_address();
 		res.address = get_public_address_as_str(m_core.get_nettype(), false, lMiningAdr);
 	}
 
@@ -553,7 +553,7 @@ void DaemonHandler::handle(const MiningStatus::Request &req, MiningStatus::Respo
 	res.error_details = "";
 }
 
-void DaemonHandler::handle(const SaveBC::Request &req, SaveBC::Response &res)
+void DaemonHandler::handle(const SaveBC::Request& req, SaveBC::Response& res)
 {
 	if(!m_core.get_blockchain_storage().store_blockchain())
 	{
@@ -566,7 +566,7 @@ void DaemonHandler::handle(const SaveBC::Request &req, SaveBC::Response &res)
 	}
 }
 
-void DaemonHandler::handle(const GetBlockHash::Request &req, GetBlockHash::Response &res)
+void DaemonHandler::handle(const GetBlockHash::Request& req, GetBlockHash::Response& res)
 {
 	if(m_core.get_current_blockchain_height() <= req.height)
 	{
@@ -581,19 +581,19 @@ void DaemonHandler::handle(const GetBlockHash::Request &req, GetBlockHash::Respo
 	res.status = Message::STATUS_OK;
 }
 
-void DaemonHandler::handle(const GetBlockTemplate::Request &req, GetBlockTemplate::Response &res)
+void DaemonHandler::handle(const GetBlockTemplate::Request& req, GetBlockTemplate::Response& res)
 {
 	res.status = Message::STATUS_FAILED;
 	res.error_details = "RPC method not yet implemented.";
 }
 
-void DaemonHandler::handle(const SubmitBlock::Request &req, SubmitBlock::Response &res)
+void DaemonHandler::handle(const SubmitBlock::Request& req, SubmitBlock::Response& res)
 {
 	res.status = Message::STATUS_FAILED;
 	res.error_details = "RPC method not yet implemented.";
 }
 
-void DaemonHandler::handle(const GetLastBlockHeader::Request &req, GetLastBlockHeader::Response &res)
+void DaemonHandler::handle(const GetLastBlockHeader::Request& req, GetLastBlockHeader::Response& res)
 {
 	const crypto::hash block_hash = m_core.get_tail_id();
 
@@ -607,7 +607,7 @@ void DaemonHandler::handle(const GetLastBlockHeader::Request &req, GetLastBlockH
 	res.status = Message::STATUS_OK;
 }
 
-void DaemonHandler::handle(const GetBlockHeaderByHash::Request &req, GetBlockHeaderByHash::Response &res)
+void DaemonHandler::handle(const GetBlockHeaderByHash::Request& req, GetBlockHeaderByHash::Response& res)
 {
 	if(!getBlockHeaderByHash(req.hash, res.header))
 	{
@@ -619,7 +619,7 @@ void DaemonHandler::handle(const GetBlockHeaderByHash::Request &req, GetBlockHea
 	res.status = Message::STATUS_OK;
 }
 
-void DaemonHandler::handle(const GetBlockHeaderByHeight::Request &req, GetBlockHeaderByHeight::Response &res)
+void DaemonHandler::handle(const GetBlockHeaderByHeight::Request& req, GetBlockHeaderByHeight::Response& res)
 {
 	const crypto::hash block_hash = m_core.get_block_id_by_height(req.height);
 
@@ -633,7 +633,7 @@ void DaemonHandler::handle(const GetBlockHeaderByHeight::Request &req, GetBlockH
 	res.status = Message::STATUS_OK;
 }
 
-void DaemonHandler::handle(const GetBlockHeadersByHeight::Request &req, GetBlockHeadersByHeight::Response &res)
+void DaemonHandler::handle(const GetBlockHeadersByHeight::Request& req, GetBlockHeadersByHeight::Response& res)
 {
 	res.headers.resize(req.heights.size());
 
@@ -652,25 +652,25 @@ void DaemonHandler::handle(const GetBlockHeadersByHeight::Request &req, GetBlock
 	res.status = Message::STATUS_OK;
 }
 
-void DaemonHandler::handle(const GetBlock::Request &req, GetBlock::Response &res)
+void DaemonHandler::handle(const GetBlock::Request& req, GetBlock::Response& res)
 {
 	res.status = Message::STATUS_FAILED;
 	res.error_details = "RPC method not yet implemented.";
 }
 
-void DaemonHandler::handle(const GetPeerList::Request &req, GetPeerList::Response &res)
+void DaemonHandler::handle(const GetPeerList::Request& req, GetPeerList::Response& res)
 {
 	res.status = Message::STATUS_FAILED;
 	res.error_details = "RPC method not yet implemented.";
 }
 
-void DaemonHandler::handle(const SetLogHashRate::Request &req, SetLogHashRate::Response &res)
+void DaemonHandler::handle(const SetLogHashRate::Request& req, SetLogHashRate::Response& res)
 {
 	res.status = Message::STATUS_FAILED;
 	res.error_details = "RPC method not yet implemented.";
 }
 
-void DaemonHandler::handle(const SetLogLevel::Request &req, SetLogLevel::Response &res)
+void DaemonHandler::handle(const SetLogLevel::Request& req, SetLogLevel::Response& res)
 {
 	if(req.level < 0 || req.level > 4)
 	{
@@ -683,7 +683,7 @@ void DaemonHandler::handle(const SetLogLevel::Request &req, SetLogLevel::Respons
 	}
 }
 
-void DaemonHandler::handle(const GetTransactionPool::Request &req, GetTransactionPool::Response &res)
+void DaemonHandler::handle(const GetTransactionPool::Request& req, GetTransactionPool::Response& res)
 {
 	bool r = m_core.get_pool_for_rpc(res.transactions, res.key_images);
 
@@ -693,39 +693,39 @@ void DaemonHandler::handle(const GetTransactionPool::Request &req, GetTransactio
 		res.status = Message::STATUS_OK;
 }
 
-void DaemonHandler::handle(const GetConnections::Request &req, GetConnections::Response &res)
+void DaemonHandler::handle(const GetConnections::Request& req, GetConnections::Response& res)
 {
 	res.status = Message::STATUS_FAILED;
 	res.error_details = "RPC method not yet implemented.";
 }
 
-void DaemonHandler::handle(const GetBlockHeadersRange::Request &req, GetBlockHeadersRange::Response &res)
+void DaemonHandler::handle(const GetBlockHeadersRange::Request& req, GetBlockHeadersRange::Response& res)
 {
 	res.status = Message::STATUS_FAILED;
 	res.error_details = "RPC method not yet implemented.";
 }
 
-void DaemonHandler::handle(const StopDaemon::Request &req, StopDaemon::Response &res)
+void DaemonHandler::handle(const StopDaemon::Request& req, StopDaemon::Response& res)
 {
 	res.status = Message::STATUS_FAILED;
 	res.error_details = "RPC method not yet implemented.";
 }
 
-void DaemonHandler::handle(const StartSaveGraph::Request &req, StartSaveGraph::Response &res)
+void DaemonHandler::handle(const StartSaveGraph::Request& req, StartSaveGraph::Response& res)
 {
 	res.status = Message::STATUS_FAILED;
 	res.error_details = "RPC method not yet implemented.";
 }
 
-void DaemonHandler::handle(const StopSaveGraph::Request &req, StopSaveGraph::Response &res)
+void DaemonHandler::handle(const StopSaveGraph::Request& req, StopSaveGraph::Response& res)
 {
 	res.status = Message::STATUS_FAILED;
 	res.error_details = "RPC method not yet implemented.";
 }
 
-void DaemonHandler::handle(const HardForkInfo::Request &req, HardForkInfo::Response &res)
+void DaemonHandler::handle(const HardForkInfo::Request& req, HardForkInfo::Response& res)
 {
-	const Blockchain &blockchain = m_core.get_blockchain_storage();
+	const Blockchain& blockchain = m_core.get_blockchain_storage();
 	uint8_t version = req.version > 0 ? req.version : blockchain.get_ideal_hard_fork_version();
 	res.info.version = blockchain.get_current_hard_fork_version_num();
 	res.info.enabled = blockchain.get_hard_fork_voting_info(version, res.info.window, res.info.votes, res.info.threshold, res.info.earliest_height, res.info.voting);
@@ -733,32 +733,32 @@ void DaemonHandler::handle(const HardForkInfo::Request &req, HardForkInfo::Respo
 	res.status = Message::STATUS_OK;
 }
 
-void DaemonHandler::handle(const GetBans::Request &req, GetBans::Response &res)
+void DaemonHandler::handle(const GetBans::Request& req, GetBans::Response& res)
 {
 	res.status = Message::STATUS_FAILED;
 	res.error_details = "RPC method not yet implemented.";
 }
 
-void DaemonHandler::handle(const SetBans::Request &req, SetBans::Response &res)
+void DaemonHandler::handle(const SetBans::Request& req, SetBans::Response& res)
 {
 	res.status = Message::STATUS_FAILED;
 	res.error_details = "RPC method not yet implemented.";
 }
 
-void DaemonHandler::handle(const FlushTransactionPool::Request &req, FlushTransactionPool::Response &res)
+void DaemonHandler::handle(const FlushTransactionPool::Request& req, FlushTransactionPool::Response& res)
 {
 	res.status = Message::STATUS_FAILED;
 	res.error_details = "RPC method not yet implemented.";
 }
 
-void DaemonHandler::handle(const GetOutputHistogram::Request &req, GetOutputHistogram::Response &res)
+void DaemonHandler::handle(const GetOutputHistogram::Request& req, GetOutputHistogram::Response& res)
 {
 	std::map<uint64_t, std::tuple<uint64_t, uint64_t, uint64_t>> histogram;
 	try
 	{
 		histogram = m_core.get_blockchain_storage().get_output_histogram(req.amounts, req.unlocked, req.recent_cutoff);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		res.status = Message::STATUS_FAILED;
 		res.error_details = e.what();
@@ -767,7 +767,7 @@ void DaemonHandler::handle(const GetOutputHistogram::Request &req, GetOutputHist
 
 	res.histogram.clear();
 	res.histogram.reserve(histogram.size());
-	for(const auto &i : histogram)
+	for(const auto& i : histogram)
 	{
 		if(std::get<0>(i.second) >= req.min_count && (std::get<0>(i.second) <= req.max_count || req.max_count == 0))
 			res.histogram.emplace_back(output_amount_count{i.first, std::get<0>(i.second), std::get<1>(i.second), std::get<2>(i.second)});
@@ -776,11 +776,11 @@ void DaemonHandler::handle(const GetOutputHistogram::Request &req, GetOutputHist
 	res.status = Message::STATUS_OK;
 }
 
-void DaemonHandler::handle(const GetOutputKeys::Request &req, GetOutputKeys::Response &res)
+void DaemonHandler::handle(const GetOutputKeys::Request& req, GetOutputKeys::Response& res)
 {
 	try
 	{
-		for(const auto &i : req.outputs)
+		for(const auto& i : req.outputs)
 		{
 			crypto::public_key key;
 			rct::key mask;
@@ -789,7 +789,7 @@ void DaemonHandler::handle(const GetOutputKeys::Request &req, GetOutputKeys::Res
 			res.keys.emplace_back(output_key_mask_unlocked{key, mask, unlocked});
 		}
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		res.status = Message::STATUS_FAILED;
 		res.error_details = e.what();
@@ -799,13 +799,13 @@ void DaemonHandler::handle(const GetOutputKeys::Request &req, GetOutputKeys::Res
 	res.status = Message::STATUS_OK;
 }
 
-void DaemonHandler::handle(const GetRPCVersion::Request &req, GetRPCVersion::Response &res)
+void DaemonHandler::handle(const GetRPCVersion::Request& req, GetRPCVersion::Response& res)
 {
 	res.version = DAEMON_RPC_VERSION_ZMQ;
 	res.status = Message::STATUS_OK;
 }
 
-bool DaemonHandler::getBlockHeaderByHash(const crypto::hash &hash_in, cryptonote::rpc::BlockHeaderResponse &header)
+bool DaemonHandler::getBlockHeaderByHash(const crypto::hash& hash_in, cryptonote::rpc::BlockHeaderResponse& header)
 {
 	block b;
 
@@ -830,7 +830,7 @@ bool DaemonHandler::getBlockHeaderByHash(const crypto::hash &hash_in, cryptonote
 	header.depth = m_core.get_current_blockchain_height() - header.height - 1;
 
 	header.reward = 0;
-	for(const auto &out : b.miner_tx.vout)
+	for(const auto& out : b.miner_tx.vout)
 	{
 		header.reward += out.amount;
 	}
@@ -840,17 +840,17 @@ bool DaemonHandler::getBlockHeaderByHash(const crypto::hash &hash_in, cryptonote
 	return true;
 }
 
-std::string DaemonHandler::handle(const std::string &request)
+std::string DaemonHandler::handle(const std::string& request)
 {
 	GULPSF_LOG_L1("Handling RPC request: {}", request);
 
-	Message *resp_message = NULL;
+	Message* resp_message = NULL;
 
 	try
 	{
 		FullMessage req_full(request, true);
 
-		rapidjson::Value &req_json = req_full.getMessage();
+		rapidjson::Value& req_json = req_full.getMessage();
 
 		const std::string request_type = req_full.getRequestType();
 
@@ -897,7 +897,7 @@ std::string DaemonHandler::handle(const std::string &request)
 
 		return response;
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		if(resp_message)
 		{

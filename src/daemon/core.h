@@ -49,16 +49,15 @@
 
 #include "common/gulps.hpp"
 
-
-
 namespace daemonize
 {
 
 class t_core final
 {
 	GULPS_CAT_MAJOR("daemon_core");
+
   public:
-	static void init_options(boost::program_options::options_description &option_spec)
+	static void init_options(boost::program_options::options_description& option_spec)
 	{
 		cryptonote::core::init_options(option_spec);
 	}
@@ -72,13 +71,14 @@ class t_core final
 
   public:
 	t_core(
-		boost::program_options::variables_map const &vm)
-		: m_core{nullptr}, m_vm_HACK{vm}
+		boost::program_options::variables_map const& vm) :
+		m_core{nullptr},
+		m_vm_HACK{vm}
 	{
 	}
 
 	// TODO - get rid of circular dependencies in internals
-	void set_protocol(t_protocol_raw &protocol)
+	void set_protocol(t_protocol_raw& protocol)
 	{
 		m_core.set_cryptonote_protocol(&protocol);
 	}
@@ -109,7 +109,7 @@ class t_core final
 		return true;
 	}
 
-	cryptonote::core &get()
+	cryptonote::core& get()
 	{
 		return m_core;
 	}
@@ -128,4 +128,4 @@ class t_core final
 		}
 	}
 };
-}
+} // namespace daemonize

@@ -50,7 +50,8 @@
  * The global variable environment contents for the ipsecmod
  * Shared between threads, this represents long term information.
  */
-struct ipsecmod_env {
+struct ipsecmod_env
+{
 	/** White listed domains for ipsecmod. */
 	rbtree_type* whitelist;
 };
@@ -58,7 +59,8 @@ struct ipsecmod_env {
 /**
  * Per query state for the ipsecmod module.
  */
-struct ipsecmod_qstate {
+struct ipsecmod_qstate
+{
 	/** State of the IPsec module. */
 	/** NOTE: This value is copied here from the configuration so that a change
 	 *  with unbound-control would not complicate an already running mesh. */

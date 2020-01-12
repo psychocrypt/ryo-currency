@@ -36,12 +36,12 @@
 class BlockFuzzer : public Fuzzer
 {
   public:
-	virtual int run(const std::string &filename);
+	virtual int run(const std::string& filename);
 
   private:
 };
 
-int BlockFuzzer::run(const std::string &filename)
+int BlockFuzzer::run(const std::string& filename)
 {
 	std::string s;
 
@@ -59,7 +59,7 @@ int BlockFuzzer::run(const std::string &filename)
 	return 0;
 }
 
-int main(int argc, const char **argv)
+int main(int argc, const char** argv)
 {
 	BlockFuzzer fuzzer;
 	return run_fuzzer(argc, argv, fuzzer);

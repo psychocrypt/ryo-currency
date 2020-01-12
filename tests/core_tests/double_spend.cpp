@@ -43,7 +43,7 @@ gen_double_spend_in_different_chains::gen_double_spend_in_different_chains()
 	REGISTER_CALLBACK_METHOD(gen_double_spend_in_different_chains, check_double_spend);
 }
 
-bool gen_double_spend_in_different_chains::generate(std::vector<test_event_entry> &events) const
+bool gen_double_spend_in_different_chains::generate(std::vector<test_event_entry>& events) const
 {
 	INIT_DOUBLE_SPEND_TEST();
 
@@ -71,7 +71,7 @@ bool gen_double_spend_in_different_chains::generate(std::vector<test_event_entry
 	return true;
 }
 
-bool gen_double_spend_in_different_chains::check_double_spend(cryptonote::core &c, size_t /*ev_index*/, const std::vector<test_event_entry> &events)
+bool gen_double_spend_in_different_chains::check_double_spend(cryptonote::core& c, size_t /*ev_index*/, const std::vector<test_event_entry>& events)
 {
 	DEFINE_TESTS_ERROR_CONTEXT("gen_double_spend_in_different_chains::check_double_spend");
 

@@ -52,12 +52,14 @@
 template <typename T>
 class thdq
 {
-public:
-
+  public:
 	bool pop(T& item)
 	{
 		std::unique_lock<std::mutex> mlock(mutex_);
-		while (queue_.empty() && !finish) { cond_.wait(mlock); }
+		while(queue_.empty() && !finish)
+		{
+			cond_.wait(mlock);
+		}
 		if(!queue_.empty())
 		{
 			item = std::move(queue_.front());
@@ -77,16 +79,25 @@ public:
 	bool wait_for_pop(std::unique_lock<std::mutex>& lck)
 	{
 		lck.lock();
-		while (queue_.empty() && !finish) { cond_.wait(lck); }
+		while(queue_.empty() && !finish)
+		{
+			cond_.wait(lck);
+		}
 		bool has_pop = !queue_.empty();
-		if(!has_pop) { lck.unlock(); }
+		if(!has_pop)
+		{
+			lck.unlock();
+		}
 		return has_pop;
 	}
 
 	size_t wait_for_size(size_t q_size)
 	{
 		std::unique_lock<std::mutex> mlock(mutex_);
-		while (queue_.size() > q_size) { size_cond_.wait(mlock); }
+		while(queue_.size() > q_size)
+		{
+			size_cond_.wait(mlock);
+		}
 		return queue_.size();
 	}
 
@@ -102,7 +113,8 @@ public:
 	void push(const T& item)
 	{
 		std::unique_lock<std::mutex> mlock(mutex_);
-		if(finish) return;
+		if(finish)
+			return;
 		queue_.push(item);
 		mlock.unlock();
 		cond_.notify_one();
@@ -111,7 +123,8 @@ public:
 	void push(T&& item)
 	{
 		std::unique_lock<std::mutex> mlock(mutex_);
-		if(finish) return;
+		if(finish)
+			return;
 		queue_.push(std::move(item));
 		mlock.unlock();
 		cond_.notify_one();
@@ -124,7 +137,7 @@ public:
 		cond_.notify_all();
 	}
 
-private:
+  private:
 	std::queue<T> queue_;
 	std::mutex mutex_;
 	std::condition_variable cond_;

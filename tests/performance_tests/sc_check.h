@@ -43,7 +43,7 @@ class test_sc_check
 
 	bool test()
 	{
-		sc_check((unsigned char *)m_scalar.data);
+		sc_check((unsigned char*)m_scalar.data);
 		return true;
 	}
 

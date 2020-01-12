@@ -14,14 +14,16 @@
 
 /* structure and list for storing lan addresses
  * with ascii representation and mask */
-struct lan_addr_s {
-	char ifname[IFNAMSIZ];	/* example: eth0 */
+struct lan_addr_s
+{
+	char ifname[IFNAMSIZ]; /* example: eth0 */
 #ifdef ENABLE_IPV6
-	unsigned int index;		/* use if_nametoindex() */
-#endif /* ENABLE_IPV6 */
-	char str[16];	/* example: 192.168.0.1 */
-	struct in_addr addr, mask;	/* ip/mask */
-	LIST_ENTRY(lan_addr_s) list;
+	unsigned int index;		   /* use if_nametoindex() */
+#endif						   /* ENABLE_IPV6 */
+	char str[16];			   /* example: 192.168.0.1 */
+	struct in_addr addr, mask; /* ip/mask */
+	LIST_ENTRY(lan_addr_s)
+	list;
 };
 LIST_HEAD(lan_addr_list, lan_addr_s);
 

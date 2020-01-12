@@ -55,23 +55,23 @@ namespace Ryo
 
 Subaddress::~Subaddress() {}
 
-SubaddressImpl::SubaddressImpl(WalletImpl *wallet)
-	: m_wallet(wallet) {}
+SubaddressImpl::SubaddressImpl(WalletImpl* wallet) :
+	m_wallet(wallet) {}
 
-void SubaddressImpl::addRow(uint32_t accountIndex, const std::string &label)
+void SubaddressImpl::addRow(uint32_t accountIndex, const std::string& label)
 {
 	m_wallet->m_wallet->add_subaddress(accountIndex, label);
 	refresh(accountIndex);
 }
 
-void SubaddressImpl::setLabel(uint32_t accountIndex, uint32_t addressIndex, const std::string &label)
+void SubaddressImpl::setLabel(uint32_t accountIndex, uint32_t addressIndex, const std::string& label)
 {
 	try
 	{
 		m_wallet->m_wallet->set_subaddress_label({accountIndex, addressIndex}, label);
 		refresh(accountIndex);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		LOG_ERROR("setLabel: " << e.what());
 	}
@@ -97,7 +97,7 @@ void SubaddressImpl::clearRows()
 	m_rows.clear();
 }
 
-std::vector<SubaddressRow *> SubaddressImpl::getAll() const
+std::vector<SubaddressRow*> SubaddressImpl::getAll() const
 {
 	return m_rows;
 }
@@ -107,4 +107,4 @@ SubaddressImpl::~SubaddressImpl()
 	clearRows();
 }
 
-} // namespace
+} // namespace Ryo

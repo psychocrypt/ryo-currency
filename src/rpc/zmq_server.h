@@ -65,12 +65,13 @@ static constexpr int DEFAULT_RPC_RECV_TIMEOUT_MS = 1000;
 class ZmqServer
 {
 	GULPS_CAT_MAJOR("zmq_serv");
+
   public:
-	ZmqServer(RpcHandler &h);
+	ZmqServer(RpcHandler& h);
 
 	~ZmqServer();
 
-	static void init_options(boost::program_options::options_description &desc);
+	static void init_options(boost::program_options::options_description& desc);
 
 	void serve();
 
@@ -81,7 +82,7 @@ class ZmqServer
 	void stop();
 
   private:
-	RpcHandler &handler;
+	RpcHandler& handler;
 
 	volatile bool stop_signal;
 	volatile bool running;
@@ -93,6 +94,6 @@ class ZmqServer
 	std::unique_ptr<zmq::socket_t> rep_socket;
 };
 
-} // namespace cryptonote
-
 } // namespace rpc
+
+} // namespace cryptonote

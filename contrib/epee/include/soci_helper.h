@@ -37,7 +37,7 @@ struct type_conversion<uint64_t>
 {
 	typedef long long base_type;
 
-	static void from_base(base_type a_, indicator ind, uint64_t &mi)
+	static void from_base(base_type a_, indicator ind, uint64_t& mi)
 	{
 		if(ind == i_null)
 		{
@@ -48,7 +48,7 @@ struct type_conversion<uint64_t>
 		//mi.set(i);
 	}
 
-	static void to_base(const uint64_t &mi, base_type &i, indicator &ind)
+	static void to_base(const uint64_t& mi, base_type& i, indicator& ind)
 	{
 		i = (base_type)mi;
 		ind = i_ok;
@@ -60,7 +60,7 @@ struct type_conversion<bool>
 {
 	typedef int base_type;
 
-	static void from_base(base_type a_, indicator ind, bool &mi)
+	static void from_base(base_type a_, indicator ind, bool& mi)
 	{
 		if(ind == i_null)
 		{
@@ -71,7 +71,7 @@ struct type_conversion<bool>
 		//mi.set(i);
 	}
 
-	static void to_base(const bool &mi, base_type &i, indicator &ind)
+	static void to_base(const bool& mi, base_type& i, indicator& ind)
 	{
 		i = mi ? 1 : 0;
 		ind = i_ok;
@@ -81,20 +81,20 @@ struct type_conversion<bool>
 class per_thread_session
 {
   public:
-	bool init(const std::string &connection_string)
+	bool init(const std::string& connection_string)
 	{
 		m_connection_string = connection_string;
 
 		return true;
 	}
 
-	soci::session &get()
+	soci::session& get()
 	{
 
 		//soci::session
 
 		m_db_connections_lock.lock();
-		boost::shared_ptr<soci::session> &conn_ptr = m_db_connections[epee::misc_utils::get_thread_string_id()];
+		boost::shared_ptr<soci::session>& conn_ptr = m_db_connections[epee::misc_utils::get_thread_string_id()];
 		m_db_connections_lock.unlock();
 		if(!conn_ptr.get())
 		{
@@ -109,7 +109,7 @@ class per_thread_session
 		//soci::session
 
 		m_db_connections_lock.lock();
-		boost::shared_ptr<soci::session> &conn_ptr = m_db_connections[misc_utils::get_thread_string_id()];
+		boost::shared_ptr<soci::session>& conn_ptr = m_db_connections[misc_utils::get_thread_string_id()];
 		m_db_connections_lock.unlock();
 		if(conn_ptr.get())
 		{
@@ -133,5 +133,5 @@ class per_thread_session
 	epee::critical_section m_db_connections_lock;
 	std::string m_connection_string;
 };
-}
+} // namespace soci
 /*}*/

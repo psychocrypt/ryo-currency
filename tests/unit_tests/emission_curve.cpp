@@ -42,7 +42,6 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #include "gtest/gtest.h"
 #include "gtest/internal/gtest-internal.h"
 #include "unit_tests_utils.h"
@@ -66,7 +65,7 @@ TEST(emission_curve, validate_with_lookup_table)
 	std::string line;
 	getline(file, line);
 
-	while( circ_supply < MONEY_SUPPLY + 500000) //: # loop through block 0 to a few years after tail
+	while(circ_supply < MONEY_SUPPLY + 500000) //: # loop through block 0 to a few years after tail
 	{
 		uint64_t dev_block_reward = 0u;
 		get_dev_fund_amount<MAINNET>(height, dev_block_reward);
@@ -80,10 +79,10 @@ TEST(emission_curve, validate_with_lookup_table)
 
 		circ_supply = already_generated_coins + dev_fund - common_config::PREMINE_BURN_AMOUNT;
 
-		if(int(height % (COIN_EMISSION_HEIGHT_INTERVAL/6)) == 0)
+		if(int(height % (COIN_EMISSION_HEIGHT_INTERVAL / 6)) == 0)
 		{
 			getline(file, line);
-			std::vector< std::string > vs;
+			std::vector<std::string> vs;
 			testing::internal::SplitString(line, '\t', &vs);
 			ASSERT_EQ(std::stoul(vs[0]), height);
 			ASSERT_EQ(std::stoul(vs[1]), block_reward);
@@ -94,9 +93,8 @@ TEST(emission_curve, validate_with_lookup_table)
 	}
 }
 
-
 // For the test case the blocksize is not taken in account.
-bool get_block_reward_old(network_type nettype, uint64_t already_generated_coins, uint64_t &reward, uint64_t height)
+bool get_block_reward_old(network_type nettype, uint64_t already_generated_coins, uint64_t& reward, uint64_t height)
 {
 	// old config values form the file cryptonight_config.h
 	constexpr uint64_t PEAK_COIN_EMISSION_YEAR = 4;
@@ -166,4 +164,4 @@ TEST(emission_curve, old_vs_table)
 		height++;
 	}
 }
-}
+} // namespace

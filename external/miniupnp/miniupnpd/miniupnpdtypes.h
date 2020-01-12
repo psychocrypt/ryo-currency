@@ -14,16 +14,18 @@
 
 /* structure and list for storing lan addresses
  * with ascii representation and mask */
-struct lan_addr_s {
-	char ifname[IFNAMSIZ];	/* example: eth0 */
-	unsigned int index;		/* use if_nametoindex() */
-	char str[16];	/* example: 192.168.0.1 */
-	struct in_addr addr, mask;	/* ip/mask */
+struct lan_addr_s
+{
+	char ifname[IFNAMSIZ];	 /* example: eth0 */
+	unsigned int index;		   /* use if_nametoindex() */
+	char str[16];			   /* example: 192.168.0.1 */
+	struct in_addr addr, mask; /* ip/mask */
 #ifdef MULTIPLE_EXTERNAL_IP
 	char ext_ip_str[16];
 	struct in_addr ext_ip_addr;
 #endif
-	LIST_ENTRY(lan_addr_s) list;
+	LIST_ENTRY(lan_addr_s)
+	list;
 };
 LIST_HEAD(lan_addr_list, lan_addr_s);
 

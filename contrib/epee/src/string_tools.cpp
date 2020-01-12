@@ -43,14 +43,14 @@ std::string get_ip_string_from_int32(uint32_t ip)
 {
 	in_addr adr;
 	adr.s_addr = ip;
-	const char *pbuf = inet_ntoa(adr);
+	const char* pbuf = inet_ntoa(adr);
 	if(pbuf)
 		return pbuf;
 	else
 		return "[failed]";
 }
 //----------------------------------------------------------------------------
-bool get_ip_int32_from_string(uint32_t &ip, const std::string &ip_str)
+bool get_ip_int32_from_string(uint32_t& ip, const std::string& ip_str)
 {
 	ip = inet_addr(ip_str.c_str());
 	if(INADDR_NONE == ip)
@@ -59,7 +59,7 @@ bool get_ip_int32_from_string(uint32_t &ip, const std::string &ip_str)
 	return true;
 }
 //----------------------------------------------------------------------------
-bool validate_hex(uint64_t length, const std::string &str)
+bool validate_hex(uint64_t length, const std::string& str)
 {
 	if(str.size() != length)
 		return false;
@@ -68,5 +68,5 @@ bool validate_hex(uint64_t length, const std::string &str)
 			return false;
 	return true;
 }
-}
-}
+} // namespace string_tools
+} // namespace epee

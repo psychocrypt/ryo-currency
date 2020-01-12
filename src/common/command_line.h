@@ -59,16 +59,15 @@
 
 #include "common/gulps.hpp"
 
-
 namespace command_line
 {
 
 GULPS_CAT_MAJOR("cmd_line");
 
 //! \return True if `str` is `is_iequal("y" || "yes" || `tr("yes"))`.
-bool is_yes(const std::string &str);
+bool is_yes(const std::string& str);
 //! \return True if `str` is `is_iequal("n" || "no" || `tr("no"))`.
-bool is_no(const std::string &str);
+bool is_no(const std::string& str);
 
 template <typename T, bool required = false, bool dependent = false, int NUM_DEPS = 1>
 struct arg_descriptor;
@@ -78,8 +77,8 @@ struct arg_descriptor<T, false>
 {
 	typedef T value_type;
 
-	const char *name;
-	const char *description;
+	const char* name;
+	const char* description;
 	T default_value;
 	bool not_use_default;
 };
@@ -89,8 +88,8 @@ struct arg_descriptor<std::vector<T>, false>
 {
 	typedef std::vector<T> value_type;
 
-	const char *name;
-	const char *description;
+	const char* name;
+	const char* description;
 };
 
 template <typename T>
@@ -100,8 +99,8 @@ struct arg_descriptor<T, true>
 
 	typedef T value_type;
 
-	const char *name;
-	const char *description;
+	const char* name;
+	const char* description;
 };
 
 template <typename T>
@@ -109,12 +108,12 @@ struct arg_descriptor<T, false, true>
 {
 	typedef T value_type;
 
-	const char *name;
-	const char *description;
+	const char* name;
+	const char* description;
 
 	T default_value;
 
-	const arg_descriptor<bool, false> &ref;
+	const arg_descriptor<bool, false>& ref;
 	std::function<T(bool, bool, T)> depf;
 
 	bool not_use_default;
@@ -125,25 +124,25 @@ struct arg_descriptor<T, false, true, NUM_DEPS>
 {
 	typedef T value_type;
 
-	const char *name;
-	const char *description;
+	const char* name;
+	const char* description;
 
 	T default_value;
 
-	std::array<const arg_descriptor<bool, false> *, NUM_DEPS> ref;
+	std::array<const arg_descriptor<bool, false>*, NUM_DEPS> ref;
 	std::function<T(std::array<bool, NUM_DEPS>, bool, T)> depf;
 
 	bool not_use_default;
 };
 
 template <typename T>
-boost::program_options::typed_value<T, char> *make_semantic(const arg_descriptor<T, true> & /*arg*/)
+boost::program_options::typed_value<T, char>* make_semantic(const arg_descriptor<T, true>& /*arg*/)
 {
 	return boost::program_options::value<T>()->required();
 }
 
 template <typename T>
-boost::program_options::typed_value<T, char> *make_semantic(const arg_descriptor<T, false> &arg)
+boost::program_options::typed_value<T, char>* make_semantic(const arg_descriptor<T, false>& arg)
 {
 	auto semantic = boost::program_options::value<T>();
 	if(!arg.not_use_default)
@@ -152,7 +151,7 @@ boost::program_options::typed_value<T, char> *make_semantic(const arg_descriptor
 }
 
 template <typename T>
-boost::program_options::typed_value<T, char> *make_semantic(const arg_descriptor<T, false, true> &arg)
+boost::program_options::typed_value<T, char>* make_semantic(const arg_descriptor<T, false, true>& arg)
 {
 	auto semantic = boost::program_options::value<T>();
 	if(!arg.not_use_default)
@@ -167,7 +166,7 @@ boost::program_options::typed_value<T, char> *make_semantic(const arg_descriptor
 }
 
 template <typename T, int NUM_DEPS>
-boost::program_options::typed_value<T, char> *make_semantic(const arg_descriptor<T, false, true, NUM_DEPS> &arg)
+boost::program_options::typed_value<T, char>* make_semantic(const arg_descriptor<T, false, true, NUM_DEPS>& arg)
 {
 	auto semantic = boost::program_options::value<T>();
 	if(!arg.not_use_default)
@@ -190,7 +189,7 @@ boost::program_options::typed_value<T, char> *make_semantic(const arg_descriptor
 }
 
 template <typename T>
-boost::program_options::typed_value<T, char> *make_semantic(const arg_descriptor<T, false> &arg, const T &def)
+boost::program_options::typed_value<T, char>* make_semantic(const arg_descriptor<T, false>& arg, const T& def)
 {
 	auto semantic = boost::program_options::value<T>();
 	if(!arg.not_use_default)
@@ -199,7 +198,7 @@ boost::program_options::typed_value<T, char> *make_semantic(const arg_descriptor
 }
 
 template <typename T>
-boost::program_options::typed_value<std::vector<T>, char> *make_semantic(const arg_descriptor<std::vector<T>, false> & /*arg*/)
+boost::program_options::typed_value<std::vector<T>, char>* make_semantic(const arg_descriptor<std::vector<T>, false>& /*arg*/)
 {
 	auto semantic = boost::program_options::value<std::vector<T>>();
 	semantic->default_value(std::vector<T>(), "");
@@ -207,11 +206,11 @@ boost::program_options::typed_value<std::vector<T>, char> *make_semantic(const a
 }
 
 template <typename T, bool required, bool dependent, int NUM_DEPS>
-void add_arg(boost::program_options::options_description &description, const arg_descriptor<T, required, dependent, NUM_DEPS> &arg, bool unique = true)
+void add_arg(boost::program_options::options_description& description, const arg_descriptor<T, required, dependent, NUM_DEPS>& arg, bool unique = true)
 {
 	if(0 != description.find_nothrow(arg.name, false))
 	{
-		GULPS_CHECK_AND_ASSERT_MES(!unique, void(), "Argument already exists: " , arg.name);
+		GULPS_CHECK_AND_ASSERT_MES(!unique, void(), "Argument already exists: ", arg.name);
 		return;
 	}
 
@@ -219,11 +218,11 @@ void add_arg(boost::program_options::options_description &description, const arg
 }
 
 template <typename T>
-void add_arg(boost::program_options::options_description &description, const arg_descriptor<T, false> &arg, const T &def, bool unique = true)
+void add_arg(boost::program_options::options_description& description, const arg_descriptor<T, false>& arg, const T& def, bool unique = true)
 {
 	if(0 != description.find_nothrow(arg.name, false))
 	{
-		GULPS_CHECK_AND_ASSERT_MES(!unique, void(), "Argument already exists: " , arg.name);
+		GULPS_CHECK_AND_ASSERT_MES(!unique, void(), "Argument already exists: ", arg.name);
 		return;
 	}
 
@@ -231,11 +230,11 @@ void add_arg(boost::program_options::options_description &description, const arg
 }
 
 template <>
-inline void add_arg(boost::program_options::options_description &description, const arg_descriptor<bool, false> &arg, bool unique)
+inline void add_arg(boost::program_options::options_description& description, const arg_descriptor<bool, false>& arg, bool unique)
 {
 	if(0 != description.find_nothrow(arg.name, false))
 	{
-		GULPS_CHECK_AND_ASSERT_MES(!unique, void(), "Argument already exists: " , arg.name);
+		GULPS_CHECK_AND_ASSERT_MES(!unique, void(), "Argument already exists: ", arg.name);
 		return;
 	}
 
@@ -243,8 +242,8 @@ inline void add_arg(boost::program_options::options_description &description, co
 }
 
 template <typename charT>
-boost::program_options::basic_parsed_options<charT> parse_command_line(int argc, const charT *const argv[],
-																	   const boost::program_options::options_description &desc, bool allow_unregistered = false)
+boost::program_options::basic_parsed_options<charT> parse_command_line(int argc, const charT* const argv[],
+	const boost::program_options::options_description& desc, bool allow_unregistered = false)
 {
 	auto parser = boost::program_options::command_line_parser(argc, argv);
 	parser.options(desc);
@@ -256,13 +255,13 @@ boost::program_options::basic_parsed_options<charT> parse_command_line(int argc,
 }
 
 template <typename F>
-bool handle_error_helper(const boost::program_options::options_description &desc, F parser)
+bool handle_error_helper(const boost::program_options::options_description& desc, F parser)
 {
 	try
 	{
 		return parser();
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		GULPSF_ERROR("Failed to parse arguments: {}", e.what());
 		GULPS_PRINT(desc);
@@ -277,26 +276,26 @@ bool handle_error_helper(const boost::program_options::options_description &desc
 }
 
 template <typename T, bool required, bool dependent, int NUM_DEPS>
-typename std::enable_if<!std::is_same<T, bool>::value, bool>::type has_arg(const boost::program_options::variables_map &vm, const arg_descriptor<T, required, dependent, NUM_DEPS> &arg)
+typename std::enable_if<!std::is_same<T, bool>::value, bool>::type has_arg(const boost::program_options::variables_map& vm, const arg_descriptor<T, required, dependent, NUM_DEPS>& arg)
 {
 	auto value = vm[arg.name];
 	return !value.empty();
 }
 
 template <typename T, bool required, bool dependent, int NUM_DEPS>
-bool is_arg_defaulted(const boost::program_options::variables_map &vm, const arg_descriptor<T, required, dependent, NUM_DEPS> &arg)
+bool is_arg_defaulted(const boost::program_options::variables_map& vm, const arg_descriptor<T, required, dependent, NUM_DEPS>& arg)
 {
 	return vm[arg.name].defaulted();
 }
 
 template <typename T>
-T get_arg(const boost::program_options::variables_map &vm, const arg_descriptor<T, false, true> &arg)
+T get_arg(const boost::program_options::variables_map& vm, const arg_descriptor<T, false, true>& arg)
 {
 	return arg.depf(get_arg(vm, arg.ref), is_arg_defaulted(vm, arg), vm[arg.name].template as<T>());
 }
 
 template <typename T, int NUM_DEPS>
-T get_arg(const boost::program_options::variables_map &vm, const arg_descriptor<T, false, true, NUM_DEPS> &arg)
+T get_arg(const boost::program_options::variables_map& vm, const arg_descriptor<T, false, true, NUM_DEPS>& arg)
 {
 	std::array<bool, NUM_DEPS> depval;
 	for(size_t i = 0; i < depval.size(); ++i)
@@ -305,13 +304,13 @@ T get_arg(const boost::program_options::variables_map &vm, const arg_descriptor<
 }
 
 template <typename T, bool required>
-T get_arg(const boost::program_options::variables_map &vm, const arg_descriptor<T, required> &arg)
+T get_arg(const boost::program_options::variables_map& vm, const arg_descriptor<T, required>& arg)
 {
 	return vm[arg.name].template as<T>();
 }
 
 template <bool dependent, int NUM_DEPS>
-inline bool has_arg(const boost::program_options::variables_map &vm, const arg_descriptor<bool, false, dependent, NUM_DEPS> &arg)
+inline bool has_arg(const boost::program_options::variables_map& vm, const arg_descriptor<bool, false, dependent, NUM_DEPS>& arg)
 {
 	return get_arg(vm, arg);
 }
@@ -323,4 +322,4 @@ void set_console_utf8();
 
 extern const arg_descriptor<bool> arg_help;
 extern const arg_descriptor<bool> arg_version;
-}
+} // namespace command_line

@@ -74,7 +74,7 @@ class TransactionInfoImpl : public TransactionInfo
 	virtual std::string hash() const;
 	virtual std::time_t timestamp() const;
 	virtual std::string paymentId() const;
-	virtual const std::vector<Transfer> &transfers() const;
+	virtual const std::vector<Transfer>& transfers() const;
 	virtual uint64_t confirmations() const;
 	virtual uint64_t unlockTime() const;
 
@@ -98,4 +98,4 @@ class TransactionInfoImpl : public TransactionInfo
 	friend class TransactionHistoryImpl;
 };
 
-} // namespace
+} // namespace Ryo

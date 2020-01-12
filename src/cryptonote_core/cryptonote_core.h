@@ -72,7 +72,7 @@ namespace cryptonote
 {
 struct test_options
 {
-	const std::pair<uint8_t, uint64_t> *hard_forks;
+	const std::pair<uint8_t, uint64_t>* hard_forks;
 };
 
 extern const command_line::arg_descriptor<std::string, false, true, 2> arg_data_dir;
@@ -101,7 +101,7 @@ class core : public i_miner_handler
        *
        * @param pprotocol pre-constructed protocol object to store and use
        */
-	core(i_cryptonote_protocol *pprotocol);
+	core(i_cryptonote_protocol* pprotocol);
 
 	/**
      * @copydoc Blockchain::handle_get_objects
@@ -109,7 +109,7 @@ class core : public i_miner_handler
      * @note see Blockchain::handle_get_objects()
      * @param context connection context associated with the request
      */
-	bool handle_get_objects(NOTIFY_REQUEST_GET_OBJECTS::request &arg, NOTIFY_RESPONSE_GET_OBJECTS::request &rsp, cryptonote_connection_context &context);
+	bool handle_get_objects(NOTIFY_REQUEST_GET_OBJECTS::request& arg, NOTIFY_RESPONSE_GET_OBJECTS::request& rsp, cryptonote_connection_context& context);
 
 	/**
       * @brief calls various idle routines
@@ -134,7 +134,7 @@ class core : public i_miner_handler
       *
       * @return true if the transaction made it to the transaction pool, otherwise false
       */
-	bool handle_incoming_tx(const blobdata &tx_blob, tx_verification_context &tvc, bool keeped_by_block, bool relayed, bool do_not_relay);
+	bool handle_incoming_tx(const blobdata& tx_blob, tx_verification_context& tvc, bool keeped_by_block, bool relayed, bool do_not_relay);
 
 	/**
       * @brief handles a list of incoming transactions
@@ -150,7 +150,7 @@ class core : public i_miner_handler
       *
       * @return true if the transactions made it to the transaction pool, otherwise false
       */
-	bool handle_incoming_txs(const std::list<blobdata> &tx_blobs, std::vector<tx_verification_context> &tvc, bool keeped_by_block, bool relayed, bool do_not_relay);
+	bool handle_incoming_txs(const std::list<blobdata>& tx_blobs, std::vector<tx_verification_context>& tvc, bool keeped_by_block, bool relayed, bool do_not_relay);
 
 	/**
       * @brief handles an incoming block
@@ -166,14 +166,14 @@ class core : public i_miner_handler
       * @return false if loading new checkpoints fails, or the block is not
       * added, otherwise true
       */
-	bool handle_incoming_block(const blobdata &block_blob, block_verification_context &bvc, bool update_miner_blocktemplate = true);
+	bool handle_incoming_block(const blobdata& block_blob, block_verification_context& bvc, bool update_miner_blocktemplate = true);
 
 	/**
       * @copydoc Blockchain::prepare_handle_incoming_blocks
       *
       * @note see Blockchain::prepare_handle_incoming_blocks
       */
-	bool prepare_handle_incoming_blocks(const std::list<block_complete_entry> &blocks);
+	bool prepare_handle_incoming_blocks(const std::list<block_complete_entry>& blocks);
 
 	/**
       * @copydoc Blockchain::cleanup_handle_incoming_blocks
@@ -189,14 +189,14 @@ class core : public i_miner_handler
       *
       * @return whether or not the block is too big
       */
-	bool check_incoming_block_size(const blobdata &block_blob) const;
+	bool check_incoming_block_size(const blobdata& block_blob) const;
 
 	/**
       * @brief get the cryptonote protocol instance
       *
       * @return the instance
       */
-	i_cryptonote_protocol *get_protocol() { return m_pprotocol; }
+	i_cryptonote_protocol* get_protocol() { return m_pprotocol; }
 
 	//-------------------- i_miner_handler -----------------------
 
@@ -211,33 +211,33 @@ class core : public i_miner_handler
       *
       * @return true if the block was added to the main chain, otherwise false
       */
-	virtual bool handle_block_found(block &b);
+	virtual bool handle_block_found(block& b);
 
 	/**
       * @copydoc Blockchain::create_block_template
       *
       * @note see Blockchain::create_block_template
       */
-	virtual bool get_block_template(block &b, const account_public_address &adr, difficulty_type &diffic, uint64_t &height, uint64_t &expected_reward, const blobdata &ex_nonce);
+	virtual bool get_block_template(block& b, const account_public_address& adr, difficulty_type& diffic, uint64_t& height, uint64_t& expected_reward, const blobdata& ex_nonce);
 
 	/**
       * @brief called when a transaction is relayed
       */
-	virtual void on_transaction_relayed(const cryptonote::blobdata &tx);
+	virtual void on_transaction_relayed(const cryptonote::blobdata& tx);
 
 	/**
       * @brief gets the miner instance
       *
       * @return a reference to the miner instance
       */
-	miner &get_miner() { return m_miner; }
+	miner& get_miner() { return m_miner; }
 
 	/**
       * @brief gets the miner instance (const)
       *
       * @return a const reference to the miner instance
       */
-	const miner &get_miner() const { return m_miner; }
+	const miner& get_miner() const { return m_miner; }
 
 	/**
       * @brief adds command line options to the given options set
@@ -247,7 +247,7 @@ class core : public i_miner_handler
       *
       * @param desc return-by-reference the command line options set to add to
       */
-	static void init_options(boost::program_options::options_description &desc);
+	static void init_options(boost::program_options::options_description& desc);
 
 	/**
       * @brief initializes the core as needed
@@ -261,14 +261,14 @@ class core : public i_miner_handler
       *
       * @return false if one of the init steps fails, otherwise true
       */
-	bool init(const boost::program_options::variables_map &vm, const char *config_subdir = NULL, const test_options *test_options = NULL);
+	bool init(const boost::program_options::variables_map& vm, const char* config_subdir = NULL, const test_options* test_options = NULL);
 
 	/**
       * @copydoc Blockchain::reset_and_set_genesis_block
       *
       * @note see Blockchain::reset_and_set_genesis_block
       */
-	bool set_genesis_block(const block &b);
+	bool set_genesis_block(const block& b);
 
 	/**
       * @brief performs safe shutdown steps for core and core components
@@ -321,28 +321,28 @@ class core : public i_miner_handler
       * @param height return-by-reference height of the block
       * @param top_id return-by-reference hash of the block
       */
-	void get_blockchain_top(uint64_t &height, crypto::hash &top_id) const;
+	void get_blockchain_top(uint64_t& height, crypto::hash& top_id) const;
 
 	/**
       * @copydoc Blockchain::get_blocks(uint64_t, size_t, std::list<std::pair<cryptonote::blobdata,block>>&, std::list<transaction>&) const
       *
       * @note see Blockchain::get_blocks(uint64_t, size_t, std::list<std::pair<cryptonote::blobdata,block>>&, std::list<transaction>&) const
       */
-	bool get_blocks(uint64_t start_offset, size_t count, std::list<std::pair<cryptonote::blobdata, block>> &blocks, std::list<cryptonote::blobdata> &txs) const;
+	bool get_blocks(uint64_t start_offset, size_t count, std::list<std::pair<cryptonote::blobdata, block>>& blocks, std::list<cryptonote::blobdata>& txs) const;
 
 	/**
       * @copydoc Blockchain::get_blocks(uint64_t, size_t, std::list<std::pair<cryptonote::blobdata,block>>&) const
       *
       * @note see Blockchain::get_blocks(uint64_t, size_t, std::list<std::pair<cryptonote::blobdata,block>>&) const
       */
-	bool get_blocks(uint64_t start_offset, size_t count, std::list<std::pair<cryptonote::blobdata, block>> &blocks) const;
+	bool get_blocks(uint64_t start_offset, size_t count, std::list<std::pair<cryptonote::blobdata, block>>& blocks) const;
 
 	/**
       * @copydoc Blockchain::get_blocks(uint64_t, size_t, std::list<std::pair<cryptonote::blobdata,block>>&) const
       *
       * @note see Blockchain::get_blocks(uint64_t, size_t, std::list<std::pair<cryptonote::blobdata,block>>&) const
       */
-	bool get_blocks(uint64_t start_offset, size_t count, std::list<block> &blocks) const;
+	bool get_blocks(uint64_t start_offset, size_t count, std::list<block>& blocks) const;
 
 	/**
       * @copydoc Blockchain::get_blocks(const t_ids_container&, t_blocks_container&, t_missed_container&) const
@@ -350,7 +350,7 @@ class core : public i_miner_handler
       * @note see Blockchain::get_blocks(const t_ids_container&, t_blocks_container&, t_missed_container&) const
       */
 	template <class t_ids_container, class t_blocks_container, class t_missed_container>
-	bool get_blocks(const t_ids_container &block_ids, t_blocks_container &blocks, t_missed_container &missed_bs) const
+	bool get_blocks(const t_ids_container& block_ids, t_blocks_container& blocks, t_missed_container& missed_bs) const
 	{
 		return m_blockchain_storage.get_blocks(block_ids, blocks, missed_bs);
 	}
@@ -367,28 +367,28 @@ class core : public i_miner_handler
       *
       * @note see Blockchain::get_transactions
       */
-	bool get_transactions(const std::vector<crypto::hash> &txs_ids, std::list<cryptonote::blobdata> &txs, std::list<crypto::hash> &missed_txs) const;
+	bool get_transactions(const std::vector<crypto::hash>& txs_ids, std::list<cryptonote::blobdata>& txs, std::list<crypto::hash>& missed_txs) const;
 
 	/**
       * @copydoc Blockchain::get_transactions
       *
       * @note see Blockchain::get_transactions
       */
-	bool get_transactions(const std::vector<crypto::hash> &txs_ids, std::list<transaction> &txs, std::list<crypto::hash> &missed_txs) const;
+	bool get_transactions(const std::vector<crypto::hash>& txs_ids, std::list<transaction>& txs, std::list<crypto::hash>& missed_txs) const;
 
 	/**
       * @copydoc Blockchain::get_block_by_hash
       *
       * @note see Blockchain::get_block_by_hash
       */
-	bool get_block_by_hash(const crypto::hash &h, block &blk, bool *orphan = NULL) const;
+	bool get_block_by_hash(const crypto::hash& h, block& blk, bool* orphan = NULL) const;
 
 	/**
       * @copydoc Blockchain::get_alternative_blocks
       *
       * @note see Blockchain::get_alternative_blocks(std::list<block>&) const
       */
-	bool get_alternative_blocks(std::list<block> &blocks) const;
+	bool get_alternative_blocks(std::list<block>& blocks) const;
 
 	/**
       * @copydoc Blockchain::get_alternative_blocks_count
@@ -402,21 +402,21 @@ class core : public i_miner_handler
       *
       * @param pprotocol the pointer to set ours as
       */
-	void set_cryptonote_protocol(i_cryptonote_protocol *pprotocol);
+	void set_cryptonote_protocol(i_cryptonote_protocol* pprotocol);
 
 	/**
       * @copydoc Blockchain::set_checkpoints
       *
       * @note see Blockchain::set_checkpoints()
       */
-	void set_checkpoints(checkpoints &&chk_pts);
+	void set_checkpoints(checkpoints&& chk_pts);
 
 	/**
       * @brief set the file path to read from when loading checkpoints
       *
       * @param path the path to set ours as
       */
-	void set_checkpoints_file_path(const std::string &path);
+	void set_checkpoints_file_path(const std::string& path);
 
 	/**
       * @brief set whether or not we enforce DNS checkpoints
@@ -437,7 +437,7 @@ class core : public i_miner_handler
       *
       * @note see tx_memory_pool::have_tx
       */
-	bool pool_has_tx(const crypto::hash &txid) const;
+	bool pool_has_tx(const crypto::hash& txid) const;
 
 	/**
       * @copydoc tx_memory_pool::get_transactions
@@ -445,14 +445,14 @@ class core : public i_miner_handler
       *
       * @note see tx_memory_pool::get_transactions
       */
-	bool get_pool_transactions(std::list<transaction> &txs, bool include_unrelayed_txes = true) const;
+	bool get_pool_transactions(std::list<transaction>& txs, bool include_unrelayed_txes = true) const;
 
 	/**
       * @copydoc tx_memory_pool::get_txpool_backlog
       *
       * @note see tx_memory_pool::get_txpool_backlog
       */
-	bool get_txpool_backlog(std::vector<tx_backlog_entry> &backlog) const;
+	bool get_txpool_backlog(std::vector<tx_backlog_entry>& backlog) const;
 
 	/**
       * @copydoc tx_memory_pool::get_transactions
@@ -460,7 +460,7 @@ class core : public i_miner_handler
       *
       * @note see tx_memory_pool::get_transactions
       */
-	bool get_pool_transaction_hashes(std::vector<crypto::hash> &txs, bool include_unrelayed_txes = true) const;
+	bool get_pool_transaction_hashes(std::vector<crypto::hash>& txs, bool include_unrelayed_txes = true) const;
 
 	/**
       * @copydoc tx_memory_pool::get_transactions
@@ -468,14 +468,14 @@ class core : public i_miner_handler
       *
       * @note see tx_memory_pool::get_transactions
       */
-	bool get_pool_transaction_stats(struct txpool_stats &stats, bool include_unrelayed_txes = true) const;
+	bool get_pool_transaction_stats(struct txpool_stats& stats, bool include_unrelayed_txes = true) const;
 
 	/**
       * @copydoc tx_memory_pool::get_transaction
       *
       * @note see tx_memory_pool::get_transaction
       */
-	bool get_pool_transaction(const crypto::hash &id, cryptonote::blobdata &tx) const;
+	bool get_pool_transaction(const crypto::hash& id, cryptonote::blobdata& tx) const;
 
 	/**
       * @copydoc tx_memory_pool::get_pool_transactions_and_spent_keys_info
@@ -483,14 +483,14 @@ class core : public i_miner_handler
       *
       * @note see tx_memory_pool::get_pool_transactions_and_spent_keys_info
       */
-	bool get_pool_transactions_and_spent_keys_info(std::vector<tx_info> &tx_infos, std::vector<spent_key_image_info> &key_image_infos, bool include_unrelayed_txes = true) const;
+	bool get_pool_transactions_and_spent_keys_info(std::vector<tx_info>& tx_infos, std::vector<spent_key_image_info>& key_image_infos, bool include_unrelayed_txes = true) const;
 
 	/**
       * @copydoc tx_memory_pool::get_pool_for_rpc
       *
       * @note see tx_memory_pool::get_pool_for_rpc
       */
-	bool get_pool_for_rpc(std::vector<cryptonote::rpc::tx_in_pool> &tx_infos, cryptonote::rpc::key_images_with_tx_hashes &key_image_infos) const;
+	bool get_pool_for_rpc(std::vector<cryptonote::rpc::tx_in_pool>& tx_infos, cryptonote::rpc::key_images_with_tx_hashes& key_image_infos) const;
 
 	/**
       * @copydoc tx_memory_pool::get_transactions_count
@@ -511,31 +511,31 @@ class core : public i_miner_handler
       *
       * @note see Blockchain::have_block
       */
-	bool have_block(const crypto::hash &id) const;
+	bool have_block(const crypto::hash& id) const;
 
 	/**
       * @copydoc Blockchain::get_short_chain_history
       *
       * @note see Blockchain::get_short_chain_history
       */
-	bool get_short_chain_history(std::list<crypto::hash> &ids) const;
+	bool get_short_chain_history(std::list<crypto::hash>& ids) const;
 
 	/**
       * @copydoc Blockchain::find_blockchain_supplement(const std::list<crypto::hash>&, NOTIFY_RESPONSE_CHAIN_ENTRY::request&) const
       *
       * @note see Blockchain::find_blockchain_supplement(const std::list<crypto::hash>&, NOTIFY_RESPONSE_CHAIN_ENTRY::request&) const
       */
-	bool find_blockchain_supplement(const std::list<crypto::hash> &qblock_ids, NOTIFY_RESPONSE_CHAIN_ENTRY::request &resp) const;
+	bool find_blockchain_supplement(const std::list<crypto::hash>& qblock_ids, NOTIFY_RESPONSE_CHAIN_ENTRY::request& resp) const;
 
 	/**
       * @copydoc Blockchain::find_blockchain_supplement(const uint64_t, const std::list<crypto::hash>&, std::list<std::pair<cryptonote::blobdata, std::list<cryptonote::blobdata> > >&, uint64_t&, uint64_t&, size_t) const
       *
       * @note see Blockchain::find_blockchain_supplement(const uint64_t, const std::list<crypto::hash>&, std::list<std::pair<cryptonote::blobdata, std::list<transaction> > >&, uint64_t&, uint64_t&, size_t) const
       */
-	bool find_blockchain_supplement(const uint64_t req_start_block, const std::list<crypto::hash> &qblock_ids, std::list<std::pair<cryptonote::blobdata, std::list<cryptonote::blobdata>>> &blocks, uint64_t &total_height, uint64_t &start_height, size_t max_count) const;
+	bool find_blockchain_supplement(const uint64_t req_start_block, const std::list<crypto::hash>& qblock_ids, std::list<std::pair<cryptonote::blobdata, std::list<cryptonote::blobdata>>>& blocks, uint64_t& total_height, uint64_t& start_height, size_t max_count) const;
 
-	inline bool find_blockchain_supplement_indexed(const uint64_t req_start_block, const std::list<crypto::hash> &qblock_ids, std::vector<block_complete_entry_v>& blocks,
-			std::vector<COMMAND_RPC_GET_BLOCKS_FAST::block_output_indices>& out_idx, uint64_t &total_height, uint64_t &start_height, size_t max_count) const
+	inline bool find_blockchain_supplement_indexed(const uint64_t req_start_block, const std::list<crypto::hash>& qblock_ids, std::vector<block_complete_entry_v>& blocks,
+		std::vector<COMMAND_RPC_GET_BLOCKS_FAST::block_output_indices>& out_idx, uint64_t& total_height, uint64_t& start_height, size_t max_count) const
 	{
 		return m_blockchain_storage.find_blockchain_supplement_indexed(req_start_block, qblock_ids, blocks, out_idx, total_height, start_height, max_count);
 	}
@@ -546,14 +546,14 @@ class core : public i_miner_handler
       *
       * @return true
       */
-	bool get_stat_info(core_stat_info &st_inf) const;
+	bool get_stat_info(core_stat_info& st_inf) const;
 
 	/**
       * @copydoc Blockchain::get_tx_outputs_gindexs
       *
       * @note see Blockchain::get_tx_outputs_gindexs
       */
-	bool get_tx_outputs_gindexs(const crypto::hash &tx_id, std::vector<uint64_t> &indexs) const;
+	bool get_tx_outputs_gindexs(const crypto::hash& tx_id, std::vector<uint64_t>& indexs) const;
 
 	/**
       * @copydoc Blockchain::get_tail_id
@@ -574,14 +574,14 @@ class core : public i_miner_handler
       *
       * @note see Blockchain::get_random_outs_for_amounts
       */
-	bool get_random_outs_for_amounts(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::request &req, COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::response &res) const;
+	bool get_random_outs_for_amounts(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::request& req, COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::response& res) const;
 
 	/**
       * @copydoc Blockchain::get_outs
       *
       * @note see Blockchain::get_outs
       */
-	bool get_outs(const COMMAND_RPC_GET_OUTPUTS_BIN::request &req, COMMAND_RPC_GET_OUTPUTS_BIN::response &res) const;
+	bool get_outs(const COMMAND_RPC_GET_OUTPUTS_BIN::request& req, COMMAND_RPC_GET_OUTPUTS_BIN::response& res) const;
 
 	/**
       *
@@ -589,14 +589,14 @@ class core : public i_miner_handler
       *
       * @note see Blockchain::get_random_rct_outs
       */
-	bool get_random_rct_outs(const COMMAND_RPC_GET_RANDOM_RCT_OUTPUTS::request &req, COMMAND_RPC_GET_RANDOM_RCT_OUTPUTS::response &res) const;
+	bool get_random_rct_outs(const COMMAND_RPC_GET_RANDOM_RCT_OUTPUTS::request& req, COMMAND_RPC_GET_RANDOM_RCT_OUTPUTS::response& res) const;
 
 	/**
       * @copydoc Blockchain::get_output_distribution
       *
       * @brief get per block distribution of outputs of a given amount
       */
-	bool get_output_distribution(uint64_t amount, uint64_t from_height, uint64_t to_height, uint64_t &start_height, std::vector<uint64_t> &distribution, uint64_t &base) const;
+	bool get_output_distribution(uint64_t amount, uint64_t from_height, uint64_t to_height, uint64_t& start_height, std::vector<uint64_t>& distribution, uint64_t& base) const;
 
 	/**
       * @copydoc miner::pause
@@ -617,14 +617,14 @@ class core : public i_miner_handler
       *
       * @return a reference to the Blockchain instance
       */
-	Blockchain &get_blockchain_storage() { return m_blockchain_storage; }
+	Blockchain& get_blockchain_storage() { return m_blockchain_storage; }
 
 	/**
       * @brief gets the Blockchain instance (const)
       *
       * @return a const reference to the Blockchain instance
       */
-	const Blockchain &get_blockchain_storage() const { return m_blockchain_storage; }
+	const Blockchain& get_blockchain_storage() const { return m_blockchain_storage; }
 
 	/**
       * @copydoc tx_memory_pool::print_pool
@@ -720,7 +720,7 @@ class core : public i_miner_handler
       *
       * @note see Blockchain::have_tx_keyimg_as_spent
       */
-	bool is_key_image_spent(const crypto::key_image &key_im) const;
+	bool is_key_image_spent(const crypto::key_image& key_im) const;
 
 	/**
       * @brief check if multiple key images are spent
@@ -732,7 +732,7 @@ class core : public i_miner_handler
       *
       * @return true
       */
-	bool are_key_images_spent(const std::vector<crypto::key_image> &key_im, std::vector<bool> &spent) const;
+	bool are_key_images_spent(const std::vector<crypto::key_image>& key_im, std::vector<bool>& spent) const;
 
 	/**
       * @brief check if multiple key images are spent in the transaction pool
@@ -742,7 +742,7 @@ class core : public i_miner_handler
       *
       * @return true
       */
-	bool are_key_images_spent_in_pool(const std::vector<crypto::key_image> &key_im, std::vector<bool> &spent) const;
+	bool are_key_images_spent_in_pool(const std::vector<crypto::key_image>& key_im, std::vector<bool>& spent) const;
 
 	/**
       * @brief get the number of blocks to sync in one go
@@ -777,7 +777,7 @@ class core : public i_miner_handler
       *
       * @return number of usable blocks
       */
-	uint64_t prevalidate_block_hashes(uint64_t height, const std::list<crypto::hash> &hashes);
+	uint64_t prevalidate_block_hashes(uint64_t height, const std::list<crypto::hash>& hashes);
 
 	/**
       * @brief get free disk space on the blockchain partition
@@ -804,7 +804,7 @@ class core : public i_miner_handler
       * @param do_not_relay whether to prevent the transaction from being relayed
       *
       */
-	bool add_new_tx(transaction &tx, const crypto::hash &tx_hash, const crypto::hash &tx_prefix_hash, size_t blob_size, tx_verification_context &tvc, bool keeped_by_block, bool relayed, bool do_not_relay);
+	bool add_new_tx(transaction& tx, const crypto::hash& tx_hash, const crypto::hash& tx_prefix_hash, size_t blob_size, tx_verification_context& tvc, bool keeped_by_block, bool relayed, bool do_not_relay);
 
 	/**
       * @brief add a new transaction to the transaction pool
@@ -821,14 +821,14 @@ class core : public i_miner_handler
       * is already in a block on the Blockchain, or is successfully added
       * to the transaction pool
       */
-	bool add_new_tx(transaction &tx, tx_verification_context &tvc, bool keeped_by_block, bool relayed, bool do_not_relay);
+	bool add_new_tx(transaction& tx, tx_verification_context& tvc, bool keeped_by_block, bool relayed, bool do_not_relay);
 
 	/**
       * @copydoc Blockchain::add_new_block
       *
       * @note see Blockchain::add_new_block
       */
-	bool add_new_block(const block &b, block_verification_context &bvc);
+	bool add_new_block(const block& b, block_verification_context& bvc);
 
 	/**
       * @brief load any core state stored on disk
@@ -844,7 +844,7 @@ class core : public i_miner_handler
       *
       * @note see parse_tx_from_blob(transaction&, crypto::hash&, crypto::hash&, const blobdata&) const
       */
-	bool parse_tx_from_blob(transaction &tx, crypto::hash &tx_hash, crypto::hash &tx_prefix_hash, const blobdata &blob) const;
+	bool parse_tx_from_blob(transaction& tx, crypto::hash& tx_hash, crypto::hash& tx_prefix_hash, const blobdata& blob) const;
 
 	/**
       * @brief check a transaction's syntax
@@ -856,7 +856,7 @@ class core : public i_miner_handler
       *
       * @return true
       */
-	bool check_tx_syntax(const transaction &tx) const;
+	bool check_tx_syntax(const transaction& tx) const;
 
 	/**
       * @brief validates some simple properties of a transaction
@@ -874,10 +874,10 @@ class core : public i_miner_handler
       *
       * @return true if all the checks pass, otherwise false
       */
-	bool check_tx_semantic(const transaction &tx, bool keeped_by_block) const;
+	bool check_tx_semantic(const transaction& tx, bool keeped_by_block) const;
 
-	bool handle_incoming_tx_pre(const blobdata &tx_blob, tx_verification_context &tvc, cryptonote::transaction &tx, crypto::hash &tx_hash, crypto::hash &tx_prefixt_hash, bool keeped_by_block, bool relayed, bool do_not_relay);
-	bool handle_incoming_tx_post(const blobdata &tx_blob, tx_verification_context &tvc, cryptonote::transaction &tx, crypto::hash &tx_hash, crypto::hash &tx_prefixt_hash, bool keeped_by_block, bool relayed, bool do_not_relay);
+	bool handle_incoming_tx_pre(const blobdata& tx_blob, tx_verification_context& tvc, cryptonote::transaction& tx, crypto::hash& tx_hash, crypto::hash& tx_prefixt_hash, bool keeped_by_block, bool relayed, bool do_not_relay);
+	bool handle_incoming_tx_post(const blobdata& tx_blob, tx_verification_context& tvc, cryptonote::transaction& tx, crypto::hash& tx_hash, crypto::hash& tx_prefixt_hash, bool keeped_by_block, bool relayed, bool do_not_relay);
 
 	/**
       * @copydoc miner::on_block_chain_update
@@ -895,7 +895,7 @@ class core : public i_miner_handler
       *
       * @return true
       */
-	bool handle_command_line(const boost::program_options::variables_map &vm);
+	bool handle_command_line(const boost::program_options::variables_map& vm);
 
 	/**
       * @brief verify that each input key image in a transaction is unique
@@ -904,7 +904,7 @@ class core : public i_miner_handler
       *
       * @return false if any key image is repeated, otherwise true
       */
-	bool check_tx_inputs_keyimages_diff(const transaction &tx) const;
+	bool check_tx_inputs_keyimages_diff(const transaction& tx) const;
 
 	/**
       * @brief verify that each ring uses distinct members
@@ -913,7 +913,7 @@ class core : public i_miner_handler
       *
       * @return false if any ring uses duplicate members, true otherwise
       */
-	bool check_tx_inputs_ring_members_diff(const transaction &tx) const;
+	bool check_tx_inputs_ring_members_diff(const transaction& tx) const;
 
 	/**
       * @brief verify that each input key image in a transaction is in
@@ -923,7 +923,7 @@ class core : public i_miner_handler
       *
       * @return false if any key image is not in the valid domain, otherwise true
       */
-	bool check_tx_inputs_keyimages_domain(const transaction &tx) const;
+	bool check_tx_inputs_keyimages_domain(const transaction& tx) const;
 
 	/**
       * @brief checks HardFork status and prints messages about it
@@ -965,7 +965,7 @@ class core : public i_miner_handler
 	tx_memory_pool m_mempool;		 //!< transaction pool instance
 	Blockchain m_blockchain_storage; //!< Blockchain instance
 
-	i_cryptonote_protocol *m_pprotocol; //!< cryptonote protocol instance
+	i_cryptonote_protocol* m_pprotocol; //!< cryptonote protocol instance
 
 	epee::critical_section m_incoming_tx_lock; //!< incoming transaction lock
 
@@ -1003,7 +1003,7 @@ class core : public i_miner_handler
 	std::unordered_set<crypto::hash> bad_semantics_txes[2];
 	boost::mutex bad_semantics_txes_lock;
 
-	tools::threadpool &m_threadpool;
+	tools::threadpool& m_threadpool;
 
 	enum
 	{
@@ -1023,6 +1023,6 @@ class core : public i_miner_handler
 	bool m_fluffy_blocks_enabled;
 	bool m_offline;
 };
-}
+} // namespace cryptonote
 
 POP_WARNINGS

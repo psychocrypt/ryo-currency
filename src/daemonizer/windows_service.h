@@ -54,21 +54,21 @@
 
 namespace windows
 {
-bool check_admin(bool &result);
+bool check_admin(bool& result);
 
 bool ensure_admin(
-	std::string const &arguments);
+	std::string const& arguments);
 
 bool install_service(
-	std::string const &service_name, std::string const &arguments);
+	std::string const& service_name, std::string const& arguments);
 
 bool uninstall_service(
-	std::string const &service_name);
+	std::string const& service_name);
 
 bool start_service(
-	std::string const &service_name);
+	std::string const& service_name);
 
 bool stop_service(
-	std::string const &service_name);
-}
+	std::string const& service_name);
+} // namespace windows
 #endif

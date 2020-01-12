@@ -44,7 +44,7 @@ static int __AFL_LOOP(int)
 }
 #endif
 
-int run_fuzzer(int argc, const char **argv, Fuzzer &fuzzer)
+int run_fuzzer(int argc, const char** argv, Fuzzer& fuzzer)
 {
 	if(argc < 2)
 	{

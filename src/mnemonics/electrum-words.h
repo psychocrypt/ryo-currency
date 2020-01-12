@@ -79,7 +79,7 @@ namespace Electrum
      * \param languages A vector is set to the list of languages.
      * \param english whether to get the names in English or the language language
      */
-void get_language_list(std::vector<std::string> &languages, bool english = false);
+void get_language_list(std::vector<std::string>& languages, bool english = false);
 
 /*!
      * \brief Verify and standardise user's input
@@ -93,14 +93,14 @@ std::string verify_language_input(std::string input);
      * \param  name the name of the language in its own language
      * \return      the name of the language in English
      */
-std::string get_english_name_for(const std::string &name);
-}
+std::string get_english_name_for(const std::string& name);
+} // namespace Electrum
 
 namespace Electrum14Words
 {
-bool words_to_bytes(std::string words, crypto::secret_key_16 &dst, uint8_t &extra, std::string &language_name);
-bool bytes_to_words(const crypto::secret_key_16 &dst, uint8_t extra, std::string &words, const std::string &language_name);
-}
+bool words_to_bytes(std::string words, crypto::secret_key_16& dst, uint8_t& extra, std::string& language_name);
+bool bytes_to_words(const crypto::secret_key_16& dst, uint8_t extra, std::string& words, const std::string& language_name);
+} // namespace Electrum14Words
 
 namespace Electrum25Words
 {
@@ -114,7 +114,7 @@ constexpr int seed_length = 24;
      * \param  language_name   Language of the seed as found gets written here.
      * \return                 false if not a multiple of 3 words, or if word is not in the words list
      */
-bool words_to_bytes(std::string words, std::string &dst, size_t len, std::string &language_name);
+bool words_to_bytes(std::string words, std::string& dst, size_t len, std::string& language_name);
 /*!
      * \brief Converts seed words to bytes (secret key).
      * \param  words           String containing the words separated by spaces.
@@ -122,7 +122,7 @@ bool words_to_bytes(std::string words, std::string &dst, size_t len, std::string
      * \param  language_name   Language of the seed as found gets written here.
      * \return                 false if not a multiple of 3 words, or if word is not in the words list
      */
-bool words_to_bytes(std::string words, crypto::secret_key &dst, std::string &language_name);
+bool words_to_bytes(std::string words, crypto::secret_key& dst, std::string& language_name);
 
 /*!
      * \brief Converts bytes to seed words.
@@ -132,7 +132,7 @@ bool words_to_bytes(std::string words, crypto::secret_key &dst, std::string &lan
      * \param  language_name Seed language name
      * \return               true if successful false if not. Unsuccessful if wrong key size.
      */
-bool bytes_to_words(const char *src, size_t len, std::string &words, const std::string &language_name);
+bool bytes_to_words(const char* src, size_t len, std::string& words, const std::string& language_name);
 
 /*!
      * \brief Converts bytes (secret key) to seed words.
@@ -141,8 +141,8 @@ bool bytes_to_words(const char *src, size_t len, std::string &words, const std::
      * \param  language_name Seed language name
      * \return               true if successful false if not. Unsuccessful if wrong key size.
      */
-bool bytes_to_words(const crypto::secret_key &src, std::string &words, const std::string &language_name);
-}
-}
+bool bytes_to_words(const crypto::secret_key& src, std::string& words, const std::string& language_name);
+} // namespace Electrum25Words
+} // namespace crypto
 
 #endif

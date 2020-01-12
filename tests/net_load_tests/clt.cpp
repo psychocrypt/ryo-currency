@@ -54,7 +54,7 @@ const size_t DEFAULT_OPERATION_TIMEOUT = 30000;
 const size_t RESERVED_CONN_CNT = 1;
 
 template <typename t_predicate>
-bool busy_wait_for(size_t timeout_ms, const t_predicate &predicate, size_t sleep_ms = 10)
+bool busy_wait_for(size_t timeout_ms, const t_predicate& predicate, size_t sleep_ms = 10)
 {
 	for(size_t i = 0; i < timeout_ms / sleep_ms; ++i)
 	{
@@ -69,10 +69,14 @@ bool busy_wait_for(size_t timeout_ms, const t_predicate &predicate, size_t sleep
 class t_connection_opener_1
 {
   public:
-	t_connection_opener_1(test_tcp_server &tcp_server, size_t open_request_target)
-		: m_tcp_server(tcp_server), m_open_request_target(open_request_target), m_next_id(0), m_error_count(0), m_connections(open_request_target)
+	t_connection_opener_1(test_tcp_server& tcp_server, size_t open_request_target) :
+		m_tcp_server(tcp_server),
+		m_open_request_target(open_request_target),
+		m_next_id(0),
+		m_error_count(0),
+		m_connections(open_request_target)
 	{
-		for(auto &conn_id : m_connections)
+		for(auto& conn_id : m_connections)
 			conn_id = boost::uuids::nil_uuid();
 	}
 
@@ -82,7 +86,7 @@ class t_connection_opener_1
 		if(m_open_request_target <= id)
 			return false;
 
-		bool r = m_tcp_server.connect_async("127.0.0.1", srv_port, CONNECTION_TIMEOUT, [=](const test_connection_context &context, const boost::system::error_code &ec) {
+		bool r = m_tcp_server.connect_async("127.0.0.1", srv_port, CONNECTION_TIMEOUT, [=](const test_connection_context& context, const boost::system::error_code& ec) {
 			if(!ec)
 			{
 				m_connections[id] = context.m_connection_id;
@@ -117,7 +121,7 @@ class t_connection_opener_1
 	size_t error_count() const { return m_error_count.load(std::memory_order_relaxed); }
 
   private:
-	test_tcp_server &m_tcp_server;
+	test_tcp_server& m_tcp_server;
 	size_t m_open_request_target;
 	std::atomic<size_t> m_next_id;
 	std::atomic<size_t> m_error_count;
@@ -127,8 +131,12 @@ class t_connection_opener_1
 class t_connection_opener_2
 {
   public:
-	t_connection_opener_2(test_tcp_server &tcp_server, size_t open_request_target, size_t max_opened_connection_count)
-		: m_tcp_server(tcp_server), m_open_request_target(open_request_target), m_open_request_count(0), m_error_count(0), m_open_close_test_helper(tcp_server, open_request_target, max_opened_connection_count)
+	t_connection_opener_2(test_tcp_server& tcp_server, size_t open_request_target, size_t max_opened_connection_count) :
+		m_tcp_server(tcp_server),
+		m_open_request_target(open_request_target),
+		m_open_request_count(0),
+		m_error_count(0),
+		m_open_close_test_helper(tcp_server, open_request_target, max_opened_connection_count)
 	{
 	}
 
@@ -138,7 +146,7 @@ class t_connection_opener_2
 		if(m_open_request_target <= req_count)
 			return false;
 
-		bool r = m_tcp_server.connect_async("127.0.0.1", srv_port, CONNECTION_TIMEOUT, [=](const test_connection_context &context, const boost::system::error_code &ec) {
+		bool r = m_tcp_server.connect_async("127.0.0.1", srv_port, CONNECTION_TIMEOUT, [=](const test_connection_context& context, const boost::system::error_code& ec) {
 			if(!ec)
 			{
 				m_open_close_test_helper.handle_new_connection(context.m_connection_id);
@@ -166,7 +174,7 @@ class t_connection_opener_2
 	size_t error_count() const { return m_error_count.load(std::memory_order_relaxed); }
 
   private:
-	test_tcp_server &m_tcp_server;
+	test_tcp_server& m_tcp_server;
 	size_t m_open_request_target;
 	std::atomic<size_t> m_open_request_count;
 	std::atomic<size_t> m_error_count;
@@ -176,8 +184,8 @@ class t_connection_opener_2
 class net_load_test_clt : public ::testing::Test
 {
   public:
-	net_load_test_clt()
-		: m_tcp_server(epee::net_utils::e_connection_type_RPC) // RPC disables network limit for unit tests
+	net_load_test_clt() :
+		m_tcp_server(epee::net_utils::e_connection_type_RPC) // RPC disables network limit for unit tests
 	{
 	}
 
@@ -195,7 +203,7 @@ class net_load_test_clt : public ::testing::Test
 		// Connect to server
 		std::atomic<int> conn_status(0);
 		m_cmd_conn_id = boost::uuids::nil_uuid();
-		ASSERT_TRUE(m_tcp_server.connect_async("127.0.0.1", srv_port, CONNECTION_TIMEOUT, [&](const test_connection_context &context, const boost::system::error_code &ec) {
+		ASSERT_TRUE(m_tcp_server.connect_async("127.0.0.1", srv_port, CONNECTION_TIMEOUT, [&](const test_connection_context& context, const boost::system::error_code& ec) {
 			if(!ec)
 			{
 				m_cmd_conn_id = context.m_connection_id;
@@ -214,9 +222,9 @@ class net_load_test_clt : public ::testing::Test
 		conn_status.store(0, std::memory_order_seq_cst);
 		CMD_RESET_STATISTICS::request req;
 		ASSERT_TRUE(epee::net_utils::async_invoke_remote_command2<CMD_RESET_STATISTICS::response>(m_cmd_conn_id, CMD_RESET_STATISTICS::ID, req,
-																								  m_tcp_server.get_config_object(), [&](int code, const CMD_RESET_STATISTICS::response &rsp, const test_connection_context &) {
-																									  conn_status.store(code, std::memory_order_seq_cst);
-																								  }));
+			m_tcp_server.get_config_object(), [&](int code, const CMD_RESET_STATISTICS::response& rsp, const test_connection_context&) {
+				conn_status.store(code, std::memory_order_seq_cst);
+			}));
 
 		EXPECT_TRUE(busy_wait_for(DEFAULT_OPERATION_TIMEOUT, [&] { return 0 != conn_status.load(std::memory_order_seq_cst); })) << "reset statistics timed out";
 		ASSERT_LT(0, conn_status.load(std::memory_order_seq_cst));
@@ -231,10 +239,10 @@ class net_load_test_clt : public ::testing::Test
 	static void TearDownTestCase()
 	{
 		// Stop server
-		test_levin_commands_handler *commands_handler_ptr = new test_levin_commands_handler();
-		test_levin_commands_handler &commands_handler = *commands_handler_ptr;
+		test_levin_commands_handler* commands_handler_ptr = new test_levin_commands_handler();
+		test_levin_commands_handler& commands_handler = *commands_handler_ptr;
 		test_tcp_server tcp_server(epee::net_utils::e_connection_type_RPC);
-		tcp_server.get_config_object().set_handler(commands_handler_ptr, [](epee::levin::levin_commands_handler<test_connection_context> *handler) -> void { delete handler; });
+		tcp_server.get_config_object().set_handler(commands_handler_ptr, [](epee::levin::levin_commands_handler<test_connection_context>* handler) -> void { delete handler; });
 		tcp_server.get_config_object().m_invoke_timeout = CONNECTION_TIMEOUT;
 
 		if(!tcp_server.init_server(clt_port, "127.0.0.1"))
@@ -245,7 +253,7 @@ class net_load_test_clt : public ::testing::Test
 		// Connect to server and invoke shutdown command
 		std::atomic<int> conn_status(0);
 		boost::uuids::uuid cmd_conn_id = boost::uuids::nil_uuid();
-		tcp_server.connect_async("127.0.0.1", srv_port, CONNECTION_TIMEOUT, [&](const test_connection_context &context, const boost::system::error_code &ec) {
+		tcp_server.connect_async("127.0.0.1", srv_port, CONNECTION_TIMEOUT, [&](const test_connection_context& context, const boost::system::error_code& ec) {
 			cmd_conn_id = context.m_connection_id;
 			conn_status.store(!ec ? 1 : -1, std::memory_order_seq_cst);
 		});
@@ -261,19 +269,19 @@ class net_load_test_clt : public ::testing::Test
 	}
 
 	template <typename Func>
-	static auto call_func(size_t /*thread_index*/, const Func &func, int) -> decltype(func())
+	static auto call_func(size_t /*thread_index*/, const Func& func, int) -> decltype(func())
 	{
 		func();
 	}
 
 	template <typename Func>
-	static auto call_func(size_t thread_index, const Func &func, long) -> decltype(func(thread_index))
+	static auto call_func(size_t thread_index, const Func& func, long) -> decltype(func(thread_index))
 	{
 		func(thread_index);
 	}
 
 	template <typename Func>
-	void parallel_exec(const Func &func)
+	void parallel_exec(const Func& func)
 	{
 		unit_test::call_counter properly_finished_threads;
 		std::vector<boost::thread> threads(m_thread_count);
@@ -285,35 +293,35 @@ class net_load_test_clt : public ::testing::Test
 			});
 		}
 
-		for(auto &th : threads)
+		for(auto& th : threads)
 			th.join();
 
 		ASSERT_EQ(properly_finished_threads.get(), m_thread_count);
 	}
 
-	void get_server_statistics(CMD_GET_STATISTICS::response &statistics)
+	void get_server_statistics(CMD_GET_STATISTICS::response& statistics)
 	{
 		std::atomic<int> req_status(0);
 		CMD_GET_STATISTICS::request req;
 		ASSERT_TRUE(epee::net_utils::async_invoke_remote_command2<CMD_GET_STATISTICS::response>(m_cmd_conn_id, CMD_GET_STATISTICS::ID, req,
-																								m_tcp_server.get_config_object(), [&](int code, const CMD_GET_STATISTICS::response &rsp, const test_connection_context &) {
-																									if(0 < code)
-																									{
-																										statistics = rsp;
-																									}
-																									else
-																									{
-																										std::cout << "Get server statistics error: " << code << std::endl;
-																									}
-																									req_status.store(0 < code ? 1 : -1, std::memory_order_seq_cst);
-																								}));
+			m_tcp_server.get_config_object(), [&](int code, const CMD_GET_STATISTICS::response& rsp, const test_connection_context&) {
+				if(0 < code)
+				{
+					statistics = rsp;
+				}
+				else
+				{
+					std::cout << "Get server statistics error: " << code << std::endl;
+				}
+				req_status.store(0 < code ? 1 : -1, std::memory_order_seq_cst);
+			}));
 
 		EXPECT_TRUE(busy_wait_for(DEFAULT_OPERATION_TIMEOUT, [&] { return 0 != req_status.load(std::memory_order_seq_cst); })) << "get_server_statistics timed out";
 		ASSERT_EQ(1, req_status.load(std::memory_order_seq_cst));
 	}
 
 	template <typename t_predicate>
-	bool busy_wait_for_server_statistics(CMD_GET_STATISTICS::response &statistics, const t_predicate &predicate)
+	bool busy_wait_for_server_statistics(CMD_GET_STATISTICS::response& statistics, const t_predicate& predicate)
 	{
 		for(size_t i = 0; i < 30; ++i)
 		{
@@ -343,7 +351,7 @@ class net_load_test_clt : public ::testing::Test
 	size_t m_thread_count;
 	boost::uuids::uuid m_cmd_conn_id;
 };
-}
+} // namespace
 
 TEST_F(net_load_test_clt, a_lot_of_client_connections_and_connections_closed_by_client)
 {
@@ -381,7 +389,7 @@ TEST_F(net_load_test_clt, a_lot_of_client_connections_and_connections_closed_by_
 
 	// Wait for server to handle all open and close requests
 	CMD_GET_STATISTICS::response srv_stat;
-	busy_wait_for_server_statistics(srv_stat, [](const CMD_GET_STATISTICS::response &stat) { return stat.new_connection_counter - RESERVED_CONN_CNT <= stat.close_connection_counter; });
+	busy_wait_for_server_statistics(srv_stat, [](const CMD_GET_STATISTICS::response& stat) { return stat.new_connection_counter - RESERVED_CONN_CNT <= stat.close_connection_counter; });
 	std::cout << "server statistics: " << srv_stat.to_string() << std::endl;
 
 	// Check server status
@@ -393,7 +401,7 @@ TEST_F(net_load_test_clt, a_lot_of_client_connections_and_connections_closed_by_
 	ask_for_data_requests();
 
 	// Wait for server to close rest connections
-	busy_wait_for_server_statistics(srv_stat, [](const CMD_GET_STATISTICS::response &stat) { return stat.new_connection_counter - RESERVED_CONN_CNT <= stat.close_connection_counter; });
+	busy_wait_for_server_statistics(srv_stat, [](const CMD_GET_STATISTICS::response& stat) { return stat.new_connection_counter - RESERVED_CONN_CNT <= stat.close_connection_counter; });
 	std::cout << "server statistics: " << srv_stat.to_string() << std::endl;
 
 	// Check server status. All connections should be closed
@@ -422,7 +430,7 @@ TEST_F(net_load_test_clt, a_lot_of_client_connections_and_connections_closed_by_
 	// Wait for server accepts all connections
 	CMD_GET_STATISTICS::response srv_stat;
 	int last_new_connection_counter = -1;
-	busy_wait_for_server_statistics(srv_stat, [&last_new_connection_counter](const CMD_GET_STATISTICS::response &stat) {
+	busy_wait_for_server_statistics(srv_stat, [&last_new_connection_counter](const CMD_GET_STATISTICS::response& stat) {
 		if(last_new_connection_counter == static_cast<int>(stat.new_connection_counter))
 			return true;
 		else
@@ -445,7 +453,7 @@ TEST_F(net_load_test_clt, a_lot_of_client_connections_and_connections_closed_by_
 	ASSERT_LE(RESERVED_CONN_CNT, m_tcp_server.get_config_object().get_connections_count());
 
 	// Wait for server to handle all open and close requests
-	busy_wait_for_server_statistics(srv_stat, [](const CMD_GET_STATISTICS::response &stat) { return stat.new_connection_counter - RESERVED_CONN_CNT <= stat.close_connection_counter; });
+	busy_wait_for_server_statistics(srv_stat, [](const CMD_GET_STATISTICS::response& stat) { return stat.new_connection_counter - RESERVED_CONN_CNT <= stat.close_connection_counter; });
 	std::cout << "server statistics: " << srv_stat.to_string() << std::endl;
 
 	// Check server status
@@ -453,17 +461,17 @@ TEST_F(net_load_test_clt, a_lot_of_client_connections_and_connections_closed_by_
 	ASSERT_EQ(RESERVED_CONN_CNT, srv_stat.opened_connections_count);
 
 	// Close rest connections
-	m_tcp_server.get_config_object().foreach_connection([&](test_connection_context &ctx) {
+	m_tcp_server.get_config_object().foreach_connection([&](test_connection_context& ctx) {
 		if(ctx.m_connection_id != m_cmd_conn_id)
 		{
 			CMD_DATA_REQUEST::request req;
 			bool r = epee::net_utils::async_invoke_remote_command2<CMD_DATA_REQUEST::response>(ctx.m_connection_id, CMD_DATA_REQUEST::ID, req,
-																							   m_tcp_server.get_config_object(), [=](int code, const CMD_DATA_REQUEST::response &rsp, const test_connection_context &) {
-																								   if(code <= 0)
-																								   {
-																									   std::cout << "Failed to invoke CMD_DATA_REQUEST. code = " << code << std::endl;
-																								   }
-																							   });
+				m_tcp_server.get_config_object(), [=](int code, const CMD_DATA_REQUEST::response& rsp, const test_connection_context&) {
+					if(code <= 0)
+					{
+						std::cout << "Failed to invoke CMD_DATA_REQUEST. code = " << code << std::endl;
+					}
+				});
 			if(!r)
 				std::cout << "Failed to invoke CMD_DATA_REQUEST" << std::endl;
 		}
@@ -517,7 +525,7 @@ TEST_F(net_load_test_clt, permament_open_and_close_and_connections_closed_by_cli
 
 	// Wait for server to handle all open and close requests
 	CMD_GET_STATISTICS::response srv_stat;
-	busy_wait_for_server_statistics(srv_stat, [](const CMD_GET_STATISTICS::response &stat) { return stat.new_connection_counter - RESERVED_CONN_CNT <= stat.close_connection_counter; });
+	busy_wait_for_server_statistics(srv_stat, [](const CMD_GET_STATISTICS::response& stat) { return stat.new_connection_counter - RESERVED_CONN_CNT <= stat.close_connection_counter; });
 	std::cout << "server statistics: " << srv_stat.to_string() << std::endl;
 
 	// Check server status
@@ -529,7 +537,7 @@ TEST_F(net_load_test_clt, permament_open_and_close_and_connections_closed_by_cli
 	ask_for_data_requests();
 
 	// Wait for server to close rest connections
-	busy_wait_for_server_statistics(srv_stat, [](const CMD_GET_STATISTICS::response &stat) { return stat.new_connection_counter - RESERVED_CONN_CNT <= stat.close_connection_counter; });
+	busy_wait_for_server_statistics(srv_stat, [](const CMD_GET_STATISTICS::response& stat) { return stat.new_connection_counter - RESERVED_CONN_CNT <= stat.close_connection_counter; });
 	std::cout << "server statistics: " << srv_stat.to_string() << std::endl;
 
 	// Check server status. All connections should be closed
@@ -547,9 +555,9 @@ TEST_F(net_load_test_clt, permament_open_and_close_and_connections_closed_by_ser
 	req_start.open_request_target = CONNECTION_COUNT;
 	req_start.max_opened_conn_count = MAX_OPENED_CONN_COUNT;
 	ASSERT_TRUE(epee::net_utils::async_invoke_remote_command2<CMD_START_OPEN_CLOSE_TEST::response>(m_cmd_conn_id, CMD_START_OPEN_CLOSE_TEST::ID, req_start,
-																								   m_tcp_server.get_config_object(), [&](int code, const CMD_START_OPEN_CLOSE_TEST::response &, const test_connection_context &) {
-																									   test_state.store(0 < code ? 1 : -1, std::memory_order_seq_cst);
-																								   }));
+		m_tcp_server.get_config_object(), [&](int code, const CMD_START_OPEN_CLOSE_TEST::response&, const test_connection_context&) {
+			test_state.store(0 < code ? 1 : -1, std::memory_order_seq_cst);
+		}));
 
 	// Wait for server response
 	EXPECT_TRUE(busy_wait_for(DEFAULT_OPERATION_TIMEOUT, [&] { return 1 == test_state.load(std::memory_order_seq_cst); }));
@@ -573,7 +581,7 @@ TEST_F(net_load_test_clt, permament_open_and_close_and_connections_closed_by_ser
 	// Wait for server accepts all connections
 	CMD_GET_STATISTICS::response srv_stat;
 	int last_new_connection_counter = -1;
-	busy_wait_for_server_statistics(srv_stat, [&last_new_connection_counter](const CMD_GET_STATISTICS::response &stat) {
+	busy_wait_for_server_statistics(srv_stat, [&last_new_connection_counter](const CMD_GET_STATISTICS::response& stat) {
 		if(last_new_connection_counter == static_cast<int>(stat.new_connection_counter))
 			return true;
 		else
@@ -595,7 +603,7 @@ TEST_F(net_load_test_clt, permament_open_and_close_and_connections_closed_by_ser
 	ASSERT_LE(RESERVED_CONN_CNT, m_tcp_server.get_config_object().get_connections_count());
 
 	// Wait for server to handle all open and close requests
-	busy_wait_for_server_statistics(srv_stat, [](const CMD_GET_STATISTICS::response &stat) { return stat.new_connection_counter - RESERVED_CONN_CNT <= stat.close_connection_counter; });
+	busy_wait_for_server_statistics(srv_stat, [](const CMD_GET_STATISTICS::response& stat) { return stat.new_connection_counter - RESERVED_CONN_CNT <= stat.close_connection_counter; });
 	std::cout << "server statistics: " << srv_stat.to_string() << std::endl;
 
 	// Check server status
@@ -603,17 +611,17 @@ TEST_F(net_load_test_clt, permament_open_and_close_and_connections_closed_by_ser
 	ASSERT_EQ(RESERVED_CONN_CNT, srv_stat.opened_connections_count);
 
 	// Close rest connections
-	m_tcp_server.get_config_object().foreach_connection([&](test_connection_context &ctx) {
+	m_tcp_server.get_config_object().foreach_connection([&](test_connection_context& ctx) {
 		if(ctx.m_connection_id != m_cmd_conn_id)
 		{
 			CMD_DATA_REQUEST::request req;
 			bool r = epee::net_utils::async_invoke_remote_command2<CMD_DATA_REQUEST::response>(ctx.m_connection_id, CMD_DATA_REQUEST::ID, req,
-																							   m_tcp_server.get_config_object(), [=](int code, const CMD_DATA_REQUEST::response &rsp, const test_connection_context &) {
-																								   if(code <= 0)
-																								   {
-																									   std::cout << "Failed to invoke CMD_DATA_REQUEST. code = " << code << std::endl;
-																								   }
-																							   });
+				m_tcp_server.get_config_object(), [=](int code, const CMD_DATA_REQUEST::response& rsp, const test_connection_context&) {
+					if(code <= 0)
+					{
+						std::cout << "Failed to invoke CMD_DATA_REQUEST. code = " << code << std::endl;
+					}
+				});
 			if(!r)
 				std::cout << "Failed to invoke CMD_DATA_REQUEST" << std::endl;
 		}
@@ -629,12 +637,11 @@ TEST_F(net_load_test_clt, permament_open_and_close_and_connections_closed_by_ser
 	ASSERT_EQ(RESERVED_CONN_CNT, m_tcp_server.get_config_object().get_connections_count());
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 	tools::on_startup();
 	debug::get_set_enable_assert(true, false);
 	//set up logging options
-	
 
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();

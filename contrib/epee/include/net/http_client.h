@@ -57,8 +57,6 @@
 
 #include "common/gulps.hpp"
 
-
-
 extern epee::critical_section gregexp_lock;
 
 namespace epee
@@ -100,13 +98,13 @@ namespace net_utils
 	};*/
 
 //---------------------------------------------------------------------------
-static inline const char *get_hex_vals()
+static inline const char* get_hex_vals()
 {
 	static const char hexVals[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 	return hexVals;
 }
 
-static inline const char *get_unsave_chars()
+static inline const char* get_unsave_chars()
 {
 	//static char unsave_chars[] = "\"<>%\\^[]`+$,@:;/!#?=&";
 	static const char unsave_chars[] = "\"<>%\\^[]`+$,@:;!#&";
@@ -118,7 +116,7 @@ static inline bool is_unsafe(unsigned char compare_char)
 	if(compare_char <= 32 || compare_char >= 123)
 		return true;
 
-	const char *punsave = get_unsave_chars();
+	const char* punsave = get_unsave_chars();
 
 	for(int ichar_pos = 0; 0 != punsave[ichar_pos]; ichar_pos++)
 		if(compare_char == punsave[ichar_pos])
@@ -156,14 +154,14 @@ static inline std::string dec_to_hex(char num, int radix)
 
 	return csTmp;
 }
-static inline int get_index(const char *s, char c)
+static inline int get_index(const char* s, char c)
 {
-	const char *ptr = (const char *)memchr(s, c, 16);
+	const char* ptr = (const char*)memchr(s, c, 16);
 	return ptr ? ptr - s : -1;
 }
-static inline std::string hex_to_dec_2bytes(const char *s)
+static inline std::string hex_to_dec_2bytes(const char* s)
 {
-	const char *hex = get_hex_vals();
+	const char* hex = get_hex_vals();
 	int i0 = get_index(hex, toupper(s[0]));
 	int i1 = get_index(hex, toupper(s[1]));
 	if(i0 < 0 || i1 < 0)
@@ -178,7 +176,7 @@ static inline std::string convert(char val)
 	csRet += dec_to_hex(val, 16);
 	return csRet;
 }
-static inline std::string conver_to_url_format(const std::string &uri)
+static inline std::string conver_to_url_format(const std::string& uri)
 {
 
 	std::string result;
@@ -193,7 +191,7 @@ static inline std::string conver_to_url_format(const std::string &uri)
 
 	return result;
 }
-static inline std::string convert_from_url_format(const std::string &uri)
+static inline std::string convert_from_url_format(const std::string& uri)
 {
 
 	std::string result;
@@ -212,7 +210,7 @@ static inline std::string convert_from_url_format(const std::string &uri)
 	return result;
 }
 
-static inline std::string convert_to_url_format_force_all(const std::string &uri)
+static inline std::string convert_to_url_format_force_all(const std::string& uri)
 {
 
 	std::string result;
@@ -267,22 +265,35 @@ class http_simple_client_template : public i_target_handler
 	bool m_ssl;
 
   public:
-
 	GULPS_CAT_MAJOR("epee_http_client");
 
-	explicit http_simple_client_template()
-		: i_target_handler(), m_net_client(), m_host_buff(), m_port(), m_auth(), m_header_cache(), m_response_info(), m_len_in_summary(0), m_len_in_remain(0), m_pcontent_encoding_handler(nullptr), m_state(), m_chunked_state(), m_chunked_cache(), m_lock(), m_ssl(false)
+	explicit http_simple_client_template() :
+		i_target_handler(),
+		m_net_client(),
+		m_host_buff(),
+		m_port(),
+		m_auth(),
+		m_header_cache(),
+		m_response_info(),
+		m_len_in_summary(0),
+		m_len_in_remain(0),
+		m_pcontent_encoding_handler(nullptr),
+		m_state(),
+		m_chunked_state(),
+		m_chunked_cache(),
+		m_lock(),
+		m_ssl(false)
 	{
 	}
 
-	const std::string &get_host() const { return m_host_buff; };
-	const std::string &get_port() const { return m_port; };
+	const std::string& get_host() const { return m_host_buff; };
+	const std::string& get_port() const { return m_port; };
 
-	bool set_server(const std::string &address, boost::optional<login> user, bool ssl = false)
+	bool set_server(const std::string& address, boost::optional<login> user, bool ssl = false)
 	{
 		http::url_content parsed{};
 		const bool r = parse_url(address, parsed);
-		GULPS_CHECK_AND_ASSERT_MES(r && parsed.host.size() > 0 && parsed.port != 0, false, "failed to parse url: " , address);
+		GULPS_CHECK_AND_ASSERT_MES(r && parsed.host.size() > 0 && parsed.port != 0, false, "failed to parse url: ", address);
 		set_server(std::move(parsed.host), std::to_string(parsed.port), std::move(user), ssl);
 		return true;
 	}
@@ -315,7 +326,7 @@ class http_simple_client_template : public i_target_handler
 		return m_net_client.is_connected();
 	}
 	//---------------------------------------------------------------------------
-	virtual bool handle_target_data(std::string &piece_of_transfer)
+	virtual bool handle_target_data(std::string& piece_of_transfer)
 	{
 		CRITICAL_REGION_LOCAL(m_lock);
 		m_response_info.m_body += piece_of_transfer;
@@ -323,19 +334,19 @@ class http_simple_client_template : public i_target_handler
 		return true;
 	}
 	//---------------------------------------------------------------------------
-	virtual bool on_header(const http_response_info &headers)
+	virtual bool on_header(const http_response_info& headers)
 	{
 		return true;
 	}
 	//---------------------------------------------------------------------------
-	inline bool invoke_get(const boost::string_ref uri, std::chrono::milliseconds timeout, const std::string &body = std::string(), const http_response_info **ppresponse_info = NULL, const fields_list &additional_params = fields_list())
+	inline bool invoke_get(const boost::string_ref uri, std::chrono::milliseconds timeout, const std::string& body = std::string(), const http_response_info** ppresponse_info = NULL, const fields_list& additional_params = fields_list())
 	{
 		CRITICAL_REGION_LOCAL(m_lock);
 		return invoke(uri, "GET", body, timeout, ppresponse_info, additional_params);
 	}
 
 	//---------------------------------------------------------------------------
-	inline bool invoke(const boost::string_ref uri, const boost::string_ref method, const std::string &body, std::chrono::milliseconds timeout, const http_response_info **ppresponse_info = NULL, const fields_list &additional_params = fields_list())
+	inline bool invoke(const boost::string_ref uri, const boost::string_ref method, const std::string& body, std::chrono::milliseconds timeout, const http_response_info** ppresponse_info = NULL, const fields_list& additional_params = fields_list())
 	{
 		CRITICAL_REGION_LOCAL(m_lock);
 		if(!is_connected())
@@ -343,7 +354,7 @@ class http_simple_client_template : public i_target_handler
 			GULPS_LOG_L1("Reconnecting...");
 			if(!connect(timeout))
 			{
-				GULPSF_LOG_L1("Failed to connect to {}:{}", m_host_buff , m_port);
+				GULPSF_LOG_L1("Failed to connect to {}:{}", m_host_buff, m_port);
 				return false;
 			}
 		}
@@ -355,7 +366,7 @@ class http_simple_client_template : public i_target_handler
 		add_field(req_buff, "Content-Length", std::to_string(body.size()));
 
 		//handle "additional_params"
-		for(const auto &field : additional_params)
+		for(const auto& field : additional_params)
 			add_field(req_buff, field);
 
 		for(unsigned sends = 0; sends < 2; ++sends)
@@ -403,13 +414,13 @@ class http_simple_client_template : public i_target_handler
 		return false;
 	}
 	//---------------------------------------------------------------------------
-	inline bool invoke_post(const boost::string_ref uri, const std::string &body, std::chrono::milliseconds timeout, const http_response_info **ppresponse_info = NULL, const fields_list &additional_params = fields_list())
+	inline bool invoke_post(const boost::string_ref uri, const std::string& body, std::chrono::milliseconds timeout, const http_response_info** ppresponse_info = NULL, const fields_list& additional_params = fields_list())
 	{
 		CRITICAL_REGION_LOCAL(m_lock);
 		return invoke(uri, "POST", body, timeout, ppresponse_info, additional_params);
 	}
 	//---------------------------------------------------------------------------
-	bool test(const std::string &s, std::chrono::milliseconds timeout) // TEST FUNC ONLY
+	bool test(const std::string& s, std::chrono::milliseconds timeout) // TEST FUNC ONLY
 	{
 		CRITICAL_REGION_LOCAL(m_lock);
 		m_net_client.set_test_data(s);
@@ -481,7 +492,7 @@ class http_simple_client_template : public i_target_handler
 		}
 	}
 	//---------------------------------------------------------------------------
-	inline bool handle_header(std::string &recv_buff, bool &need_more_data)
+	inline bool handle_header(std::string& recv_buff, bool& need_more_data)
 	{
 
 		CRITICAL_REGION_LOCAL(m_lock);
@@ -518,7 +529,7 @@ class http_simple_client_template : public i_target_handler
 		return true;
 	}
 	//---------------------------------------------------------------------------
-	inline bool handle_body_content_len(std::string &recv_buff, bool &need_more_data)
+	inline bool handle_body_content_len(std::string& recv_buff, bool& need_more_data)
 	{
 		CRITICAL_REGION_LOCAL(m_lock);
 		if(!recv_buff.size())
@@ -543,7 +554,7 @@ class http_simple_client_template : public i_target_handler
 		return true;
 	}
 	//---------------------------------------------------------------------------
-	inline bool handle_body_connection_close(std::string &recv_buff, bool &need_more_data)
+	inline bool handle_body_connection_close(std::string& recv_buff, bool& need_more_data)
 	{
 		CRITICAL_REGION_LOCAL(m_lock);
 		if(!recv_buff.size())
@@ -566,7 +577,7 @@ class http_simple_client_template : public i_target_handler
 			return false;
 	}
 	//---------------------------------------------------------------------------
-	inline bool get_len_from_chunk_head(const std::string &chunk_head, size_t &result_size)
+	inline bool get_len_from_chunk_head(const std::string& chunk_head, size_t& result_size)
 	{
 		std::stringstream str_stream;
 		str_stream << std::hex;
@@ -576,7 +587,7 @@ class http_simple_client_template : public i_target_handler
 		return true;
 	}
 	//---------------------------------------------------------------------------
-	inline bool get_chunk_head(std::string &buff, size_t &chunk_size, bool &is_matched)
+	inline bool get_chunk_head(std::string& buff, size_t& chunk_size, bool& is_matched)
 	{
 		is_matched = false;
 		size_t offset = 0;
@@ -631,7 +642,7 @@ class http_simple_client_template : public i_target_handler
 		return true;
 	}
 	//---------------------------------------------------------------------------
-	inline bool handle_body_body_chunked(std::string &recv_buff, bool &need_more_data)
+	inline bool handle_body_body_chunked(std::string& recv_buff, bool& need_more_data)
 	{
 		CRITICAL_REGION_LOCAL(m_lock);
 		if(!recv_buff.size())
@@ -726,39 +737,39 @@ class http_simple_client_template : public i_target_handler
 		return true;
 	}
 	//---------------------------------------------------------------------------
-	inline bool parse_header(http_header_info &body_info, const std::string &m_cache_to_process)
+	inline bool parse_header(http_header_info& body_info, const std::string& m_cache_to_process)
 	{
 		GULPS_LOG_L2("http_stream_filter::parse_cached_header(*)");
 
-		const char *ptr = m_cache_to_process.c_str();
+		const char* ptr = m_cache_to_process.c_str();
 		while(ptr[0] != '\r' || ptr[1] != '\n')
 		{
 			// optional \n
 			if(*ptr == '\n')
 				++ptr;
 			// an identifier composed of letters or -
-			const char *key_pos = ptr;
+			const char* key_pos = ptr;
 			while(isalnum(*ptr) || *ptr == '_' || *ptr == '-')
 				++ptr;
-			const char *key_end = ptr;
+			const char* key_end = ptr;
 			// optional space (not in RFC, but in previous code)
 			if(*ptr == ' ')
 				++ptr;
-			GULPS_CHECK_AND_ASSERT_MES(*ptr == ':', true, "http_stream_filter::parse_cached_header() invalid header in: " , m_cache_to_process);
+			GULPS_CHECK_AND_ASSERT_MES(*ptr == ':', true, "http_stream_filter::parse_cached_header() invalid header in: ", m_cache_to_process);
 			++ptr;
 			// optional whitespace, but not newlines - line folding is obsolete, let's ignore it
 			while(isblank(*ptr))
 				++ptr;
-			const char *value_pos = ptr;
+			const char* value_pos = ptr;
 			while(*ptr != '\r' && *ptr != '\n')
 				++ptr;
-			const char *value_end = ptr;
+			const char* value_end = ptr;
 			// optional trailing whitespace
 			while(value_end > value_pos && isblank(*(value_end - 1)))
 				--value_end;
 			if(*ptr == '\r')
 				++ptr;
-			GULPS_CHECK_AND_ASSERT_MES(*ptr == '\n', true, "http_stream_filter::parse_cached_header() invalid header in: " , m_cache_to_process);
+			GULPS_CHECK_AND_ASSERT_MES(*ptr == '\n', true, "http_stream_filter::parse_cached_header() invalid header in: ", m_cache_to_process);
 			++ptr;
 
 			const std::string key = std::string(key_pos, key_end - key_pos);
@@ -795,19 +806,19 @@ class http_simple_client_template : public i_target_handler
 	inline bool analize_first_response_line()
 	{
 		//First line response, look like this:	"HTTP/1.1 200 OK"
-		const char *ptr = m_header_cache.c_str();
+		const char* ptr = m_header_cache.c_str();
 		GULPS_CHECK_AND_ASSERT_MES(!memcmp(ptr, "HTTP/", 5), false, "Invalid first response line: " + m_header_cache);
 		ptr += 5;
 		GULPS_CHECK_AND_ASSERT_MES(isdigit(*ptr), false, "Invalid first response line: " + m_header_cache);
 		unsigned long ul;
-		char *end;
+		char* end;
 		ul = strtoul(ptr, &end, 10);
 		GULPS_CHECK_AND_ASSERT_MES(ul <= INT_MAX && *end == '.', false, "Invalid first response line: " + m_header_cache);
 		m_response_info.m_http_ver_hi = ul;
 		ptr = end + 1;
-		GULPS_CHECK_AND_ASSERT_MES(isdigit(*ptr), false, "Invalid first response line: " + m_header_cache + ", ptr: " , ptr);
+		GULPS_CHECK_AND_ASSERT_MES(isdigit(*ptr), false, "Invalid first response line: " + m_header_cache + ", ptr: ", ptr);
 		ul = strtoul(ptr, &end, 10);
-		GULPS_CHECK_AND_ASSERT_MES(ul <= INT_MAX && isblank(*end), false, "Invalid first response line: " + m_header_cache + ", ptr: " , ptr);
+		GULPS_CHECK_AND_ASSERT_MES(ul <= INT_MAX && isblank(*end), false, "Invalid first response line: " + m_header_cache + ", ptr: ", ptr);
 		m_response_info.m_http_ver_lo = ul;
 		ptr = end + 1;
 		while(isblank(*ptr))
@@ -822,7 +833,7 @@ class http_simple_client_template : public i_target_handler
 			++ptr;
 		if(*ptr == '\r')
 			++ptr;
-		GULPS_CHECK_AND_ASSERT_MES(*ptr == '\n', false, "Invalid first response line: " , m_header_cache);
+		GULPS_CHECK_AND_ASSERT_MES(*ptr == '\n', false, "Invalid first response line: ", m_header_cache);
 		++ptr;
 
 		m_header_cache.erase(0, ptr - m_header_cache.c_str());
@@ -856,7 +867,7 @@ class http_simple_client_template : public i_target_handler
 		std::string fake_str; //gcc error workaround
 
 		bool res = parse_header(m_response_info.m_header_info, m_header_cache);
-		GULPS_CHECK_AND_ASSERT_MES(res, false, "http_stream_filter::analize_cached_reply_header_and_invoke_state(): failed to anilize reply header: " , m_header_cache);
+		GULPS_CHECK_AND_ASSERT_MES(res, false, "http_stream_filter::analize_cached_reply_header_and_invoke_state(): failed to anilize reply header: ", m_header_cache);
 
 		set_reply_content_encoder();
 
@@ -922,7 +933,7 @@ class http_simple_client_template : public i_target_handler
 		}
 		return false;
 	}
-	inline bool is_connection_close_field(const std::string &str)
+	inline bool is_connection_close_field(const std::string& str)
 	{
 		STATIC_REGEXP_EXPR_1(rexp_match_close, "^\\s*close", boost::regex::icase | boost::regex::normal);
 		boost::smatch result;
@@ -931,7 +942,7 @@ class http_simple_client_template : public i_target_handler
 		else
 			return false;
 	}
-	inline bool is_multipart_body(const http_header_info &head_info, OUT std::string &boundary)
+	inline bool is_multipart_body(const http_header_info& head_info, OUT std::string& boundary)
 	{
 		//Check whether this is multi part - if yes, capture boundary immediately
 		STATIC_REGEXP_EXPR_1(rexp_match_multipart_type, "^\\s*multipart/([\\w\\-]+); boundary=((\"(.*?)\")|(\\\\\"(.*?)\\\\\")|([^\\s;]*))", boost::regex::icase | boost::regex::normal);
@@ -958,6 +969,6 @@ class http_simple_client_template : public i_target_handler
 	}
 };
 typedef http_simple_client_template<blocked_mode_client> http_simple_client;
-}
-}
-}
+} // namespace http
+} // namespace net_utils
+} // namespace epee

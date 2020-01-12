@@ -58,7 +58,8 @@ struct sock_list;
 /**
  * Response classifications for the validator. The different types of proofs.
  */
-enum val_classification {
+enum val_classification
+{
 	/** Not subtyped yet. */
 	VAL_CLASS_UNTYPED = 0,
 	/** Not a recognized subtype. */
@@ -92,7 +93,7 @@ enum val_classification {
  * 	Then, another CNAME type, CNAME_NOANSWER or POSITIVE are possible.
  */
 enum val_classification val_classify_response(uint16_t query_flags,
-	struct query_info* origqinf, struct query_info* qinf, 
+	struct query_info* origqinf, struct query_info* qinf,
 	struct reply_info* rep, size_t skip);
 
 /**
@@ -109,7 +110,7 @@ enum val_classification val_classify_response(uint16_t query_flags,
  * 	(even partially), or null if the response isn't signed.
  * @param signer_len: length of signer_name of 0 if signer_name is NULL.
  */
-void val_find_signer(enum val_classification subtype, 
+void val_find_signer(enum val_classification subtype,
 	struct query_info* qinf, struct reply_info* rep,
 	size_t cname_skip, uint8_t** signer_name, size_t* signer_len);
 
@@ -142,8 +143,8 @@ enum sec_status val_verify_rrset(struct module_env* env, struct val_env* ve,
  * @param qstate: qstate with region.
  * @return security status of verification.
  */
-enum sec_status val_verify_rrset_entry(struct module_env* env, 
-	struct val_env* ve, struct ub_packed_rrset_key* rrset, 
+enum sec_status val_verify_rrset_entry(struct module_env* env,
+	struct val_env* ve, struct ub_packed_rrset_key* rrset,
 	struct key_entry_key* kkey, char** reason, sldns_pkt_section section,
 	struct module_qstate* qstate);
 
@@ -163,8 +164,8 @@ enum sec_status val_verify_rrset_entry(struct module_env* env,
  *     sec_status_insecure if end of trust (i.e., unknown algorithms).
  *     sec_status_bogus if it fails.
  */
-enum sec_status val_verify_DNSKEY_with_DS(struct module_env* env, 
-	struct val_env* ve, struct ub_packed_rrset_key* dnskey_rrset, 
+enum sec_status val_verify_DNSKEY_with_DS(struct module_env* env,
+	struct val_env* ve, struct ub_packed_rrset_key* dnskey_rrset,
 	struct ub_packed_rrset_key* ds_rrset, uint8_t* sigalg, char** reason,
 	struct module_qstate* qstate);
 
@@ -185,8 +186,8 @@ enum sec_status val_verify_DNSKEY_with_DS(struct module_env* env,
  *     sec_status_insecure if end of trust (i.e., unknown algorithms).
  *     sec_status_bogus if it fails.
  */
-enum sec_status val_verify_DNSKEY_with_TA(struct module_env* env, 
-	struct val_env* ve, struct ub_packed_rrset_key* dnskey_rrset, 
+enum sec_status val_verify_DNSKEY_with_TA(struct module_env* env,
+	struct val_env* ve, struct ub_packed_rrset_key* dnskey_rrset,
 	struct ub_packed_rrset_key* ta_ds,
 	struct ub_packed_rrset_key* ta_dnskey, uint8_t* sigalg, char** reason,
 	struct module_qstate* qstate);
@@ -215,12 +216,11 @@ enum sec_status val_verify_DNSKEY_with_TA(struct module_env* env,
  *         rrset.
  *         if downprot is set, a key entry with an algo list is made.
  */
-struct key_entry_key* val_verify_new_DNSKEYs(struct regional* region, 
-	struct module_env* env, struct val_env* ve, 
-	struct ub_packed_rrset_key* dnskey_rrset, 
+struct key_entry_key* val_verify_new_DNSKEYs(struct regional* region,
+	struct module_env* env, struct val_env* ve,
+	struct ub_packed_rrset_key* dnskey_rrset,
 	struct ub_packed_rrset_key* ds_rrset, int downprot, char** reason,
 	struct module_qstate* qstate);
-
 
 /**
  * Verify rrset with trust anchor: DS and DNSKEY rrset.
@@ -245,10 +245,10 @@ struct key_entry_key* val_verify_new_DNSKEYs(struct regional* region,
  *         rrset.
  *         if downprot is set, a key entry with an algo list is made.
  */
-struct key_entry_key* val_verify_new_DNSKEYs_with_ta(struct regional* region, 
-	struct module_env* env, struct val_env* ve, 
-	struct ub_packed_rrset_key* dnskey_rrset, 
-	struct ub_packed_rrset_key* ta_ds_rrset, 
+struct key_entry_key* val_verify_new_DNSKEYs_with_ta(struct regional* region,
+	struct module_env* env, struct val_env* ve,
+	struct ub_packed_rrset_key* dnskey_rrset,
+	struct ub_packed_rrset_key* ta_ds_rrset,
 	struct ub_packed_rrset_key* ta_dnskey_rrset,
 	int downprot, char** reason, struct module_qstate* qstate);
 
@@ -308,7 +308,7 @@ int val_chase_cname(struct query_info* qchase, struct reply_info* rep,
  * @param signer: signer name or NULL if an unsigned RRset is considered.
  *	If NULL, rrsets with the lookup name are copied over.
  */
-void val_fill_reply(struct reply_info* chase, struct reply_info* orig, 
+void val_fill_reply(struct reply_info* chase, struct reply_info* orig,
 	size_t cname_skip, uint8_t* name, size_t len, uint8_t* signer);
 
 /**
@@ -336,8 +336,8 @@ void val_check_nonsecure(struct module_env* env, struct reply_info* rep);
  * @param r: rrset cache to store updated security status into.
  * @param env: module environment
  */
-void val_mark_indeterminate(struct reply_info* rep, 
-	struct val_anchors* anchors, struct rrset_cache* r, 
+void val_mark_indeterminate(struct reply_info* rep,
+	struct val_anchors* anchors, struct rrset_cache* r,
 	struct module_env* env);
 
 /**

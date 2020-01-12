@@ -63,8 +63,8 @@ namespace Ryo
 
 UnsignedTransaction::~UnsignedTransaction() {}
 
-UnsignedTransactionImpl::UnsignedTransactionImpl(WalletImpl &wallet)
-	: m_wallet(wallet)
+UnsignedTransactionImpl::UnsignedTransactionImpl(WalletImpl& wallet) :
+	m_wallet(wallet)
 {
 	m_status = Status_Ok;
 }
@@ -84,7 +84,7 @@ string UnsignedTransactionImpl::errorString() const
 	return m_errorString;
 }
 
-bool UnsignedTransactionImpl::sign(const std::string &signedFileName)
+bool UnsignedTransactionImpl::sign(const std::string& signedFileName)
 {
 	if(m_wallet.watchOnly())
 	{
@@ -103,7 +103,7 @@ bool UnsignedTransactionImpl::sign(const std::string &signedFileName)
 			return false;
 		}
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		m_errorString = string(tr("Failed to sign transaction")) + e.what();
 		m_status = Status_Error;
@@ -113,7 +113,7 @@ bool UnsignedTransactionImpl::sign(const std::string &signedFileName)
 }
 
 //----------------------------------------------------------------------------------------------------
-bool UnsignedTransactionImpl::checkLoadedTx(const std::function<size_t()> get_num_txes, const std::function<const tools::wallet2::tx_construction_data &(size_t)> &get_tx, const std::string &extra_message)
+bool UnsignedTransactionImpl::checkLoadedTx(const std::function<size_t()> get_num_txes, const std::function<const tools::wallet2::tx_construction_data&(size_t)>& get_tx, const std::string& extra_message)
 {
 	// gather info to ask the user
 	uint64_t amount = 0, amount_to_dests = 0, change = 0;
@@ -123,7 +123,7 @@ bool UnsignedTransactionImpl::checkLoadedTx(const std::function<size_t()> get_nu
 	std::string payment_id_string = "";
 	for(size_t n = 0; n < get_num_txes(); ++n)
 	{
-		const tools::wallet2::tx_construction_data &cd = get_tx(n);
+		const tools::wallet2::tx_construction_data& cd = get_tx(n);
 
 		std::vector<cryptonote::tx_extra_field> tx_extra_fields;
 		bool has_encrypted_payment_id = false;
@@ -159,7 +159,7 @@ bool UnsignedTransactionImpl::checkLoadedTx(const std::function<size_t()> get_nu
 		}
 		for(size_t d = 0; d < cd.splitted_dsts.size(); ++d)
 		{
-			const cryptonote::tx_destination_entry &entry = cd.splitted_dsts[d];
+			const cryptonote::tx_destination_entry& entry = cd.splitted_dsts[d];
 			std::string address, standard_address = get_account_address_as_str(m_wallet.m_wallet->nettype(), entry.is_subaddress, entry.addr);
 			if(has_encrypted_payment_id && !entry.is_subaddress)
 			{
@@ -234,9 +234,9 @@ bool UnsignedTransactionImpl::checkLoadedTx(const std::function<size_t()> get_nu
 std::vector<uint64_t> UnsignedTransactionImpl::amount() const
 {
 	std::vector<uint64_t> result;
-	for(const auto &utx : m_unsigned_tx_set.txes)
+	for(const auto& utx : m_unsigned_tx_set.txes)
 	{
-		for(const auto &unsigned_dest : utx.dests)
+		for(const auto& unsigned_dest : utx.dests)
 		{
 			result.push_back(unsigned_dest.amount);
 		}
@@ -247,12 +247,12 @@ std::vector<uint64_t> UnsignedTransactionImpl::amount() const
 std::vector<uint64_t> UnsignedTransactionImpl::fee() const
 {
 	std::vector<uint64_t> result;
-	for(const auto &utx : m_unsigned_tx_set.txes)
+	for(const auto& utx : m_unsigned_tx_set.txes)
 	{
 		uint64_t fee = 0;
-		for(const auto &i : utx.sources)
+		for(const auto& i : utx.sources)
 			fee += i.amount;
-		for(const auto &i : utx.splitted_dsts)
+		for(const auto& i : utx.splitted_dsts)
 			fee -= i.amount;
 		result.push_back(fee);
 	}
@@ -262,7 +262,7 @@ std::vector<uint64_t> UnsignedTransactionImpl::fee() const
 std::vector<uint64_t> UnsignedTransactionImpl::mixin() const
 {
 	std::vector<uint64_t> result;
-	for(const auto &utx : m_unsigned_tx_set.txes)
+	for(const auto& utx : m_unsigned_tx_set.txes)
 	{
 		size_t min_mixin = ~0;
 		// TODO: Is this loop needed or is sources[0] ?
@@ -285,7 +285,7 @@ uint64_t UnsignedTransactionImpl::txCount() const
 std::vector<std::string> UnsignedTransactionImpl::paymentId() const
 {
 	std::vector<string> result;
-	for(const auto &utx : m_unsigned_tx_set.txes)
+	for(const auto& utx : m_unsigned_tx_set.txes)
 	{
 		crypto::hash payment_id = crypto::null_hash;
 		cryptonote::tx_extra_nonce extra_nonce;
@@ -316,7 +316,7 @@ std::vector<std::string> UnsignedTransactionImpl::recipientAddress() const
 {
 	// TODO: return integrated address if short payment ID exists
 	std::vector<string> result;
-	for(const auto &utx : m_unsigned_tx_set.txes)
+	for(const auto& utx : m_unsigned_tx_set.txes)
 	{
 		if(utx.dests.empty())
 		{
@@ -331,7 +331,7 @@ std::vector<std::string> UnsignedTransactionImpl::recipientAddress() const
 uint64_t UnsignedTransactionImpl::minMixinCount() const
 {
 	uint64_t min_mixin = ~0;
-	for(const auto &utx : m_unsigned_tx_set.txes)
+	for(const auto& utx : m_unsigned_tx_set.txes)
 	{
 		for(size_t s = 0; s < utx.sources.size(); ++s)
 		{
@@ -343,4 +343,4 @@ uint64_t UnsignedTransactionImpl::minMixinCount() const
 	return min_mixin;
 }
 
-} // namespace
+} // namespace Ryo

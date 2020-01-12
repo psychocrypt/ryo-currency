@@ -10,7 +10,7 @@
 
 #ifdef memcmp
 /* undef here otherwise autoheader messes it up in config.h */
-#  undef memcmp
+#undef memcmp
 #endif
 
 #endif /* COMPAT_MEMCMP_H */

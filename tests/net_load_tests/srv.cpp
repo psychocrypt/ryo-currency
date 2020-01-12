@@ -39,28 +39,29 @@
 
 using namespace net_load_tests;
 
-#define EXIT_ON_ERROR(cond)                   \
-	{                                         \
-		if(!(cond))                           \
-		{                                     \
+#define EXIT_ON_ERROR(cond)                               \
+	{                                                     \
+		if(!(cond))                                       \
+		{                                                 \
 			std::cout << "ERROR: " << #cond << std::endl; \
-			exit(1);                          \
-		}                                     \
-		else                                  \
-		{                                     \
-		}                                     \
+			exit(1);                                      \
+		}                                                 \
+		else                                              \
+		{                                                 \
+		}                                                 \
 	}
 
 namespace
 {
 struct srv_levin_commands_handler : public test_levin_commands_handler
 {
-	srv_levin_commands_handler(test_tcp_server &tcp_server)
-		: m_tcp_server(tcp_server), m_open_close_test_conn_id(boost::uuids::nil_uuid())
+	srv_levin_commands_handler(test_tcp_server& tcp_server) :
+		m_tcp_server(tcp_server),
+		m_open_close_test_conn_id(boost::uuids::nil_uuid())
 	{
 	}
 
-	virtual void on_connection_new(test_connection_context &context)
+	virtual void on_connection_new(test_connection_context& context)
 	{
 		test_levin_commands_handler::on_connection_new(context);
 		context.m_closed = false;
@@ -74,7 +75,7 @@ struct srv_levin_commands_handler : public test_levin_commands_handler
 		}
 	}
 
-	virtual void on_connection_close(test_connection_context &context)
+	virtual void on_connection_close(test_connection_context& context)
 	{
 		test_levin_commands_handler::on_connection_close(context);
 
@@ -99,13 +100,13 @@ struct srv_levin_commands_handler : public test_levin_commands_handler
 	HANDLE_INVOKE_T2(CMD_START_OPEN_CLOSE_TEST, &srv_levin_commands_handler::handle_start_open_close_test)
 	END_INVOKE_MAP2()
 
-	int handle_close_all_connections(int command, const CMD_CLOSE_ALL_CONNECTIONS::request &req, test_connection_context &context)
+	int handle_close_all_connections(int command, const CMD_CLOSE_ALL_CONNECTIONS::request& req, test_connection_context& context)
 	{
 		close_connections(context.m_connection_id);
 		return 1;
 	}
 
-	int handle_get_statistics(int command, const CMD_GET_STATISTICS::request &, CMD_GET_STATISTICS::response &rsp, test_connection_context & /*context*/)
+	int handle_get_statistics(int command, const CMD_GET_STATISTICS::request&, CMD_GET_STATISTICS::response& rsp, test_connection_context& /*context*/)
 	{
 		rsp.opened_connections_count = m_tcp_server.get_config_object().get_connections_count();
 		rsp.new_connection_counter = new_connection_counter();
@@ -114,7 +115,7 @@ struct srv_levin_commands_handler : public test_levin_commands_handler
 		return 1;
 	}
 
-	int handle_reset_statistics(int command, const CMD_RESET_STATISTICS::request &, CMD_RESET_STATISTICS::response & /*rsp*/, test_connection_context & /*context*/)
+	int handle_reset_statistics(int command, const CMD_RESET_STATISTICS::request&, CMD_RESET_STATISTICS::response& /*rsp*/, test_connection_context& /*context*/)
 	{
 		m_new_connection_counter.reset();
 		m_new_connection_counter.inc();
@@ -122,7 +123,7 @@ struct srv_levin_commands_handler : public test_levin_commands_handler
 		return 1;
 	}
 
-	int handle_start_open_close_test(int command, const CMD_START_OPEN_CLOSE_TEST::request &req, CMD_START_OPEN_CLOSE_TEST::response &, test_connection_context &context)
+	int handle_start_open_close_test(int command, const CMD_START_OPEN_CLOSE_TEST::request& req, CMD_START_OPEN_CLOSE_TEST::response&, test_connection_context& context)
 	{
 		boost::unique_lock<boost::mutex> lock(m_open_close_test_mutex);
 		if(0 == m_open_close_test_helper.get())
@@ -139,29 +140,29 @@ struct srv_levin_commands_handler : public test_levin_commands_handler
 		}
 	}
 
-	int handle_shutdown(int command, const CMD_SHUTDOWN::request &req, test_connection_context & /*context*/)
+	int handle_shutdown(int command, const CMD_SHUTDOWN::request& req, test_connection_context& /*context*/)
 	{
 		std::cout << "Got shutdown request. Shutting down..." << std::endl;
 		m_tcp_server.send_stop_signal();
 		return 1;
 	}
 
-	int handle_send_data_requests(int /*command*/, const CMD_SEND_DATA_REQUESTS::request &req, test_connection_context &context)
+	int handle_send_data_requests(int /*command*/, const CMD_SEND_DATA_REQUESTS::request& req, test_connection_context& context)
 	{
 		boost::uuids::uuid cmd_conn_id = context.m_connection_id;
-		m_tcp_server.get_config_object().foreach_connection([&](test_connection_context &ctx) {
+		m_tcp_server.get_config_object().foreach_connection([&](test_connection_context& ctx) {
 			if(ctx.m_connection_id != cmd_conn_id)
 			{
 				CMD_DATA_REQUEST::request req2;
 				req2.data.resize(req.request_size);
 
 				bool r = epee::net_utils::async_invoke_remote_command2<CMD_DATA_REQUEST::response>(ctx.m_connection_id, CMD_DATA_REQUEST::ID, req2,
-																								   m_tcp_server.get_config_object(), [=](int code, const CMD_DATA_REQUEST::response &rsp, const test_connection_context &) {
-																									   if(code <= 0)
-																									   {
-																										   std::cout << "Failed to invoke CMD_DATA_REQUEST. code = " << code << std::endl;
-																									   }
-																								   });
+					m_tcp_server.get_config_object(), [=](int code, const CMD_DATA_REQUEST::response& rsp, const test_connection_context&) {
+						if(code <= 0)
+						{
+							std::cout << "Failed to invoke CMD_DATA_REQUEST. code = " << code << std::endl;
+						}
+					});
 				if(!r)
 					std::cout << "Failed to invoke CMD_DATA_REQUEST" << std::endl;
 			}
@@ -177,7 +178,7 @@ struct srv_levin_commands_handler : public test_levin_commands_handler
 		std::cout << "Closing connections. Number of opened connections: " << m_tcp_server.get_config_object().get_connections_count() << std::endl;
 
 		size_t count = 0;
-		bool r = m_tcp_server.get_config_object().foreach_connection([&](test_connection_context &ctx) {
+		bool r = m_tcp_server.get_config_object().foreach_connection([&](test_connection_context& ctx) {
 			if(ctx.m_connection_id != cmd_conn_id)
 			{
 				++count;
@@ -198,7 +199,7 @@ struct srv_levin_commands_handler : public test_levin_commands_handler
 		{
 			// Perhaps not all connections were closed, try to close it after 7 seconds
 			boost::shared_ptr<boost::asio::deadline_timer> sh_deadline(new boost::asio::deadline_timer(m_tcp_server.get_io_service(), boost::posix_time::seconds(7)));
-			sh_deadline->async_wait([=](const boost::system::error_code &ec) {
+			sh_deadline->async_wait([=](const boost::system::error_code& ec) {
 				boost::shared_ptr<boost::asio::deadline_timer> t = sh_deadline; // Capture sh_deadline
 				if(!ec)
 				{
@@ -213,19 +214,18 @@ struct srv_levin_commands_handler : public test_levin_commands_handler
 	}
 
   private:
-	test_tcp_server &m_tcp_server;
+	test_tcp_server& m_tcp_server;
 
 	boost::uuids::uuid m_open_close_test_conn_id;
 	boost::mutex m_open_close_test_mutex;
 	std::unique_ptr<open_close_test_helper> m_open_close_test_helper;
 };
-}
+} // namespace
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 	tools::on_startup();
 	//set up logging options
-	
 
 	size_t thread_count = (std::max)(min_thread_count, boost::thread::hardware_concurrency() / 2);
 
@@ -233,8 +233,8 @@ int main(int argc, char **argv)
 	if(!tcp_server.init_server(srv_port, "127.0.0.1"))
 		return 1;
 
-	srv_levin_commands_handler *commands_handler = new srv_levin_commands_handler(tcp_server);
-	tcp_server.get_config_object().set_handler(commands_handler, [](epee::levin::levin_commands_handler<test_connection_context> *handler) { delete handler; });
+	srv_levin_commands_handler* commands_handler = new srv_levin_commands_handler(tcp_server);
+	tcp_server.get_config_object().set_handler(commands_handler, [](epee::levin::levin_commands_handler<test_connection_context>* handler) { delete handler; });
 	tcp_server.get_config_object().m_invoke_timeout = 10000;
 	//tcp_server.get_config_object().m_max_packet_size = max_packet_size;
 

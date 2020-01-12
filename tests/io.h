@@ -34,7 +34,7 @@
 #include <type_traits>
 #include <vector>
 
-inline bool hexdecode(const char *from, std::size_t length, void *to)
+inline bool hexdecode(const char* from, std::size_t length, void* to)
 {
 	std::size_t i;
 	for(i = 0; i < length; i++)
@@ -65,12 +65,12 @@ inline bool hexdecode(const char *from, std::size_t length, void *to)
 		{
 			return false;
 		}
-		*(reinterpret_cast<unsigned char *>(to) + i) = v;
+		*(reinterpret_cast<unsigned char*>(to) + i) = v;
 	}
 	return true;
 }
 
-inline void get(std::istream &input, bool &res)
+inline void get(std::istream& input, bool& res)
 {
 	std::string sres;
 	input >> sres;
@@ -90,12 +90,12 @@ inline void get(std::istream &input, bool &res)
 
 template <typename T>
 typename std::enable_if<std::is_integral<T>::value, void>::type
-get(std::istream &input, T &res)
+get(std::istream& input, T& res)
 {
 	input >> res;
 }
 
-inline void getvar(std::istream &input, std::size_t length, void *res)
+inline void getvar(std::istream& input, std::size_t length, void* res)
 {
 	std::string sres;
 	input >> sres;
@@ -107,12 +107,12 @@ inline void getvar(std::istream &input, std::size_t length, void *res)
 
 template <typename T>
 typename std::enable_if<std::is_standard_layout<T>::value && !std::is_scalar<T>::value, void>::type
-get(std::istream &input, T &res)
+get(std::istream& input, T& res)
 {
 	getvar(input, sizeof(T), &res);
 }
 
-inline void get(std::istream &input, std::vector<char> &res)
+inline void get(std::istream& input, std::vector<char>& res)
 {
 	std::string sres;
 	input >> sres;
@@ -139,7 +139,7 @@ inline void get(std::istream &input, std::vector<char> &res)
 
 template <typename T, typename... TT>
 typename std::enable_if<(sizeof...(TT) > 0), void>::type
-get(std::istream &input, T &res, TT &... resres)
+get(std::istream& input, T& res, TT&... resres)
 {
 	get(input, res);
 	get(input, resres...);
@@ -155,7 +155,7 @@ get(std::istream &input, T &res, TT &... resres)
 #define NESTED_GET(z, n, data) get(input, BOOST_PP_CAT(res, n));
 #define GET(z, n, data)                                                    \
 	template <BOOST_PP_ENUM_PARAMS(n, typename T)>                         \
-	void get(std::istream &input, BOOST_PP_ENUM_BINARY_PARAMS(n, T, &res)) \
+	void get(std::istream& input, BOOST_PP_ENUM_BINARY_PARAMS(n, T, &res)) \
 	{                                                                      \
 		BOOST_PP_REPEAT(n, NESTED_GET, ~)                                  \
 	}

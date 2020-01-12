@@ -49,28 +49,28 @@
 #include <set>
 
 template <template <bool> class Archive, class T>
-bool do_serialize(Archive<false> &ar, std::set<T> &v);
+bool do_serialize(Archive<false>& ar, std::set<T>& v);
 template <template <bool> class Archive, class T>
-bool do_serialize(Archive<true> &ar, std::set<T> &v);
+bool do_serialize(Archive<true>& ar, std::set<T>& v);
 
 namespace serialization
 {
 namespace detail
 {
 template <typename T>
-void do_add(std::set<T> &c, T &&e)
+void do_add(std::set<T>& c, T&& e)
 {
 	c.insert(std::move(e));
 }
-}
-}
+} // namespace detail
+} // namespace serialization
 
 #include "serialization.h"
 
 template <template <bool> class Archive, class T>
-bool do_serialize(Archive<false> &ar, std::set<T> &v)
+bool do_serialize(Archive<false>& ar, std::set<T>& v)
 {
 	return do_serialize_container(ar, v);
 }
 template <template <bool> class Archive, class T>
-bool do_serialize(Archive<true> &ar, std::set<T> &v) { return do_serialize_container(ar, v); }
+bool do_serialize(Archive<true>& ar, std::set<T>& v) { return do_serialize_container(ar, v); }

@@ -144,7 +144,7 @@ TEST(DNSResolver, GetTXTRecord)
 
 	EXPECT_NE(0, records.size());
 
-	for(auto &rec : records)
+	for(auto& rec : records)
 	{
 		std::cout << "TXT record for donate.getmonero.org: " << rec << std::endl;
 	}
@@ -158,7 +158,7 @@ TEST(DNSResolver, GetTXTRecord)
 	EXPECT_STREQ("donate.getmonero.org", addr.c_str());
 }
 
-bool is_equal(const char *s, const std::vector<std::string> &v) { return v.size() == 1 && v[0] == s; }
+bool is_equal(const char* s, const std::vector<std::string>& v) { return v.size() == 1 && v[0] == s; }
 
 TEST(DNS_PUBLIC, empty) { EXPECT_TRUE(tools::dns_utils::parse_dns_public("").empty()); }
 TEST(DNS_PUBLIC, default) { EXPECT_TRUE(tools::dns_utils::parse_dns_public("tcp").size() > 0); }

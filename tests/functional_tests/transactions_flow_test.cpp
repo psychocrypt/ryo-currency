@@ -44,7 +44,7 @@ namespace
 {
 uint64_t const TEST_FEE = 5000000000;			 // 5 * 10^9
 uint64_t const TEST_DUST_THRESHOLD = 5000000000; // 5 * 10^9
-}
+} // namespace
 
 std::string generate_random_wallet_name()
 {
@@ -56,13 +56,13 @@ std::string generate_random_wallet_name()
 inline uint64_t random(const uint64_t max_value)
 {
 	return (uint64_t(rand()) ^
-			(uint64_t(rand()) << 16) ^
-			(uint64_t(rand()) << 32) ^
-			(uint64_t(rand()) << 48)) %
+			   (uint64_t(rand()) << 16) ^
+			   (uint64_t(rand()) << 32) ^
+			   (uint64_t(rand()) << 48)) %
 		   max_value;
 }
 
-bool do_send_money(tools::wallet2 &w1, tools::wallet2 &w2, size_t mix_in_factor, uint64_t amount_to_transfer, transaction &tx, size_t parts = 1)
+bool do_send_money(tools::wallet2& w1, tools::wallet2& w2, size_t mix_in_factor, uint64_t amount_to_transfer, transaction& tx, size_t parts = 1)
 {
 	GULPS_CHECK_AND_ASSERT_MES(parts > 0, false, "parts must be > 0");
 
@@ -96,17 +96,17 @@ bool do_send_money(tools::wallet2 &w1, tools::wallet2 &w2, size_t mix_in_factor,
 		//w1.commit_tx(ptx);
 		return true;
 	}
-	catch(const std::exception &)
+	catch(const std::exception&)
 	{
 		return false;
 	}
 }
 
-uint64_t get_money_in_first_transfers(const tools::wallet2::transfer_container &incoming_transfers, size_t n_transfers)
+uint64_t get_money_in_first_transfers(const tools::wallet2::transfer_container& incoming_transfers, size_t n_transfers)
 {
 	uint64_t summ = 0;
 	size_t count = 0;
-	BOOST_FOREACH(const tools::wallet2::transfer_details &td, incoming_transfers)
+	BOOST_FOREACH(const tools::wallet2::transfer_details& td, incoming_transfers)
 	{
 		summ += td.m_tx.vout[td.m_internal_output_index].amount;
 		if(++count >= n_transfers)
@@ -117,12 +117,12 @@ uint64_t get_money_in_first_transfers(const tools::wallet2::transfer_container &
 
 #define FIRST_N_TRANSFERS 10 * 10
 
-bool transactions_flow_test(std::string &working_folder,
-							std::string path_source_wallet,
-							std::string path_target_wallet,
-							std::string &daemon_addr_a,
-							std::string &daemon_addr_b,
-							uint64_t amount_to_transfer, size_t mix_in_factor, size_t transactions_count, size_t transactions_per_second)
+bool transactions_flow_test(std::string& working_folder,
+	std::string path_source_wallet,
+	std::string path_target_wallet,
+	std::string& daemon_addr_a,
+	std::string& daemon_addr_b,
+	uint64_t amount_to_transfer, size_t mix_in_factor, size_t transactions_count, size_t transactions_per_second)
 {
 	std::cout << "-----------------------STARTING TRANSACTIONS FLOW TEST-----------------------" << std::endl;
 	tools::wallet2 w1, w2;
@@ -137,7 +137,7 @@ bool transactions_flow_test(std::string &working_folder,
 		w1.generate_new(working_folder + "/" + path_source_wallet, "");
 		w2.generate_new(working_folder + "/" + path_target_wallet, "");
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		std::cout << "failed to generate wallet: " << e.what() << std::endl;
 		return false;
@@ -157,8 +157,8 @@ bool transactions_flow_test(std::string &working_folder,
 	w2.init(daemon_addr_b);
 
 	std::cout << "Using wallets: \n"
-								   << "Source:  " << w1.get_account().get_public_address_str(MAINNET) << "\nPath: " << working_folder + "/" + path_source_wallet
-								   << "\nTarget:  " << w2.get_account().get_public_address_str(MAINNET) << "\nPath: " << working_folder + "/" + path_target_wallet << std::endl;
+			  << "Source:  " << w1.get_account().get_public_address_str(MAINNET) << "\nPath: " << working_folder + "/" + path_source_wallet
+			  << "\nTarget:  " << w2.get_account().get_public_address_str(MAINNET) << "\nPath: " << working_folder + "/" + path_target_wallet << std::endl;
 
 	//lets do some money
 	epee::net_utils::http::http_simple_client http_client;
@@ -194,7 +194,7 @@ bool transactions_flow_test(std::string &working_folder,
 		{
 			//lets go!
 			size_t count = 0;
-			BOOST_FOREACH(tools::wallet2::transfer_details &td, incoming_transfers)
+			BOOST_FOREACH(tools::wallet2::transfer_details& td, incoming_transfers)
 			{
 				cryptonote::transaction tx_s;
 				bool r = do_send_money(w1, w1, 0, td.m_tx.vout[td.m_internal_output_index].amount - TEST_FEE, tx_s, 50);
@@ -257,7 +257,7 @@ bool transactions_flow_test(std::string &working_folder,
 		transfered_money += amount_to_tx;
 
 		std::cout << "transferred " << amount_to_tx << ", i=" << i << std::endl;
-		tx_test_entry &ent = txs[get_transaction_hash(tx)] = boost::value_initialized<tx_test_entry>();
+		tx_test_entry& ent = txs[get_transaction_hash(tx)] = boost::value_initialized<tx_test_entry>();
 		ent.amount_transfered = amount_to_tx;
 		ent.tx = tx;
 		//if(i % transactions_per_second)
@@ -276,7 +276,7 @@ bool transactions_flow_test(std::string &working_folder,
 	uint64_t money_2 = w2.balance(0);
 	if(money_2 == transfered_money)
 	{
-		std::cout  <<"-----------------------FINISHING TRANSACTIONS FLOW TEST OK-----------------------" << std::endl;
+		std::cout << "-----------------------FINISHING TRANSACTIONS FLOW TEST OK-----------------------" << std::endl;
 		std::cout << "transferred " << print_money(transfered_money) << " via " << i << " transactions" << std::endl;
 		return true;
 	}
@@ -284,14 +284,14 @@ bool transactions_flow_test(std::string &working_folder,
 	{
 		tools::wallet2::transfer_container tc;
 		w2.get_transfers(tc);
-		BOOST_FOREACH(tools::wallet2::transfer_details &td, tc)
+		BOOST_FOREACH(tools::wallet2::transfer_details& td, tc)
 		{
 			auto it = txs.find(td.m_txid);
 			GULPS_CHECK_AND_ASSERT_MES(it != txs.end(), false, "transaction not found in local cache");
 			it->second.m_received_count += 1;
 		}
 
-		BOOST_FOREACH(auto &tx_pair, txs)
+		BOOST_FOREACH(auto& tx_pair, txs)
 		{
 			if(tx_pair.second.m_received_count != 1)
 			{

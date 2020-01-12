@@ -11,15 +11,16 @@ static void remove_line_handler();
 
 static boost::mutex sync_mutex;
 static rdln::linestatus line_stat;
-static char *the_line;
+static char* the_line;
 
 namespace
 {
-rdln::readline_buffer *current = NULL;
+rdln::readline_buffer* current = NULL;
 }
 
-rdln::suspend_readline::suspend_readline()
-	: m_buffer(NULL), m_restart(false)
+rdln::suspend_readline::suspend_readline() :
+	m_buffer(NULL),
+	m_restart(false)
 {
 	m_buffer = current;
 	if(!m_buffer)
@@ -37,14 +38,15 @@ rdln::suspend_readline::~suspend_readline()
 		m_buffer->start();
 }
 
-std::vector<std::string> &rdln::readline_buffer::completion_commands()
+std::vector<std::string>& rdln::readline_buffer::completion_commands()
 {
 	static std::vector<std::string> commands = {"exit"};
 	return commands;
 }
 
-rdln::readline_buffer::readline_buffer()
-	: std::stringbuf(), m_cout_buf(NULL)
+rdln::readline_buffer::readline_buffer() :
+	std::stringbuf(),
+	m_cout_buf(NULL)
 {
 	current = this;
 }
@@ -67,7 +69,7 @@ void rdln::readline_buffer::stop()
 	remove_line_handler();
 }
 
-rdln::linestatus rdln::readline_buffer::get_line(std::string &line) const
+rdln::linestatus rdln::readline_buffer::get_line(std::string& line) const
 {
 	boost::lock_guard<boost::mutex> lock(sync_mutex);
 	line_stat = rdln::partial;
@@ -81,7 +83,7 @@ rdln::linestatus rdln::readline_buffer::get_line(std::string &line) const
 	return line_stat;
 }
 
-void rdln::readline_buffer::set_prompt(const std::string &prompt)
+void rdln::readline_buffer::set_prompt(const std::string& prompt)
 {
 	if(m_cout_buf == NULL)
 		return;
@@ -90,14 +92,14 @@ void rdln::readline_buffer::set_prompt(const std::string &prompt)
 	rl_redisplay();
 }
 
-void rdln::readline_buffer::add_completion(const std::string &command)
+void rdln::readline_buffer::add_completion(const std::string& command)
 {
 	if(std::find(completion_commands().begin(), completion_commands().end(), command) != completion_commands().end())
 		return;
 	completion_commands().push_back(command);
 }
 
-const std::vector<std::string> &rdln::readline_buffer::get_completions()
+const std::vector<std::string>& rdln::readline_buffer::get_completions()
 {
 	return completion_commands();
 }
@@ -107,7 +109,7 @@ int rdln::readline_buffer::sync()
 	boost::lock_guard<boost::mutex> lock(sync_mutex);
 #if RL_READLINE_VERSION < 0x0700
 	char lbuf[2] = {0, 0};
-	char *line = NULL;
+	char* line = NULL;
 	int end = 0, point = 0;
 #endif
 
@@ -147,7 +149,7 @@ int rdln::readline_buffer::sync()
 	return 0;
 }
 
-static void handle_line(char *line)
+static void handle_line(char* line)
 {
 	bool exit = false;
 	if(line)
@@ -176,7 +178,7 @@ static void handle_line(char *line)
 	return;
 }
 
-static char *completion_matches(const char *text, int state)
+static char* completion_matches(const char* text, int state)
 {
 	static size_t list_index;
 	static size_t len;
@@ -187,10 +189,10 @@ static char *completion_matches(const char *text, int state)
 		len = strlen(text);
 	}
 
-	const std::vector<std::string> &completions = rdln::readline_buffer::get_completions();
+	const std::vector<std::string>& completions = rdln::readline_buffer::get_completions();
 	for(; list_index < completions.size();)
 	{
-		const std::string &cmd = completions[list_index++];
+		const std::string& cmd = completions[list_index++];
 		if(cmd.compare(0, len, text) == 0)
 		{
 			return strdup(cmd.c_str());
@@ -200,7 +202,7 @@ static char *completion_matches(const char *text, int state)
 	return NULL;
 }
 
-static char **attempted_completion(const char *text, int start, int end)
+static char** attempted_completion(const char* text, int start, int end)
 {
 	rl_attempted_completion_over = 1;
 	return rl_completion_matches(text, completion_matches);

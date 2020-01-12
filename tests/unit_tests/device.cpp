@@ -74,8 +74,8 @@ TEST(device, ops)
 	crypto::key_image ki0, ki1;
 
 	rct::skpkGen(sk, pk);
-	rct::scalarmultBase((rct::key &)pk0, (rct::key &)sk0);
-	rct::scalarmultBase((rct::key &)pk1, (rct::key &)sk1);
+	rct::scalarmultBase((rct::key&)pk0, (rct::key&)sk0);
+	rct::scalarmultBase((rct::key&)pk1, (rct::key&)sk1);
 
 	dev.scalarmultKey(resd, pk, sk);
 	rct::scalarmultKey(res, pk, sk);
@@ -85,8 +85,8 @@ TEST(device, ops)
 	rct::scalarmultBase(res, sk);
 	ASSERT_EQ(resd, res);
 
-	dev.sc_secret_add((crypto::secret_key &)resd, sk0, sk1);
-	sc_add((unsigned char *)&res, (unsigned char *)&sk0, (unsigned char *)&sk1);
+	dev.sc_secret_add((crypto::secret_key&)resd, sk0, sk1);
+	sc_add((unsigned char*)&res, (unsigned char*)&sk0, (unsigned char*)&sk1);
 	ASSERT_EQ(resd, res);
 
 	dev.generate_key_derivation(pk0, sk0, derd);

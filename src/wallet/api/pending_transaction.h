@@ -57,11 +57,11 @@ class WalletImpl;
 class PendingTransactionImpl : public PendingTransaction
 {
   public:
-	PendingTransactionImpl(WalletImpl &wallet);
+	PendingTransactionImpl(WalletImpl& wallet);
 	~PendingTransactionImpl();
 	int status() const;
 	std::string errorString() const;
-	bool commit(const std::string &filename = "", bool overwrite = false);
+	bool commit(const std::string& filename = "", bool overwrite = false);
 	uint64_t amount() const;
 	uint64_t dust() const;
 	uint64_t fee() const;
@@ -73,10 +73,10 @@ class PendingTransactionImpl : public PendingTransaction
 
   private:
 	friend class WalletImpl;
-	WalletImpl &m_wallet;
+	WalletImpl& m_wallet;
 
 	int m_status;
 	std::string m_errorString;
 	std::vector<tools::wallet2::pending_tx> m_pending_tx;
 };
-}
+} // namespace Ryo

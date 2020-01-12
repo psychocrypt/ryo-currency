@@ -73,7 +73,7 @@ namespace tools
 //! Functional class for closing C file handles.
 struct close_file
 {
-	void operator()(std::FILE *handle) const noexcept
+	void operator()(std::FILE* handle) const noexcept
 	{
 		if(handle)
 		{
@@ -88,7 +88,7 @@ class private_file
 	std::unique_ptr<std::FILE, close_file> m_handle;
 	std::string m_filename;
 
-	private_file(std::FILE *handle, std::string &&filename) noexcept;
+	private_file(std::FILE* handle, std::string&& filename) noexcept;
 
   public:
 	//! `handle() == nullptr && filename.empty()`.
@@ -98,14 +98,14 @@ class private_file
       OR `private_file{}` on error. */
 	static private_file create(std::string filename);
 
-	private_file(private_file &&) = default;
-	private_file &operator=(private_file &&) = default;
+	private_file(private_file&&) = default;
+	private_file& operator=(private_file&&) = default;
 
 	//! Deletes `filename()` and closes `handle()`.
 	~private_file() noexcept;
 
-	std::FILE *handle() const noexcept { return m_handle.get(); }
-	const std::string &filename() const noexcept { return m_filename; }
+	std::FILE* handle() const noexcept { return m_handle.get(); }
+	const std::string& filename() const noexcept { return m_filename; }
 };
 
 /*! \brief Returns the default data directory.
@@ -145,10 +145,10 @@ std::string get_os_version_string();
    *  wrapper around boost::filesyste::create_directories.
    *  (ensure-directory-exists): greenspun's tenth rule in action!
    */
-bool create_directories_if_necessary(const std::string &path);
+bool create_directories_if_necessary(const std::string& path);
 /*! \brief std::rename wrapper for nix and something strange for windows.
    */
-std::error_code replace_file(const std::string &replacement_name, const std::string &replaced_name);
+std::error_code replace_file(const std::string& replacement_name, const std::string& replaced_name);
 
 bool sanitize_locale();
 
@@ -226,9 +226,9 @@ void set_strict_default_file_permissions(bool strict);
 void set_max_concurrency(unsigned n);
 unsigned get_max_concurrency();
 
-bool is_local_address(const std::string &address);
-int vercmp(const char *v0, const char *v1); // returns < 0, 0, > 0, similar to strcmp, but more human friendly than lexical - does not attempt to validate
+bool is_local_address(const std::string& address);
+int vercmp(const char* v0, const char* v1); // returns < 0, 0, > 0, similar to strcmp, but more human friendly than lexical - does not attempt to validate
 
-bool sha256sum(const uint8_t *data, size_t len, crypto::hash &hash);
-bool sha256sum(const std::string &filename, crypto::hash &hash);
-}
+bool sha256sum(const uint8_t* data, size_t len, crypto::hash& hash);
+bool sha256sum(const std::string& filename, crypto::hash& hash);
+} // namespace tools

@@ -42,25 +42,22 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #include "daemon/command_parser_executor.h"
 #include "common/dns_utils.h"
 #include "version.h"
 
 #include "common/gulps.hpp"
 
-
-
 namespace daemonize
 {
 
 t_command_parser_executor::t_command_parser_executor(
-	uint32_t ip, uint16_t port, const boost::optional<tools::login> &login, bool is_rpc, cryptonote::core_rpc_server *rpc_server)
-	: m_executor(ip, port, login, is_rpc, rpc_server)
+	uint32_t ip, uint16_t port, const boost::optional<tools::login>& login, bool is_rpc, cryptonote::core_rpc_server* rpc_server) :
+	m_executor(ip, port, login, is_rpc, rpc_server)
 {
 }
 
-bool t_command_parser_executor::print_peer_list(const std::vector<std::string> &args)
+bool t_command_parser_executor::print_peer_list(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -68,7 +65,7 @@ bool t_command_parser_executor::print_peer_list(const std::vector<std::string> &
 	return m_executor.print_peer_list();
 }
 
-bool t_command_parser_executor::print_peer_list_stats(const std::vector<std::string> &args)
+bool t_command_parser_executor::print_peer_list_stats(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -76,7 +73,7 @@ bool t_command_parser_executor::print_peer_list_stats(const std::vector<std::str
 	return m_executor.print_peer_list_stats();
 }
 
-bool t_command_parser_executor::save_blockchain(const std::vector<std::string> &args)
+bool t_command_parser_executor::save_blockchain(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -84,7 +81,7 @@ bool t_command_parser_executor::save_blockchain(const std::vector<std::string> &
 	return m_executor.save_blockchain();
 }
 
-bool t_command_parser_executor::show_hash_rate(const std::vector<std::string> &args)
+bool t_command_parser_executor::show_hash_rate(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -92,7 +89,7 @@ bool t_command_parser_executor::show_hash_rate(const std::vector<std::string> &a
 	return m_executor.show_hash_rate();
 }
 
-bool t_command_parser_executor::hide_hash_rate(const std::vector<std::string> &args)
+bool t_command_parser_executor::hide_hash_rate(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -100,7 +97,7 @@ bool t_command_parser_executor::hide_hash_rate(const std::vector<std::string> &a
 	return m_executor.hide_hash_rate();
 }
 
-bool t_command_parser_executor::show_difficulty(const std::vector<std::string> &args)
+bool t_command_parser_executor::show_difficulty(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -108,7 +105,7 @@ bool t_command_parser_executor::show_difficulty(const std::vector<std::string> &
 	return m_executor.show_difficulty();
 }
 
-bool t_command_parser_executor::show_status(const std::vector<std::string> &args)
+bool t_command_parser_executor::show_status(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -116,7 +113,7 @@ bool t_command_parser_executor::show_status(const std::vector<std::string> &args
 	return m_executor.show_status();
 }
 
-bool t_command_parser_executor::print_connections(const std::vector<std::string> &args)
+bool t_command_parser_executor::print_connections(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -124,7 +121,7 @@ bool t_command_parser_executor::print_connections(const std::vector<std::string>
 	return m_executor.print_connections();
 }
 
-bool t_command_parser_executor::print_blockchain_info(const std::vector<std::string> &args)
+bool t_command_parser_executor::print_blockchain_info(const std::vector<std::string>& args)
 {
 	if(!args.size())
 	{
@@ -147,7 +144,7 @@ bool t_command_parser_executor::print_blockchain_info(const std::vector<std::str
 	return m_executor.print_blockchain_info(start_index, end_index);
 }
 
-bool t_command_parser_executor::set_log_level(const std::vector<std::string> &args)
+bool t_command_parser_executor::set_log_level(const std::vector<std::string>& args)
 {
 	if(args.size() > 1)
 	{
@@ -176,7 +173,7 @@ bool t_command_parser_executor::set_log_level(const std::vector<std::string> &ar
 	}
 }
 
-bool t_command_parser_executor::print_height(const std::vector<std::string> &args)
+bool t_command_parser_executor::print_height(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -184,7 +181,7 @@ bool t_command_parser_executor::print_height(const std::vector<std::string> &arg
 	return m_executor.print_height();
 }
 
-bool t_command_parser_executor::print_block(const std::vector<std::string> &args)
+bool t_command_parser_executor::print_block(const std::vector<std::string>& args)
 {
 	if(args.empty())
 	{
@@ -192,7 +189,7 @@ bool t_command_parser_executor::print_block(const std::vector<std::string> &args
 		return false;
 	}
 
-	const std::string &arg = args.front();
+	const std::string& arg = args.front();
 
 	bool is_hash = !(std::find_if(arg.begin(), arg.end(), [](char c) { return !std::isdigit(c); }) == arg.end());
 	if(is_hash)
@@ -210,7 +207,7 @@ bool t_command_parser_executor::print_block(const std::vector<std::string> &args
 			uint64_t height = boost::lexical_cast<uint64_t>(arg);
 			return m_executor.print_block_by_height(height);
 		}
-		catch(const boost::bad_lexical_cast &e)
+		catch(const boost::bad_lexical_cast& e)
 		{
 			return false;
 		}
@@ -218,7 +215,7 @@ bool t_command_parser_executor::print_block(const std::vector<std::string> &args
 	return false;
 }
 
-bool t_command_parser_executor::print_transaction(const std::vector<std::string> &args)
+bool t_command_parser_executor::print_transaction(const std::vector<std::string>& args)
 {
 	bool include_hex = false;
 	bool include_json = false;
@@ -242,7 +239,7 @@ bool t_command_parser_executor::print_transaction(const std::vector<std::string>
 		return true;
 	}
 
-	const std::string &str_hash = args.front();
+	const std::string& str_hash = args.front();
 	crypto::hash tx_hash;
 	if(parse_hash256(str_hash, tx_hash))
 	{
@@ -252,7 +249,7 @@ bool t_command_parser_executor::print_transaction(const std::vector<std::string>
 	return true;
 }
 
-bool t_command_parser_executor::is_key_image_spent(const std::vector<std::string> &args)
+bool t_command_parser_executor::is_key_image_spent(const std::vector<std::string>& args)
 {
 	if(args.empty())
 	{
@@ -260,7 +257,7 @@ bool t_command_parser_executor::is_key_image_spent(const std::vector<std::string
 		return true;
 	}
 
-	const std::string &str = args.front();
+	const std::string& str = args.front();
 	crypto::key_image ki;
 	crypto::hash hash;
 	if(parse_hash256(str, hash))
@@ -272,7 +269,7 @@ bool t_command_parser_executor::is_key_image_spent(const std::vector<std::string
 	return true;
 }
 
-bool t_command_parser_executor::print_transaction_pool_long(const std::vector<std::string> &args)
+bool t_command_parser_executor::print_transaction_pool_long(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -280,7 +277,7 @@ bool t_command_parser_executor::print_transaction_pool_long(const std::vector<st
 	return m_executor.print_transaction_pool_long();
 }
 
-bool t_command_parser_executor::print_transaction_pool_short(const std::vector<std::string> &args)
+bool t_command_parser_executor::print_transaction_pool_short(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -288,7 +285,7 @@ bool t_command_parser_executor::print_transaction_pool_short(const std::vector<s
 	return m_executor.print_transaction_pool_short();
 }
 
-bool t_command_parser_executor::print_transaction_pool_stats(const std::vector<std::string> &args)
+bool t_command_parser_executor::print_transaction_pool_stats(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -296,7 +293,7 @@ bool t_command_parser_executor::print_transaction_pool_stats(const std::vector<s
 	return m_executor.print_transaction_pool_stats();
 }
 
-bool t_command_parser_executor::start_mining(const std::vector<std::string> &args)
+bool t_command_parser_executor::start_mining(const std::vector<std::string>& args)
 {
 	if(!args.size())
 	{
@@ -340,7 +337,7 @@ bool t_command_parser_executor::start_mining(const std::vector<std::string> &arg
 
 	if(nettype != cryptonote::MAINNET)
 
-	GULPSF_PRINT("Mining to a {} address, make sure this is intentional!", (nettype == cryptonote::TESTNET ? "testnet" : "stagenet"));
+		GULPSF_PRINT("Mining to a {} address, make sure this is intentional!", (nettype == cryptonote::TESTNET ? "testnet" : "stagenet"));
 	uint64_t threads_count = 1;
 	bool do_background_mining = false;
 	bool ignore_battery = false;
@@ -370,7 +367,7 @@ bool t_command_parser_executor::start_mining(const std::vector<std::string> &arg
 	return true;
 }
 
-bool t_command_parser_executor::stop_mining(const std::vector<std::string> &args)
+bool t_command_parser_executor::stop_mining(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -378,7 +375,7 @@ bool t_command_parser_executor::stop_mining(const std::vector<std::string> &args
 	return m_executor.stop_mining();
 }
 
-bool t_command_parser_executor::stop_daemon(const std::vector<std::string> &args)
+bool t_command_parser_executor::stop_daemon(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -386,7 +383,7 @@ bool t_command_parser_executor::stop_daemon(const std::vector<std::string> &args
 	return m_executor.stop_daemon();
 }
 
-bool t_command_parser_executor::print_status(const std::vector<std::string> &args)
+bool t_command_parser_executor::print_status(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
@@ -394,7 +391,7 @@ bool t_command_parser_executor::print_status(const std::vector<std::string> &arg
 	return m_executor.print_status();
 }
 
-bool t_command_parser_executor::set_limit(const std::vector<std::string> &args)
+bool t_command_parser_executor::set_limit(const std::vector<std::string>& args)
 {
 	if(args.size() > 1)
 		return false;
@@ -407,7 +404,7 @@ bool t_command_parser_executor::set_limit(const std::vector<std::string> &args)
 	{
 		limit = std::stoll(args[0]);
 	}
-	catch(const std::exception &ex)
+	catch(const std::exception& ex)
 	{
 		GULPS_PRINT("failed to parse argument");
 		return false;
@@ -416,7 +413,7 @@ bool t_command_parser_executor::set_limit(const std::vector<std::string> &args)
 	return m_executor.set_limit(limit, limit);
 }
 
-bool t_command_parser_executor::set_limit_up(const std::vector<std::string> &args)
+bool t_command_parser_executor::set_limit_up(const std::vector<std::string>& args)
 {
 	if(args.size() > 1)
 		return false;
@@ -429,7 +426,7 @@ bool t_command_parser_executor::set_limit_up(const std::vector<std::string> &arg
 	{
 		limit = std::stoll(args[0]);
 	}
-	catch(const std::exception &ex)
+	catch(const std::exception& ex)
 	{
 		GULPS_PRINT("failed to parse argument");
 		return false;
@@ -438,7 +435,7 @@ bool t_command_parser_executor::set_limit_up(const std::vector<std::string> &arg
 	return m_executor.set_limit(0, limit);
 }
 
-bool t_command_parser_executor::set_limit_down(const std::vector<std::string> &args)
+bool t_command_parser_executor::set_limit_down(const std::vector<std::string>& args)
 {
 	if(args.size() > 1)
 		return false;
@@ -451,7 +448,7 @@ bool t_command_parser_executor::set_limit_down(const std::vector<std::string> &a
 	{
 		limit = std::stoll(args[0]);
 	}
-	catch(const std::exception &ex)
+	catch(const std::exception& ex)
 	{
 		GULPS_PRINT("failed to parse argument");
 		return false;
@@ -460,7 +457,7 @@ bool t_command_parser_executor::set_limit_down(const std::vector<std::string> &a
 	return m_executor.set_limit(limit, 0);
 }
 
-bool t_command_parser_executor::out_peers(const std::vector<std::string> &args)
+bool t_command_parser_executor::out_peers(const std::vector<std::string>& args)
 {
 	if(args.empty())
 		return false;
@@ -471,7 +468,7 @@ bool t_command_parser_executor::out_peers(const std::vector<std::string> &args)
 		limit = std::stoi(args[0]);
 	}
 
-	catch(const std::exception &ex)
+	catch(const std::exception& ex)
 	{
 		GULPS_ERROR("stoi exception");
 		return false;
@@ -480,7 +477,7 @@ bool t_command_parser_executor::out_peers(const std::vector<std::string> &args)
 	return m_executor.out_peers(limit);
 }
 
-bool t_command_parser_executor::in_peers(const std::vector<std::string> &args)
+bool t_command_parser_executor::in_peers(const std::vector<std::string>& args)
 {
 	if(args.empty())
 		return false;
@@ -491,7 +488,7 @@ bool t_command_parser_executor::in_peers(const std::vector<std::string> &args)
 		limit = std::stoi(args[0]);
 	}
 
-	catch(const std::exception &ex)
+	catch(const std::exception& ex)
 	{
 		GULPS_ERROR("stoi exception");
 		return false;
@@ -500,7 +497,7 @@ bool t_command_parser_executor::in_peers(const std::vector<std::string> &args)
 	return m_executor.in_peers(limit);
 }
 
-bool t_command_parser_executor::hard_fork_info(const std::vector<std::string> &args)
+bool t_command_parser_executor::hard_fork_info(const std::vector<std::string>& args)
 {
 	int version;
 	if(args.size() == 0)
@@ -513,7 +510,7 @@ bool t_command_parser_executor::hard_fork_info(const std::vector<std::string> &a
 		{
 			version = std::stoi(args[0]);
 		}
-		catch(const std::exception &ex)
+		catch(const std::exception& ex)
 		{
 			return false;
 		}
@@ -527,14 +524,14 @@ bool t_command_parser_executor::hard_fork_info(const std::vector<std::string> &a
 	return m_executor.hard_fork_info(version);
 }
 
-bool t_command_parser_executor::show_bans(const std::vector<std::string> &args)
+bool t_command_parser_executor::show_bans(const std::vector<std::string>& args)
 {
 	if(!args.empty())
 		return false;
 	return m_executor.print_bans();
 }
 
-bool t_command_parser_executor::ban(const std::vector<std::string> &args)
+bool t_command_parser_executor::ban(const std::vector<std::string>& args)
 {
 	if(args.size() != 1 && args.size() != 2)
 		return false;
@@ -546,7 +543,7 @@ bool t_command_parser_executor::ban(const std::vector<std::string> &args)
 		{
 			seconds = std::stoi(args[1]);
 		}
-		catch(const std::exception &e)
+		catch(const std::exception& e)
 		{
 			return false;
 		}
@@ -558,7 +555,7 @@ bool t_command_parser_executor::ban(const std::vector<std::string> &args)
 	return m_executor.ban(ip, seconds);
 }
 
-bool t_command_parser_executor::unban(const std::vector<std::string> &args)
+bool t_command_parser_executor::unban(const std::vector<std::string>& args)
 {
 	if(args.size() != 1)
 		return false;
@@ -566,7 +563,7 @@ bool t_command_parser_executor::unban(const std::vector<std::string> &args)
 	return m_executor.unban(ip);
 }
 
-bool t_command_parser_executor::flush_txpool(const std::vector<std::string> &args)
+bool t_command_parser_executor::flush_txpool(const std::vector<std::string>& args)
 {
 	if(args.size() > 1)
 		return false;
@@ -585,7 +582,7 @@ bool t_command_parser_executor::flush_txpool(const std::vector<std::string> &arg
 	return m_executor.flush_txpool(txid);
 }
 
-bool t_command_parser_executor::output_histogram(const std::vector<std::string> &args)
+bool t_command_parser_executor::output_histogram(const std::vector<std::string>& args)
 {
 	std::vector<uint64_t> amounts;
 	uint64_t min_count = 3;
@@ -617,7 +614,7 @@ bool t_command_parser_executor::output_histogram(const std::vector<std::string> 
 	return m_executor.output_histogram(amounts, min_count, max_count);
 }
 
-bool t_command_parser_executor::print_coinbase_tx_sum(const std::vector<std::string> &args)
+bool t_command_parser_executor::print_coinbase_tx_sum(const std::vector<std::string>& args)
 {
 	if(!args.size())
 	{
@@ -640,7 +637,7 @@ bool t_command_parser_executor::print_coinbase_tx_sum(const std::vector<std::str
 	return m_executor.print_coinbase_tx_sum(height, count);
 }
 
-bool t_command_parser_executor::alt_chain_info(const std::vector<std::string> &args)
+bool t_command_parser_executor::alt_chain_info(const std::vector<std::string>& args)
 {
 	if(args.size())
 	{
@@ -651,7 +648,7 @@ bool t_command_parser_executor::alt_chain_info(const std::vector<std::string> &a
 	return m_executor.alt_chain_info();
 }
 
-bool t_command_parser_executor::print_blockchain_dynamic_stats(const std::vector<std::string> &args)
+bool t_command_parser_executor::print_blockchain_dynamic_stats(const std::vector<std::string>& args)
 {
 	if(args.size() != 1)
 	{
@@ -669,7 +666,7 @@ bool t_command_parser_executor::print_blockchain_dynamic_stats(const std::vector
 	return m_executor.print_blockchain_dynamic_stats(nblocks);
 }
 
-bool t_command_parser_executor::update(const std::vector<std::string> &args)
+bool t_command_parser_executor::update(const std::vector<std::string>& args)
 {
 	if(args.size() != 1)
 	{
@@ -680,7 +677,7 @@ bool t_command_parser_executor::update(const std::vector<std::string> &args)
 	return m_executor.update(args.front());
 }
 
-bool t_command_parser_executor::relay_tx(const std::vector<std::string> &args)
+bool t_command_parser_executor::relay_tx(const std::vector<std::string>& args)
 {
 	if(args.size() != 1)
 		return false;
@@ -696,7 +693,7 @@ bool t_command_parser_executor::relay_tx(const std::vector<std::string> &args)
 	return m_executor.relay_tx(txid);
 }
 
-bool t_command_parser_executor::sync_info(const std::vector<std::string> &args)
+bool t_command_parser_executor::sync_info(const std::vector<std::string>& args)
 {
 	if(args.size() != 0)
 		return false;
@@ -704,7 +701,7 @@ bool t_command_parser_executor::sync_info(const std::vector<std::string> &args)
 	return m_executor.sync_info();
 }
 
-bool t_command_parser_executor::version(const std::vector<std::string> &args)
+bool t_command_parser_executor::version(const std::vector<std::string>& args)
 {
 	GULPSF_PRINT("Ryo '{}' ({})", RYO_RELEASE_NAME, RYO_VERSION_FULL);
 	return true;

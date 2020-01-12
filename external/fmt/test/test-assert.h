@@ -10,18 +10,21 @@
 
 #include <stdexcept>
 
-class AssertionFailure : public std::logic_error {
- public:
-  explicit AssertionFailure(const char *message) : std::logic_error(message) {}
+class AssertionFailure : public std::logic_error
+{
+  public:
+	explicit AssertionFailure(const char* message) :
+		std::logic_error(message) {}
 };
 
 #define FMT_ASSERT(condition, message) \
-  if (!(condition)) throw AssertionFailure(message);
+	if(!(condition))                   \
+		throw AssertionFailure(message);
 
 #include "gtest-extra.h"
 
 // Expects an assertion failure.
 #define EXPECT_ASSERT(stmt, message) \
-  EXPECT_THROW_MSG(stmt, AssertionFailure, message)
+	EXPECT_THROW_MSG(stmt, AssertionFailure, message)
 
-#endif  // FMT_TEST_ASSERT_H
+#endif // FMT_TEST_ASSERT_H

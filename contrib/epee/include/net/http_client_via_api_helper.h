@@ -31,8 +31,6 @@
 
 #include "common/gulps.hpp"
 
-
-
 namespace epee
 {
 namespace net_utils
@@ -42,7 +40,7 @@ namespace http_client
 
 GULPS_CAT_MAJOR("epee_http_client");
 
-inline bool http_ssl_invoke(const std::string &url, const std::string usr, const std::string psw, std::string &http_response_body, bool use_post = false)
+inline bool http_ssl_invoke(const std::string& url, const std::string usr, const std::string psw, std::string& http_response_body, bool use_post = false)
 {
 	bool final_res = false;
 
@@ -53,7 +51,7 @@ inline bool http_ssl_invoke(const std::string &url, const std::string usr, const
 	if(!hinet)
 	{
 		int err = ::GetLastError();
-		GULPSF_PRINT("Failed to call InternetOpenA, \nError: {} {}", err , log_space::get_win32_err_descr(err));
+		GULPSF_PRINT("Failed to call InternetOpenA, \nError: {} {}", err, log_space::get_win32_err_descr(err));
 		return false;
 	}
 
@@ -164,7 +162,7 @@ inline bool http_ssl_invoke(const std::string &url, const std::string usr, const
 	else
 	{
 		int err = ::GetLastError();
-		GULPSF_PRINT("Failed to call InternetConnectA({}, port {} \nError: {}", string_encoding::convert_to_ansii(url_obj.GetHostName()) , port , log_space::get_win32_err_descr(err));
+		GULPSF_PRINT("Failed to call InternetConnectA({}, port {} \nError: {}", string_encoding::convert_to_ansii(url_obj.GetHostName()), port, log_space::get_win32_err_descr(err));
 	}
 
 	res = ::InternetCloseHandle(hinet);
@@ -175,6 +173,6 @@ inline bool http_ssl_invoke(const std::string &url, const std::string usr, const
 	}
 	return final_res;
 }
-}
-}
-}
+} // namespace http_client
+} // namespace net_utils
+} // namespace epee

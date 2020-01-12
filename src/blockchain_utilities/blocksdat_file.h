@@ -72,19 +72,19 @@ using namespace cryptonote;
 class BlocksdatFile
 {
   public:
-	bool store_blockchain_raw(cryptonote::Blockchain *cs, cryptonote::tx_memory_pool *txp,
-							  boost::filesystem::path &output_file, uint64_t use_block_height = 0);
+	bool store_blockchain_raw(cryptonote::Blockchain* cs, cryptonote::tx_memory_pool* txp,
+		boost::filesystem::path& output_file, uint64_t use_block_height = 0);
 
   protected:
-	Blockchain *m_blockchain_storage;
+	Blockchain* m_blockchain_storage;
 
-	std::ofstream *m_raw_data_file;
+	std::ofstream* m_raw_data_file;
 
 	// open export file for write
-	bool open_writer(const boost::filesystem::path &file_path, uint64_t block_stop);
+	bool open_writer(const boost::filesystem::path& file_path, uint64_t block_stop);
 	bool initialize_file(uint64_t block_stop);
 	bool close();
-	void write_block(const crypto::hash &block_hash);
+	void write_block(const crypto::hash& block_hash);
 
   private:
 	uint64_t m_cur_height; // tracks current height during export

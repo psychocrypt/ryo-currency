@@ -25,7 +25,8 @@
 //
 
 #pragma once
-extern "C" {
+extern "C"
+{
 #include "zlib/zlib.h"
 }
 #pragma comment(lib, "zlibstat.lib")
@@ -34,7 +35,7 @@ namespace epee
 {
 namespace zlib_helper
 {
-inline bool pack(std::string &target)
+inline bool pack(std::string& target)
 {
 	std::string result_packed_buff;
 
@@ -45,9 +46,9 @@ inline bool pack(std::string &target)
 
 		result_packed_buff.resize(target.size() * 2, 'X');
 
-		zstream.next_in = (Bytef *)target.data();
+		zstream.next_in = (Bytef*)target.data();
 		zstream.avail_in = (uInt)target.size();
-		zstream.next_out = (Bytef *)result_packed_buff.data();
+		zstream.next_out = (Bytef*)result_packed_buff.data();
 		zstream.avail_out = (uInt)result_packed_buff.size();
 
 		ret = deflate(&zstream, Z_FINISH);
@@ -64,7 +65,7 @@ inline bool pack(std::string &target)
 	return true;
 }
 
-inline bool unpack(std::string &target)
+inline bool unpack(std::string& target)
 {
 	z_stream zstream = {0};
 	int ret = inflateInit(&zstream); //
@@ -76,7 +77,7 @@ inline bool unpack(std::string &target)
 	while(target.size())
 	{
 
-		zstream.next_out = (Bytef *)current_decode_buff.data();
+		zstream.next_out = (Bytef*)current_decode_buff.data();
 		zstream.avail_out = (uInt)ungzip_buff_size;
 
 		int flag = Z_SYNC_FLUSH;
@@ -86,7 +87,7 @@ inline bool unpack(std::string &target)
 				0x8 + 0x7 * 0x10,
 				(((0x8 + 0x7 * 0x10) * 0x100 + 30) / 31 * 31) & 0xFF,
 			};
-		zstream.next_in = (Bytef *)dummy_head;
+		zstream.next_in = (Bytef*)dummy_head;
 		zstream.avail_in = sizeof(dummy_head);
 		ret = inflate(&zstream, Z_NO_FLUSH);
 		if(ret != Z_OK)
@@ -95,7 +96,7 @@ inline bool unpack(std::string &target)
 			return false;
 		}
 
-		zstream.next_in = (Bytef *)target.data();
+		zstream.next_in = (Bytef*)target.data();
 		zstream.avail_in = (uInt)target.size();
 
 		ret = inflate(&zstream, Z_SYNC_FLUSH);
@@ -127,5 +128,5 @@ inline bool unpack(std::string &target)
 	decode_summary_buff.swap(target);
 	return 1;
 }
-};
+}; // namespace zlib_helper
 } //namespace epee

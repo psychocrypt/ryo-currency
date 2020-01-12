@@ -58,7 +58,8 @@ struct ub_event_base;
  *	qq : write queries to the async service pid/tid.
  *	rr : read results from the async service pid/tid.
  */
-struct ub_ctx {
+struct ub_ctx
+{
 	/* --- pipes --- */
 	/** mutex on query write pipe */
 	lock_basic_type qqpipe_lock;
@@ -128,7 +129,7 @@ struct ub_ctx {
 	 * Used when cancel is done for lookup (and delete).
 	 * Used to see if querynum is free for use.
 	 * Content of type ctx_query.
-	 */ 
+	 */
 	rbtree_type queries;
 };
 
@@ -138,7 +139,8 @@ struct ub_ctx {
  * But also, outstanding for sync resolution by one of the threads that
  * has joined the threadpool.
  */
-struct ctx_query {
+struct ctx_query
+{
 	/** node in rbtree, must be first entry, key is ptr to the querynum */
 	struct rbnode_type node;
 	/** query id number, key for node */
@@ -170,7 +172,8 @@ struct ctx_query {
 /**
  * The error constants
  */
-enum ub_ctx_err {
+enum ub_ctx_err
+{
 	/** no error */
 	UB_NOERROR = 0,
 	/** socket operation. Set to -1, so that if an error from _fd() is
@@ -204,7 +207,8 @@ enum ub_ctx_err {
  * 	o uint32 command code.
  * 	o per command format.
  */
-enum ub_ctx_cmd {
+enum ub_ctx_cmd
+{
 	/** QUIT */
 	UB_LIBCMD_QUIT = 0,
 	/** New query, sent to bg worker */
@@ -242,7 +246,7 @@ void context_query_delete(struct ctx_query* q);
  * @return new ctx_query or NULL for malloc failure.
  */
 struct ctx_query* context_new(struct ub_ctx* ctx, const char* name, int rrtype,
-        int rrclass, ub_callback_type cb, void* cbarg);
+	int rrclass, ub_callback_type cb, void* cbarg);
 
 /**
  * Get a new alloc. Creates a new one or uses a cached one.
@@ -281,7 +285,7 @@ uint8_t* context_serialize_new_query(struct ctx_query* q, uint32_t* len);
  * @param len: the length of the allocation is returned.
  * @return: an alloc, or NULL on mem error.
  */
-uint8_t* context_serialize_answer(struct ctx_query* q, int err, 
+uint8_t* context_serialize_answer(struct ctx_query* q, int err,
 	struct sldns_buffer* pkt, uint32_t* len);
 
 /**
@@ -315,7 +319,7 @@ enum ub_ctx_cmd context_serial_getcmd(uint8_t* p, uint32_t len);
  * @param len: length of buffer.
  * @return looked up ctx_query or NULL for malloc failure.
  */
-struct ctx_query* context_lookup_new_query(struct ub_ctx* ctx, 
+struct ctx_query* context_lookup_new_query(struct ub_ctx* ctx,
 	uint8_t* p, uint32_t len);
 
 /**
@@ -325,7 +329,7 @@ struct ctx_query* context_lookup_new_query(struct ub_ctx* ctx,
  * @param len: length of buffer.
  * @return new ctx_query or NULL for malloc failure.
  */
-struct ctx_query* context_deserialize_new_query(struct ub_ctx* ctx, 
+struct ctx_query* context_deserialize_new_query(struct ub_ctx* ctx,
 	uint8_t* p, uint32_t len);
 
 /**
@@ -336,7 +340,7 @@ struct ctx_query* context_deserialize_new_query(struct ub_ctx* ctx,
  * @param err: error code to be returned to client is passed.
  * @return ctx_query with answer added or NULL for malloc failure.
  */
-struct ctx_query* context_deserialize_answer(struct ub_ctx* ctx, 
+struct ctx_query* context_deserialize_answer(struct ub_ctx* ctx,
 	uint8_t* p, uint32_t len, int* err);
 
 /**
@@ -346,7 +350,7 @@ struct ctx_query* context_deserialize_answer(struct ub_ctx* ctx,
  * @param len: length of buffer.
  * @return ctx_query to cancel or NULL for failure.
  */
-struct ctx_query* context_deserialize_cancel(struct ub_ctx* ctx, 
+struct ctx_query* context_deserialize_cancel(struct ub_ctx* ctx,
 	uint8_t* p, uint32_t len);
 
 #endif /* LIBUNBOUND_CONTEXT_H */

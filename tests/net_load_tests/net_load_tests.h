@@ -62,7 +62,7 @@ struct test_levin_commands_handler : public epee::levin::levin_commands_handler<
 	{
 	}
 
-	virtual int invoke(int command, const std::string &in_buff, std::string &buff_out, test_connection_context &context)
+	virtual int invoke(int command, const std::string& in_buff, std::string& buff_out, test_connection_context& context)
 	{
 		//m_invoke_counter.inc();
 		//std::unique_lock<std::mutex> lock(m_mutex);
@@ -73,7 +73,7 @@ struct test_levin_commands_handler : public epee::levin::levin_commands_handler<
 		return LEVIN_OK;
 	}
 
-	virtual int notify(int command, const std::string &in_buff, test_connection_context &context)
+	virtual int notify(int command, const std::string& in_buff, test_connection_context& context)
 	{
 		//m_notify_counter.inc();
 		//std::unique_lock<std::mutex> lock(m_mutex);
@@ -83,19 +83,19 @@ struct test_levin_commands_handler : public epee::levin::levin_commands_handler<
 		return LEVIN_OK;
 	}
 
-	virtual void callback(test_connection_context &context)
+	virtual void callback(test_connection_context& context)
 	{
 		//m_callback_counter.inc();
 		//std::cout << "test_levin_commands_handler::callback()" << std::endl;
 	}
 
-	virtual void on_connection_new(test_connection_context &context)
+	virtual void on_connection_new(test_connection_context& context)
 	{
 		m_new_connection_counter.inc();
 		//std::cout << "test_levin_commands_handler::on_connection_new()" << std::endl;
 	}
 
-	virtual void on_connection_close(test_connection_context &context)
+	virtual void on_connection_close(test_connection_context& context)
 	{
 		m_close_connection_counter.inc();
 		//std::cout << "test_levin_commands_handler::on_connection_close()" << std::endl;
@@ -135,14 +135,20 @@ struct test_levin_commands_handler : public epee::levin::levin_commands_handler<
 class open_close_test_helper
 {
   public:
-	open_close_test_helper(test_tcp_server &tcp_server, size_t open_request_target, size_t max_opened_connection_count)
-		: m_tcp_server(tcp_server), m_open_request_target(open_request_target), m_max_opened_connection_count(max_opened_connection_count), m_opened_connection_count(0), m_next_opened_conn_idx(0), m_next_closed_conn_idx(0), m_connections(open_request_target)
+	open_close_test_helper(test_tcp_server& tcp_server, size_t open_request_target, size_t max_opened_connection_count) :
+		m_tcp_server(tcp_server),
+		m_open_request_target(open_request_target),
+		m_max_opened_connection_count(max_opened_connection_count),
+		m_opened_connection_count(0),
+		m_next_opened_conn_idx(0),
+		m_next_closed_conn_idx(0),
+		m_connections(open_request_target)
 	{
-		for(auto &conn_id : m_connections)
+		for(auto& conn_id : m_connections)
 			conn_id = boost::uuids::nil_uuid();
 	}
 
-	bool handle_new_connection(const boost::uuids::uuid &connection_id, bool ignore_close_fails = false)
+	bool handle_new_connection(const boost::uuids::uuid& connection_id, bool ignore_close_fails = false)
 	{
 		size_t idx = m_next_opened_conn_idx.fetch_add(1, std::memory_order_relaxed);
 		if(idx >= m_connections.size())
@@ -197,7 +203,7 @@ class open_close_test_helper
 	size_t opened_connection_count() const { return m_opened_connection_count.load(std::memory_order_relaxed); }
 
   private:
-	test_tcp_server &m_tcp_server;
+	test_tcp_server& m_tcp_server;
 	size_t m_open_request_target;
 	size_t m_max_opened_connection_count;
 	std::atomic<size_t> m_opened_connection_count;
@@ -350,4 +356,4 @@ struct CMD_DATA_REQUEST
 		END_KV_SERIALIZE_MAP()
 	};
 };
-}
+} // namespace net_load_tests

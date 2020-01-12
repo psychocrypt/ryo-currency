@@ -145,11 +145,11 @@ class test_check_tx_signature_aggregated_bulletproofs : private multi_tx_test_ba
 
 	bool test()
 	{
-		std::vector<const rct::rctSig *> rvv;
+		std::vector<const rct::rctSig*> rvv;
 		rvv.reserve(m_txes.size());
 		for(size_t n = 0; n < m_txes.size(); ++n)
 		{
-			const rct::rctSig &rv = m_txes[n].rct_signatures;
+			const rct::rctSig& rv = m_txes[n].rct_signatures;
 			if(!rct::verRctNonSemanticsSimple(rv))
 				return false;
 			rvv.push_back(&rv);

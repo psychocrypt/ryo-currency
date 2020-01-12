@@ -72,21 +72,21 @@ class t_command_server
 
   public:
 	t_command_server(
-		uint32_t ip, uint16_t port, const boost::optional<tools::login> &login, bool is_rpc = true, cryptonote::core_rpc_server *rpc_server = NULL);
+		uint32_t ip, uint16_t port, const boost::optional<tools::login>& login, bool is_rpc = true, cryptonote::core_rpc_server* rpc_server = NULL);
 
-	bool process_command_str(const std::string &cmd);
+	bool process_command_str(const std::string& cmd);
 
-	bool process_command_vec(const std::vector<std::string> &cmd);
+	bool process_command_vec(const std::vector<std::string>& cmd);
 
 	bool start_handling(std::function<void(void)> exit_handler = NULL);
 
 	void stop_handling();
 
   private:
-	bool help(const std::vector<std::string> &args);
+	bool help(const std::vector<std::string>& args);
 
 	std::string get_commands_str();
-	std::string get_command_usage(const std::vector<std::string> &args);
+	std::string get_command_usage(const std::vector<std::string>& args);
 };
 
 } // namespace daemonize

@@ -61,13 +61,13 @@ namespace epee
 {
 namespace file_io_utils
 {
-inline bool is_file_exist(const std::string &path)
+inline bool is_file_exist(const std::string& path)
 {
 	boost::filesystem::path p(path);
 	return boost::filesystem::exists(p);
 }
 
-inline bool save_string_to_file(const std::string &path_to_file, const std::string &str)
+inline bool save_string_to_file(const std::string& path_to_file, const std::string& str)
 {
 #ifdef WIN32
 	WCHAR wide_path[1000];
@@ -102,7 +102,7 @@ inline bool save_string_to_file(const std::string &path_to_file, const std::stri
 #endif
 }
 
-inline bool get_file_time(const std::string &path_to_file, time_t &ft)
+inline bool get_file_time(const std::string& path_to_file, time_t& ft)
 {
 	boost::system::error_code ec;
 	ft = boost::filesystem::last_write_time(boost::filesystem::path(path_to_file), ec);
@@ -112,7 +112,7 @@ inline bool get_file_time(const std::string &path_to_file, time_t &ft)
 		return false;
 }
 
-inline bool set_file_time(const std::string &path_to_file, const time_t &ft)
+inline bool set_file_time(const std::string& path_to_file, const time_t& ft)
 {
 	boost::system::error_code ec;
 	boost::filesystem::last_write_time(boost::filesystem::path(path_to_file), ft, ec);
@@ -122,7 +122,7 @@ inline bool set_file_time(const std::string &path_to_file, const time_t &ft)
 		return false;
 }
 
-inline bool load_file_to_string(const std::string &path_to_file, std::string &target_str)
+inline bool load_file_to_string(const std::string& path_to_file, std::string& target_str)
 {
 #ifdef WIN32
 	WCHAR wide_path[1000];
@@ -161,7 +161,7 @@ inline bool load_file_to_string(const std::string &path_to_file, std::string &ta
 		target_str.resize(file_size_t);
 
 		fstream.seekg(0, std::ios::beg);
-		fstream.read((char *)target_str.data(), target_str.size());
+		fstream.read((char*)target_str.data(), target_str.size());
 		fstream.close();
 		return true;
 	}
@@ -173,7 +173,7 @@ inline bool load_file_to_string(const std::string &path_to_file, std::string &ta
 #endif
 }
 
-inline bool append_string_to_file(const std::string &path_to_file, const std::string &str)
+inline bool append_string_to_file(const std::string& path_to_file, const std::string& str)
 {
 	// No special Windows implementation because so far not used in Monero code
 	try
@@ -192,7 +192,7 @@ inline bool append_string_to_file(const std::string &path_to_file, const std::st
 	}
 }
 
-inline bool get_file_size(const std::string &path_to_file, uint64_t &size)
+inline bool get_file_size(const std::string& path_to_file, uint64_t& size)
 {
 #ifdef WIN32
 	WCHAR wide_path[1000];
@@ -227,7 +227,7 @@ inline bool get_file_size(const std::string &path_to_file, uint64_t &size)
 	}
 #endif
 }
-}
-}
+} // namespace file_io_utils
+} // namespace epee
 
 #endif //_FILE_IO_UTILS_H_

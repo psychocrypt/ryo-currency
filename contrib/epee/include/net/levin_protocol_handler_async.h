@@ -43,8 +43,6 @@
 
 #include "common/gulps.hpp"
 
-
-
 #ifndef MIN_BYTES_WANTED
 #define MIN_BYTES_WANTED 512
 #endif
@@ -64,20 +62,20 @@ template <class t_connection_context>
 class async_protocol_handler_config
 {
 	GULPS_CAT_MAJOR("epee_lev_proto");
-	typedef boost::unordered_map<boost::uuids::uuid, async_protocol_handler<t_connection_context> *> connections_map;
+	typedef boost::unordered_map<boost::uuids::uuid, async_protocol_handler<t_connection_context>*> connections_map;
 	critical_section m_connects_lock;
 	connections_map m_connects;
 
-	void add_connection(async_protocol_handler<t_connection_context> *pc);
-	void del_connection(async_protocol_handler<t_connection_context> *pc);
+	void add_connection(async_protocol_handler<t_connection_context>* pc);
+	void del_connection(async_protocol_handler<t_connection_context>* pc);
 
-	async_protocol_handler<t_connection_context> *find_connection(boost::uuids::uuid connection_id) const;
-	int find_and_lock_connection(boost::uuids::uuid connection_id, async_protocol_handler<t_connection_context> *&aph);
+	async_protocol_handler<t_connection_context>* find_connection(boost::uuids::uuid connection_id) const;
+	int find_and_lock_connection(boost::uuids::uuid connection_id, async_protocol_handler<t_connection_context>*& aph);
 
 	friend class async_protocol_handler<t_connection_context>;
 
-	levin_commands_handler<t_connection_context> *m_pcommands_handler;
-	void (*m_pcommands_handler_destroy)(levin_commands_handler<t_connection_context> *);
+	levin_commands_handler<t_connection_context>* m_pcommands_handler;
+	void (*m_pcommands_handler_destroy)(levin_commands_handler<t_connection_context>*);
 
 	void delete_connections(size_t count, bool incoming);
 
@@ -86,22 +84,25 @@ class async_protocol_handler_config
 	uint64_t m_max_packet_size;
 	uint64_t m_invoke_timeout;
 
-	int invoke(int command, const std::string &in_buff, std::string &buff_out, boost::uuids::uuid connection_id);
+	int invoke(int command, const std::string& in_buff, std::string& buff_out, boost::uuids::uuid connection_id);
 	template <class callback_t>
-	int invoke_async(int command, const std::string &in_buff, boost::uuids::uuid connection_id, const callback_t &cb, size_t timeout = LEVIN_DEFAULT_TIMEOUT_PRECONFIGURED);
+	int invoke_async(int command, const std::string& in_buff, boost::uuids::uuid connection_id, const callback_t& cb, size_t timeout = LEVIN_DEFAULT_TIMEOUT_PRECONFIGURED);
 
-	int notify(int command, const std::string &in_buff, boost::uuids::uuid connection_id);
+	int notify(int command, const std::string& in_buff, boost::uuids::uuid connection_id);
 	bool close(boost::uuids::uuid connection_id);
-	bool update_connection_context(const t_connection_context &contxt);
+	bool update_connection_context(const t_connection_context& contxt);
 	bool request_callback(boost::uuids::uuid connection_id);
 	template <class callback_t>
-	bool foreach_connection(const callback_t &cb);
+	bool foreach_connection(const callback_t& cb);
 	template <class callback_t>
-	bool for_connection(const boost::uuids::uuid &connection_id, const callback_t &cb);
+	bool for_connection(const boost::uuids::uuid& connection_id, const callback_t& cb);
 	size_t get_connections_count();
-	void set_handler(levin_commands_handler<t_connection_context> *handler, void (*destroy)(levin_commands_handler<t_connection_context> *) = NULL);
+	void set_handler(levin_commands_handler<t_connection_context>* handler, void (*destroy)(levin_commands_handler<t_connection_context>*) = NULL);
 
-	async_protocol_handler_config() : m_pcommands_handler(NULL), m_pcommands_handler_destroy(NULL), m_max_packet_size(LEVIN_DEFAULT_MAX_PACKET_SIZE)
+	async_protocol_handler_config() :
+		m_pcommands_handler(NULL),
+		m_pcommands_handler_destroy(NULL),
+		m_max_packet_size(LEVIN_DEFAULT_MAX_PACKET_SIZE)
 	{
 	}
 	~async_protocol_handler_config() { set_handler(NULL, NULL); }
@@ -116,6 +117,7 @@ template <class t_connection_context = net_utils::connection_context_base>
 class async_protocol_handler
 {
 	GULPS_CAT_MAJOR("epee_lev_proto");
+
   public:
 	typedef t_connection_context connection_context;
 	typedef async_protocol_handler_config<t_connection_context> config_type;
@@ -141,9 +143,9 @@ class async_protocol_handler
 	volatile uint32_t m_wait_count;
 	volatile uint32_t m_close_called;
 	bucket_head2 m_current_head;
-	net_utils::i_service_endpoint *m_pservice_endpoint;
-	config_type &m_config;
-	t_connection_context &m_connection_context;
+	net_utils::i_service_endpoint* m_pservice_endpoint;
+	config_type& m_config;
+	t_connection_context& m_connection_context;
 
 	std::string m_cache_in_buffer;
 	stream_state m_state;
@@ -153,7 +155,7 @@ class async_protocol_handler
 
 	struct invoke_response_handler_base
 	{
-		virtual bool handle(int res, const std::string &buff, connection_context &context) = 0;
+		virtual bool handle(int res, const std::string& buff, connection_context& context) = 0;
 		virtual bool is_timer_started() const = 0;
 		virtual void cancel() = 0;
 		virtual bool cancel_timer() = 0;
@@ -162,15 +164,21 @@ class async_protocol_handler
 	template <class callback_t>
 	struct anvoke_handler : invoke_response_handler_base
 	{
-		anvoke_handler(const callback_t &cb, uint64_t timeout, async_protocol_handler &con, int command)
-			: m_cb(cb), m_timeout(timeout), m_con(con), m_timer(con.m_pservice_endpoint->get_io_service()), m_timer_started(false),
-			  m_cancel_timer_called(false), m_timer_cancelled(false), m_command(command)
+		anvoke_handler(const callback_t& cb, uint64_t timeout, async_protocol_handler& con, int command) :
+			m_cb(cb),
+			m_timeout(timeout),
+			m_con(con),
+			m_timer(con.m_pservice_endpoint->get_io_service()),
+			m_timer_started(false),
+			m_cancel_timer_called(false),
+			m_timer_cancelled(false),
+			m_command(command)
 		{
 			if(m_con.start_outer_call())
 			{
 				GULPS_LOG_L1(con.get_context_ref(), " invoke_handler, timeout: ", timeout);
 				m_timer.expires_from_now(boost::posix_time::milliseconds(timeout));
-				m_timer.async_wait([&con, command, cb, timeout](const boost::system::error_code &ec) {
+				m_timer.async_wait([&con, command, cb, timeout](const boost::system::error_code& ec) {
 					if(ec == boost::asio::error::operation_aborted)
 						return;
 					GULPS_INFO(con.get_context_ref(), " Timeout on invoke operation happened, command: ", command, " timeout: ", timeout);
@@ -186,14 +194,14 @@ class async_protocol_handler
 		{
 		}
 		callback_t m_cb;
-		async_protocol_handler &m_con;
+		async_protocol_handler& m_con;
 		boost::asio::deadline_timer m_timer;
 		bool m_timer_started;
 		bool m_cancel_timer_called;
 		bool m_timer_cancelled;
 		uint64_t m_timeout;
 		int m_command;
-		virtual bool handle(int res, const std::string &buff, typename async_protocol_handler::connection_context &context)
+		virtual bool handle(int res, const std::string& buff, typename async_protocol_handler::connection_context& context)
 		{
 			if(!cancel_timer())
 				return false;
@@ -229,12 +237,12 @@ class async_protocol_handler
 			boost::system::error_code ignored_ec;
 			if(!m_cancel_timer_called && m_timer.cancel(ignored_ec) > 0)
 			{
-				callback_t &cb = m_cb;
+				callback_t& cb = m_cb;
 				uint64_t timeout = m_timeout;
-				async_protocol_handler &con = m_con;
+				async_protocol_handler& con = m_con;
 				int command = m_command;
 				m_timer.expires_from_now(boost::posix_time::milliseconds(m_timeout));
-				m_timer.async_wait([&con, cb, command, timeout](const boost::system::error_code &ec) {
+				m_timer.async_wait([&con, cb, command, timeout](const boost::system::error_code& ec) {
 					if(ec == boost::asio::error::operation_aborted)
 						return;
 					GULPS_INFO(con.get_context_ref(), " Timeout on invoke operation happened, command: ", command, " timeout: ", timeout);
@@ -250,7 +258,7 @@ class async_protocol_handler
 	std::list<boost::shared_ptr<invoke_response_handler_base>> m_invoke_response_handlers;
 
 	template <class callback_t>
-	bool add_invoke_response_handler(const callback_t &cb, uint64_t timeout, async_protocol_handler &con, int command)
+	bool add_invoke_response_handler(const callback_t& cb, uint64_t timeout, async_protocol_handler& con, int command)
 	{
 		CRITICAL_REGION_LOCAL(m_invoke_response_handlers_lock);
 		boost::shared_ptr<invoke_response_handler_base> handler(boost::make_shared<anvoke_handler<callback_t>>(cb, timeout, con, command));
@@ -261,13 +269,14 @@ class async_protocol_handler
 	friend struct anvoke_handler;
 
   public:
-	async_protocol_handler(net_utils::i_service_endpoint *psnd_hndlr,
-						   config_type &config,
-						   t_connection_context &conn_context) : m_current_head(bucket_head2()),
-																 m_pservice_endpoint(psnd_hndlr),
-																 m_config(config),
-																 m_connection_context(conn_context),
-																 m_state(stream_state_head)
+	async_protocol_handler(net_utils::i_service_endpoint* psnd_hndlr,
+		config_type& config,
+		t_connection_context& conn_context) :
+		m_current_head(bucket_head2()),
+		m_pservice_endpoint(psnd_hndlr),
+		m_config(config),
+		m_connection_context(conn_context),
+		m_state(stream_state_head)
 	{
 		m_close_called = 0;
 		m_deletion_initiated = false;
@@ -288,7 +297,7 @@ class async_protocol_handler
 		{
 			misc_utils::sleep_no_w(100);
 		}
-		GULPS_CHECK_AND_ASSERT_MES_NO_RET(0 == boost::interprocess::ipcdetail::atomic_read32(&m_wait_count), "Failed to wait for operation completion. m_wait_count = " , m_wait_count);
+		GULPS_CHECK_AND_ASSERT_MES_NO_RET(0 == boost::interprocess::ipcdetail::atomic_read32(&m_wait_count), "Failed to wait for operation completion. m_wait_count = ", m_wait_count);
 
 		GULPS_LOG_L2(m_connection_context, "~async_protocol_handler()");
 	}
@@ -298,7 +307,7 @@ class async_protocol_handler
 		GULPS_LOG_L2(m_connection_context, "[levin_protocol] -->> start_outer_call");
 		if(!m_pservice_endpoint->add_ref())
 		{
-			GULPS_ERROR(m_connection_context , " [levin_protocol] -->> start_outer_call failed");
+			GULPS_ERROR(m_connection_context, " [levin_protocol] -->> start_outer_call failed");
 			return false;
 		}
 		boost::interprocess::ipcdetail::atomic_inc32(&m_wait_count);
@@ -306,7 +315,7 @@ class async_protocol_handler
 	}
 	bool finish_outer_call()
 	{
-		GULPS_LOG_L2(m_connection_context , "[levin_protocol] ,-- finish_outer_call");
+		GULPS_LOG_L2(m_connection_context, "[levin_protocol] ,-- finish_outer_call");
 		boost::interprocess::ipcdetail::atomic_dec32(&m_wait_count);
 		m_pservice_endpoint->release();
 		return true;
@@ -322,7 +331,7 @@ class async_protocol_handler
 
 		// Never call callback inside critical section, that can cause deadlock. Callback can be called when
 		// invoke_response_handler_base is cancelled
-		std::for_each(local_invoke_response_handlers.begin(), local_invoke_response_handlers.end(), [](const boost::shared_ptr<invoke_response_handler_base> &pinv_resp_hndlr) {
+		std::for_each(local_invoke_response_handlers.begin(), local_invoke_response_handlers.end(), [](const boost::shared_ptr<invoke_response_handler_base>& pinv_resp_hndlr) {
 			pinv_resp_hndlr->cancel();
 		});
 
@@ -337,7 +346,7 @@ class async_protocol_handler
 		return true;
 	}
 
-	void update_connection_context(const connection_context &contxt)
+	void update_connection_context(const connection_context& contxt)
 	{
 		m_connection_context = contxt;
 	}
@@ -355,26 +364,24 @@ class async_protocol_handler
 		m_config.m_pcommands_handler->callback(m_connection_context);
 	}
 
-	virtual bool handle_recv(const void *ptr, size_t cb)
+	virtual bool handle_recv(const void* ptr, size_t cb)
 	{
 		if(boost::interprocess::ipcdetail::atomic_read32(&m_close_called))
 			return false; //closing connections
 
 		if(!m_config.m_pcommands_handler)
 		{
-			GULPS_ERROR(m_connection_context , "Commands handler not set!");
+			GULPS_ERROR(m_connection_context, "Commands handler not set!");
 			return false;
 		}
 
 		if(m_cache_in_buffer.size() + cb > m_config.m_max_packet_size)
 		{
-			GULPS_WARN(m_connection_context , "Maximum packet size exceed!, m_max_packet_size = " , m_config.m_max_packet_size
-										  , ", packet received " , m_cache_in_buffer.size() + cb
-										  , ", connection will be closed.");
+			GULPS_WARN(m_connection_context, "Maximum packet size exceed!, m_max_packet_size = ", m_config.m_max_packet_size, ", packet received ", m_cache_in_buffer.size() + cb, ", connection will be closed.");
 			return false;
 		}
 
-		m_cache_in_buffer.append((const char *)ptr, cb);
+		m_cache_in_buffer.append((const char*)ptr, cb);
 
 		bool is_continue = true;
 		while(is_continue)
@@ -393,7 +400,7 @@ class async_protocol_handler
 							//async call scenario
 							boost::shared_ptr<invoke_response_handler_base> response_handler = m_invoke_response_handlers.front();
 							response_handler->reset_timer();
-							GULPS_LOG_L1(m_connection_context , "LEVIN_PACKET partial msg received. len=" , cb);
+							GULPS_LOG_L1(m_connection_context, "LEVIN_PACKET partial msg received. len=", cb);
 						}
 					}
 					break;
@@ -410,11 +417,7 @@ class async_protocol_handler
 
 					bool is_response = (m_oponent_protocol_ver == LEVIN_PROTOCOL_VER_1 && m_current_head.m_flags & LEVIN_PACKET_RESPONSE);
 
-					GULPS_LOG_L1(m_connection_context , "LEVIN_PACKET_RECIEVED. [len=" , m_current_head.m_cb
-												, ", flags" , m_current_head.m_flags
-												, ", r?=" , m_current_head.m_have_to_return_data
-												, ", cmd = " , m_current_head.m_command
-												, ", v=" , m_current_head.m_protocol_version);
+					GULPS_LOG_L1(m_connection_context, "LEVIN_PACKET_RECIEVED. [len=", m_current_head.m_cb, ", flags", m_current_head.m_flags, ", r?=", m_current_head.m_have_to_return_data, ", cmd = ", m_current_head.m_command, ", v=", m_current_head.m_protocol_version);
 
 					if(is_response)
 					{ //response to some invoke
@@ -438,7 +441,7 @@ class async_protocol_handler
 							//use sync call scenario
 							if(!boost::interprocess::ipcdetail::atomic_read32(&m_wait_count) && !boost::interprocess::ipcdetail::atomic_read32(&m_close_called))
 							{
-								GULPS_ERROR(m_connection_context , "no active invoke when response came, wtf?");
+								GULPS_ERROR(m_connection_context, "no active invoke when response came, wtf?");
 								return false;
 							}
 							else
@@ -466,17 +469,13 @@ class async_protocol_handler
 							m_current_head.m_have_to_return_data = false;
 							m_current_head.m_protocol_version = LEVIN_PROTOCOL_VER_1;
 							m_current_head.m_flags = LEVIN_PACKET_RESPONSE;
-							std::string send_buff((const char *)&m_current_head, sizeof(m_current_head));
+							std::string send_buff((const char*)&m_current_head, sizeof(m_current_head));
 							send_buff += return_buff;
 							CRITICAL_REGION_BEGIN(m_send_lock);
 							if(!m_pservice_endpoint->do_send(send_buff.data(), send_buff.size()))
 								return false;
 							CRITICAL_REGION_END();
-							GULPS_LOG_L1(m_connection_context , "LEVIN_PACKET_SENT. [len=" , m_current_head.m_cb
-														, ", flags" , m_current_head.m_flags
-														, ", r?=" , m_current_head.m_have_to_return_data
-														, ", cmd = " , m_current_head.m_command
-														, ", ver=" , m_current_head.m_protocol_version);
+							GULPS_LOG_L1(m_connection_context, "LEVIN_PACKET_SENT. [len=", m_current_head.m_cb, ", flags", m_current_head.m_flags, ", r?=", m_current_head.m_have_to_return_data, ", cmd = ", m_current_head.m_command, ", ver=", m_current_head.m_protocol_version);
 						}
 						else
 							m_config.m_pcommands_handler->notify(m_current_head.m_command, buff_to_invoke, m_connection_context);
@@ -488,16 +487,16 @@ class async_protocol_handler
 			{
 				if(m_cache_in_buffer.size() < sizeof(bucket_head2))
 				{
-					if(m_cache_in_buffer.size() >= sizeof(uint64_t) && *((uint64_t *)m_cache_in_buffer.data()) != LEVIN_SIGNATURE)
+					if(m_cache_in_buffer.size() >= sizeof(uint64_t) && *((uint64_t*)m_cache_in_buffer.data()) != LEVIN_SIGNATURE)
 					{
-						GULPS_WARN(m_connection_context , "Signature mismatch, connection will be closed");
+						GULPS_WARN(m_connection_context, "Signature mismatch, connection will be closed");
 						return false;
 					}
 					is_continue = false;
 					break;
 				}
 
-				bucket_head2 *phead = (bucket_head2 *)m_cache_in_buffer.data();
+				bucket_head2* phead = (bucket_head2*)m_cache_in_buffer.data();
 				if(LEVIN_SIGNATURE != phead->m_signature)
 				{
 					GULPS_LOG_ERROR(m_connection_context, "Signature mismatch, connection will be closed");
@@ -510,15 +509,13 @@ class async_protocol_handler
 				m_oponent_protocol_ver = m_current_head.m_protocol_version;
 				if(m_current_head.m_cb > m_config.m_max_packet_size)
 				{
-					GULPS_LOG_ERROR(m_connection_context , "Maximum packet size exceed!, m_max_packet_size = " , m_config.m_max_packet_size
-																										   , ", packet header received " , m_current_head.m_cb
-																										   , ", connection will be closed.");
+					GULPS_LOG_ERROR(m_connection_context, "Maximum packet size exceed!, m_max_packet_size = ", m_config.m_max_packet_size, ", packet header received ", m_current_head.m_cb, ", connection will be closed.");
 					return false;
 				}
 			}
 			break;
 			default:
-				GULPS_LOG_ERROR(m_connection_context, "Undefined state in levin_server_impl::connection_handler, m_state=",  m_state);
+				GULPS_LOG_ERROR(m_connection_context, "Undefined state in levin_server_impl::connection_handler, m_state=", m_state);
 				return false;
 			}
 		}
@@ -537,7 +534,7 @@ class async_protocol_handler
 	}
 
 	template <class callback_t>
-	bool async_invoke(int command, const std::string &in_buff, const callback_t &cb, size_t timeout = LEVIN_DEFAULT_TIMEOUT_PRECONFIGURED)
+	bool async_invoke(int command, const std::string& in_buff, const callback_t& cb, size_t timeout = LEVIN_DEFAULT_TIMEOUT_PRECONFIGURED)
 	{
 		misc_utils::auto_scope_leave_caller scope_exit_handler = misc_utils::create_scope_leave_handler(
 			boost::bind(&async_protocol_handler::finish_outer_call, this));
@@ -607,7 +604,7 @@ class async_protocol_handler
 		return true;
 	}
 
-	int invoke(int command, const std::string &in_buff, std::string &buff_out)
+	int invoke(int command, const std::string& in_buff, std::string& buff_out)
 	{
 		misc_utils::auto_scope_leave_caller scope_exit_handler = misc_utils::create_scope_leave_handler(
 			boost::bind(&async_protocol_handler::finish_outer_call, this));
@@ -644,11 +641,7 @@ class async_protocol_handler
 		}
 		CRITICAL_REGION_END();
 
-		GULPS_LOG_L1(m_connection_context , "LEVIN_PACKET_SENT. [len=" , head.m_cb
-									, ", f=" , head.m_flags
-									, ", r?=" , head.m_have_to_return_data
-									, ", cmd = " , head.m_command
-									, ", ver=" , head.m_protocol_version);
+		GULPS_LOG_L1(m_connection_context, "LEVIN_PACKET_SENT. [len=", head.m_cb, ", f=", head.m_flags, ", r?=", head.m_have_to_return_data, ", cmd = ", head.m_command, ", ver=", head.m_protocol_version);
 
 		uint64_t ticks_start = misc_utils::get_tick_count();
 		size_t prev_size = 0;
@@ -662,7 +655,7 @@ class async_protocol_handler
 			}
 			if(misc_utils::get_tick_count() - ticks_start > m_config.m_invoke_timeout)
 			{
-				GULPS_WARN(m_connection_context , "invoke timeout (" , m_config.m_invoke_timeout , "), closing connection ");
+				GULPS_WARN(m_connection_context, "invoke timeout (", m_config.m_invoke_timeout, "), closing connection ");
 				close();
 				return LEVIN_ERROR_CONNECTION_TIMEDOUT;
 			}
@@ -681,7 +674,7 @@ class async_protocol_handler
 		return m_invoke_result_code;
 	}
 
-	int notify(int command, const std::string &in_buff)
+	int notify(int command, const std::string& in_buff)
 	{
 		misc_utils::auto_scope_leave_caller scope_exit_handler = misc_utils::create_scope_leave_handler(
 			boost::bind(&async_protocol_handler::finish_outer_call, this));
@@ -715,18 +708,18 @@ class async_protocol_handler
 			return -1;
 		}
 		CRITICAL_REGION_END();
-		GULPS_LOG_L1(m_connection_context , "LEVIN_PACKET_SENT. [len=" , head.m_cb , ", f=" , head.m_flags , ", r?=" , head.m_have_to_return_data , ", cmd = " , head.m_command , ", ver=" , head.m_protocol_version);
+		GULPS_LOG_L1(m_connection_context, "LEVIN_PACKET_SENT. [len=", head.m_cb, ", f=", head.m_flags, ", r?=", head.m_have_to_return_data, ", cmd = ", head.m_command, ", ver=", head.m_protocol_version);
 
 		return 1;
 	}
 	//------------------------------------------------------------------------------------------
 	boost::uuids::uuid get_connection_id() { return m_connection_context.m_connection_id; }
 	//------------------------------------------------------------------------------------------
-	t_connection_context &get_context_ref() { return m_connection_context; }
+	t_connection_context& get_context_ref() { return m_connection_context; }
 };
 //------------------------------------------------------------------------------------------
 template <class t_connection_context>
-void async_protocol_handler_config<t_connection_context>::del_connection(async_protocol_handler<t_connection_context> *pconn)
+void async_protocol_handler_config<t_connection_context>::del_connection(async_protocol_handler<t_connection_context>* pconn)
 {
 	CRITICAL_REGION_BEGIN(m_connects_lock);
 	m_connects.erase(pconn->get_connection_id());
@@ -739,7 +732,7 @@ void async_protocol_handler_config<t_connection_context>::delete_connections(siz
 {
 	std::vector<boost::uuids::uuid> connections;
 	CRITICAL_REGION_BEGIN(m_connects_lock);
-	for(auto &c : m_connects)
+	for(auto& c : m_connects)
 	{
 		if(c.second->m_connection_context.m_is_income == incoming)
 			connections.push_back(c.first);
@@ -754,12 +747,12 @@ void async_protocol_handler_config<t_connection_context>::delete_connections(siz
 		try
 		{
 			auto i = connections.end() - 1;
-			async_protocol_handler<t_connection_context> *conn = m_connects.at(*i);
+			async_protocol_handler<t_connection_context>* conn = m_connects.at(*i);
 			del_connection(conn);
 			close(*i);
 			connections.erase(i);
 		}
-		catch(const std::out_of_range &e)
+		catch(const std::out_of_range& e)
 		{
 			GULPS_WARN("Connection not found in m_connects, continuing");
 		}
@@ -782,7 +775,7 @@ void async_protocol_handler_config<t_connection_context>::del_in_connections(siz
 }
 //------------------------------------------------------------------------------------------
 template <class t_connection_context>
-void async_protocol_handler_config<t_connection_context>::add_connection(async_protocol_handler<t_connection_context> *pconn)
+void async_protocol_handler_config<t_connection_context>::add_connection(async_protocol_handler<t_connection_context>* pconn)
 {
 	CRITICAL_REGION_BEGIN(m_connects_lock);
 	m_connects[pconn->get_connection_id()] = pconn;
@@ -791,14 +784,14 @@ void async_protocol_handler_config<t_connection_context>::add_connection(async_p
 }
 //------------------------------------------------------------------------------------------
 template <class t_connection_context>
-async_protocol_handler<t_connection_context> *async_protocol_handler_config<t_connection_context>::find_connection(boost::uuids::uuid connection_id) const
+async_protocol_handler<t_connection_context>* async_protocol_handler_config<t_connection_context>::find_connection(boost::uuids::uuid connection_id) const
 {
 	auto it = m_connects.find(connection_id);
 	return it == m_connects.end() ? 0 : it->second;
 }
 //------------------------------------------------------------------------------------------
 template <class t_connection_context>
-int async_protocol_handler_config<t_connection_context>::find_and_lock_connection(boost::uuids::uuid connection_id, async_protocol_handler<t_connection_context> *&aph)
+int async_protocol_handler_config<t_connection_context>::find_and_lock_connection(boost::uuids::uuid connection_id, async_protocol_handler<t_connection_context>*& aph)
 {
 	CRITICAL_REGION_LOCAL(m_connects_lock);
 	aph = find_connection(connection_id);
@@ -810,30 +803,30 @@ int async_protocol_handler_config<t_connection_context>::find_and_lock_connectio
 }
 //------------------------------------------------------------------------------------------
 template <class t_connection_context>
-int async_protocol_handler_config<t_connection_context>::invoke(int command, const std::string &in_buff, std::string &buff_out, boost::uuids::uuid connection_id)
+int async_protocol_handler_config<t_connection_context>::invoke(int command, const std::string& in_buff, std::string& buff_out, boost::uuids::uuid connection_id)
 {
-	async_protocol_handler<t_connection_context> *aph;
+	async_protocol_handler<t_connection_context>* aph;
 	int r = find_and_lock_connection(connection_id, aph);
 	return LEVIN_OK == r ? aph->invoke(command, in_buff, buff_out) : r;
 }
 //------------------------------------------------------------------------------------------
 template <class t_connection_context>
 template <class callback_t>
-int async_protocol_handler_config<t_connection_context>::invoke_async(int command, const std::string &in_buff, boost::uuids::uuid connection_id, const callback_t &cb, size_t timeout)
+int async_protocol_handler_config<t_connection_context>::invoke_async(int command, const std::string& in_buff, boost::uuids::uuid connection_id, const callback_t& cb, size_t timeout)
 {
-	async_protocol_handler<t_connection_context> *aph;
+	async_protocol_handler<t_connection_context>* aph;
 	int r = find_and_lock_connection(connection_id, aph);
 	return LEVIN_OK == r ? aph->async_invoke(command, in_buff, cb, timeout) : r;
 }
 //------------------------------------------------------------------------------------------
 template <class t_connection_context>
 template <class callback_t>
-bool async_protocol_handler_config<t_connection_context>::foreach_connection(const callback_t &cb)
+bool async_protocol_handler_config<t_connection_context>::foreach_connection(const callback_t& cb)
 {
 	CRITICAL_REGION_LOCAL(m_connects_lock);
-	for(auto &c : m_connects)
+	for(auto& c : m_connects)
 	{
-		async_protocol_handler<t_connection_context> *aph = c.second;
+		async_protocol_handler<t_connection_context>* aph = c.second;
 		if(!cb(aph->get_context_ref()))
 			return false;
 	}
@@ -842,10 +835,10 @@ bool async_protocol_handler_config<t_connection_context>::foreach_connection(con
 //------------------------------------------------------------------------------------------
 template <class t_connection_context>
 template <class callback_t>
-bool async_protocol_handler_config<t_connection_context>::for_connection(const boost::uuids::uuid &connection_id, const callback_t &cb)
+bool async_protocol_handler_config<t_connection_context>::for_connection(const boost::uuids::uuid& connection_id, const callback_t& cb)
 {
 	CRITICAL_REGION_LOCAL(m_connects_lock);
-	async_protocol_handler<t_connection_context> *aph = find_connection(connection_id);
+	async_protocol_handler<t_connection_context>* aph = find_connection(connection_id);
 	if(!aph)
 		return false;
 	if(!cb(aph->get_context_ref()))
@@ -861,7 +854,7 @@ size_t async_protocol_handler_config<t_connection_context>::get_connections_coun
 }
 //------------------------------------------------------------------------------------------
 template <class t_connection_context>
-void async_protocol_handler_config<t_connection_context>::set_handler(levin_commands_handler<t_connection_context> *handler, void (*destroy)(levin_commands_handler<t_connection_context> *))
+void async_protocol_handler_config<t_connection_context>::set_handler(levin_commands_handler<t_connection_context>* handler, void (*destroy)(levin_commands_handler<t_connection_context>*))
 {
 	if(m_pcommands_handler && m_pcommands_handler_destroy)
 		(*m_pcommands_handler_destroy)(m_pcommands_handler);
@@ -870,9 +863,9 @@ void async_protocol_handler_config<t_connection_context>::set_handler(levin_comm
 }
 //------------------------------------------------------------------------------------------
 template <class t_connection_context>
-int async_protocol_handler_config<t_connection_context>::notify(int command, const std::string &in_buff, boost::uuids::uuid connection_id)
+int async_protocol_handler_config<t_connection_context>::notify(int command, const std::string& in_buff, boost::uuids::uuid connection_id)
 {
-	async_protocol_handler<t_connection_context> *aph;
+	async_protocol_handler<t_connection_context>* aph;
 	int r = find_and_lock_connection(connection_id, aph);
 	return LEVIN_OK == r ? aph->notify(command, in_buff) : r;
 }
@@ -881,15 +874,15 @@ template <class t_connection_context>
 bool async_protocol_handler_config<t_connection_context>::close(boost::uuids::uuid connection_id)
 {
 	CRITICAL_REGION_LOCAL(m_connects_lock);
-	async_protocol_handler<t_connection_context> *aph = find_connection(connection_id);
+	async_protocol_handler<t_connection_context>* aph = find_connection(connection_id);
 	return 0 != aph ? aph->close() : false;
 }
 //------------------------------------------------------------------------------------------
 template <class t_connection_context>
-bool async_protocol_handler_config<t_connection_context>::update_connection_context(const t_connection_context &contxt)
+bool async_protocol_handler_config<t_connection_context>::update_connection_context(const t_connection_context& contxt)
 {
 	CRITICAL_REGION_LOCAL(m_connects_lock);
-	async_protocol_handler<t_connection_context> *aph = find_connection(contxt.m_connection_id);
+	async_protocol_handler<t_connection_context>* aph = find_connection(contxt.m_connection_id);
 	if(0 == aph)
 		return false;
 	aph->update_connection_context(contxt);
@@ -899,7 +892,7 @@ bool async_protocol_handler_config<t_connection_context>::update_connection_cont
 template <class t_connection_context>
 bool async_protocol_handler_config<t_connection_context>::request_callback(boost::uuids::uuid connection_id)
 {
-	async_protocol_handler<t_connection_context> *aph;
+	async_protocol_handler<t_connection_context>* aph;
 	int r = find_and_lock_connection(connection_id, aph);
 	if(LEVIN_OK == r)
 	{
@@ -911,5 +904,5 @@ bool async_protocol_handler_config<t_connection_context>::request_callback(boost
 		return false;
 	}
 }
-}
-}
+} // namespace levin
+} // namespace epee

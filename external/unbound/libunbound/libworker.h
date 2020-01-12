@@ -65,7 +65,8 @@ struct query_info;
  * The library-worker status structure
  * Internal to the worker.
  */
-struct libworker {
+struct libworker
+{
 	/** every worker has a unique thread_num. (first in struct) */
 	int thread_num;
 	/** context we are operating under */

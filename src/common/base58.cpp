@@ -120,7 +120,7 @@ struct decoded_block_sizes
 
 decoded_block_sizes decoded_block_sizes::instance;
 
-uint64_t uint_8be_to_64(const uint8_t *data, size_t size)
+uint64_t uint_8be_to_64(const uint8_t* data, size_t size)
 {
 	assert(1 <= size && size <= sizeof(uint64_t));
 
@@ -158,19 +158,19 @@ uint64_t uint_8be_to_64(const uint8_t *data, size_t size)
 	return res;
 }
 
-void uint_64_to_8be(uint64_t num, size_t size, uint8_t *data)
+void uint_64_to_8be(uint64_t num, size_t size, uint8_t* data)
 {
 	assert(1 <= size && size <= sizeof(uint64_t));
 
 	uint64_t num_be = SWAP64BE(num);
-	memcpy(data, reinterpret_cast<uint8_t *>(&num_be) + sizeof(uint64_t) - size, size);
+	memcpy(data, reinterpret_cast<uint8_t*>(&num_be) + sizeof(uint64_t) - size, size);
 }
 
-void encode_block(const char *block, size_t size, char *res)
+void encode_block(const char* block, size_t size, char* res)
 {
 	assert(1 <= size && size <= full_block_size);
 
-	uint64_t num = uint_8be_to_64(reinterpret_cast<const uint8_t *>(block), size);
+	uint64_t num = uint_8be_to_64(reinterpret_cast<const uint8_t*>(block), size);
 	int i = static_cast<int>(encoded_block_sizes[size]) - 1;
 	while(0 < num)
 	{
@@ -181,7 +181,7 @@ void encode_block(const char *block, size_t size, char *res)
 	}
 }
 
-bool decode_block(const char *block, size_t size, char *res)
+bool decode_block(const char* block, size_t size, char* res)
 {
 	assert(1 <= size && size <= full_encoded_block_size);
 
@@ -209,13 +209,13 @@ bool decode_block(const char *block, size_t size, char *res)
 	if(static_cast<size_t>(res_size) < full_block_size && (UINT64_C(1) << (8 * res_size)) <= res_num)
 		return false; // Overflow
 
-	uint_64_to_8be(res_num, res_size, reinterpret_cast<uint8_t *>(res));
+	uint_64_to_8be(res_num, res_size, reinterpret_cast<uint8_t*>(res));
 
 	return true;
 }
-}
+} // namespace
 
-std::string encode(const std::string &data)
+std::string encode(const std::string& data)
 {
 	if(data.empty())
 		return std::string();
@@ -238,7 +238,7 @@ std::string encode(const std::string &data)
 	return res;
 }
 
-bool decode(const std::string &enc, std::string &data)
+bool decode(const std::string& enc, std::string& data)
 {
 	if(enc.empty())
 	{
@@ -263,24 +263,24 @@ bool decode(const std::string &enc, std::string &data)
 	if(0 < last_block_size)
 	{
 		if(!decode_block(enc.data() + full_block_count * full_encoded_block_size, last_block_size,
-						 &data[full_block_count * full_block_size]))
+			   &data[full_block_count * full_block_size]))
 			return false;
 	}
 
 	return true;
 }
 
-std::string encode_addr(uint64_t tag, const std::string &data)
+std::string encode_addr(uint64_t tag, const std::string& data)
 {
 	std::string buf = get_varint_data(tag);
 	buf += data;
 	crypto::hash hash = crypto::cn_fast_hash(buf.data(), buf.size());
-	const char *hash_data = reinterpret_cast<const char *>(&hash);
+	const char* hash_data = reinterpret_cast<const char*>(&hash);
 	buf.append(hash_data, addr_checksum_size);
 	return encode(buf);
 }
 
-bool decode_addr(std::string addr, uint64_t &tag, std::string &data)
+bool decode_addr(std::string addr, uint64_t& tag, std::string& data)
 {
 	std::string addr_data;
 	bool r = decode(addr, addr_data);
@@ -294,7 +294,7 @@ bool decode_addr(std::string addr, uint64_t &tag, std::string &data)
 
 	addr_data.resize(addr_data.size() - addr_checksum_size);
 	crypto::hash hash = crypto::cn_fast_hash(addr_data.data(), addr_data.size());
-	std::string expected_checksum(reinterpret_cast<const char *>(&hash), addr_checksum_size);
+	std::string expected_checksum(reinterpret_cast<const char*>(&hash), addr_checksum_size);
 	if(expected_checksum != checksum)
 		return false;
 
@@ -305,5 +305,5 @@ bool decode_addr(std::string addr, uint64_t &tag, std::string &data)
 	data = addr_data.substr(read);
 	return true;
 }
-}
-}
+} // namespace base58
+} // namespace tools

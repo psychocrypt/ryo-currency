@@ -37,10 +37,10 @@ static const rct::key TESTPOW2SCALAR = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 static const rct::key TESTSMALLSCALAR = {{5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 static const rct::key TESTPOINT = rct::scalarmultBase(rct::skGen());
 
-static rct::key basic(const std::vector<rct::MultiexpData> &data)
+static rct::key basic(const std::vector<rct::MultiexpData>& data)
 {
 	ge_p3 res_p3 = ge_p3_identity;
-	for(const auto &d : data)
+	for(const auto& d : data)
 	{
 		ge_cached cached;
 		ge_p3 p3;
@@ -55,7 +55,7 @@ static rct::key basic(const std::vector<rct::MultiexpData> &data)
 	return res;
 }
 
-static ge_p3 get_p3(const rct::key &point)
+static ge_p3 get_p3(const rct::key& point)
 {
 	ge_p3 p3;
 	EXPECT_TRUE(ge_frombytes_vartime(&p3, point.bytes) == 0);
@@ -152,7 +152,7 @@ TEST(multiexp, pippenger_only_zeroes)
 	rct::bp_cache exp;
 	for(int n = 0; n < 16; ++n)
 		exp.me_pad.push_back({rct::zero(), get_p3(TESTPOINT)});
-	ASSERT_TRUE(basic(exp.me_pad) ==  exp.multiexp_p());
+	ASSERT_TRUE(basic(exp.me_pad) == exp.multiexp_p());
 }
 
 TEST(multiexp, bos_coster_only_identities)

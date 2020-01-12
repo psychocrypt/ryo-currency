@@ -31,17 +31,15 @@
 
 #include "common/gulps.hpp"
 
-
-
 namespace epee
 {
 namespace levin
 {
 template <class t_struct>
-bool pack_struct_to_levin_message(const t_struct &t, std::string &buff, int command_id)
+bool pack_struct_to_levin_message(const t_struct& t, std::string& buff, int command_id)
 {
 	buff.resize(sizeof(levin::bucket_head));
-	levin::bucket_head &head = *(levin::bucket_head *)(&buff[0]);
+	levin::bucket_head& head = *(levin::bucket_head*)(&buff[0]);
 	head.m_signature = LEVIN_SIGNATURE;
 	head.m_cb = 0;
 	head.m_have_to_return_data = true;
@@ -59,10 +57,10 @@ bool pack_struct_to_levin_message(const t_struct &t, std::string &buff, int comm
 	return true;
 }
 
-bool pack_data_to_levin_message(const std::string &data, std::string &buff, int command_id)
+bool pack_data_to_levin_message(const std::string& data, std::string& buff, int command_id)
 {
 	buff.resize(sizeof(levin::bucket_head));
-	levin::bucket_head &head = *(levin::bucket_head *)(&buff[0]);
+	levin::bucket_head& head = *(levin::bucket_head*)(&buff[0]);
 	head.m_signature = LEVIN_SIGNATURE;
 	head.m_cb = 0;
 	head.m_have_to_return_data = true;
@@ -76,7 +74,7 @@ bool pack_data_to_levin_message(const std::string &data, std::string &buff, int 
 	return true;
 }
 
-bool load_levin_data_from_levin_message(std::string &levin_data, const std::string &buff, int &command)
+bool load_levin_data_from_levin_message(std::string& levin_data, const std::string& buff, int& command)
 {
 	GULPS_CAT_MAJOR("epee_lev_help");
 	if(buff.size() < sizeof(levin::bucket_head))
@@ -85,7 +83,7 @@ bool load_levin_data_from_levin_message(std::string &levin_data, const std::stri
 		return false;
 	}
 
-	levin::bucket_head &head = *(levin::bucket_head *)(&buff[0]);
+	levin::bucket_head& head = *(levin::bucket_head*)(&buff[0]);
 	if(head.m_signature != LEVIN_SIGNATURE)
 	{
 		GULPS_LOG_L3("Failed to read signature in levin message, at load_struct_from_levin_message");
@@ -104,7 +102,7 @@ bool load_levin_data_from_levin_message(std::string &levin_data, const std::stri
 }
 
 template <class t_struct>
-bool load_struct_from_levin_message(t_struct &t, const std::string &buff, int &command)
+bool load_struct_from_levin_message(t_struct& t, const std::string& buff, int& command)
 {
 	GULPS_CAT_MAJOR("epee_lev_help");
 	if(buff.size() < sizeof(levin::bucket_head))
@@ -113,7 +111,7 @@ bool load_struct_from_levin_message(t_struct &t, const std::string &buff, int &c
 		return false;
 	}
 
-	levin::bucket_head &head = *(levin::bucket_head *)(&buff[0]);
+	levin::bucket_head& head = *(levin::bucket_head*)(&buff[0]);
 	if(head.m_signature != LEVIN_SIGNATURE)
 	{
 		GULPS_ERROR("Failed to read signature in levin message, at load_struct_from_levin_message");
@@ -136,5 +134,5 @@ bool load_struct_from_levin_message(t_struct &t, const std::string &buff, int &c
 	command = head.m_command;
 	return true;
 }
-}
-}
+} // namespace levin
+} // namespace epee

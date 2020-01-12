@@ -42,8 +42,6 @@
 
 #include "common/gulps.hpp"
 
-
-
 #define LEVIN_DEFAULT_DATA_BUFF_SIZE 2000
 
 namespace epee
@@ -55,6 +53,7 @@ template <class TProtocol>
 class cp_server_impl //: public abstract_handler
 {
 	GULPS_CAT_MAJOR("epee_tcp_srv");
+
   public:
 	cp_server_impl(/*abstract_handler* phandler = NULL*/);
 	virtual ~cp_server_impl();
@@ -66,7 +65,8 @@ class cp_server_impl //: public abstract_handler
 	bool is_stop_signal();
 	virtual bool on_net_idle() { return true; }
 	size_t get_active_connections_num();
-	typename TProtocol::config_type &get_config_object() { return m_config; }
+	typename TProtocol::config_type& get_config_object() { return m_config; }
+
   private:
 	enum overlapped_operation_type
 	{
@@ -90,7 +90,13 @@ class cp_server_impl //: public abstract_handler
 	template <class TProtocol>
 	struct connection : public net_utils::i_service_endpoint
 	{
-		connection(typename TProtocol::config_type &ref_config) : m_sock(INVALID_SOCKET), m_tprotocol_handler(this, ref_config, context), m_psend_data(NULL), m_precv_data(NULL), m_asked_to_shutdown(0), m_connection_shutwoned(0)
+		connection(typename TProtocol::config_type& ref_config) :
+			m_sock(INVALID_SOCKET),
+			m_tprotocol_handler(this, ref_config, context),
+			m_psend_data(NULL),
+			m_precv_data(NULL),
+			m_asked_to_shutdown(0),
+			m_connection_shutwoned(0)
 		{
 		}
 
@@ -98,16 +104,16 @@ class cp_server_impl //: public abstract_handler
 		//{
 		//}
 
-		connection<TProtocol> &operator=(const connection<TProtocol> &obj)
+		connection<TProtocol>& operator=(const connection<TProtocol>& obj)
 		{
 			return *this;
 		}
 
 		bool init_buffers()
 		{
-			m_psend_data = (io_data_base *)new char[sizeof(io_data_base) + LEVIN_DEFAULT_DATA_BUFF_SIZE - 1];
+			m_psend_data = (io_data_base*)new char[sizeof(io_data_base) + LEVIN_DEFAULT_DATA_BUFF_SIZE - 1];
 			m_psend_data->TotalBuffBytes = LEVIN_DEFAULT_DATA_BUFF_SIZE;
-			m_precv_data = (io_data_base *)new char[sizeof(io_data_base) + LEVIN_DEFAULT_DATA_BUFF_SIZE - 1];
+			m_precv_data = (io_data_base*)new char[sizeof(io_data_base) + LEVIN_DEFAULT_DATA_BUFF_SIZE - 1];
 			m_precv_data->TotalBuffBytes = LEVIN_DEFAULT_DATA_BUFF_SIZE;
 			return true;
 		}
@@ -117,7 +123,7 @@ class cp_server_impl //: public abstract_handler
 			if(!::InterlockedCompareExchange(&m_asked_to_shutdown, 1, 0))
 			{
 				m_psend_data->m_op_type = op_type_stop;
-				::PostQueuedCompletionStatus(m_completion_port, 0, (ULONG_PTR) this, &m_psend_data->m_overlapped);
+				::PostQueuedCompletionStatus(m_completion_port, 0, (ULONG_PTR)this, &m_psend_data->m_overlapped);
 			}
 			return true;
 		}
@@ -136,7 +142,7 @@ class cp_server_impl //: public abstract_handler
 			if(m_precv_data)
 				delete m_precv_data;
 		}
-		virtual bool handle_send(const void *ptr, size_t cb)
+		virtual bool handle_send(const void* ptr, size_t cb)
 		{
 			PROFILE_FUNC("[handle_send]");
 			if(m_psend_data->TotalBuffBytes < cb)
@@ -191,7 +197,7 @@ class cp_server_impl //: public abstract_handler
 			return true;
 
 		delete m_psend_data;
-		m_psend_data = (io_data_base *)new char[sizeof(io_data_base) + new_size - 1];
+		m_psend_data = (io_data_base*)new char[sizeof(io_data_base) + new_size - 1];
 		m_psend_data->TotalBuffBytes = new_size;
 		GULPS_PRINT_L3("Connection buffer resized up to ", new_size);
 		return true;
@@ -201,8 +207,8 @@ class cp_server_impl //: public abstract_handler
 	net_utils::connection_context_base context;
 	TProtocol m_tprotocol_handler;
 	typename TProtocol::config_type m_dummy_config;
-	io_data_base *m_precv_data;
-	io_data_base *m_psend_data;
+	io_data_base* m_precv_data;
+	io_data_base* m_psend_data;
 	HANDLE m_completion_port;
 	volatile LONG m_asked_to_shutdown;
 	volatile LONG m_connection_shutwoned;
@@ -210,10 +216,10 @@ class cp_server_impl //: public abstract_handler
 PRAGMA_WARNING_POP
 
 bool worker_thread_member();
-static unsigned CALLBACK worker_thread(void *param);
+static unsigned CALLBACK worker_thread(void* param);
 
 bool add_new_connection(SOCKET new_sock, long ip_from, int port_from);
-bool shutdown_connection(connection<TProtocol> *pconn);
+bool shutdown_connection(connection<TProtocol>* pconn);
 
 typedef std::map<SOCKET, boost::shared_ptr<connection<TProtocol>>> connections_container;
 SOCKET m_listen_socket;
@@ -226,8 +232,8 @@ volatile LONG m_stop;
 bool m_initialized;
 volatile LONG m_worker_thread_counter;
 typename TProtocol::config_type m_config;
-};
-}
+}; // namespace net_utils
+} // namespace epee
 }
 #include "abstract_tcp_server_cp.inl"
 

@@ -61,13 +61,13 @@ namespace command_line
 {
 namespace
 {
-const char *tr(const char *str)
+const char* tr(const char* str)
 {
 	return i18n_translate(str, "command_line");
 }
-}
+} // namespace
 
-bool is_yes(const std::string &str)
+bool is_yes(const std::string& str)
 {
 	if(str == "y" || str == "Y")
 		return true;
@@ -81,7 +81,7 @@ bool is_yes(const std::string &str)
 	return false;
 }
 
-bool is_no(const std::string &str)
+bool is_no(const std::string& str)
 {
 	if(str == "n" || str == "N")
 		return true;
@@ -133,4 +133,4 @@ void set_console_utf8()
 
 const arg_descriptor<bool> arg_help = {"help", "Produce help message"};
 const arg_descriptor<bool> arg_version = {"version", "Output version information"};
-}
+} // namespace command_line

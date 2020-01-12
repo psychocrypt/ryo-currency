@@ -84,7 +84,7 @@ enum
 template <typename OutputIt, typename T>
 /* Requires T to be both an integral type and unsigned, should be a compile error if it is not */
 typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value, void>::type
-write_varint(OutputIt &&dest, T i)
+write_varint(OutputIt&& dest, T i)
 {
 	/* Make sure that there is one after this */
 	while(i >= 0x80)
@@ -101,7 +101,7 @@ write_varint(OutputIt &&dest, T i)
 /*! \brief Returns the string that represents the varint
    */
 template <typename T>
-std::string get_varint_data(const T &v)
+std::string get_varint_data(const T& v)
 {
 	std::stringstream ss;
 	write_varint(std::ostreambuf_iterator<char>(ss), v);
@@ -111,7 +111,7 @@ std::string get_varint_data(const T &v)
    */
 template <int bits, typename InputIt, typename T>
 typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value && 0 <= bits && bits <= std::numeric_limits<T>::digits, int>::type
-read_varint(InputIt &&first, InputIt &&last, T &write)
+read_varint(InputIt&& first, InputIt&& last, T& write)
 {
 	int read = 0;
 	write = 0;
@@ -148,8 +148,8 @@ read_varint(InputIt &&first, InputIt &&last, T &write)
    *  Sets template parameters for you.
    */
 template <typename InputIt, typename T>
-int read_varint(InputIt &&first, InputIt &&last, T &i)
+int read_varint(InputIt&& first, InputIt&& last, T& i)
 {
 	return read_varint<std::numeric_limits<T>::digits, InputIt, T>(std::move(first), std::move(last), i);
 }
-}
+} // namespace tools

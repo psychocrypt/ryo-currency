@@ -57,7 +57,7 @@ size_t nsec3_hash_algo_size_supported(int id);
  * @return false on failure.
 */
 int secalgo_nsec3_hash(int algo, unsigned char* buf, size_t len,
-        unsigned char* res);
+	unsigned char* res);
 
 /**
  * Calculate the sha256 hash for the data buffer into the result.

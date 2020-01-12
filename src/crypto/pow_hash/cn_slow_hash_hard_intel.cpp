@@ -79,7 +79,7 @@ inline void aes_genkey_sub(__m128i& xout0, __m128i& xout2)
 }
 
 inline void aes_genkey(const __m128i* memory, __m128i& k0, __m128i& k1, __m128i& k2, __m128i& k3, __m128i& k4,
-					   __m128i& k5, __m128i& k6, __m128i& k7, __m128i& k8, __m128i& k9)
+	__m128i& k5, __m128i& k6, __m128i& k7, __m128i& k8, __m128i& k9)
 {
 	__m128i xout0, xout2;
 
@@ -413,11 +413,11 @@ inline __m128 _mm_set1_ps_epi32(uint32_t x)
 	return _mm_castsi128_ps(_mm_set1_epi32(x));
 }
 
-inline __m128 fma_break(__m128 x) 
-{ 
-	// Break the dependency chain by setitng the exp to ?????01 
-	__m128 xx = _mm_and_ps(_mm_set1_ps_epi32(0xFEFFFFFF), x); 
-	return _mm_or_ps(_mm_set1_ps_epi32(0x00800000), xx); 
+inline __m128 fma_break(__m128 x)
+{
+	// Break the dependency chain by setitng the exp to ?????01
+	__m128 xx = _mm_and_ps(_mm_set1_ps_epi32(0xFEFFFFFF), x);
+	return _mm_or_ps(_mm_set1_ps_epi32(0x00800000), xx);
 }
 
 // 14

@@ -96,7 +96,7 @@ const int kStdErrFileno = STDERR_FILENO;
 namespace
 {
 template <typename T>
-T ReadProcFileField(const string &filename, int field)
+T ReadProcFileField(const string& filename, int field)
 {
 	std::string dummy;
 	std::ifstream file(filename.c_str());
@@ -131,8 +131,8 @@ size_t GetThreadCount()
 		// task_threads allocates resources in thread_list and we need to free them
 		// to avoid leaks.
 		vm_deallocate(task,
-					  reinterpret_cast<vm_address_t>(thread_list),
-					  sizeof(thread_t) * thread_count);
+			reinterpret_cast<vm_address_t>(thread_list),
+			sizeof(thread_t) * thread_count);
 		return static_cast<size_t>(thread_count);
 	}
 	else
@@ -201,11 +201,11 @@ void SleepMilliseconds(int n)
 	::Sleep(n);
 }
 
-AutoHandle::AutoHandle()
-	: handle_(INVALID_HANDLE_VALUE) {}
+AutoHandle::AutoHandle() :
+	handle_(INVALID_HANDLE_VALUE) {}
 
-AutoHandle::AutoHandle(Handle handle)
-	: handle_(handle) {}
+AutoHandle::AutoHandle(Handle handle) :
+	handle_(handle) {}
 
 AutoHandle::~AutoHandle()
 {
@@ -248,11 +248,11 @@ bool AutoHandle::IsCloseable() const
 	return handle_ != NULL && handle_ != INVALID_HANDLE_VALUE;
 }
 
-Notification::Notification()
-	: event_(::CreateEvent(NULL,  // Default security attributes.
-						   TRUE,  // Do not reset automatically.
-						   FALSE, // Initially unset.
-						   NULL))
+Notification::Notification() :
+	event_(::CreateEvent(NULL, // Default security attributes.
+		TRUE,				   // Do not reset automatically.
+		FALSE,				   // Initially unset.
+		NULL))
 { // Anonymous event.
 	GTEST_CHECK_(event_.Get() != NULL);
 }
@@ -268,11 +268,11 @@ void Notification::WaitForNotification()
 		::WaitForSingleObject(event_.Get(), INFINITE) == WAIT_OBJECT_0);
 }
 
-Mutex::Mutex()
-	: owner_thread_id_(0),
-	  type_(kDynamic),
-	  critical_section_init_phase_(0),
-	  critical_section_(new CRITICAL_SECTION)
+Mutex::Mutex() :
+	owner_thread_id_(0),
+	type_(kDynamic),
+	critical_section_init_phase_(0),
+	critical_section_(new CRITICAL_SECTION)
 {
 	::InitializeCriticalSection(critical_section_);
 }
@@ -343,8 +343,8 @@ void Mutex::ThreadSafeLazyInit()
 			// Somebody else is already initializing the mutex; spin until they
 			// are done.
 			while(::InterlockedCompareExchange(&critical_section_init_phase_,
-											   2L,
-											   2L) != 2L)
+					  2L,
+					  2L) != 2L)
 			{
 				// Possibly yields the rest of the thread's time slice to other
 				// threads.
@@ -369,10 +369,10 @@ namespace
 class ThreadWithParamSupport : public ThreadWithParamBase
 {
   public:
-	static HANDLE CreateThread(Runnable *runnable,
-							   Notification *thread_can_start)
+	static HANDLE CreateThread(Runnable* runnable,
+		Notification* thread_can_start)
 	{
-		ThreadMainParam *param = new ThreadMainParam(runnable, thread_can_start);
+		ThreadMainParam* param = new ThreadMainParam(runnable, thread_can_start);
 		DWORD thread_id;
 		// TODO(yukawa): Consider to use _beginthreadex instead.
 		HANDLE thread_handle = ::CreateThread(
@@ -394,20 +394,20 @@ class ThreadWithParamSupport : public ThreadWithParamBase
   private:
 	struct ThreadMainParam
 	{
-		ThreadMainParam(Runnable *runnable, Notification *thread_can_start)
-			: runnable_(runnable),
-			  thread_can_start_(thread_can_start)
+		ThreadMainParam(Runnable* runnable, Notification* thread_can_start) :
+			runnable_(runnable),
+			thread_can_start_(thread_can_start)
 		{
 		}
 		scoped_ptr<Runnable> runnable_;
 		// Does not own.
-		Notification *thread_can_start_;
+		Notification* thread_can_start_;
 	};
 
-	static DWORD WINAPI ThreadMain(void *ptr)
+	static DWORD WINAPI ThreadMain(void* ptr)
 	{
 		// Transfers ownership.
-		scoped_ptr<ThreadMainParam> param(static_cast<ThreadMainParam *>(ptr));
+		scoped_ptr<ThreadMainParam> param(static_cast<ThreadMainParam*>(ptr));
 		if(param->thread_can_start_ != NULL)
 			param->thread_can_start_->WaitForNotification();
 		param->runnable_->Run();
@@ -422,10 +422,10 @@ class ThreadWithParamSupport : public ThreadWithParamBase
 
 } // namespace
 
-ThreadWithParamBase::ThreadWithParamBase(Runnable *runnable,
-										 Notification *thread_can_start)
-	: thread_(ThreadWithParamSupport::CreateThread(runnable,
-												   thread_can_start))
+ThreadWithParamBase::ThreadWithParamBase(Runnable* runnable,
+	Notification* thread_can_start) :
+	thread_(ThreadWithParamSupport::CreateThread(runnable,
+		thread_can_start))
 {
 }
 
@@ -449,12 +449,12 @@ class ThreadLocalRegistryImpl
   public:
 	// Registers thread_local_instance as having value on the current thread.
 	// Returns a value that can be used to identify the thread from other threads.
-	static ThreadLocalValueHolderBase *GetValueOnCurrentThread(
-		const ThreadLocalBase *thread_local_instance)
+	static ThreadLocalValueHolderBase* GetValueOnCurrentThread(
+		const ThreadLocalBase* thread_local_instance)
 	{
 		DWORD current_thread = ::GetCurrentThreadId();
 		MutexLock lock(&mutex_);
-		ThreadIdToThreadLocals *const thread_to_thread_locals =
+		ThreadIdToThreadLocals* const thread_to_thread_locals =
 			GetThreadLocalsMapLocked();
 		ThreadIdToThreadLocals::iterator thread_local_pos =
 			thread_to_thread_locals->find(current_thread);
@@ -465,7 +465,7 @@ class ThreadLocalRegistryImpl
 								   .first;
 			StartWatcherThreadFor(current_thread);
 		}
-		ThreadLocalValues &thread_local_values = thread_local_pos->second;
+		ThreadLocalValues& thread_local_values = thread_local_pos->second;
 		ThreadLocalValues::iterator value_pos =
 			thread_local_values.find(thread_local_instance);
 		if(value_pos == thread_local_values.end())
@@ -482,21 +482,21 @@ class ThreadLocalRegistryImpl
 	}
 
 	static void OnThreadLocalDestroyed(
-		const ThreadLocalBase *thread_local_instance)
+		const ThreadLocalBase* thread_local_instance)
 	{
 		std::vector<linked_ptr<ThreadLocalValueHolderBase>> value_holders;
 		// Clean up the ThreadLocalValues data structure while holding the lock, but
 		// defer the destruction of the ThreadLocalValueHolderBases.
 		{
 			MutexLock lock(&mutex_);
-			ThreadIdToThreadLocals *const thread_to_thread_locals =
+			ThreadIdToThreadLocals* const thread_to_thread_locals =
 				GetThreadLocalsMapLocked();
 			for(ThreadIdToThreadLocals::iterator it =
 					thread_to_thread_locals->begin();
 				it != thread_to_thread_locals->end();
 				++it)
 			{
-				ThreadLocalValues &thread_local_values = it->second;
+				ThreadLocalValues& thread_local_values = it->second;
 				ThreadLocalValues::iterator value_pos =
 					thread_local_values.find(thread_local_instance);
 				if(value_pos != thread_local_values.end())
@@ -520,13 +520,13 @@ class ThreadLocalRegistryImpl
 		// lock, but defer the destruction of the ThreadLocalValueHolderBases.
 		{
 			MutexLock lock(&mutex_);
-			ThreadIdToThreadLocals *const thread_to_thread_locals =
+			ThreadIdToThreadLocals* const thread_to_thread_locals =
 				GetThreadLocalsMapLocked();
 			ThreadIdToThreadLocals::iterator thread_local_pos =
 				thread_to_thread_locals->find(thread_id);
 			if(thread_local_pos != thread_to_thread_locals->end())
 			{
-				ThreadLocalValues &thread_local_values = thread_local_pos->second;
+				ThreadLocalValues& thread_local_values = thread_local_pos->second;
 				for(ThreadLocalValues::iterator value_pos =
 						thread_local_values.begin();
 					value_pos != thread_local_values.end();
@@ -543,8 +543,8 @@ class ThreadLocalRegistryImpl
 
   private:
 	// In a particular thread, maps a ThreadLocal object to its value.
-	typedef std::map<const ThreadLocalBase *,
-					 linked_ptr<ThreadLocalValueHolderBase>>
+	typedef std::map<const ThreadLocalBase*,
+		linked_ptr<ThreadLocalValueHolderBase>>
 		ThreadLocalValues;
 	// Stores all ThreadIdToThreadLocals having values in a thread, indexed by
 	// thread's ID.
@@ -559,8 +559,8 @@ class ThreadLocalRegistryImpl
 		// The returned handle will be kept in thread_map and closed by
 		// watcher_thread in WatcherThreadFunc.
 		HANDLE thread = ::OpenThread(SYNCHRONIZE | THREAD_QUERY_INFORMATION,
-									 FALSE,
-									 thread_id);
+			FALSE,
+			thread_id);
 		GTEST_CHECK_(thread != NULL);
 		// We need to to pass a valid thread ID pointer into CreateThread for it
 		// to work correctly under Win98.
@@ -576,7 +576,7 @@ class ThreadLocalRegistryImpl
 		// Give the watcher thread the same priority as ours to avoid being
 		// blocked by it.
 		::SetThreadPriority(watcher_thread,
-							::GetThreadPriority(::GetCurrentThread()));
+			::GetThreadPriority(::GetCurrentThread()));
 		::ResumeThread(watcher_thread);
 		::CloseHandle(watcher_thread);
 	}
@@ -585,8 +585,8 @@ class ThreadLocalRegistryImpl
 	// ThreadIdToThreadLocals about thread termination.
 	static DWORD WINAPI WatcherThreadFunc(LPVOID param)
 	{
-		const ThreadIdAndHandle *tah =
-			reinterpret_cast<const ThreadIdAndHandle *>(param);
+		const ThreadIdAndHandle* tah =
+			reinterpret_cast<const ThreadIdAndHandle*>(param);
 		GTEST_CHECK_(
 			::WaitForSingleObject(tah->second, INFINITE) == WAIT_OBJECT_0);
 		OnThreadExit(tah->first);
@@ -596,10 +596,10 @@ class ThreadLocalRegistryImpl
 	}
 
 	// Returns map of thread local instances.
-	static ThreadIdToThreadLocals *GetThreadLocalsMapLocked()
+	static ThreadIdToThreadLocals* GetThreadLocalsMapLocked()
 	{
 		mutex_.AssertHeld();
-		static ThreadIdToThreadLocals *map = new ThreadIdToThreadLocals;
+		static ThreadIdToThreadLocals* map = new ThreadIdToThreadLocals;
 		return map;
 	}
 
@@ -612,15 +612,15 @@ class ThreadLocalRegistryImpl
 Mutex ThreadLocalRegistryImpl::mutex_(Mutex::kStaticMutex);
 Mutex ThreadLocalRegistryImpl::thread_map_mutex_(Mutex::kStaticMutex);
 
-ThreadLocalValueHolderBase *ThreadLocalRegistry::GetValueOnCurrentThread(
-	const ThreadLocalBase *thread_local_instance)
+ThreadLocalValueHolderBase* ThreadLocalRegistry::GetValueOnCurrentThread(
+	const ThreadLocalBase* thread_local_instance)
 {
 	return ThreadLocalRegistryImpl::GetValueOnCurrentThread(
 		thread_local_instance);
 }
 
 void ThreadLocalRegistry::OnThreadLocalDestroyed(
-	const ThreadLocalBase *thread_local_instance)
+	const ThreadLocalBase* thread_local_instance)
 {
 	ThreadLocalRegistryImpl::OnThreadLocalDestroyed(thread_local_instance);
 }
@@ -642,11 +642,11 @@ RE::~RE()
 		regfree(&partial_regex_);
 		regfree(&full_regex_);
 	}
-	free(const_cast<char *>(pattern_));
+	free(const_cast<char*>(pattern_));
 }
 
 // Returns true iff regular expression re matches the entire str.
-bool RE::FullMatch(const char *str, const RE &re)
+bool RE::FullMatch(const char* str, const RE& re)
 {
 	if(!re.is_valid_)
 		return false;
@@ -657,7 +657,7 @@ bool RE::FullMatch(const char *str, const RE &re)
 
 // Returns true iff regular expression re matches a substring of str
 // (including str itself).
-bool RE::PartialMatch(const char *str, const RE &re)
+bool RE::PartialMatch(const char* str, const RE& re)
 {
 	if(!re.is_valid_)
 		return false;
@@ -667,14 +667,14 @@ bool RE::PartialMatch(const char *str, const RE &re)
 }
 
 // Initializes an RE from its string representation.
-void RE::Init(const char *regex)
+void RE::Init(const char* regex)
 {
 	pattern_ = posix::StrDup(regex);
 
 	// Reserves enough bytes to hold the regular expression used for a
 	// full match.
 	const size_t full_regex_len = strlen(regex) + 10;
-	char *const full_pattern = new char[full_regex_len];
+	char* const full_pattern = new char[full_regex_len];
 
 	snprintf(full_pattern, full_regex_len, "^(%s)$", regex);
 	is_valid_ = regcomp(&full_regex_, full_pattern, REG_EXTENDED) == 0;
@@ -688,7 +688,7 @@ void RE::Init(const char *regex)
 	// regex.  We change it to an equivalent form "()" to be safe.
 	if(is_valid_)
 	{
-		const char *const partial_regex = (*regex == '\0') ? "()" : regex;
+		const char* const partial_regex = (*regex == '\0') ? "()" : regex;
 		is_valid_ = regcomp(&partial_regex_, partial_regex, REG_EXTENDED) == 0;
 	}
 	EXPECT_TRUE(is_valid_)
@@ -702,7 +702,7 @@ void RE::Init(const char *regex)
 
 // Returns true iff ch appears anywhere in str (excluding the
 // terminating '\0' character).
-bool IsInSet(char ch, const char *str)
+bool IsInSet(char ch, const char* str)
 {
 	return ch != '\0' && strchr(str, ch) != NULL;
 }
@@ -767,7 +767,7 @@ bool AtomMatchesChar(bool escaped, char pattern_char, char ch)
 }
 
 // Helper function used by ValidateRegex() to format error messages.
-std::string FormatRegexSyntaxError(const char *regex, int index)
+std::string FormatRegexSyntaxError(const char* regex, int index)
 {
 	return (Message() << "Syntax error at index " << index
 					  << " in simple regular expression \"" << regex << "\": ")
@@ -776,7 +776,7 @@ std::string FormatRegexSyntaxError(const char *regex, int index)
 
 // Generates non-fatal failures and returns false if regex is invalid;
 // otherwise returns true.
-bool ValidateRegex(const char *regex)
+bool ValidateRegex(const char* regex)
 {
 	if(regex == NULL)
 	{
@@ -855,8 +855,8 @@ bool ValidateRegex(const char *regex)
 // probably time out anyway.  We are fine with this limitation as
 // std::string has it too.
 bool MatchRepetitionAndRegexAtHead(
-	bool escaped, char c, char repeat, const char *regex,
-	const char *str)
+	bool escaped, char c, char repeat, const char* regex,
+	const char* str)
 {
 	const size_t min_count = (repeat == '+') ? 1 : 0;
 	const size_t max_count = (repeat == '?') ? 1 : static_cast<size_t>(-1) - 1;
@@ -883,7 +883,7 @@ bool MatchRepetitionAndRegexAtHead(
 // Returns true iff regex matches a prefix of str.  regex must be a
 // valid simple regular expression and not start with "^", or the
 // result is undefined.
-bool MatchRegexAtHead(const char *regex, const char *str)
+bool MatchRegexAtHead(const char* regex, const char* str)
 {
 	if(*regex == '\0') // An empty regex matches a prefix of anything.
 		return true;
@@ -923,7 +923,7 @@ bool MatchRegexAtHead(const char *regex, const char *str)
 // stack space normally.  In rare cases the time complexity can be
 // exponential with respect to the regex length + the string length,
 // but usually it's must faster (often close to linear).
-bool MatchRegexAnywhere(const char *regex, const char *str)
+bool MatchRegexAnywhere(const char* regex, const char* str)
 {
 	if(regex == NULL || str == NULL)
 		return false;
@@ -944,25 +944,25 @@ bool MatchRegexAnywhere(const char *regex, const char *str)
 
 RE::~RE()
 {
-	free(const_cast<char *>(pattern_));
-	free(const_cast<char *>(full_pattern_));
+	free(const_cast<char*>(pattern_));
+	free(const_cast<char*>(full_pattern_));
 }
 
 // Returns true iff regular expression re matches the entire str.
-bool RE::FullMatch(const char *str, const RE &re)
+bool RE::FullMatch(const char* str, const RE& re)
 {
 	return re.is_valid_ && MatchRegexAnywhere(re.full_pattern_, str);
 }
 
 // Returns true iff regular expression re matches a substring of str
 // (including str itself).
-bool RE::PartialMatch(const char *str, const RE &re)
+bool RE::PartialMatch(const char* str, const RE& re)
 {
 	return re.is_valid_ && MatchRegexAnywhere(re.pattern_, str);
 }
 
 // Initializes an RE from its string representation.
-void RE::Init(const char *regex)
+void RE::Init(const char* regex)
 {
 	pattern_ = full_pattern_ = NULL;
 	if(regex != NULL)
@@ -981,7 +981,7 @@ void RE::Init(const char *regex)
 	// Reserves enough bytes to hold the regular expression used for a
 	// full match: we need space to prepend a '^', append a '$', and
 	// terminate the string with '\0'.
-	char *buffer = static_cast<char *>(malloc(len + 3));
+	char* buffer = static_cast<char*>(malloc(len + 3));
 	full_pattern_ = buffer;
 
 	if(*regex != '^')
@@ -1004,7 +1004,7 @@ const char kUnknownFile[] = "unknown file";
 
 // Formats a source file path and a line number as they would appear
 // in an error message from the compiler used to compile this code.
-GTEST_API_::std::string FormatFileLocation(const char *file, int line)
+GTEST_API_::std::string FormatFileLocation(const char* file, int line)
 {
 	const std::string file_name(file == NULL ? kUnknownFile : file);
 
@@ -1025,7 +1025,7 @@ GTEST_API_::std::string FormatFileLocation(const char *file, int line)
 // Note that FormatCompilerIndependentFileLocation() does NOT append colon
 // to the file location it produces, unlike FormatFileLocation().
 GTEST_API_::std::string FormatCompilerIndependentFileLocation(
-	const char *file, int line)
+	const char* file, int line)
 {
 	const std::string file_name(file == NULL ? kUnknownFile : file);
 
@@ -1035,10 +1035,10 @@ GTEST_API_::std::string FormatCompilerIndependentFileLocation(
 		return file_name + ":" + StreamableToString(line);
 }
 
-GTestLog::GTestLog(GTestLogSeverity severity, const char *file, int line)
-	: severity_(severity)
+GTestLog::GTestLog(GTestLogSeverity severity, const char* file, int line) :
+	severity_(severity)
 {
-	const char *const marker =
+	const char* const marker =
 		severity == GTEST_INFO ? "[  INFO ]" : severity == GTEST_WARNING ? "[WARNING]" : severity == GTEST_ERROR ? "[ ERROR ]" : "[ FATAL ]";
 	GetStream() << ::std::endl
 				<< marker << " "
@@ -1066,7 +1066,9 @@ class CapturedStream
 {
   public:
 	// The ctor redirects the stream to a temporary file.
-	explicit CapturedStream(int fd) : fd_(fd), uncaptured_fd_(dup(fd))
+	explicit CapturedStream(int fd) :
+		fd_(fd),
+		uncaptured_fd_(dup(fd))
 	{
 #if GTEST_OS_WINDOWS
 		char temp_dir_path[MAX_PATH + 1] = {'\0'};  // NOLINT
@@ -1074,9 +1076,9 @@ class CapturedStream
 
 		::GetTempPathA(sizeof(temp_dir_path), temp_dir_path);
 		const UINT success = ::GetTempFileNameA(temp_dir_path,
-												"gtest_redir",
-												0, // Generate unique file name.
-												temp_file_path);
+			"gtest_redir",
+			0, // Generate unique file name.
+			temp_file_path);
 		GTEST_CHECK_(success != 0)
 			<< "Unable to create a temporary file in " << temp_dir_path;
 		const int captured_fd = creat(temp_file_path, _S_IREAD | _S_IWRITE);
@@ -1131,7 +1133,7 @@ class CapturedStream
 			uncaptured_fd_ = -1;
 		}
 
-		FILE *const file = posix::FOpen(filename_.c_str(), "r");
+		FILE* const file = posix::FOpen(filename_.c_str(), "r");
 		const std::string content = ReadEntireFile(file);
 		posix::FClose(file);
 		return content;
@@ -1148,11 +1150,11 @@ class CapturedStream
 
 GTEST_DISABLE_MSC_WARNINGS_POP_()
 
-static CapturedStream *g_captured_stderr = NULL;
-static CapturedStream *g_captured_stdout = NULL;
+static CapturedStream* g_captured_stderr = NULL;
+static CapturedStream* g_captured_stdout = NULL;
 
 // Starts capturing an output stream (stdout/stderr).
-void CaptureStream(int fd, const char *stream_name, CapturedStream **stream)
+void CaptureStream(int fd, const char* stream_name, CapturedStream** stream)
 {
 	if(*stream != NULL)
 	{
@@ -1163,7 +1165,7 @@ void CaptureStream(int fd, const char *stream_name, CapturedStream **stream)
 }
 
 // Stops capturing the output stream and returns the captured string.
-std::string GetCapturedStream(CapturedStream **captured_stream)
+std::string GetCapturedStream(CapturedStream** captured_stream)
 {
 	const std::string content = (*captured_stream)->GetCapturedString();
 
@@ -1204,7 +1206,7 @@ std::string TempDir()
 #if GTEST_OS_WINDOWS_MOBILE
 	return "\\temp\\";
 #elif GTEST_OS_WINDOWS
-	const char *temp_dir = posix::GetEnv("TEMP");
+	const char* temp_dir = posix::GetEnv("TEMP");
 	if(temp_dir == NULL || temp_dir[0] == '\0')
 		return "\\temp\\";
 	else if(temp_dir[strlen(temp_dir) - 1] == '\\')
@@ -1218,16 +1220,16 @@ std::string TempDir()
 #endif // GTEST_OS_WINDOWS_MOBILE
 }
 
-size_t GetFileSize(FILE *file)
+size_t GetFileSize(FILE* file)
 {
 	fseek(file, 0, SEEK_END);
 	return static_cast<size_t>(ftell(file));
 }
 
-std::string ReadEntireFile(FILE *file)
+std::string ReadEntireFile(FILE* file)
 {
 	const size_t file_size = GetFileSize(file);
-	char *const buffer = new char[file_size];
+	char* const buffer = new char[file_size];
 
 	size_t bytes_last_read = 0; // # of bytes read in the last fread()
 	size_t bytes_read = 0;		// # of bytes read so far
@@ -1250,17 +1252,17 @@ std::string ReadEntireFile(FILE *file)
 
 #if GTEST_HAS_DEATH_TEST
 
-static const ::std::vector<testing::internal::string> *g_injected_test_argvs =
+static const ::std::vector<testing::internal::string>* g_injected_test_argvs =
 	NULL; // Owned.
 
-void SetInjectableArgvs(const ::std::vector<testing::internal::string> *argvs)
+void SetInjectableArgvs(const ::std::vector<testing::internal::string>* argvs)
 {
 	if(g_injected_test_argvs != argvs)
 		delete g_injected_test_argvs;
 	g_injected_test_argvs = argvs;
 }
 
-const ::std::vector<testing::internal::string> &GetInjectableArgvs()
+const ::std::vector<testing::internal::string>& GetInjectableArgvs()
 {
 	if(g_injected_test_argvs != NULL)
 	{
@@ -1284,7 +1286,7 @@ void Abort()
 // Returns the name of the environment variable corresponding to the
 // given flag.  For example, FlagToEnvVar("foo") will return
 // "GTEST_FOO" in the open-source version.
-static std::string FlagToEnvVar(const char *flag)
+static std::string FlagToEnvVar(const char* flag)
 {
 	const std::string full_flag =
 		(Message() << GTEST_FLAG_PREFIX_ << flag).GetString();
@@ -1301,10 +1303,10 @@ static std::string FlagToEnvVar(const char *flag)
 // Parses 'str' for a 32-bit signed integer.  If successful, writes
 // the result to *value and returns true; otherwise leaves *value
 // unchanged and returns false.
-bool ParseInt32(const Message &src_text, const char *str, Int32 *value)
+bool ParseInt32(const Message& src_text, const char* str, Int32* value)
 {
 	// Parses the environment variable as a decimal integer.
-	char *end = NULL;
+	char* end = NULL;
 	const long long_value = strtol(str, &end, 10); // NOLINT
 
 	// Has strtol() consumed all characters in the string?
@@ -1323,11 +1325,11 @@ bool ParseInt32(const Message &src_text, const char *str, Int32 *value)
 	// Is the parsed value in the range of an Int32?
 	const Int32 result = static_cast<Int32>(long_value);
 	if(long_value == LONG_MAX || long_value == LONG_MIN ||
-	   // The parsed value overflows as a long.  (strtol() returns
-	   // LONG_MAX or LONG_MIN when the input overflows.)
-	   result != long_value
-	   // The parsed value overflows as an Int32.
-	   )
+		// The parsed value overflows as a long.  (strtol() returns
+		// LONG_MAX or LONG_MIN when the input overflows.)
+		result != long_value
+		// The parsed value overflows as an Int32.
+	)
 	{
 		Message msg;
 		msg << "WARNING: " << src_text
@@ -1346,26 +1348,26 @@ bool ParseInt32(const Message &src_text, const char *str, Int32 *value)
 // the given flag; if it's not set, returns default_value.
 //
 // The value is considered true iff it's not "0".
-bool BoolFromGTestEnv(const char *flag, bool default_value)
+bool BoolFromGTestEnv(const char* flag, bool default_value)
 {
 #if defined(GTEST_GET_BOOL_FROM_ENV_)
 	return GTEST_GET_BOOL_FROM_ENV_(flag, default_value);
 #endif // defined(GTEST_GET_BOOL_FROM_ENV_)
 	const std::string env_var = FlagToEnvVar(flag);
-	const char *const string_value = posix::GetEnv(env_var.c_str());
+	const char* const string_value = posix::GetEnv(env_var.c_str());
 	return string_value == NULL ? default_value : strcmp(string_value, "0") != 0;
 }
 
 // Reads and returns a 32-bit integer stored in the environment
 // variable corresponding to the given flag; if it isn't set or
 // doesn't represent a valid 32-bit integer, returns default_value.
-Int32 Int32FromGTestEnv(const char *flag, Int32 default_value)
+Int32 Int32FromGTestEnv(const char* flag, Int32 default_value)
 {
 #if defined(GTEST_GET_INT32_FROM_ENV_)
 	return GTEST_GET_INT32_FROM_ENV_(flag, default_value);
 #endif // defined(GTEST_GET_INT32_FROM_ENV_)
 	const std::string env_var = FlagToEnvVar(flag);
-	const char *const string_value = posix::GetEnv(env_var.c_str());
+	const char* const string_value = posix::GetEnv(env_var.c_str());
 	if(string_value == NULL)
 	{
 		// The environment variable is not set.
@@ -1374,10 +1376,10 @@ Int32 Int32FromGTestEnv(const char *flag, Int32 default_value)
 
 	Int32 result = default_value;
 	if(!ParseInt32(Message() << "Environment variable " << env_var,
-				   string_value, &result))
+		   string_value, &result))
 	{
 		printf("The default value %s is used.\n",
-			   (Message() << default_value).GetString().c_str());
+			(Message() << default_value).GetString().c_str());
 		fflush(stdout);
 		return default_value;
 	}
@@ -1387,13 +1389,13 @@ Int32 Int32FromGTestEnv(const char *flag, Int32 default_value)
 
 // Reads and returns the string environment variable corresponding to
 // the given flag; if it's not set, returns default_value.
-const char *StringFromGTestEnv(const char *flag, const char *default_value)
+const char* StringFromGTestEnv(const char* flag, const char* default_value)
 {
 #if defined(GTEST_GET_STRING_FROM_ENV_)
 	return GTEST_GET_STRING_FROM_ENV_(flag, default_value);
 #endif // defined(GTEST_GET_STRING_FROM_ENV_)
 	const std::string env_var = FlagToEnvVar(flag);
-	const char *const value = posix::GetEnv(env_var.c_str());
+	const char* const value = posix::GetEnv(env_var.c_str());
 	return value == NULL ? default_value : value;
 }
 

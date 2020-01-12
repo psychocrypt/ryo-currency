@@ -39,7 +39,7 @@ class critical_section
 	boost::mutex m_section;
 
   public:
-	critical_section(const critical_section &section)
+	critical_section(const critical_section& section)
 	{
 		InitializeCriticalSection(&m_section);
 	}
@@ -69,7 +69,7 @@ class critical_section
 		return TryEnterCriticalSection(&m_section) ? true : false;
 	}
 
-	critical_section &operator=(const critical_section &section)
+	critical_section& operator=(const critical_section& section)
 	{
 		return *this;
 	}
@@ -78,12 +78,12 @@ class critical_section
 class critical_region
 {
 
-	::critical_section *m_locker;
+	::critical_section* m_locker;
 
-	critical_region(const critical_region &) {}
+	critical_region(const critical_region&) {}
 
   public:
-	critical_region(critical_section &cs)
+	critical_region(critical_section& cs)
 	{
 		m_locker = &cs;
 		cs.lock();
@@ -134,7 +134,8 @@ class shared_critical_section
 class shared_guard
 {
   public:
-	shared_guard(shared_critical_section &ref_sec) : m_ref_sec(ref_sec)
+	shared_guard(shared_critical_section& ref_sec) :
+		m_ref_sec(ref_sec)
 	{
 		m_ref_sec.lock_shared();
 	}
@@ -145,13 +146,14 @@ class shared_guard
 	}
 
   private:
-	shared_critical_section &m_ref_sec;
+	shared_critical_section& m_ref_sec;
 };
 
 class exclusive_guard
 {
   public:
-	exclusive_guard(shared_critical_section &ref_sec) : m_ref_sec(ref_sec)
+	exclusive_guard(shared_critical_section& ref_sec) :
+		m_ref_sec(ref_sec)
 	{
 		m_ref_sec.lock_exclusive();
 	}
@@ -162,7 +164,7 @@ class exclusive_guard
 	}
 
   private:
-	shared_critical_section &m_ref_sec;
+	shared_critical_section& m_ref_sec;
 };
 
 class event
@@ -198,18 +200,18 @@ class event
 
 #define SHARED_CRITICAL_REGION_BEGIN(x) \
 	{                                   \
-	shared_guard critical_region_var(x)
+		shared_guard critical_region_var(x)
 #define EXCLUSIVE_CRITICAL_REGION_BEGIN(x) \
 	{                                      \
-	exclusive_guard critical_region_var(x)
+		exclusive_guard critical_region_var(x)
 
 #define CRITICAL_REGION_LOCAL(x) critical_region critical_region_var(x)
 #define CRITICAL_REGION_BEGIN(x) \
 	{                            \
-	critical_region critical_region_var(x)
+		critical_region critical_region_var(x)
 #define CRITICAL_REGION_END() }
 
-inline const char *get_wait_for_result_as_text(DWORD res)
+inline const char* get_wait_for_result_as_text(DWORD res)
 {
 	switch(res)
 	{

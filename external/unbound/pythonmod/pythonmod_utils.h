@@ -57,7 +57,6 @@ struct delegpt_addr;
  */
 int storeQueryInCache(struct module_qstate* qstate, struct query_info* qinfo, struct reply_info* msgrep, int is_referral);
 
-
 /**
  *  Invalidate the message associated with query_info stored in message cache.
  *
@@ -88,6 +87,6 @@ int createResponse(struct module_qstate* qstate, sldns_buffer* pkt);
 void reply_addr2str(struct comm_reply* reply, char* dest, int maxlen);
 
 /* Convert target->addr to string */
-void delegpt_addr_addr2str(struct delegpt_addr* target, char *dest, int maxlen);
+void delegpt_addr_addr2str(struct delegpt_addr* target, char* dest, int maxlen);
 
 #endif /* PYTHONMOD_UTILS_H */

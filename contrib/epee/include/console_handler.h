@@ -51,8 +51,10 @@ namespace epee
 class async_stdin_reader
 {
   public:
-	async_stdin_reader()
-		: m_run(true), m_has_read_request(false), m_read_status(state_init)
+	async_stdin_reader() :
+		m_run(true),
+		m_has_read_request(false),
+		m_read_status(state_init)
 	{
 #ifdef HAVE_READLINE
 		m_readline_buffer.start();
@@ -66,14 +68,14 @@ class async_stdin_reader
 	}
 
 #ifdef HAVE_READLINE
-	rdln::readline_buffer &get_readline_buffer()
+	rdln::readline_buffer& get_readline_buffer()
 	{
 		return m_readline_buffer;
 	}
 #endif
 
 	// Not thread safe. Only one thread can call this method at once.
-	bool get_line(std::string &line)
+	bool get_line(std::string& line)
 	{
 		if(!start_read())
 			return false;
@@ -282,7 +284,7 @@ class async_stdin_reader
 };
 
 template <class t_server>
-bool empty_commands_handler(t_server *psrv, const std::string &command)
+bool empty_commands_handler(t_server* psrv, const std::string& command)
 {
 	return true;
 }
@@ -290,21 +292,24 @@ bool empty_commands_handler(t_server *psrv, const std::string &command)
 class async_console_handler
 {
 	GULPS_CAT_MAJOR("epee_csl_hand");
+
   public:
 	async_console_handler()
 	{
 	}
 
 	template <class t_server, class chain_handler>
-	bool run(t_server *psrv, chain_handler ch_handler, std::function<std::string(void)> prompt, const std::string &usage = "")
+	bool run(t_server* psrv, chain_handler ch_handler, std::function<std::string(void)> prompt, const std::string& usage = "")
 	{
-		return run(prompt, usage, [&](const std::string &cmd) { return ch_handler(psrv, cmd); }, [&] { psrv->send_stop_signal(); });
+		return run(
+			prompt, usage, [&](const std::string& cmd) { return ch_handler(psrv, cmd); }, [&] { psrv->send_stop_signal(); });
 	}
 
 	template <class chain_handler>
-	bool run(chain_handler ch_handler, std::function<std::string(void)> prompt, const std::string &usage = "", std::function<void(void)> exit_handler = NULL)
+	bool run(chain_handler ch_handler, std::function<std::string(void)> prompt, const std::string& usage = "", std::function<void(void)> exit_handler = NULL)
 	{
-		return run(prompt, usage, [&](const std::string &cmd) { return ch_handler(cmd); }, exit_handler);
+		return run(
+			prompt, usage, [&](const std::string& cmd) { return ch_handler(cmd); }, exit_handler);
 	}
 
 	void stop()
@@ -329,13 +334,13 @@ class async_console_handler
 			if(prompt.back() != ' ')
 				prompt += ' ';
 			gulps::inst().log(gulps::message(gulps::OUT_USER_0, gulps::LEVEL_PRINT, gulps_major_cat::c_str(),
-					"cmd_prompt", __FILE__, __LINE__, std::move(prompt), gulps::COLOR_BOLD_YELLOW, false));
+				"cmd_prompt", __FILE__, __LINE__, std::move(prompt), gulps::COLOR_BOLD_YELLOW, false));
 		}
 	}
 
   private:
 	template <typename t_cmd_handler>
-	bool run(std::function<std::string(void)> prompt, const std::string &usage, const t_cmd_handler &cmd_handler, std::function<void(void)> exit_handler)
+	bool run(std::function<std::string(void)> prompt, const std::string& usage, const t_cmd_handler& cmd_handler, std::function<void(void)> exit_handler)
 	{
 		bool continue_handle = true;
 		m_prompt = prompt;
@@ -382,7 +387,7 @@ class async_console_handler
 					GULPS_PRINT(usage);
 				}
 			}
-			catch(const std::exception &ex)
+			catch(const std::exception& ex)
 			{
 				GULPSF_ERROR("Exception at [console_handler], what={}", ex.what());
 			}
@@ -399,7 +404,7 @@ class async_console_handler
 };
 
 template <class t_server, class t_handler>
-bool start_default_console(t_server *ptsrv, t_handler handlr, std::function<std::string(void)> prompt, const std::string &usage = "")
+bool start_default_console(t_server* ptsrv, t_handler handlr, std::function<std::string(void)> prompt, const std::string& usage = "")
 {
 	std::shared_ptr<async_console_handler> console_handler = std::make_shared<async_console_handler>();
 	boost::thread([=]() { console_handler->run<t_server, t_handler>(ptsrv, handlr, prompt, usage); }).detach();
@@ -407,47 +412,50 @@ bool start_default_console(t_server *ptsrv, t_handler handlr, std::function<std:
 }
 
 template <class t_server, class t_handler>
-bool start_default_console(t_server *ptsrv, t_handler handlr, const std::string &prompt, const std::string &usage = "")
+bool start_default_console(t_server* ptsrv, t_handler handlr, const std::string& prompt, const std::string& usage = "")
 {
-	return start_default_console(ptsrv, handlr, [prompt]() { return prompt; }, usage);
+	return start_default_console(
+		ptsrv, handlr, [prompt]() { return prompt; }, usage);
 }
 
 template <class t_server>
-bool start_default_console(t_server *ptsrv, const std::string &prompt, const std::string &usage = "")
+bool start_default_console(t_server* ptsrv, const std::string& prompt, const std::string& usage = "")
 {
 	return start_default_console(ptsrv, empty_commands_handler<t_server>, prompt, usage);
 }
 
 template <class t_server, class t_handler>
-bool no_srv_param_adapter(t_server *ptsrv, const std::string &cmd, t_handler handlr)
+bool no_srv_param_adapter(t_server* ptsrv, const std::string& cmd, t_handler handlr)
 {
 	return handlr(cmd);
 }
 
 template <class t_server, class t_handler>
-bool run_default_console_handler_no_srv_param(t_server *ptsrv, t_handler handlr, std::function<std::string(void)> prompt, const std::string &usage = "")
+bool run_default_console_handler_no_srv_param(t_server* ptsrv, t_handler handlr, std::function<std::string(void)> prompt, const std::string& usage = "")
 {
 	async_console_handler console_handler;
 	return console_handler.run(ptsrv, boost::bind<bool>(no_srv_param_adapter<t_server, t_handler>, _1, _2, handlr), prompt, usage);
 }
 
 template <class t_server, class t_handler>
-bool run_default_console_handler_no_srv_param(t_server *ptsrv, t_handler handlr, const std::string &prompt, const std::string &usage = "")
+bool run_default_console_handler_no_srv_param(t_server* ptsrv, t_handler handlr, const std::string& prompt, const std::string& usage = "")
 {
-	return run_default_console_handler_no_srv_param(ptsrv, handlr, [prompt]() { return prompt; }, usage);
+	return run_default_console_handler_no_srv_param(
+		ptsrv, handlr, [prompt]() { return prompt; }, usage);
 }
 
 template <class t_server, class t_handler>
-bool start_default_console_handler_no_srv_param(t_server *ptsrv, t_handler handlr, std::function<std::string(void)> prompt, const std::string &usage = "")
+bool start_default_console_handler_no_srv_param(t_server* ptsrv, t_handler handlr, std::function<std::string(void)> prompt, const std::string& usage = "")
 {
 	boost::thread(boost::bind(run_default_console_handler_no_srv_param<t_server, t_handler>, ptsrv, handlr, prompt, usage));
 	return true;
 }
 
 template <class t_server, class t_handler>
-bool start_default_console_handler_no_srv_param(t_server *ptsrv, t_handler handlr, const std::string &prompt, const std::string &usage = "")
+bool start_default_console_handler_no_srv_param(t_server* ptsrv, t_handler handlr, const std::string& prompt, const std::string& usage = "")
 {
-	return start_default_console_handler_no_srv_param(ptsrv, handlr, [prompt]() { return prompt; }, usage);
+	return start_default_console_handler_no_srv_param(
+		ptsrv, handlr, [prompt]() { return prompt; }, usage);
 }
 
 /*template<class a>
@@ -474,21 +482,21 @@ bool start_default_console_handler_no_srv_param(t_server *ptsrv, t_handler handl
 class command_handler
 {
   public:
-	typedef boost::function<bool(const std::vector<std::string> &)> callback;
+	typedef boost::function<bool(const std::vector<std::string>&)> callback;
 	typedef std::map<std::string, std::pair<callback, std::pair<std::string, std::string>>> lookup;
 
 	std::string get_usage()
 	{
 		std::stringstream ss;
 
-		for(auto &x : m_command_handlers)
+		for(auto& x : m_command_handlers)
 		{
 			ss << x.second.second.first << "\n";
 		}
 		return ss.str();
 	}
 
-	std::pair<std::string, std::string> get_documentation(const std::vector<std::string> &cmd)
+	std::pair<std::string, std::string> get_documentation(const std::vector<std::string>& cmd)
 	{
 		if(cmd.empty())
 			return std::make_pair("", "");
@@ -498,9 +506,9 @@ class command_handler
 		return it->second.second;
 	}
 
-	void set_handler(const std::string &cmd, const callback &hndlr, const std::string &usage = "", const std::string &description = "")
+	void set_handler(const std::string& cmd, const callback& hndlr, const std::string& usage = "", const std::string& description = "")
 	{
-		lookup::mapped_type &vt = m_command_handlers[cmd];
+		lookup::mapped_type& vt = m_command_handlers[cmd];
 		vt.first = hndlr;
 		vt.second.first = description.empty() ? cmd : usage;
 		vt.second.second = description.empty() ? usage : description;
@@ -509,7 +517,7 @@ class command_handler
 #endif
 	}
 
-	bool process_command_vec(const std::vector<std::string> &cmd)
+	bool process_command_vec(const std::vector<std::string>& cmd)
 	{
 		if(!cmd.size())
 			return false;
@@ -520,7 +528,7 @@ class command_handler
 		return it->second.first(cmd_local);
 	}
 
-	bool process_command_str(const std::string &cmd)
+	bool process_command_str(const std::string& cmd)
 	{
 		std::vector<std::string> cmd_v;
 		boost::split(cmd_v, cmd, boost::is_any_of(" "), boost::token_compress_on);
@@ -542,13 +550,13 @@ class console_handlers_binder : public command_handler
 	async_console_handler m_console_handler;
 
   public:
-	bool start_handling(std::function<std::string(void)> prompt, const std::string &usage_string = "", std::function<void(void)> exit_handler = NULL)
+	bool start_handling(std::function<std::string(void)> prompt, const std::string& usage_string = "", std::function<void(void)> exit_handler = NULL)
 	{
 		m_console_thread.reset(new boost::thread(boost::bind(&console_handlers_binder::run_handling, this, prompt, usage_string, exit_handler)));
 		m_console_thread->detach();
 		return true;
 	}
-	bool start_handling(const std::string &prompt, const std::string &usage_string = "", std::function<void(void)> exit_handler = NULL)
+	bool start_handling(const std::string& prompt, const std::string& usage_string = "", std::function<void(void)> exit_handler = NULL)
 	{
 		return start_handling([prompt]() { return prompt; }, usage_string, exit_handler);
 	}
@@ -558,7 +566,7 @@ class console_handlers_binder : public command_handler
 		m_console_handler.stop();
 	}
 
-	bool run_handling(std::function<std::string(void)> prompt, const std::string &usage_string, std::function<void(void)> exit_handler = NULL)
+	bool run_handling(std::function<std::string(void)> prompt, const std::string& usage_string, std::function<void(void)> exit_handler = NULL)
 	{
 		return m_console_handler.run(boost::bind(&console_handlers_binder::process_command_str, this, _1), prompt, usage_string, exit_handler);
 	}
@@ -596,4 +604,4 @@ class console_handlers_binder : public command_handler
 //    return console_handlers_binder::process_command_str(cmd);
 //  }
 //};
-}
+} // namespace epee

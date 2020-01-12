@@ -42,7 +42,6 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #if !defined __GNUC__ || defined __MINGW32__ || defined __MINGW64__ || defined __ANDROID__
 #define USE_UNWIND
 #else
@@ -79,31 +78,31 @@ GULPS_CAT_MAJOR("stk_trace");
 #define CXA_THROW __wrap___cxa_throw
 extern "C"
 	__attribute__((noreturn)) void
-	__real___cxa_throw(void *ex, CXA_THROW_INFO_T *info, void (*dest)(void *));
+	__real___cxa_throw(void* ex, CXA_THROW_INFO_T* info, void (*dest)(void*));
 #else // !STATICLIB
 #define CXA_THROW __cxa_throw
 extern "C" typedef
 #ifdef __clang__ // only clang, not GCC, lets apply the attr in typedef
 	__attribute__((noreturn))
 #endif			 // __clang__
-	void(cxa_throw_t)(void *ex, CXA_THROW_INFO_T *info, void (*dest)(void *));
+	void(cxa_throw_t)(void* ex, CXA_THROW_INFO_T* info, void (*dest)(void*));
 #endif			 // !STATICLIB
 
 extern "C"
 	__attribute__((noreturn)) void
-	CXA_THROW(void *ex, CXA_THROW_INFO_T *info, void (*dest)(void *))
+	CXA_THROW(void* ex, CXA_THROW_INFO_T* info, void (*dest)(void*))
 {
 
 	int status;
-	char *dsym = abi::__cxa_demangle(((const std::type_info *)info)->name(), NULL, NULL, &status);
-	tools::log_stack_trace((std::string("Exception: ") + ((!status && dsym) ? dsym : (const char *)info)).c_str());
+	char* dsym = abi::__cxa_demangle(((const std::type_info*)info)->name(), NULL, NULL, &status);
+	tools::log_stack_trace((std::string("Exception: ") + ((!status && dsym) ? dsym : (const char*)info)).c_str());
 	free(dsym);
 
 #ifndef STATICLIB
 #ifndef __clang__ // for GCC the attr can't be applied in typedef like for clang
 	__attribute__((noreturn))
 #endif // !__clang__
-	cxa_throw_t *__real___cxa_throw = (cxa_throw_t *)dlsym(RTLD_NEXT, "__cxa_throw");
+	cxa_throw_t* __real___cxa_throw = (cxa_throw_t*)dlsym(RTLD_NEXT, "__cxa_throw");
 #endif // !STATICLIB
 	__real___cxa_throw(ex, info, dest);
 }
@@ -116,12 +115,12 @@ std::string stack_trace_log;
 namespace tools
 {
 
-void set_stack_trace_log(const std::string &log)
+void set_stack_trace_log(const std::string& log)
 {
 	stack_trace_log = log;
 }
 
-void log_stack_trace(const char *msg)
+void log_stack_trace(const char* msg)
 {
 #ifdef USE_UNWIND
 	unw_context_t ctx;
@@ -130,7 +129,7 @@ void log_stack_trace(const char *msg)
 	unsigned level;
 	char sym[512], *dsym;
 	int status;
-	const char *log = stack_trace_log.empty() ? NULL : stack_trace_log.c_str();
+	const char* log = stack_trace_log.empty() ? NULL : stack_trace_log.c_str();
 #endif
 
 	if(msg)

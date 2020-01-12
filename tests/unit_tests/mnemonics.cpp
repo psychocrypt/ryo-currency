@@ -56,7 +56,7 @@ namespace
    * \param expected expected vector
    * \param present  current vector
    */
-void compare_vectors(const std::vector<std::string> &expected, const std::vector<std::string> &present)
+void compare_vectors(const std::vector<std::string>& expected, const std::vector<std::string>& present)
 {
 	std::vector<std::string>::const_iterator it1, it2;
 	for(it1 = expected.begin(), it2 = present.begin(); it1 != expected.end() && it2 != present.end();
@@ -70,9 +70,9 @@ void compare_vectors(const std::vector<std::string> &expected, const std::vector
    * \brief Tests the given language mnemonics.
    * \param language A Language instance to test
    */
-void test_language(const Language::Base &language)
+void test_language(const Language::Base& language)
 {
-	const std::vector<std::string> &word_list = language.get_word_list();
+	const std::vector<std::string>& word_list = language.get_word_list();
 	std::string seed = "", return_seed = "";
 	// Generate a random seed without checksum
 	crypto::secret_key randkey;
@@ -82,7 +82,7 @@ void test_language(const Language::Base &language)
 	}
 	crypto::Electrum25Words::bytes_to_words(randkey, seed, language.get_language_name());
 	// remove the checksum word
-	const char *space = strrchr(seed.c_str(), ' ');
+	const char* space = strrchr(seed.c_str(), ' ');
 	ASSERT_TRUE(space != NULL);
 	seed = std::string(seed.c_str(), space - seed.c_str());
 
@@ -138,7 +138,7 @@ void test_language(const Language::Base &language)
 	ASSERT_EQ(seed_vector.size(), return_seed_vector.size());
 	compare_vectors(seed_vector, return_seed_vector);
 }
-}
+} // namespace
 
 TEST(mnemonics, consistency)
 {
@@ -147,7 +147,7 @@ TEST(mnemonics, consistency)
 		std::vector<std::string> language_list;
 		crypto::Electrum::get_language_list(language_list);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		std::cout << "Error initializing mnemonics: " << e.what() << std::endl;
 		ASSERT_TRUE(false);
@@ -157,26 +157,26 @@ TEST(mnemonics, consistency)
 TEST(mnemonics, all_languages)
 {
 	srand(time(NULL));
-	std::vector<Language::Base *> languages({Language::Singleton<Language::Chinese_Simplified>::instance(),
-											 Language::Singleton<Language::English>::instance(),
-											 Language::Singleton<Language::Spanish>::instance(),
-											 Language::Singleton<Language::Portuguese>::instance(),
-											 Language::Singleton<Language::Japanese>::instance(),
-											 Language::Singleton<Language::German>::instance(),
-											 Language::Singleton<Language::Italian>::instance(),
-											 Language::Singleton<Language::Russian>::instance(),
-											 Language::Singleton<Language::French>::instance(),
-											 Language::Singleton<Language::Dutch>::instance(),
-											 Language::Singleton<Language::Esperanto>::instance(),
-											 Language::Singleton<Language::Lojban>::instance()});
+	std::vector<Language::Base*> languages({Language::Singleton<Language::Chinese_Simplified>::instance(),
+		Language::Singleton<Language::English>::instance(),
+		Language::Singleton<Language::Spanish>::instance(),
+		Language::Singleton<Language::Portuguese>::instance(),
+		Language::Singleton<Language::Japanese>::instance(),
+		Language::Singleton<Language::German>::instance(),
+		Language::Singleton<Language::Italian>::instance(),
+		Language::Singleton<Language::Russian>::instance(),
+		Language::Singleton<Language::French>::instance(),
+		Language::Singleton<Language::Dutch>::instance(),
+		Language::Singleton<Language::Esperanto>::instance(),
+		Language::Singleton<Language::Lojban>::instance()});
 
-	for(std::vector<Language::Base *>::iterator it = languages.begin(); it != languages.end(); it++)
+	for(std::vector<Language::Base*>::iterator it = languages.begin(); it != languages.end(); it++)
 	{
 		try
 		{
 			test_language(*(*it));
 		}
-		catch(const std::exception &e)
+		catch(const std::exception& e)
 		{
 			std::cout << "Error testing " << (*it)->get_language_name() << " language: " << e.what() << std::endl;
 			ASSERT_TRUE(false);

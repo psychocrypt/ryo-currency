@@ -7,6 +7,6 @@
 #ifndef PRINTRESPONSE_H_INCLUDED
 #define PRINTRESPONSE_H_INCLUDED
 
-void printresponse(const unsigned char * resp, int n);
+void printresponse(const unsigned char* resp, int n);
 
 #endif /* PRINTRESPONSE_H_INCLUDED */

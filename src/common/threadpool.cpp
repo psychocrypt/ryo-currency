@@ -55,7 +55,9 @@ static __thread int depth = 0;
 
 namespace tools
 {
-threadpool::threadpool() : running(true), active(0)
+threadpool::threadpool() :
+	running(true),
+	active(0)
 {
 	boost::thread::attributes attrs;
 	attrs.set_stack_size(THREAD_STACK_SIZE);
@@ -80,7 +82,7 @@ threadpool::~threadpool()
 	}
 }
 
-void threadpool::submit(waiter *obj, std::function<void()> f)
+void threadpool::submit(waiter* obj, std::function<void()> f)
 {
 	entry e = {obj, f};
 	boost::unique_lock<boost::mutex> lock(mutex);
@@ -118,7 +120,7 @@ threadpool::waiter::~waiter()
 	{
 		wait();
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		/* ignored */
 	}
@@ -170,4 +172,4 @@ void threadpool::run()
 		active--;
 	}
 }
-}
+} // namespace tools

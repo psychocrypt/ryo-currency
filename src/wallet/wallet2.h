@@ -87,39 +87,46 @@ class i_wallet2_callback
 {
   public:
 	// Full wallet callbacks
-	virtual void on_new_block(uint64_t height, const cryptonote::block &block) {}
-	virtual void on_money_received(uint64_t height, const crypto::hash &txid, const cryptonote::transaction &tx, uint64_t amount, const cryptonote::subaddress_index &subaddr_index) {}
-	virtual void on_unconfirmed_money_received(uint64_t height, const crypto::hash &txid, const cryptonote::transaction &tx, uint64_t amount, const cryptonote::subaddress_index &subaddr_index) {}
-	virtual void on_money_spent(uint64_t height, const crypto::hash &txid, const cryptonote::transaction &in_tx, uint64_t amount, const cryptonote::transaction &spend_tx, const cryptonote::subaddress_index &subaddr_index) {}
-	virtual void on_skip_transaction(uint64_t height, const crypto::hash &txid, const cryptonote::transaction &tx) {}
+	virtual void on_new_block(uint64_t height, const cryptonote::block& block) {}
+	virtual void on_money_received(uint64_t height, const crypto::hash& txid, const cryptonote::transaction& tx, uint64_t amount, const cryptonote::subaddress_index& subaddr_index) {}
+	virtual void on_unconfirmed_money_received(uint64_t height, const crypto::hash& txid, const cryptonote::transaction& tx, uint64_t amount, const cryptonote::subaddress_index& subaddr_index) {}
+	virtual void on_money_spent(uint64_t height, const crypto::hash& txid, const cryptonote::transaction& in_tx, uint64_t amount, const cryptonote::transaction& spend_tx, const cryptonote::subaddress_index& subaddr_index) {}
+	virtual void on_skip_transaction(uint64_t height, const crypto::hash& txid, const cryptonote::transaction& tx) {}
 	// Light wallet callbacks
 	virtual void on_lw_new_block(uint64_t height) {}
-	virtual void on_lw_money_received(uint64_t height, const crypto::hash &txid, uint64_t amount) {}
-	virtual void on_lw_unconfirmed_money_received(uint64_t height, const crypto::hash &txid, uint64_t amount) {}
-	virtual void on_lw_money_spent(uint64_t height, const crypto::hash &txid, uint64_t amount) {}
+	virtual void on_lw_money_received(uint64_t height, const crypto::hash& txid, uint64_t amount) {}
+	virtual void on_lw_unconfirmed_money_received(uint64_t height, const crypto::hash& txid, uint64_t amount) {}
+	virtual void on_lw_money_spent(uint64_t height, const crypto::hash& txid, uint64_t amount) {}
 	// Common callbacks
-	virtual void on_pool_tx_removed(const crypto::hash &txid) {}
+	virtual void on_pool_tx_removed(const crypto::hash& txid) {}
 	virtual ~i_wallet2_callback() {}
 };
 
 class hashchain
 {
-GULPS_CAT_MAJOR("wallet2");
-public:
-	hashchain() : m_genesis(crypto::null_hash), m_offset(0) {}
+	GULPS_CAT_MAJOR("wallet2");
+
+  public:
+	hashchain() :
+		m_genesis(crypto::null_hash),
+		m_offset(0) {}
 
 	size_t size() const { return m_blockchain.size() + m_offset; }
 	size_t offset() const { return m_offset; }
-	const crypto::hash &genesis() const { return m_genesis; }
-	void push_back(const crypto::hash &hash)
+	const crypto::hash& genesis() const { return m_genesis; }
+	void push_back(const crypto::hash& hash)
 	{
 		if(m_offset == 0 && m_blockchain.empty())
 			m_genesis = hash;
 		m_blockchain.push_back(hash);
 	}
-	bool is_in_bounds(size_t idx) const { GULPSF_LOG_L1("is_in_bounds: {} / {} / {}", idx, m_blockchain.size(), m_offset); return idx >= m_offset && idx < size(); }
-	const crypto::hash &operator[](size_t idx) const { return m_blockchain[idx - m_offset]; }
-	crypto::hash &operator[](size_t idx) { return m_blockchain[idx - m_offset]; }
+	bool is_in_bounds(size_t idx) const
+	{
+		GULPSF_LOG_L1("is_in_bounds: {} / {} / {}", idx, m_blockchain.size(), m_offset);
+		return idx >= m_offset && idx < size();
+	}
+	const crypto::hash& operator[](size_t idx) const { return m_blockchain[idx - m_offset]; }
+	crypto::hash& operator[](size_t idx) { return m_blockchain[idx - m_offset]; }
 	void crop(size_t height) { m_blockchain.resize(height - m_offset); }
 	void clear()
 	{
@@ -136,18 +143,18 @@ public:
 		}
 		m_blockchain.shrink_to_fit();
 	}
-	void refill(const crypto::hash &hash)
+	void refill(const crypto::hash& hash)
 	{
 		m_blockchain.push_back(hash);
 		--m_offset;
 	}
 
 	template <class t_archive>
-	inline void serialize(t_archive &a, const unsigned int ver)
+	inline void serialize(t_archive& a, const unsigned int ver)
 	{
-		a &m_offset;
-		a &m_genesis;
-		a &m_blockchain;
+		a& m_offset;
+		a& m_genesis;
+		a& m_blockchain;
 	}
 
   private:
@@ -170,26 +177,26 @@ class wallet2
 		RefreshDefault = RefreshFull,
 	};
 
-	static const char *tr(const char *str);
+	static const char* tr(const char* str);
 
-	static bool has_testnet_option(const boost::program_options::variables_map &vm);
-	static bool has_stagenet_option(const boost::program_options::variables_map &vm);
-	static void init_options(boost::program_options::options_description &desc_params);
+	static bool has_testnet_option(const boost::program_options::variables_map& vm);
+	static bool has_stagenet_option(const boost::program_options::variables_map& vm);
+	static void init_options(boost::program_options::options_description& desc_params);
 
 	//! Uses stdin and stdout. Returns a wallet2 if no errors.
-	static std::unique_ptr<wallet2> make_from_json(const boost::program_options::variables_map &vm, const std::string &json_file, const std::function<boost::optional<password_container>(const char *, bool)> &password_prompter);
+	static std::unique_ptr<wallet2> make_from_json(const boost::program_options::variables_map& vm, const std::string& json_file, const std::function<boost::optional<password_container>(const char*, bool)>& password_prompter);
 
 	//! Uses stdin and stdout. Returns a wallet2 and password for `wallet_file` if no errors.
 	static std::pair<std::unique_ptr<wallet2>, password_container>
-	make_from_file(const boost::program_options::variables_map &vm, const std::string &wallet_file, const std::function<boost::optional<password_container>(const char *, bool)> &password_prompter);
+	make_from_file(const boost::program_options::variables_map& vm, const std::string& wallet_file, const std::function<boost::optional<password_container>(const char*, bool)>& password_prompter);
 
 	//! Uses stdin and stdout. Returns a wallet2 and password for wallet with no file if no errors.
-	static std::pair<std::unique_ptr<wallet2>, password_container> make_new(const boost::program_options::variables_map &vm, const std::function<boost::optional<password_container>(const char *, bool)> &password_prompter);
+	static std::pair<std::unique_ptr<wallet2>, password_container> make_new(const boost::program_options::variables_map& vm, const std::function<boost::optional<password_container>(const char*, bool)>& password_prompter);
 
 	//! Just parses variables.
-	static std::unique_ptr<wallet2> make_dummy(const boost::program_options::variables_map &vm, const std::function<boost::optional<password_container>(const char *, bool)> &password_prompter);
+	static std::unique_ptr<wallet2> make_dummy(const boost::program_options::variables_map& vm, const std::function<boost::optional<password_container>(const char*, bool)>& password_prompter);
 
-	static bool verify_password(const std::string &keys_file_name, const epee::wipeable_string &password, bool no_spend_key, hw::device &hwdev);
+	static bool verify_password(const std::string& keys_file_name, const epee::wipeable_string& password, bool no_spend_key, hw::device& hwdev);
 
 	wallet2(cryptonote::network_type nettype = cryptonote::MAINNET, bool restricted = false);
 	~wallet2();
@@ -228,7 +235,9 @@ class wallet2
 		bool error;
 		boost::optional<cryptonote::subaddress_receive_info> received;
 
-		tx_scan_info_t() : money_transfered(0), error(true) {}
+		tx_scan_info_t() :
+			money_transfered(0),
+			error(true) {}
 	};
 
 	struct transfer_details
@@ -253,7 +262,7 @@ class wallet2
 
 		bool is_rct() const { return m_rct; }
 		uint64_t amount() const { return m_amount; }
-		const crypto::public_key &get_public_key() const { return boost::get<const cryptonote::txout_to_key>(m_tx.vout[m_internal_output_index].target).key; }
+		const crypto::public_key& get_public_key() const { return boost::get<const cryptonote::txout_to_key>(m_tx.vout[m_internal_output_index].target).key; }
 
 		BEGIN_SERIALIZE_OBJECT()
 		FIELD(m_block_height)
@@ -335,8 +344,27 @@ class wallet2
 		std::set<uint32_t> m_subaddr_indices;									  // set of address indices used as inputs in this transfer
 		std::vector<std::pair<crypto::key_image, std::vector<uint64_t>>> m_rings; // relative
 
-		confirmed_transfer_details() : m_amount_in(0), m_amount_out(0), m_change((uint64_t)-1), m_block_height(0), m_payment_id(crypto::null_hash), m_timestamp(0), m_unlock_time(0), m_subaddr_account((uint32_t)-1) {}
-		confirmed_transfer_details(const unconfirmed_transfer_details &utd, uint64_t height) : m_amount_in(utd.m_amount_in), m_amount_out(utd.m_amount_out), m_change(utd.m_change), m_block_height(height), m_dests(utd.m_dests), m_payment_id(utd.m_payment_id), m_timestamp(utd.m_timestamp), m_unlock_time(utd.m_tx.unlock_time), m_subaddr_account(utd.m_subaddr_account), m_subaddr_indices(utd.m_subaddr_indices), m_rings(utd.m_rings) {}
+		confirmed_transfer_details() :
+			m_amount_in(0),
+			m_amount_out(0),
+			m_change((uint64_t)-1),
+			m_block_height(0),
+			m_payment_id(crypto::null_hash),
+			m_timestamp(0),
+			m_unlock_time(0),
+			m_subaddr_account((uint32_t)-1) {}
+		confirmed_transfer_details(const unconfirmed_transfer_details& utd, uint64_t height) :
+			m_amount_in(utd.m_amount_in),
+			m_amount_out(utd.m_amount_out),
+			m_change(utd.m_change),
+			m_block_height(height),
+			m_dests(utd.m_dests),
+			m_payment_id(utd.m_payment_id),
+			m_timestamp(utd.m_timestamp),
+			m_unlock_time(utd.m_tx.unlock_time),
+			m_subaddr_account(utd.m_subaddr_account),
+			m_subaddr_indices(utd.m_subaddr_indices),
+			m_rings(utd.m_rings) {}
 	};
 
 	struct tx_construction_data
@@ -485,8 +513,8 @@ class wallet2
      * \param  multisig_data        The multisig restore info and keys
      * \param  create_address_file  Whether to create an address file
      */
-	void generate(const std::string &wallet_, const epee::wipeable_string &password,
-				  const std::string &multisig_data, bool create_address_file = false);
+	void generate(const std::string& wallet_, const epee::wipeable_string& password,
+		const std::string& multisig_data, bool create_address_file = false);
 
 	/*!
      * \brief Generates a wallet or restores one.
@@ -497,9 +525,9 @@ class wallet2
      * \param  create_address_file  Whether to create an address file
      * \return                      The secret key of the generated wallet
      */
-	void generate_legacy(const std::string &wallet_, const epee::wipeable_string &password, const crypto::secret_key &seed_legacy, bool create_address_file = false);
+	void generate_legacy(const std::string& wallet_, const epee::wipeable_string& password, const crypto::secret_key& seed_legacy, bool create_address_file = false);
 
-	crypto::secret_key_16 generate_new(const std::string &wallet_, const epee::wipeable_string &password, const crypto::secret_key_16 *seed = nullptr, uint8_t extra = cryptonote::ACC_OPT_LONG_ADDRESS, bool create_address_file = false);
+	crypto::secret_key_16 generate_new(const std::string& wallet_, const epee::wipeable_string& password, const crypto::secret_key_16* seed = nullptr, uint8_t extra = cryptonote::ACC_OPT_LONG_ADDRESS, bool create_address_file = false);
 	/*!
      * \brief Creates a wallet from a public address and a spend/view secret key pair.
      * \param  wallet_              Name of wallet file
@@ -508,9 +536,9 @@ class wallet2
      * \param  spendkey             spend secret key
      * \param  create_address_file  Whether to create an address file
      */
-	void generate(const std::string &wallet, const epee::wipeable_string &password,
-				  const cryptonote::account_public_address &account_public_address,
-				  const crypto::secret_key &spendkey, const crypto::secret_key &viewkey, bool create_address_file = false);
+	void generate(const std::string& wallet, const epee::wipeable_string& password,
+		const cryptonote::account_public_address& account_public_address,
+		const crypto::secret_key& spendkey, const crypto::secret_key& viewkey, bool create_address_file = false);
 	/*!
      * \brief Creates a watch only wallet from a public address and a view secret key.
      * \param  wallet_              Name of wallet file
@@ -518,42 +546,42 @@ class wallet2
      * \param  viewkey              view secret key
      * \param  create_address_file  Whether to create an address file
      */
-	void generate(const std::string &wallet, const epee::wipeable_string &password,
-				  const cryptonote::account_public_address &account_public_address,
-				  const crypto::secret_key &viewkey = crypto::secret_key(), bool create_address_file = false);
+	void generate(const std::string& wallet, const epee::wipeable_string& password,
+		const cryptonote::account_public_address& account_public_address,
+		const crypto::secret_key& viewkey = crypto::secret_key(), bool create_address_file = false);
 	/*!
      * \brief Restore a wallet hold by an HW.
      * \param  wallet_        Name of wallet file
      * \param  password       Password of wallet file
      * \param  device_name    name of HW to use
      */
-	void restore(const std::string &wallet_, const epee::wipeable_string &password, const std::string &device_name);
+	void restore(const std::string& wallet_, const epee::wipeable_string& password, const std::string& device_name);
 
 	/*!
      * \brief Creates a multisig wallet
      * \return empty if done, non empty if we need to send another string
      * to other participants
      */
-	std::string make_multisig(const epee::wipeable_string &password,
-							  const std::vector<std::string> &info,
-							  uint32_t threshold);
+	std::string make_multisig(const epee::wipeable_string& password,
+		const std::vector<std::string>& info,
+		uint32_t threshold);
 	/*!
      * \brief Creates a multisig wallet
      * \return empty if done, non empty if we need to send another string
      * to other participants
      */
-	std::string make_multisig(const epee::wipeable_string &password,
-							  const std::vector<crypto::secret_key> &view_keys,
-							  const std::vector<crypto::public_key> &spend_keys,
-							  uint32_t threshold);
+	std::string make_multisig(const epee::wipeable_string& password,
+		const std::vector<crypto::secret_key>& view_keys,
+		const std::vector<crypto::public_key>& spend_keys,
+		uint32_t threshold);
 	/*!
      * \brief Finalizes creation of a multisig wallet
      */
-	bool finalize_multisig(const epee::wipeable_string &password, const std::vector<std::string> &info);
+	bool finalize_multisig(const epee::wipeable_string& password, const std::vector<std::string>& info);
 	/*!
      * \brief Finalizes creation of a multisig wallet
      */
-	bool finalize_multisig(const epee::wipeable_string &password, std::unordered_set<crypto::public_key> pkeys, std::vector<crypto::public_key> signers);
+	bool finalize_multisig(const epee::wipeable_string& password, std::unordered_set<crypto::public_key> pkeys, std::vector<crypto::public_key> signers);
 	/*!
      * Get a packaged multisig information string
      */
@@ -561,11 +589,11 @@ class wallet2
 	/*!
      * Verifies and extracts keys from a packaged multisig information string
      */
-	static bool verify_multisig_info(const std::string &data, crypto::secret_key &skey, crypto::public_key &pkey);
+	static bool verify_multisig_info(const std::string& data, crypto::secret_key& skey, crypto::public_key& pkey);
 	/*!
      * Verifies and extracts keys from a packaged multisig information string
      */
-	static bool verify_extra_multisig_info(const std::string &data, std::unordered_set<crypto::public_key> &pkeys, crypto::public_key &signer);
+	static bool verify_extra_multisig_info(const std::string& data, std::unordered_set<crypto::public_key>& pkeys, crypto::public_key& signer);
 	/*!
      * Export multisig info
      * This will generate and remember new k values
@@ -581,25 +609,25 @@ class wallet2
      * \param wallet_name Name of wallet file (should exist)
      * \param password    Password for wallet file
      */
-	void rewrite(const std::string &wallet_name, const epee::wipeable_string &password);
-	void write_watch_only_wallet(const std::string &wallet_name, const epee::wipeable_string &password, std::string &new_keys_filename);
-	void load(const std::string &wallet, const epee::wipeable_string &password);
+	void rewrite(const std::string& wallet_name, const epee::wipeable_string& password);
+	void write_watch_only_wallet(const std::string& wallet_name, const epee::wipeable_string& password, std::string& new_keys_filename);
+	void load(const std::string& wallet, const epee::wipeable_string& password);
 	void store();
 	/*!
      * \brief store_to - stores wallet to another file(s), deleting old ones
      * \param path     - path to the wallet file (keys and address filenames will be generated based on this filename)
      * \param password - password to protect new wallet (TODO: probably better save the password in the wallet object?)
      */
-	void store_to(const std::string &path, const epee::wipeable_string &password);
+	void store_to(const std::string& path, const epee::wipeable_string& password);
 
 	std::string path() const;
 
 	/*!
      * \brief verifies given password is correct for default wallet keys file
      */
-	bool verify_password(const epee::wipeable_string &password) const;
-	cryptonote::account_base &get_account() { return m_account; }
-	const cryptonote::account_base &get_account() const { return m_account; }
+	bool verify_password(const epee::wipeable_string& password) const;
+	cryptonote::account_base& get_account() { return m_account; }
+	const cryptonote::account_base& get_account() const { return m_account; }
 
 	void set_refresh_from_block_height(uint64_t height) { m_refresh_from_block_height = height; }
 	uint64_t get_refresh_from_block_height() const { return m_refresh_from_block_height; }
@@ -614,12 +642,12 @@ class wallet2
 	// the minimum block size.
 	bool deinit();
 	bool init(std::string daemon_address = "http://localhost:8080",
-			  boost::optional<epee::net_utils::http::login> daemon_login = boost::none, uint64_t upper_transaction_size_limit = 0, bool ssl = false);
+		boost::optional<epee::net_utils::http::login> daemon_login = boost::none, uint64_t upper_transaction_size_limit = 0, bool ssl = false);
 
 	void stop() { m_run.store(false, std::memory_order_relaxed); }
 
-	i_wallet2_callback *callback() const { return m_callback; }
-	void callback(i_wallet2_callback *callback) { m_callback = callback; }
+	i_wallet2_callback* callback() const { return m_callback; }
+	void callback(i_wallet2_callback* callback) { m_callback = callback; }
 
 	/*!
      * \brief Checks if deterministic wallet
@@ -627,34 +655,34 @@ class wallet2
 	bool has_14word_seed() const { return get_account().has_14word_seed(); }
 	bool has_25word_seed() const { return get_account().has_25word_seed(); }
 
-	bool get_seed(std::string &electrum_words, bool &short_seed) const;
+	bool get_seed(std::string& electrum_words, bool& short_seed) const;
 
 	/*!
      * \brief Gets the seed language
      */
-	const std::string &get_seed_language() const;
+	const std::string& get_seed_language() const;
 	/*!
      * \brief Sets the seed language
      */
-	void set_seed_language(const std::string &language);
+	void set_seed_language(const std::string& language);
 
 	bool is_kurz() const { return get_account().is_kurz(); }
 
 	// Subaddress scheme
-	cryptonote::account_public_address get_subaddress(const cryptonote::subaddress_index &index) const;
+	cryptonote::account_public_address get_subaddress(const cryptonote::subaddress_index& index) const;
 	cryptonote::account_public_address get_address() const { return get_subaddress({0, 0}); }
-	crypto::public_key get_subaddress_spend_public_key(const cryptonote::subaddress_index &index) const;
+	crypto::public_key get_subaddress_spend_public_key(const cryptonote::subaddress_index& index) const;
 	std::vector<crypto::public_key> get_subaddress_spend_public_keys(uint32_t account, uint32_t begin, uint32_t end) const;
-	std::string get_subaddress_as_str(const cryptonote::subaddress_index &index) const;
+	std::string get_subaddress_as_str(const cryptonote::subaddress_index& index) const;
 	std::string get_address_as_str() const { return get_subaddress_as_str({0, 0}); }
-	std::string get_integrated_address_as_str(const crypto::hash8 &payment_id) const;
-	void add_subaddress_account(const std::string &label);
+	std::string get_integrated_address_as_str(const crypto::hash8& payment_id) const;
+	void add_subaddress_account(const std::string& label);
 	size_t get_num_subaddress_accounts() const { return m_subaddress_labels.size(); }
 	size_t get_num_subaddresses(uint32_t index_major) const { return index_major < m_subaddress_labels.size() ? m_subaddress_labels[index_major].size() : 0; }
-	void add_subaddress(uint32_t index_major, const std::string &label); // throws when index is out of bound
-	void expand_subaddresses(const cryptonote::subaddress_index &index);
-	std::string get_subaddress_label(const cryptonote::subaddress_index &index) const;
-	void set_subaddress_label(const cryptonote::subaddress_index &index, const std::string &label);
+	void add_subaddress(uint32_t index_major, const std::string& label); // throws when index is out of bound
+	void expand_subaddresses(const cryptonote::subaddress_index& index);
+	std::string get_subaddress_label(const cryptonote::subaddress_index& index) const;
+	void set_subaddress_label(const cryptonote::subaddress_index& index, const std::string& label);
 	void set_subaddress_lookahead(size_t major, size_t minor);
 	std::pair<size_t, size_t> get_subaddress_lookahead() const { return {m_subaddress_lookahead_major, m_subaddress_lookahead_minor}; }
 	/*!
@@ -662,9 +690,9 @@ class wallet2
      */
 	bool is_deprecated() const;
 	void refresh();
-	void refresh(uint64_t start_height, uint64_t &blocks_fetched);
-	void refresh(uint64_t start_height, uint64_t &blocks_fetched, bool &received_money);
-	bool refresh(uint64_t &blocks_fetched, bool &received_money, bool &ok);
+	void refresh(uint64_t start_height, uint64_t& blocks_fetched);
+	void refresh(uint64_t start_height, uint64_t& blocks_fetched, bool& received_money);
+	bool refresh(uint64_t& blocks_fetched, bool& received_money, bool& ok);
 
 	void set_refresh_type(RefreshType refresh_type) { m_refresh_type = refresh_type; }
 	RefreshType get_refresh_type() const { return m_refresh_type; }
@@ -673,9 +701,9 @@ class wallet2
 	cryptonote::network_type nettype() const { return m_nettype; }
 	bool restricted() const { return m_restricted; }
 	bool watch_only() const { return m_watch_only; }
-	bool multisig(bool *ready = NULL, uint32_t *threshold = NULL, uint32_t *total = NULL) const;
+	bool multisig(bool* ready = NULL, uint32_t* threshold = NULL, uint32_t* total = NULL) const;
 	bool has_multisig_partial_key_images() const;
-	bool get_multisig_seed(std::string &seed, const epee::wipeable_string &passphrase = std::string(), bool raw = true) const;
+	bool get_multisig_seed(std::string& seed, const epee::wipeable_string& passphrase = std::string(), bool raw = true) const;
 	bool key_on_device() const { return m_key_on_device; }
 
 	// locked & unlocked balance of given or current subaddress account
@@ -687,49 +715,49 @@ class wallet2
 	// all locked & unlocked balances of all subaddress accounts
 	uint64_t balance_all() const;
 	uint64_t unlocked_balance_all() const;
-	void transfer_selected_rct(std::vector<cryptonote::tx_destination_entry> dsts, const std::vector<size_t> &selected_transfers, size_t fake_outputs_count,
-							   std::vector<std::vector<tools::wallet2::get_outs_entry>> &outs,
-							   uint64_t unlock_time, uint64_t fee, const crypto::uniform_payment_id* payment_id, cryptonote::transaction &tx, pending_tx &ptx, bool bulletproof);
+	void transfer_selected_rct(std::vector<cryptonote::tx_destination_entry> dsts, const std::vector<size_t>& selected_transfers, size_t fake_outputs_count,
+		std::vector<std::vector<tools::wallet2::get_outs_entry>>& outs,
+		uint64_t unlock_time, uint64_t fee, const crypto::uniform_payment_id* payment_id, cryptonote::transaction& tx, pending_tx& ptx, bool bulletproof);
 
-	void commit_tx(pending_tx &ptx_vector);
-	void commit_tx(std::vector<pending_tx> &ptx_vector);
-	bool save_tx(const std::vector<pending_tx> &ptx_vector, const std::string &filename) const;
+	void commit_tx(pending_tx& ptx_vector);
+	void commit_tx(std::vector<pending_tx>& ptx_vector);
+	bool save_tx(const std::vector<pending_tx>& ptx_vector, const std::string& filename) const;
 	std::string save_multisig_tx(multisig_tx_set txs);
-	bool save_multisig_tx(const multisig_tx_set &txs, const std::string &filename);
-	std::string save_multisig_tx(const std::vector<pending_tx> &ptx_vector);
-	bool save_multisig_tx(const std::vector<pending_tx> &ptx_vector, const std::string &filename);
+	bool save_multisig_tx(const multisig_tx_set& txs, const std::string& filename);
+	std::string save_multisig_tx(const std::vector<pending_tx>& ptx_vector);
+	bool save_multisig_tx(const std::vector<pending_tx>& ptx_vector, const std::string& filename);
 	// load unsigned tx from file and sign it. Takes confirmation callback as argument. Used by the cli wallet
-	bool sign_tx(const std::string &unsigned_filename, const std::string &signed_filename, std::vector<wallet2::pending_tx> &ptx, std::function<bool(const unsigned_tx_set &)> accept_func = NULL, bool export_raw = false);
+	bool sign_tx(const std::string& unsigned_filename, const std::string& signed_filename, std::vector<wallet2::pending_tx>& ptx, std::function<bool(const unsigned_tx_set&)> accept_func = NULL, bool export_raw = false);
 	// sign unsigned tx. Takes unsigned_tx_set as argument. Used by GUI
-	bool sign_tx(unsigned_tx_set &exported_txs, const std::string &signed_filename, std::vector<wallet2::pending_tx> &ptx, bool export_raw = false);
+	bool sign_tx(unsigned_tx_set& exported_txs, const std::string& signed_filename, std::vector<wallet2::pending_tx>& ptx, bool export_raw = false);
 	// load unsigned_tx_set from file.
-	bool load_unsigned_tx(const std::string &unsigned_filename, unsigned_tx_set &exported_txs) const;
-	bool load_tx(const std::string &signed_filename, std::vector<tools::wallet2::pending_tx> &ptx, std::function<bool(const signed_tx_set &)> accept_func = NULL);
+	bool load_unsigned_tx(const std::string& unsigned_filename, unsigned_tx_set& exported_txs) const;
+	bool load_tx(const std::string& signed_filename, std::vector<tools::wallet2::pending_tx>& ptx, std::function<bool(const signed_tx_set&)> accept_func = NULL);
 	std::vector<wallet2::pending_tx> create_transactions_2(std::vector<cryptonote::tx_destination_entry> dsts, const size_t fake_outs_count, const uint64_t unlock_time, uint32_t priority, const crypto::uniform_payment_id* payment_id, uint32_t subaddr_account, std::set<uint32_t> subaddr_indices, bool trusted_daemon); // pass subaddr_indices by value on purpose
-	std::vector<wallet2::pending_tx> create_transactions_all(uint64_t below, const cryptonote::account_public_address &address, bool is_subaddress, const size_t fake_outs_count, const uint64_t unlock_time, uint32_t priority, const crypto::uniform_payment_id* payment_id, uint32_t subaddr_account, std::set<uint32_t> subaddr_indices, bool trusted_daemon);
-	std::vector<wallet2::pending_tx> create_transactions_single(const crypto::key_image &ki, const cryptonote::account_public_address &address, bool is_subaddress, const size_t fake_outs_count, const uint64_t unlock_time, uint32_t priority, const crypto::uniform_payment_id* payment_id, bool trusted_daemon);
-	std::vector<wallet2::pending_tx> create_transactions_from(const cryptonote::account_public_address &address, bool is_subaddress, std::vector<size_t> unused_transfers_indices, std::vector<size_t> unused_dust_indices, const size_t fake_outs_count, const uint64_t unlock_time, uint32_t priority, const crypto::uniform_payment_id* payment_id, bool trusted_daemon);
-	bool load_multisig_tx(cryptonote::blobdata blob, multisig_tx_set &exported_txs, std::function<bool(const multisig_tx_set &)> accept_func = NULL);
-	bool load_multisig_tx_from_file(const std::string &filename, multisig_tx_set &exported_txs, std::function<bool(const multisig_tx_set &)> accept_func = NULL);
-	bool sign_multisig_tx_from_file(const std::string &filename, std::vector<crypto::hash> &txids, std::function<bool(const multisig_tx_set &)> accept_func);
-	bool sign_multisig_tx(multisig_tx_set &exported_txs, std::vector<crypto::hash> &txids);
-	bool sign_multisig_tx_to_file(multisig_tx_set &exported_txs, const std::string &filename, std::vector<crypto::hash> &txids);
-	bool check_connection(uint32_t *version = NULL, uint32_t timeout = 200000);
-	void get_transfers(wallet2::transfer_container &incoming_transfers) const;
-	void get_payments(const crypto::uniform_payment_id &payment_id, std::list<wallet2::payment_details> &payments, uint64_t min_height = 0, const boost::optional<uint32_t> &subaddr_account = boost::none, const std::set<uint32_t> &subaddr_indices = {}) const;
-	void get_payments(std::list<std::pair<crypto::hash, wallet2::payment_details>> &payments, uint64_t min_height, uint64_t max_height = (uint64_t)-1, const boost::optional<uint32_t> &subaddr_account = boost::none, const std::set<uint32_t> &subaddr_indices = {}) const;
-	void get_payments_out(std::list<std::pair<crypto::hash, wallet2::confirmed_transfer_details>> &confirmed_payments,
-						  uint64_t min_height, uint64_t max_height = (uint64_t)-1, const boost::optional<uint32_t> &subaddr_account = boost::none, const std::set<uint32_t> &subaddr_indices = {}) const;
-	void get_unconfirmed_payments_out(std::list<std::pair<crypto::hash, wallet2::unconfirmed_transfer_details>> &unconfirmed_payments, const boost::optional<uint32_t> &subaddr_account = boost::none, const std::set<uint32_t> &subaddr_indices = {}) const;
-	void get_unconfirmed_payments(std::list<std::pair<crypto::hash, wallet2::pool_payment_details>> &unconfirmed_payments, const boost::optional<uint32_t> &subaddr_account = boost::none, const std::set<uint32_t> &subaddr_indices = {}) const;
+	std::vector<wallet2::pending_tx> create_transactions_all(uint64_t below, const cryptonote::account_public_address& address, bool is_subaddress, const size_t fake_outs_count, const uint64_t unlock_time, uint32_t priority, const crypto::uniform_payment_id* payment_id, uint32_t subaddr_account, std::set<uint32_t> subaddr_indices, bool trusted_daemon);
+	std::vector<wallet2::pending_tx> create_transactions_single(const crypto::key_image& ki, const cryptonote::account_public_address& address, bool is_subaddress, const size_t fake_outs_count, const uint64_t unlock_time, uint32_t priority, const crypto::uniform_payment_id* payment_id, bool trusted_daemon);
+	std::vector<wallet2::pending_tx> create_transactions_from(const cryptonote::account_public_address& address, bool is_subaddress, std::vector<size_t> unused_transfers_indices, std::vector<size_t> unused_dust_indices, const size_t fake_outs_count, const uint64_t unlock_time, uint32_t priority, const crypto::uniform_payment_id* payment_id, bool trusted_daemon);
+	bool load_multisig_tx(cryptonote::blobdata blob, multisig_tx_set& exported_txs, std::function<bool(const multisig_tx_set&)> accept_func = NULL);
+	bool load_multisig_tx_from_file(const std::string& filename, multisig_tx_set& exported_txs, std::function<bool(const multisig_tx_set&)> accept_func = NULL);
+	bool sign_multisig_tx_from_file(const std::string& filename, std::vector<crypto::hash>& txids, std::function<bool(const multisig_tx_set&)> accept_func);
+	bool sign_multisig_tx(multisig_tx_set& exported_txs, std::vector<crypto::hash>& txids);
+	bool sign_multisig_tx_to_file(multisig_tx_set& exported_txs, const std::string& filename, std::vector<crypto::hash>& txids);
+	bool check_connection(uint32_t* version = NULL, uint32_t timeout = 200000);
+	void get_transfers(wallet2::transfer_container& incoming_transfers) const;
+	void get_payments(const crypto::uniform_payment_id& payment_id, std::list<wallet2::payment_details>& payments, uint64_t min_height = 0, const boost::optional<uint32_t>& subaddr_account = boost::none, const std::set<uint32_t>& subaddr_indices = {}) const;
+	void get_payments(std::list<std::pair<crypto::hash, wallet2::payment_details>>& payments, uint64_t min_height, uint64_t max_height = (uint64_t)-1, const boost::optional<uint32_t>& subaddr_account = boost::none, const std::set<uint32_t>& subaddr_indices = {}) const;
+	void get_payments_out(std::list<std::pair<crypto::hash, wallet2::confirmed_transfer_details>>& confirmed_payments,
+		uint64_t min_height, uint64_t max_height = (uint64_t)-1, const boost::optional<uint32_t>& subaddr_account = boost::none, const std::set<uint32_t>& subaddr_indices = {}) const;
+	void get_unconfirmed_payments_out(std::list<std::pair<crypto::hash, wallet2::unconfirmed_transfer_details>>& unconfirmed_payments, const boost::optional<uint32_t>& subaddr_account = boost::none, const std::set<uint32_t>& subaddr_indices = {}) const;
+	void get_unconfirmed_payments(std::list<std::pair<crypto::hash, wallet2::pool_payment_details>>& unconfirmed_payments, const boost::optional<uint32_t>& subaddr_account = boost::none, const std::set<uint32_t>& subaddr_indices = {}) const;
 
 	uint64_t get_blockchain_current_height() const { return m_local_bc_height; }
 	void rescan_spent();
 	void rescan_blockchain(bool refresh = true);
-	bool is_transfer_unlocked(const transfer_details &td) const;
+	bool is_transfer_unlocked(const transfer_details& td) const;
 	bool is_transfer_unlocked(uint64_t unlock_time, uint64_t block_height) const;
 	template <class t_archive>
-	inline void serialize(t_archive &a, const unsigned int ver)
+	inline void serialize(t_archive& a, const unsigned int ver)
 	{
 		uint64_t dummy_refresh_height = 0; // moved to keys file
 		if(ver < 5)
@@ -737,44 +765,44 @@ class wallet2
 		if(ver < 19)
 		{
 			std::vector<crypto::hash> blockchain;
-			a &blockchain;
-			for(const auto &b : blockchain)
+			a& blockchain;
+			for(const auto& b : blockchain)
 			{
 				m_blockchain.push_back(b);
 			}
 		}
 		else
 		{
-			a &m_blockchain;
+			a& m_blockchain;
 		}
-		a &m_transfers;
-		a &m_account_public_address;
-		a &m_key_images;
+		a& m_transfers;
+		a& m_account_public_address;
+		a& m_key_images;
 		if(ver < 6)
 			return;
-		a &m_unconfirmed_txs;
+		a& m_unconfirmed_txs;
 		if(ver < 7)
 			return;
-		a &m_payments;
+		a& m_payments;
 		if(ver < 8)
 			return;
-		a &m_tx_keys;
+		a& m_tx_keys;
 		if(ver < 9)
 			return;
-		a &m_confirmed_txs;
+		a& m_confirmed_txs;
 		if(ver < 11)
 			return;
-		a &dummy_refresh_height;
+		a& dummy_refresh_height;
 		if(ver < 12)
 			return;
-		a &m_tx_notes;
+		a& m_tx_notes;
 		if(ver < 13)
 			return;
 		if(ver < 17)
 		{
 			// we're loading an old version, where m_unconfirmed_payments was a std::map
 			std::unordered_map<crypto::hash, payment_details> m;
-			a &m;
+			a& m;
 			for(std::unordered_map<crypto::hash, payment_details>::const_iterator i = m.begin(); i != m.end(); ++i)
 				m_unconfirmed_payments.insert(std::make_pair(i->first, pool_payment_details{i->second, false}));
 		}
@@ -785,50 +813,50 @@ class wallet2
 			// we're loading an older wallet without a pubkey map, rebuild it
 			for(size_t i = 0; i < m_transfers.size(); ++i)
 			{
-				const transfer_details &td = m_transfers[i];
-				const cryptonote::tx_out &out = td.m_tx.vout[td.m_internal_output_index];
-				const cryptonote::txout_to_key &o = boost::get<const cryptonote::txout_to_key>(out.target);
+				const transfer_details& td = m_transfers[i];
+				const cryptonote::tx_out& out = td.m_tx.vout[td.m_internal_output_index];
+				const cryptonote::txout_to_key& o = boost::get<const cryptonote::txout_to_key>(out.target);
 				m_pub_keys.emplace(o.key, i);
 			}
 			return;
 		}
-		a &m_pub_keys;
+		a& m_pub_keys;
 		if(ver < 16)
 			return;
-		a &m_address_book;
+		a& m_address_book;
 		if(ver < 17)
 			return;
 		if(ver < 22)
 		{
 			// we're loading an old version, where m_unconfirmed_payments payload was payment_details
 			std::unordered_multimap<crypto::hash, payment_details> m;
-			a &m;
-			for(const auto &i : m)
+			a& m;
+			for(const auto& i : m)
 				m_unconfirmed_payments.insert(std::make_pair(i.first, pool_payment_details{i.second, false}));
 		}
 		if(ver < 18)
 			return;
-		a &m_scanned_pool_txs[0];
-		a &m_scanned_pool_txs[1];
+		a& m_scanned_pool_txs[0];
+		a& m_scanned_pool_txs[1];
 		if(ver < 20)
 			return;
-		a &m_subaddresses;
+		a& m_subaddresses;
 		std::unordered_map<cryptonote::subaddress_index, crypto::public_key> dummy_subaddresses_inv;
-		a &dummy_subaddresses_inv;
-		a &m_subaddress_labels;
-		a &m_additional_tx_keys;
+		a& dummy_subaddresses_inv;
+		a& m_subaddress_labels;
+		a& m_additional_tx_keys;
 		if(ver < 21)
 			return;
-		a &m_attributes;
+		a& m_attributes;
 		if(ver < 22)
 			return;
-		a &m_unconfirmed_payments;
+		a& m_unconfirmed_payments;
 		if(ver < 23)
 			return;
-		a &m_account_tags;
+		a& m_account_tags;
 		if(ver < 24)
 			return;
-		a &m_ring_history_saved;
+		a& m_ring_history_saved;
 	}
 
 	/*!
@@ -837,14 +865,14 @@ class wallet2
      * \param  keys_file_exists    Whether keys file exists
      * \param  wallet_file_exists  Whether bin file exists
      */
-	static void wallet_exists(const std::string &file_path, bool &keys_file_exists, bool &wallet_file_exists);
+	static void wallet_exists(const std::string& file_path, bool& keys_file_exists, bool& wallet_file_exists);
 	/*!
      * \brief  Check if wallet file path is valid format
      * \param  file_path      Wallet file path
      * \return                Whether path is valid format
      */
-	static bool wallet_valid_path_format(const std::string &file_path);
-	static bool parse_payment_id(const std::string &payment_id_str, crypto::uniform_payment_id &payment_id);
+	static bool wallet_valid_path_format(const std::string& file_path);
+	static bool parse_payment_id(const std::string& payment_id_str, crypto::uniform_payment_id& payment_id);
 
 	bool always_confirm_transfers() const { return m_always_confirm_transfers; }
 	void always_confirm_transfers(bool always) { m_always_confirm_transfers = always; }
@@ -885,14 +913,14 @@ class wallet2
 	bool confirm_non_default_ring_size() const { return m_confirm_non_default_ring_size; }
 	void confirm_non_default_ring_size(bool always) { m_confirm_non_default_ring_size = always; }
 
-	bool get_tx_key(const crypto::hash &txid, crypto::secret_key &tx_key, std::vector<crypto::secret_key> &additional_tx_keys) const;
-	void check_tx_key(const crypto::hash &txid, const crypto::secret_key &tx_key, const std::vector<crypto::secret_key> &additional_tx_keys, const cryptonote::account_public_address &address, uint64_t &received, bool &in_pool, uint64_t &confirmations);
-	void check_tx_key_helper(const crypto::hash &txid, const crypto::key_derivation &derivation, const std::vector<crypto::key_derivation> &additional_derivations, const cryptonote::account_public_address &address, uint64_t &received, bool &in_pool, uint64_t &confirmations);
-	std::string get_tx_proof(const crypto::hash &txid, const cryptonote::account_public_address &address, bool is_subaddress, const std::string &message);
-	bool check_tx_proof(const crypto::hash &txid, const cryptonote::account_public_address &address, bool is_subaddress, const std::string &message, const std::string &sig_str, uint64_t &received, bool &in_pool, uint64_t &confirmations);
+	bool get_tx_key(const crypto::hash& txid, crypto::secret_key& tx_key, std::vector<crypto::secret_key>& additional_tx_keys) const;
+	void check_tx_key(const crypto::hash& txid, const crypto::secret_key& tx_key, const std::vector<crypto::secret_key>& additional_tx_keys, const cryptonote::account_public_address& address, uint64_t& received, bool& in_pool, uint64_t& confirmations);
+	void check_tx_key_helper(const crypto::hash& txid, const crypto::key_derivation& derivation, const std::vector<crypto::key_derivation>& additional_derivations, const cryptonote::account_public_address& address, uint64_t& received, bool& in_pool, uint64_t& confirmations);
+	std::string get_tx_proof(const crypto::hash& txid, const cryptonote::account_public_address& address, bool is_subaddress, const std::string& message);
+	bool check_tx_proof(const crypto::hash& txid, const cryptonote::account_public_address& address, bool is_subaddress, const std::string& message, const std::string& sig_str, uint64_t& received, bool& in_pool, uint64_t& confirmations);
 
-	std::string get_spend_proof(const crypto::hash &txid, const std::string &message);
-	bool check_spend_proof(const crypto::hash &txid, const std::string &message, const std::string &sig_str);
+	std::string get_spend_proof(const crypto::hash& txid, const std::string& message);
+	bool check_spend_proof(const crypto::hash& txid, const std::string& message, const std::string& sig_str);
 
 	/*!
      * \brief  Generates a proof that proves the reserve of unspent funds
@@ -901,7 +929,7 @@ class wallet2
      * \param  message                  Arbitrary challenge message to be signed together
      * \return                          Signature string
      */
-	std::string get_reserve_proof(const boost::optional<std::pair<uint32_t, uint64_t>> &account_minreserve, const std::string &message);
+	std::string get_reserve_proof(const boost::optional<std::pair<uint32_t, uint64_t>>& account_minreserve, const std::string& message);
 	/*!
      * \brief  Verifies a proof of reserve
      * \param  address                  The signer's address
@@ -911,105 +939,105 @@ class wallet2
      * \param  spent                    [OUT] the sum of spent funds included in the signature
      * \return                          true if the signature verifies correctly
      */
-	bool check_reserve_proof(const cryptonote::account_public_address &address, const std::string &message, const std::string &sig_str, uint64_t &total, uint64_t &spent);
+	bool check_reserve_proof(const cryptonote::account_public_address& address, const std::string& message, const std::string& sig_str, uint64_t& total, uint64_t& spent);
 
 	/*!
     * \brief GUI Address book get/store
     */
 	std::vector<address_book_row> get_address_book() const { return m_address_book; }
-	bool add_address_book_row(const cryptonote::account_public_address &address, const crypto::uniform_payment_id &payment_id, const std::string &description, bool is_subaddress);
+	bool add_address_book_row(const cryptonote::account_public_address& address, const crypto::uniform_payment_id& payment_id, const std::string& description, bool is_subaddress);
 	bool delete_address_book_row(std::size_t row_id);
 
 	uint64_t get_num_rct_outputs();
 	size_t get_num_transfer_details() const { return m_transfers.size(); }
-	const transfer_details &get_transfer_details(size_t idx) const;
+	const transfer_details& get_transfer_details(size_t idx) const;
 
-	void get_hard_fork_info(uint8_t version, uint64_t &earliest_height) const;
+	void get_hard_fork_info(uint8_t version, uint64_t& earliest_height) const;
 	bool use_fork_rules(cryptonote::hard_fork_feature ft, int64_t early_blocks = 0) const;
 
 	std::string get_wallet_file() const;
 	std::string get_keys_file() const;
 	std::string get_daemon_address() const;
-	const boost::optional<epee::net_utils::http::login> &get_daemon_login() const { return m_daemon_login; }
-	uint64_t get_daemon_blockchain_height(std::string &err) const;
-	uint64_t get_daemon_blockchain_target_height(std::string &err);
+	const boost::optional<epee::net_utils::http::login>& get_daemon_login() const { return m_daemon_login; }
+	uint64_t get_daemon_blockchain_height(std::string& err) const;
+	uint64_t get_daemon_blockchain_target_height(std::string& err);
 	/*!
     * \brief Calculates the approximate blockchain height from current date/time.
     */
 	uint64_t get_approximate_blockchain_height() const;
 	uint64_t estimate_blockchain_height();
 	std::vector<size_t> select_available_outputs_from_histogram(uint64_t count, bool atleast, bool unlocked, bool allow_rct, bool trusted_daemon);
-	std::vector<size_t> select_available_outputs(const std::function<bool(const transfer_details &td)> &f) const;
+	std::vector<size_t> select_available_outputs(const std::function<bool(const transfer_details& td)>& f) const;
 	std::vector<size_t> select_available_mixable_outputs(bool trusted_daemon);
 
-	size_t pop_best_value_from(const transfer_container &transfers, std::vector<size_t> &unused_dust_indices, const std::vector<size_t> &selected_transfers, bool smallest = false) const;
-	size_t pop_best_value(std::vector<size_t> &unused_dust_indices, const std::vector<size_t> &selected_transfers, bool smallest = false) const;
+	size_t pop_best_value_from(const transfer_container& transfers, std::vector<size_t>& unused_dust_indices, const std::vector<size_t>& selected_transfers, bool smallest = false) const;
+	size_t pop_best_value(std::vector<size_t>& unused_dust_indices, const std::vector<size_t>& selected_transfers, bool smallest = false) const;
 
-	void set_tx_note(const crypto::hash &txid, const std::string &note);
-	std::string get_tx_note(const crypto::hash &txid) const;
+	void set_tx_note(const crypto::hash& txid, const std::string& note);
+	std::string get_tx_note(const crypto::hash& txid) const;
 
-	void set_description(const std::string &description);
+	void set_description(const std::string& description);
 	std::string get_description() const;
 
 	/*!
      * \brief  Get the list of registered account tags. 
      * \return first.Key=(tag's name), first.Value=(tag's label), second[i]=(i-th account's tag)
      */
-	const std::pair<std::map<std::string, std::string>, std::vector<std::string>> &get_account_tags();
+	const std::pair<std::map<std::string, std::string>, std::vector<std::string>>& get_account_tags();
 	/*!
      * \brief  Set a tag to the given accounts.
      * \param  account_indices  Indices of accounts.
      * \param  tag              Tag's name. If empty, the accounts become untagged.
      */
-	void set_account_tag(const std::set<uint32_t> account_indices, const std::string &tag);
+	void set_account_tag(const std::set<uint32_t> account_indices, const std::string& tag);
 	/*!
      * \brief  Set the label of the given tag.
      * \param  tag            Tag's name (which must be non-empty).
      * \param  label          Tag's description.
      */
-	void set_account_tag_description(const std::string &tag, const std::string &description);
+	void set_account_tag_description(const std::string& tag, const std::string& description);
 
-	std::string sign(const std::string &data) const;
-	bool verify(const std::string &data, const cryptonote::account_public_address &address, const std::string &signature) const;
+	std::string sign(const std::string& data) const;
+	bool verify(const std::string& data, const cryptonote::account_public_address& address, const std::string& signature) const;
 
 	// Import/Export wallet data
 	std::vector<tools::wallet2::transfer_details> export_outputs() const;
-	size_t import_outputs(const std::vector<tools::wallet2::transfer_details> &outputs);
+	size_t import_outputs(const std::vector<tools::wallet2::transfer_details>& outputs);
 	payment_container export_payments() const;
-	void import_payments(const payment_container &payments);
-	void import_payments_out(const std::list<std::pair<crypto::hash, wallet2::confirmed_transfer_details>> &confirmed_payments);
+	void import_payments(const payment_container& payments);
+	void import_payments_out(const std::list<std::pair<crypto::hash, wallet2::confirmed_transfer_details>>& confirmed_payments);
 	std::tuple<size_t, crypto::hash, std::vector<crypto::hash>> export_blockchain() const;
-	void import_blockchain(const std::tuple<size_t, crypto::hash, std::vector<crypto::hash>> &bc);
-	bool export_key_images(const std::string &filename) const;
+	void import_blockchain(const std::tuple<size_t, crypto::hash, std::vector<crypto::hash>>& bc);
+	bool export_key_images(const std::string& filename) const;
 	std::vector<std::pair<crypto::key_image, crypto::signature>> export_key_images() const;
-	uint64_t import_key_images(const std::vector<std::pair<crypto::key_image, crypto::signature>> &signed_key_images, uint64_t &spent, uint64_t &unspent, bool check_spent = true);
-	uint64_t import_key_images(const std::string &filename, uint64_t &spent, uint64_t &unspent);
+	uint64_t import_key_images(const std::vector<std::pair<crypto::key_image, crypto::signature>>& signed_key_images, uint64_t& spent, uint64_t& unspent, bool check_spent = true);
+	uint64_t import_key_images(const std::string& filename, uint64_t& spent, uint64_t& unspent);
 
 	void update_pool_state(bool refreshed = false);
-	void remove_obsolete_pool_txs(const std::vector<crypto::hash> &tx_hashes);
+	void remove_obsolete_pool_txs(const std::vector<crypto::hash>& tx_hashes);
 
-	std::string encrypt(const std::string &plaintext, const crypto::secret_key &skey, bool authenticated = true) const;
-	std::string encrypt_with_view_secret_key(const std::string &plaintext, bool authenticated = true) const;
-	std::string decrypt(const std::string &ciphertext, const crypto::secret_key &skey, bool authenticated = true, bool is_legacy = false) const;
-	std::string decrypt_with_view_secret_key(const std::string &ciphertext, bool authenticated = true, bool is_legacy = false) const;
+	std::string encrypt(const std::string& plaintext, const crypto::secret_key& skey, bool authenticated = true) const;
+	std::string encrypt_with_view_secret_key(const std::string& plaintext, bool authenticated = true) const;
+	std::string decrypt(const std::string& ciphertext, const crypto::secret_key& skey, bool authenticated = true, bool is_legacy = false) const;
+	std::string decrypt_with_view_secret_key(const std::string& ciphertext, bool authenticated = true, bool is_legacy = false) const;
 
-	std::string make_uri(const std::string &address, const std::string &payment_id, uint64_t amount, const std::string &tx_description, const std::string &recipient_name, std::string &error) const;
-	bool parse_uri(const std::string &uri, std::string &address, std::string &payment_id, uint64_t &amount, std::string &tx_description, std::string &recipient_name, std::vector<std::string> &unknown_parameters, std::string &error);
+	std::string make_uri(const std::string& address, const std::string& payment_id, uint64_t amount, const std::string& tx_description, const std::string& recipient_name, std::string& error) const;
+	bool parse_uri(const std::string& uri, std::string& address, std::string& payment_id, uint64_t& amount, std::string& tx_description, std::string& recipient_name, std::vector<std::string>& unknown_parameters, std::string& error);
 
 	uint64_t get_blockchain_height_by_date(uint16_t year, uint8_t month, uint8_t day); // 1<=month<=12, 1<=day<=31
 
 	bool is_synced() const;
 
-	std::vector<std::pair<uint64_t, uint64_t>> estimate_backlog(const std::vector<std::pair<double, double>> &fee_levels);
-	std::vector<std::pair<uint64_t, uint64_t>> estimate_backlog(uint64_t min_blob_size, uint64_t max_blob_size, const std::vector<uint64_t> &fees);
+	std::vector<std::pair<uint64_t, uint64_t>> estimate_backlog(const std::vector<std::pair<double, double>>& fee_levels);
+	std::vector<std::pair<uint64_t, uint64_t>> estimate_backlog(uint64_t min_blob_size, uint64_t max_blob_size, const std::vector<uint64_t>& fees);
 
 	uint64_t get_fee_multiplier(uint32_t priority) const;
-	
+
 	inline uint64_t calculate_fee(size_t ring_size, size_t bytes, uint64_t fee_multiplier) const
 	{
 		using namespace cryptonote;
 		uint64_t fee = ((bytes + 1023) / 1024) * common_config::FEE_PER_KB;
-	
+
 		if(use_fork_rules(FORK_FEE_V2, 10))
 			fee += ring_size * common_config::FEE_PER_RING_MEMBER;
 
@@ -1034,45 +1062,45 @@ class wallet2
      * overwrite or misunderstand each other's attributes, a two-part key scheme is
      * proposed: <client name>.<value name>
      */
-	const char *const ATTRIBUTE_DESCRIPTION = "wallet2.description";
-	void set_attribute(const std::string &key, const std::string &value);
-	std::string get_attribute(const std::string &key) const;
+	const char* const ATTRIBUTE_DESCRIPTION = "wallet2.description";
+	void set_attribute(const std::string& key, const std::string& value);
+	std::string get_attribute(const std::string& key) const;
 
-	crypto::public_key get_multisig_signer_public_key(const crypto::secret_key &spend_skey) const;
+	crypto::public_key get_multisig_signer_public_key(const crypto::secret_key& spend_skey) const;
 	crypto::public_key get_multisig_signer_public_key() const;
 	crypto::public_key get_multisig_signing_public_key(size_t idx) const;
-	crypto::public_key get_multisig_signing_public_key(const crypto::secret_key &skey) const;
+	crypto::public_key get_multisig_signing_public_key(const crypto::secret_key& skey) const;
 
 	template <class t_request, class t_response>
-	inline bool invoke_http_json(const boost::string_ref uri, const t_request &req, t_response &res, std::chrono::milliseconds timeout = std::chrono::seconds(15), const boost::string_ref http_method = "GET")
+	inline bool invoke_http_json(const boost::string_ref uri, const t_request& req, t_response& res, std::chrono::milliseconds timeout = std::chrono::seconds(15), const boost::string_ref http_method = "GET")
 	{
 		boost::lock_guard<boost::mutex> lock(m_daemon_rpc_mutex);
 		return epee::net_utils::invoke_http_json(uri, req, res, m_http_client, timeout, http_method);
 	}
 	template <class t_request, class t_response>
-	inline bool invoke_http_bin(const boost::string_ref uri, const t_request &req, t_response &res, std::chrono::milliseconds timeout = std::chrono::seconds(15), const boost::string_ref http_method = "GET")
+	inline bool invoke_http_bin(const boost::string_ref uri, const t_request& req, t_response& res, std::chrono::milliseconds timeout = std::chrono::seconds(15), const boost::string_ref http_method = "GET")
 	{
 		boost::lock_guard<boost::mutex> lock(m_daemon_rpc_mutex);
 		return epee::net_utils::invoke_http_bin(uri, req, res, m_http_client, timeout, http_method);
 	}
 	template <class t_request, class t_response>
-	inline bool invoke_http_json_rpc(const boost::string_ref uri, const std::string &method_name, const t_request &req, t_response &res, std::chrono::milliseconds timeout = std::chrono::seconds(15), const boost::string_ref http_method = "GET", const std::string &req_id = "0")
+	inline bool invoke_http_json_rpc(const boost::string_ref uri, const std::string& method_name, const t_request& req, t_response& res, std::chrono::milliseconds timeout = std::chrono::seconds(15), const boost::string_ref http_method = "GET", const std::string& req_id = "0")
 	{
 		boost::lock_guard<boost::mutex> lock(m_daemon_rpc_mutex);
 		return epee::net_utils::invoke_http_json_rpc(uri, method_name, req, res, m_http_client, timeout, http_method, req_id);
 	}
 
-	bool set_ring_database(const std::string &filename);
+	bool set_ring_database(const std::string& filename);
 	const std::string get_ring_database() const { return m_ring_database; }
-	bool get_ring(const crypto::key_image &key_image, std::vector<uint64_t> &outs);
-	bool get_rings(const crypto::hash &txid, std::vector<std::pair<crypto::key_image, std::vector<uint64_t>>> &outs);
-	bool set_ring(const crypto::key_image &key_image, const std::vector<uint64_t> &outs, bool relative);
+	bool get_ring(const crypto::key_image& key_image, std::vector<uint64_t>& outs);
+	bool get_rings(const crypto::hash& txid, std::vector<std::pair<crypto::key_image, std::vector<uint64_t>>>& outs);
+	bool set_ring(const crypto::key_image& key_image, const std::vector<uint64_t>& outs, bool relative);
 	bool find_and_save_rings(bool force = true);
 
-	bool blackball_output(const crypto::public_key &output);
-	bool set_blackballed_outputs(const std::vector<crypto::public_key> &outputs, bool add = false);
-	bool unblackball_output(const crypto::public_key &output);
-	bool is_output_blackballed(const crypto::public_key &output) const;
+	bool blackball_output(const crypto::public_key& output);
+	bool set_blackballed_outputs(const std::vector<crypto::public_key>& outputs, bool add = false);
+	bool unblackball_output(const crypto::public_key& output);
+	bool is_output_blackballed(const crypto::public_key& output) const;
 
   private:
 	/*!
@@ -1082,56 +1110,56 @@ class wallet2
      * \param  watch_only     true to save only view key, false to save both spend and view keys
      * \return                Whether it was successful.
      */
-	bool store_keys(const std::string &keys_file_name, const epee::wipeable_string &password, bool watch_only = false);
+	bool store_keys(const std::string& keys_file_name, const epee::wipeable_string& password, bool watch_only = false);
 	/*!
      * \brief Load wallet information from wallet file.
      * \param keys_file_name Name of wallet file
      * \param password       Password of wallet file
      */
-	bool load_keys(const std::string &keys_file_name, const epee::wipeable_string &password);
-	void process_new_transaction(const crypto::hash &txid, const cryptonote::transaction &tx, const std::vector<uint64_t> &o_indices, uint64_t height, uint64_t ts, bool miner_tx, bool pool, bool double_spend_seen);
+	bool load_keys(const std::string& keys_file_name, const epee::wipeable_string& password);
+	void process_new_transaction(const crypto::hash& txid, const cryptonote::transaction& tx, const std::vector<uint64_t>& o_indices, uint64_t height, uint64_t ts, bool miner_tx, bool pool, bool double_spend_seen);
 	void detach_blockchain(uint64_t height);
-	void get_short_chain_history(std::list<crypto::hash> &ids) const;
+	void get_short_chain_history(std::list<crypto::hash>& ids) const;
 	bool is_tx_spendtime_unlocked(uint64_t unlock_time, uint64_t block_height) const;
 	bool clear();
-	void pull_hashes(uint64_t start_height, uint64_t &blocks_start_height, const std::list<crypto::hash> &short_chain_history, std::list<crypto::hash> &hashes);
-	void fast_refresh(uint64_t stop_height, uint64_t &blocks_start_height, std::list<crypto::hash> &short_chain_history);
-	uint64_t select_transfers(uint64_t needed_money, std::vector<size_t> unused_transfers_indices, std::vector<size_t> &selected_transfers, bool trusted_daemon) const;
-	bool prepare_file_names(const std::string &file_path);
-	void process_unconfirmed(const crypto::hash &txid, const cryptonote::transaction &tx, uint64_t height);
-	void process_outgoing(const crypto::hash &txid, const cryptonote::transaction &tx, uint64_t height, uint64_t ts, uint64_t spent, uint64_t received, uint32_t subaddr_account, const std::set<uint32_t> &subaddr_indices);
-	void add_unconfirmed_tx(const cryptonote::transaction &tx, uint64_t amount_in, const std::vector<cryptonote::tx_destination_entry> &dests, const crypto::hash &payment_id, uint64_t change_amount, uint32_t subaddr_account, const std::set<uint32_t> &subaddr_indices);
-	void generate_genesis(cryptonote::block &b) const;
-	void check_genesis(const crypto::hash &genesis_hash) const; //throws
-	bool generate_chacha_key_from_secret_keys(crypto::chacha_key &key) const;
-	crypto::hash get_payment_id(const pending_tx &ptx) const;
-	void check_acc_out_precomp_once(const cryptonote::tx_out &o, const crypto::key_derivation &derivation, const std::vector<crypto::key_derivation> &additional_derivations, size_t i, tx_scan_info_t &tx_scan_info, bool &already_seen) const;
-	void check_acc_out_precomp(const cryptonote::tx_out &o, const crypto::key_derivation &derivation, const std::vector<crypto::key_derivation> &additional_derivations, size_t i, tx_scan_info_t &tx_scan_info) const;
-	void parse_block_round(const cryptonote::blobdata &blob, cryptonote::block &bl, crypto::hash &bl_id, bool &error) const;
+	void pull_hashes(uint64_t start_height, uint64_t& blocks_start_height, const std::list<crypto::hash>& short_chain_history, std::list<crypto::hash>& hashes);
+	void fast_refresh(uint64_t stop_height, uint64_t& blocks_start_height, std::list<crypto::hash>& short_chain_history);
+	uint64_t select_transfers(uint64_t needed_money, std::vector<size_t> unused_transfers_indices, std::vector<size_t>& selected_transfers, bool trusted_daemon) const;
+	bool prepare_file_names(const std::string& file_path);
+	void process_unconfirmed(const crypto::hash& txid, const cryptonote::transaction& tx, uint64_t height);
+	void process_outgoing(const crypto::hash& txid, const cryptonote::transaction& tx, uint64_t height, uint64_t ts, uint64_t spent, uint64_t received, uint32_t subaddr_account, const std::set<uint32_t>& subaddr_indices);
+	void add_unconfirmed_tx(const cryptonote::transaction& tx, uint64_t amount_in, const std::vector<cryptonote::tx_destination_entry>& dests, const crypto::hash& payment_id, uint64_t change_amount, uint32_t subaddr_account, const std::set<uint32_t>& subaddr_indices);
+	void generate_genesis(cryptonote::block& b) const;
+	void check_genesis(const crypto::hash& genesis_hash) const; //throws
+	bool generate_chacha_key_from_secret_keys(crypto::chacha_key& key) const;
+	crypto::hash get_payment_id(const pending_tx& ptx) const;
+	void check_acc_out_precomp_once(const cryptonote::tx_out& o, const crypto::key_derivation& derivation, const std::vector<crypto::key_derivation>& additional_derivations, size_t i, tx_scan_info_t& tx_scan_info, bool& already_seen) const;
+	void check_acc_out_precomp(const cryptonote::tx_out& o, const crypto::key_derivation& derivation, const std::vector<crypto::key_derivation>& additional_derivations, size_t i, tx_scan_info_t& tx_scan_info) const;
+	void parse_block_round(const cryptonote::blobdata& blob, cryptonote::block& bl, crypto::hash& bl_id, bool& error) const;
 	uint64_t get_upper_transaction_size_limit() const;
 	std::vector<uint64_t> get_unspent_amounts_vector() const;
-	float get_output_relatedness(const transfer_details &td0, const transfer_details &td1) const;
-	std::vector<size_t> pick_preferred_rct_inputs(uint64_t needed_money, uint32_t subaddr_account, const std::set<uint32_t> &subaddr_indices) const;
+	float get_output_relatedness(const transfer_details& td0, const transfer_details& td1) const;
+	std::vector<size_t> pick_preferred_rct_inputs(uint64_t needed_money, uint32_t subaddr_account, const std::set<uint32_t>& subaddr_indices) const;
 	void set_spent(size_t idx, uint64_t height);
 	void set_unspent(size_t idx);
-	void get_outs(std::vector<std::vector<get_outs_entry>> &outs, const std::vector<size_t> &selected_transfers, size_t fake_outputs_count);
-	bool tx_add_fake_output(std::vector<std::vector<tools::wallet2::get_outs_entry>> &outs, uint64_t global_index, const crypto::public_key &tx_public_key, const rct::key &mask, uint64_t real_index, bool unlocked) const;
-	crypto::public_key get_tx_pub_key_from_received_outs(const tools::wallet2::transfer_details &td) const;
-	bool should_pick_a_second_output(bool use_rct, size_t n_transfers, const std::vector<size_t> &unused_transfers_indices, const std::vector<size_t> &unused_dust_indices) const;
-	std::vector<size_t> get_only_rct(const std::vector<size_t> &unused_dust_indices, const std::vector<size_t> &unused_transfers_indices) const;
-	void scan_output(const cryptonote::transaction &tx, const crypto::public_key &tx_pub_key, size_t i, tx_scan_info_t &tx_scan_info, int &num_vouts_received, std::unordered_map<cryptonote::subaddress_index, uint64_t> &tx_money_got_in_outs, std::vector<size_t> &outs) const;
+	void get_outs(std::vector<std::vector<get_outs_entry>>& outs, const std::vector<size_t>& selected_transfers, size_t fake_outputs_count);
+	bool tx_add_fake_output(std::vector<std::vector<tools::wallet2::get_outs_entry>>& outs, uint64_t global_index, const crypto::public_key& tx_public_key, const rct::key& mask, uint64_t real_index, bool unlocked) const;
+	crypto::public_key get_tx_pub_key_from_received_outs(const tools::wallet2::transfer_details& td) const;
+	bool should_pick_a_second_output(bool use_rct, size_t n_transfers, const std::vector<size_t>& unused_transfers_indices, const std::vector<size_t>& unused_dust_indices) const;
+	std::vector<size_t> get_only_rct(const std::vector<size_t>& unused_dust_indices, const std::vector<size_t>& unused_transfers_indices) const;
+	void scan_output(const cryptonote::transaction& tx, const crypto::public_key& tx_pub_key, size_t i, tx_scan_info_t& tx_scan_info, int& num_vouts_received, std::unordered_map<cryptonote::subaddress_index, uint64_t>& tx_money_got_in_outs, std::vector<size_t>& outs) const;
 	void trim_hashchain();
 	crypto::key_image get_multisig_composite_key_image(size_t n) const;
-	rct::multisig_kLRki get_multisig_composite_kLRki(size_t n, const crypto::public_key &ignore, std::unordered_set<rct::key> &used_L, std::unordered_set<rct::key> &new_used_L) const;
-	rct::multisig_kLRki get_multisig_kLRki(size_t n, const rct::key &k) const;
-	rct::key get_multisig_k(size_t idx, const std::unordered_set<rct::key> &used_L) const;
-	void update_multisig_rescan_info(const std::vector<std::vector<rct::key>> &multisig_k, const std::vector<std::vector<tools::wallet2::multisig_info>> &info, size_t n);
-	bool add_rings(const crypto::chacha_key &key, const cryptonote::transaction_prefix &tx);
-	bool add_rings(const cryptonote::transaction_prefix &tx);
-	bool remove_rings(const cryptonote::transaction_prefix &tx);
-	bool get_ring(const crypto::chacha_key &key, const crypto::key_image &key_image, std::vector<uint64_t> &outs);
+	rct::multisig_kLRki get_multisig_composite_kLRki(size_t n, const crypto::public_key& ignore, std::unordered_set<rct::key>& used_L, std::unordered_set<rct::key>& new_used_L) const;
+	rct::multisig_kLRki get_multisig_kLRki(size_t n, const rct::key& k) const;
+	rct::key get_multisig_k(size_t idx, const std::unordered_set<rct::key>& used_L) const;
+	void update_multisig_rescan_info(const std::vector<std::vector<rct::key>>& multisig_k, const std::vector<std::vector<tools::wallet2::multisig_info>>& info, size_t n);
+	bool add_rings(const crypto::chacha_key& key, const cryptonote::transaction_prefix& tx);
+	bool add_rings(const cryptonote::transaction_prefix& tx);
+	bool remove_rings(const cryptonote::transaction_prefix& tx);
+	bool get_ring(const crypto::chacha_key& key, const crypto::key_image& key_image, std::vector<uint64_t>& outs);
 
-	bool get_output_distribution(uint64_t &start_height, std::vector<uint64_t> &distribution);
+	bool get_output_distribution(uint64_t& start_height, std::vector<uint64_t>& distribution);
 
 	uint64_t get_segregation_fork_height() const;
 
@@ -1162,14 +1190,14 @@ class wallet2
 	std::vector<tools::wallet2::address_book_row> m_address_book;
 	std::pair<std::map<std::string, std::string>, std::vector<std::string>> m_account_tags;
 	uint64_t m_upper_transaction_size_limit; //TODO: auto-calc this value or request from daemon, now use some fixed value
-	const std::vector<std::vector<tools::wallet2::multisig_info>> *m_multisig_rescan_info;
-	const std::vector<std::vector<rct::key>> *m_multisig_rescan_k;
+	const std::vector<std::vector<tools::wallet2::multisig_info>>* m_multisig_rescan_info;
+	const std::vector<std::vector<rct::key>>* m_multisig_rescan_k;
 
 	std::atomic<bool> m_run;
 
 	boost::mutex m_daemon_rpc_mutex;
 
-	i_wallet2_callback *m_callback;
+	i_wallet2_callback* m_callback;
 	bool m_key_on_device;
 	cryptonote::network_type m_nettype;
 	bool m_force_network = false;
@@ -1241,7 +1269,9 @@ class wallet2
 
 		struct found_output_idx
 		{
-			found_output_idx(size_t block_idx, size_t tx_idx) : block_idx(block_idx), tx_idx(tx_idx) {}
+			found_output_idx(size_t block_idx, size_t tx_idx) :
+				block_idx(block_idx),
+				tx_idx(tx_idx) {}
 			size_t block_idx;
 			size_t tx_idx;
 		};
@@ -1258,11 +1288,12 @@ class wallet2
 		std::unordered_set<crypto::key_image> incoming_kimg;
 	};
 
-	std::unique_ptr<wallet_rpc_scan_data> pull_blocks(uint64_t start_height, const std::list<crypto::hash> &short_chain_history);
+	std::unique_ptr<wallet_rpc_scan_data> pull_blocks(uint64_t start_height, const std::list<crypto::hash>& short_chain_history);
 
 	struct wallet_refresh_ctx
 	{
-		wallet_refresh_ctx() : m_scan_error(false) {};
+		wallet_refresh_ctx() :
+			m_scan_error(false){};
 
 		thdq<std::unique_ptr<wallet_rpc_scan_data>> m_scan_in_queue;
 		thdq<std::unique_ptr<wallet_rpc_scan_data>> m_scan_out_queue;
@@ -1272,14 +1303,15 @@ class wallet2
 
 	struct wallet_scan_ctx
 	{
-		wallet_scan_ctx(const wallet2& parent, wallet_refresh_ctx& refresh_ctx) : 
+		wallet_scan_ctx(const wallet2& parent, wallet_refresh_ctx& refresh_ctx) :
 			explicit_refresh(parent.m_explicit_refresh_from_block_height),
 			wallet_create_time(parent.m_account.get_createtime()),
 			refresh_height(parent.m_refresh_from_block_height),
 			account(parent.m_account),
 			scan_type(parent.m_refresh_type),
 			refresh_ctx(refresh_ctx)
-			{}
+		{
+		}
 
 		bool explicit_refresh;
 		uint64_t wallet_create_time;
@@ -1291,7 +1323,7 @@ class wallet2
 
 	struct wallet_block_dl_ctx
 	{
-		wallet_block_dl_ctx(wallet_refresh_ctx& refresh_ctx) : 
+		wallet_block_dl_ctx(wallet_refresh_ctx& refresh_ctx) :
 			refresh_ctx(refresh_ctx) {}
 
 		size_t scan_thd_cnt;
@@ -1310,17 +1342,16 @@ class wallet2
 	void block_scan_thd(const wallet_scan_ctx& ctx);
 	bool block_scan_tx(const wallet_scan_ctx& ctx, const crypto::hash& txid, const cryptonote::transaction& tx, bloom_filter& in_kimg, std::unordered_set<crypto::key_image>& inc_kimg);
 	using tx_call_map = std::unordered_map<crypto::hash, std::pair<std::function<void()>, uint64_t>>;
-	inline void add_new_tx_call(tx_call_map& map, const crypto::hash& txid, const cryptonote::transaction& tx, const std::vector<uint64_t>& o_indices, 
-								uint64_t height, uint64_t ts, bool miner_tx)
+	inline void add_new_tx_call(tx_call_map& map, const crypto::hash& txid, const cryptonote::transaction& tx, const std::vector<uint64_t>& o_indices,
+		uint64_t height, uint64_t ts, bool miner_tx)
 	{
 		if(map.find(txid) != map.end())
 			return;
 
-		map.emplace(std::piecewise_construct, std::forward_as_tuple(txid), std::forward_as_tuple(
-			std::bind(&wallet2::process_new_transaction, this, std::cref(txid), std::cref(tx), std::cref(o_indices), height, ts, miner_tx, false, false), height));
+		map.emplace(std::piecewise_construct, std::forward_as_tuple(txid), std::forward_as_tuple(std::bind(&wallet2::process_new_transaction, this, std::cref(txid), std::cref(tx), std::cref(o_indices), height, ts, miner_tx, false, false), height));
 	}
 };
-}
+} // namespace tools
 BOOST_CLASS_VERSION(tools::wallet2, 24)
 BOOST_CLASS_VERSION(tools::wallet2::transfer_details, 9)
 BOOST_CLASS_VERSION(tools::wallet2::multisig_info, 1)
@@ -1338,7 +1369,7 @@ BOOST_CLASS_VERSION(tools::wallet2::tx_construction_data, 3)
 BOOST_CLASS_VERSION(tools::wallet2::pending_tx, 3)
 BOOST_CLASS_VERSION(tools::wallet2::multisig_sig, 0)
 
-inline void drop_from_short_history(std::list<crypto::hash> &short_chain_history, size_t N)
+inline void drop_from_short_history(std::list<crypto::hash>& short_chain_history, size_t N)
 {
 	std::list<crypto::hash>::iterator right;
 	// drop early N off, skipping the genesis block
@@ -1357,11 +1388,11 @@ namespace boost
 namespace serialization
 {
 template <class Archive>
-inline typename std::enable_if<!Archive::is_loading::value, void>::type initialize_transfer_details(Archive &a, tools::wallet2::transfer_details &x, const boost::serialization::version_type ver)
+inline typename std::enable_if<!Archive::is_loading::value, void>::type initialize_transfer_details(Archive& a, tools::wallet2::transfer_details& x, const boost::serialization::version_type ver)
 {
 }
 template <class Archive>
-inline typename std::enable_if<Archive::is_loading::value, void>::type initialize_transfer_details(Archive &a, tools::wallet2::transfer_details &x, const boost::serialization::version_type ver)
+inline typename std::enable_if<Archive::is_loading::value, void>::type initialize_transfer_details(Archive& a, tools::wallet2::transfer_details& x, const boost::serialization::version_type ver)
 {
 	if(ver < 1)
 	{
@@ -1397,50 +1428,50 @@ inline typename std::enable_if<Archive::is_loading::value, void>::type initializ
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::transfer_details &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::transfer_details& x, const boost::serialization::version_type ver)
 {
-	a &x.m_block_height;
-	a &x.m_global_output_index;
-	a &x.m_internal_output_index;
+	a& x.m_block_height;
+	a& x.m_global_output_index;
+	a& x.m_internal_output_index;
 	if(ver < 3)
 	{
 		cryptonote::transaction tx;
-		a &tx;
-		x.m_tx = (const cryptonote::transaction_prefix &)tx;
+		a& tx;
+		x.m_tx = (const cryptonote::transaction_prefix&)tx;
 		x.m_txid = cryptonote::get_transaction_hash(tx);
 	}
 	else
 	{
-		a &x.m_tx;
+		a& x.m_tx;
 	}
-	a &x.m_spent;
-	a &x.m_key_image;
+	a& x.m_spent;
+	a& x.m_key_image;
 	if(ver < 1)
 	{
 		// ensure mask and amount are set
 		initialize_transfer_details(a, x, ver);
 		return;
 	}
-	a &x.m_mask;
-	a &x.m_amount;
+	a& x.m_mask;
+	a& x.m_amount;
 	if(ver < 2)
 	{
 		initialize_transfer_details(a, x, ver);
 		return;
 	}
-	a &x.m_spent_height;
+	a& x.m_spent_height;
 	if(ver < 3)
 	{
 		initialize_transfer_details(a, x, ver);
 		return;
 	}
-	a &x.m_txid;
+	a& x.m_txid;
 	if(ver < 4)
 	{
 		initialize_transfer_details(a, x, ver);
 		return;
 	}
-	a &x.m_rct;
+	a& x.m_rct;
 	if(ver < 5)
 	{
 		initialize_transfer_details(a, x, ver);
@@ -1450,84 +1481,84 @@ inline void serialize(Archive &a, tools::wallet2::transfer_details &x, const boo
 	{
 		// v5 did not properly initialize
 		uint8_t u;
-		a &u;
+		a& u;
 		x.m_key_image_known = true;
 		return;
 	}
-	a &x.m_key_image_known;
+	a& x.m_key_image_known;
 	if(ver < 7)
 	{
 		initialize_transfer_details(a, x, ver);
 		return;
 	}
-	a &x.m_pk_index;
+	a& x.m_pk_index;
 	if(ver < 8)
 	{
 		initialize_transfer_details(a, x, ver);
 		return;
 	}
-	a &x.m_subaddr_index;
+	a& x.m_subaddr_index;
 	if(ver < 9)
 	{
 		initialize_transfer_details(a, x, ver);
 		return;
 	}
-	a &x.m_multisig_info;
-	a &x.m_multisig_k;
-	a &x.m_key_image_partial;
+	a& x.m_multisig_info;
+	a& x.m_multisig_k;
+	a& x.m_key_image_partial;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::multisig_info::LR &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::multisig_info::LR& x, const boost::serialization::version_type ver)
 {
-	a &x.m_L;
-	a &x.m_R;
+	a& x.m_L;
+	a& x.m_R;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::multisig_info &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::multisig_info& x, const boost::serialization::version_type ver)
 {
-	a &x.m_signer;
-	a &x.m_LR;
-	a &x.m_partial_key_images;
+	a& x.m_signer;
+	a& x.m_LR;
+	a& x.m_partial_key_images;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::multisig_tx_set &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::multisig_tx_set& x, const boost::serialization::version_type ver)
 {
-	a &x.m_ptx;
-	a &x.m_signers;
+	a& x.m_ptx;
+	a& x.m_signers;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::unconfirmed_transfer_details &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::unconfirmed_transfer_details& x, const boost::serialization::version_type ver)
 {
-	a &x.m_change;
-	a &x.m_sent_time;
+	a& x.m_change;
+	a& x.m_sent_time;
 	if(ver < 5)
 	{
 		cryptonote::transaction tx;
-		a &tx;
-		x.m_tx = (const cryptonote::transaction_prefix &)tx;
+		a& tx;
+		x.m_tx = (const cryptonote::transaction_prefix&)tx;
 	}
 	else
 	{
-		a &x.m_tx;
+		a& x.m_tx;
 	}
 	if(ver < 1)
 		return;
-	a &x.m_dests;
-	a &x.m_payment_id;
+	a& x.m_dests;
+	a& x.m_payment_id;
 	if(ver < 2)
 		return;
-	a &x.m_state;
+	a& x.m_state;
 	if(ver < 3)
 		return;
-	a &x.m_timestamp;
+	a& x.m_timestamp;
 	if(ver < 4)
 		return;
-	a &x.m_amount_in;
-	a &x.m_amount_out;
+	a& x.m_amount_in;
+	a& x.m_amount_out;
 	if(ver < 6)
 	{
 		// v<6 may not have change accumulated in m_amount_out, which is a pain,
@@ -1541,27 +1572,27 @@ inline void serialize(Archive &a, tools::wallet2::unconfirmed_transfer_details &
 		x.m_subaddr_account = 0;
 		return;
 	}
-	a &x.m_subaddr_account;
-	a &x.m_subaddr_indices;
+	a& x.m_subaddr_account;
+	a& x.m_subaddr_indices;
 	if(ver < 8)
 		return;
-	a &x.m_rings;
+	a& x.m_rings;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::confirmed_transfer_details &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::confirmed_transfer_details& x, const boost::serialization::version_type ver)
 {
-	a &x.m_amount_in;
-	a &x.m_amount_out;
-	a &x.m_change;
-	a &x.m_block_height;
+	a& x.m_amount_in;
+	a& x.m_amount_out;
+	a& x.m_change;
+	a& x.m_block_height;
 	if(ver < 1)
 		return;
-	a &x.m_dests;
-	a &x.m_payment_id;
+	a& x.m_dests;
+	a& x.m_payment_id;
 	if(ver < 2)
 		return;
-	a &x.m_timestamp;
+	a& x.m_timestamp;
 	if(ver < 3)
 	{
 		// v<3 may not have change accumulated in m_amount_out, which is a pain,
@@ -1582,100 +1613,100 @@ inline void serialize(Archive &a, tools::wallet2::confirmed_transfer_details &x,
 			x.m_unlock_time = 0;
 		return;
 	}
-	a &x.m_unlock_time;
+	a& x.m_unlock_time;
 	if(ver < 5)
 	{
 		x.m_subaddr_account = 0;
 		return;
 	}
-	a &x.m_subaddr_account;
-	a &x.m_subaddr_indices;
+	a& x.m_subaddr_account;
+	a& x.m_subaddr_indices;
 	if(ver < 6)
 		return;
-	a &x.m_rings;
+	a& x.m_rings;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::payment_details &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::payment_details& x, const boost::serialization::version_type ver)
 {
-	a &x.m_tx_hash;
-	a &x.m_amount;
-	a &x.m_block_height;
-	a &x.m_unlock_time;
+	a& x.m_tx_hash;
+	a& x.m_amount;
+	a& x.m_block_height;
+	a& x.m_unlock_time;
 	if(ver < 1)
 		return;
-	a &x.m_timestamp;
+	a& x.m_timestamp;
 	if(ver < 2)
 	{
 		x.m_subaddr_index = {};
 		return;
 	}
-	a &x.m_subaddr_index;
+	a& x.m_subaddr_index;
 	if(ver < 3)
 	{
 		x.m_fee = 0;
 		return;
 	}
-	a &x.m_fee;
+	a& x.m_fee;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::pool_payment_details &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::pool_payment_details& x, const boost::serialization::version_type ver)
 {
-	a &x.m_pd;
-	a &x.m_double_spend_seen;
+	a& x.m_pd;
+	a& x.m_double_spend_seen;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::address_book_row &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::address_book_row& x, const boost::serialization::version_type ver)
 {
-	a &x.m_address;
-	a &x.m_payment_id;
-	a &x.m_description;
+	a& x.m_address;
+	a& x.m_payment_id;
+	a& x.m_description;
 	if(ver < 17)
 	{
 		x.m_is_subaddress = false;
 		return;
 	}
-	a &x.m_is_subaddress;
+	a& x.m_is_subaddress;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::reserve_proof_entry &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::reserve_proof_entry& x, const boost::serialization::version_type ver)
 {
-	a &x.txid;
-	a &x.index_in_tx;
-	a &x.shared_secret;
-	a &x.key_image;
-	a &x.shared_secret_sig;
-	a &x.key_image_sig;
+	a& x.txid;
+	a& x.index_in_tx;
+	a& x.shared_secret;
+	a& x.key_image;
+	a& x.shared_secret_sig;
+	a& x.key_image_sig;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::unsigned_tx_set &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::unsigned_tx_set& x, const boost::serialization::version_type ver)
 {
-	a &x.txes;
-	a &x.transfers;
+	a& x.txes;
+	a& x.transfers;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::signed_tx_set &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::signed_tx_set& x, const boost::serialization::version_type ver)
 {
-	a &x.ptx;
-	a &x.key_images;
+	a& x.ptx;
+	a& x.key_images;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::tx_construction_data &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::tx_construction_data& x, const boost::serialization::version_type ver)
 {
-	a &x.sources;
-	a &x.change_dts;
-	a &x.splitted_dsts;
+	a& x.sources;
+	a& x.change_dts;
+	a& x.splitted_dsts;
 	if(ver < 2)
 	{
 		// load list to vector
 		std::list<size_t> selected_transfers;
-		a &selected_transfers;
+		a& selected_transfers;
 		x.selected_transfers.clear();
 		x.selected_transfers.reserve(selected_transfers.size());
 		for(size_t t : selected_transfers)
@@ -1685,7 +1716,7 @@ inline void serialize(Archive &a, tools::wallet2::tx_construction_data &x, const
 	if(ver < 3)
 	{
 		std::vector<uint8_t> extra;
-		a &extra;
+		a& extra;
 
 		using namespace cryptonote;
 		std::vector<tx_extra_field> tx_extra_fields;
@@ -1708,70 +1739,70 @@ inline void serialize(Archive &a, tools::wallet2::tx_construction_data &x, const
 		}
 	}
 	else
-		a &x.payment_id;
+		a& x.payment_id;
 
-	a &x.unlock_time;
+	a& x.unlock_time;
 
 	if(ver < 3)
 	{
 		bool dummy = true;
-		a &dummy;
+		a& dummy;
 	}
 
-	a &x.dests;
+	a& x.dests;
 	if(ver < 1)
 	{
 		x.subaddr_account = 0;
 		return;
 	}
-	a &x.subaddr_account;
-	a &x.subaddr_indices;
+	a& x.subaddr_account;
+	a& x.subaddr_indices;
 	if(ver < 2)
 		return;
-	a &x.selected_transfers;
+	a& x.selected_transfers;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::multisig_sig &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::multisig_sig& x, const boost::serialization::version_type ver)
 {
-	a &x.sigs;
-	a &x.ignore;
-	a &x.used_L;
-	a &x.signing_keys;
-	a &x.msout;
+	a& x.sigs;
+	a& x.ignore;
+	a& x.used_L;
+	a& x.signing_keys;
+	a& x.msout;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, tools::wallet2::pending_tx &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, tools::wallet2::pending_tx& x, const boost::serialization::version_type ver)
 {
-	a &x.tx;
-	a &x.dust;
-	a &x.fee;
-	a &x.dust_added_to_fee;
-	a &x.change_dts;
+	a& x.tx;
+	a& x.dust;
+	a& x.fee;
+	a& x.dust_added_to_fee;
+	a& x.change_dts;
 	if(ver < 2)
 	{
 		// load list to vector
 		std::list<size_t> selected_transfers;
-		a &selected_transfers;
+		a& selected_transfers;
 		x.selected_transfers.clear();
 		x.selected_transfers.reserve(selected_transfers.size());
 		for(size_t t : selected_transfers)
 			x.selected_transfers.push_back(t);
 	}
-	a &x.key_images;
-	a &x.tx_key;
-	a &x.dests;
-	a &x.construction_data;
+	a& x.key_images;
+	a& x.tx_key;
+	a& x.dests;
+	a& x.construction_data;
 	if(ver < 1)
 		return;
-	a &x.additional_tx_keys;
+	a& x.additional_tx_keys;
 	if(ver < 2)
 		return;
-	a &x.selected_transfers;
+	a& x.selected_transfers;
 	if(ver < 3)
 		return;
-	a &x.multisig_sigs;
+	a& x.multisig_sigs;
 }
-}
-}
+} // namespace serialization
+} // namespace boost

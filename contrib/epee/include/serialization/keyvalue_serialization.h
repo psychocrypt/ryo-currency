@@ -40,8 +40,11 @@ namespace epee
 /************************************************************************/
 #define BEGIN_KV_SERIALIZE_MAP(class_name)                                                                       \
   private:                                                                                                       \
-	class epee_zero{};                                                                                           \
-	class_name(const epee_zero){}                                                                                \
+	class epee_zero                                                                                              \
+	{                                                                                                            \
+	};                                                                                                           \
+	class_name(const epee_zero) {}                                                                               \
+                                                                                                                 \
   public:                                                                                                        \
 	class_name()                                                                                                 \
 	{                                                                                                            \
@@ -49,42 +52,42 @@ namespace epee
 		*this = set_zero;                                                                                        \
 	}                                                                                                            \
 	template <class t_storage>                                                                                   \
-	bool store(t_storage &st, typename t_storage::hsection hparent_section = nullptr) const                      \
+	bool store(t_storage& st, typename t_storage::hsection hparent_section = nullptr) const                      \
 	{                                                                                                            \
 		return serialize_map<true>(*this, st, hparent_section);                                                  \
 	}                                                                                                            \
 	template <class t_storage>                                                                                   \
-	bool _load(t_storage &stg, typename t_storage::hsection hparent_section = nullptr)                           \
+	bool _load(t_storage& stg, typename t_storage::hsection hparent_section = nullptr)                           \
 	{                                                                                                            \
 		return serialize_map<false>(*this, stg, hparent_section);                                                \
 	}                                                                                                            \
 	template <class t_storage>                                                                                   \
-	bool load(t_storage &stg, typename t_storage::hsection hparent_section = nullptr)                            \
+	bool load(t_storage& stg, typename t_storage::hsection hparent_section = nullptr)                            \
 	{                                                                                                            \
 		try                                                                                                      \
 		{                                                                                                        \
 			return serialize_map<false>(*this, stg, hparent_section);                                            \
 		}                                                                                                        \
-		catch(const std::exception &err)                                                                         \
+		catch(const std::exception& err)                                                                         \
 		{                                                                                                        \
 			(void)(err);                                                                                         \
-			GULPS_CAT2_ERROR("kv_ser","","Exception on unserializing: {}", err.what());                          \
+			GULPS_CAT2_ERROR("kv_ser", "", "Exception on unserializing: {}", err.what());                        \
 			return false;                                                                                        \
 		}                                                                                                        \
 	}                                                                                                            \
 	template <bool is_store, class this_type, class t_storage>                                                   \
-	static bool serialize_map(this_type &this_ref, t_storage &stg, typename t_storage::hsection hparent_section) \
+	static bool serialize_map(this_type& this_ref, t_storage& stg, typename t_storage::hsection hparent_section) \
 	{
 
 #define KV_SERIALIZE_N(varialble, val_name) \
 	epee::serialization::selector<is_store>::serialize(this_ref.varialble, stg, hparent_section, val_name);
 
 template <typename T>
-inline void serialize_default(const T &t, T v)
+inline void serialize_default(const T& t, T v)
 {
 }
 template <typename T>
-inline void serialize_default(T &t, T v) { t = v; }
+inline void serialize_default(T& t, T v) { t = v; }
 
 #define KV_SERIALIZE_OPT_N(variable, val_name, default_value)                                                      \
 	do                                                                                                             \
@@ -112,4 +115,4 @@ inline void serialize_default(T &t, T v) { t = v; }
 #define KV_SERIALIZE_VAL_POD_AS_BLOB_FORCE(varialble) KV_SERIALIZE_VAL_POD_AS_BLOB_FORCE_N(varialble, #varialble) //skip is_pod compile time check
 #define KV_SERIALIZE_CONTAINER_POD_AS_BLOB(varialble) KV_SERIALIZE_CONTAINER_POD_AS_BLOB_N(varialble, #varialble)
 #define KV_SERIALIZE_OPT(variable, default_value) KV_SERIALIZE_OPT_N(variable, #variable, default_value)
-}
+} // namespace epee

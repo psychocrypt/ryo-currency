@@ -34,8 +34,6 @@
 
 #include "common/gulps.hpp"
 
-
-
 #define HTTP_MAX_URI_LEN 9000
 #define HTTP_MAX_HEADER_LEN 100000
 #define HTTP_MAX_STARTING_NEWLINES 8
@@ -57,7 +55,7 @@ struct multipart_entry
 	std::string m_body;
 };
 
-inline bool match_boundary(const std::string &content_type, std::string &boundary)
+inline bool match_boundary(const std::string& content_type, std::string& boundary)
 {
 	STATIC_REGEXP_EXPR_1(rexp_match_boundary, "boundary=(.*?)(($)|([;\\s,]))", boost::regex::icase | boost::regex::normal);
 	//											        1
@@ -71,14 +69,14 @@ inline bool match_boundary(const std::string &content_type, std::string &boundar
 	return false;
 }
 
-inline bool parse_header(std::string::const_iterator it_begin, std::string::const_iterator it_end, multipart_entry &entry)
+inline bool parse_header(std::string::const_iterator it_begin, std::string::const_iterator it_end, multipart_entry& entry)
 {
 	STATIC_REGEXP_EXPR_1(rexp_mach_field,
-						 "\n?((Content-Disposition)|(Content-Type)"
-						 //  12                     3
-						 "|([\\w-]+?)) ?: ?((.*?)(\r?\n))[^\t ]",
-						 //4               56    7
-						 boost::regex::icase | boost::regex::normal);
+		"\n?((Content-Disposition)|(Content-Type)"
+		//  12                     3
+		"|([\\w-]+?)) ?: ?((.*?)(\r?\n))[^\t ]",
+		//4               56    7
+		boost::regex::icase | boost::regex::normal);
 
 	boost::smatch result;
 	std::string::const_iterator it_current_bound = it_begin;
@@ -107,7 +105,7 @@ inline bool parse_header(std::string::const_iterator it_begin, std::string::cons
 	return true;
 }
 
-inline bool handle_part_of_multipart(std::string::const_iterator it_begin, std::string::const_iterator it_end, multipart_entry &entry)
+inline bool handle_part_of_multipart(std::string::const_iterator it_begin, std::string::const_iterator it_end, multipart_entry& entry)
 {
 	std::string end_str = "\r\n\r\n";
 	std::string::const_iterator end_header_it = std::search(it_begin, it_end, end_str.begin(), end_str.end());
@@ -128,7 +126,7 @@ inline bool handle_part_of_multipart(std::string::const_iterator it_begin, std::
 	return true;
 }
 
-inline bool parse_multipart_body(const std::string &content_type, const std::string &body, std::list<multipart_entry> &out_values)
+inline bool parse_multipart_body(const std::string& content_type, const std::string& body, std::list<multipart_entry>& out_values)
 {
 	//bool res = file_io_utils::load_file_to_string("C:\\public\\multupart_data", body);
 
@@ -192,15 +190,16 @@ inline bool parse_multipart_body(const std::string &content_type, const std::str
 
 //--------------------------------------------------------------------------------------------
 template <class t_connection_context>
-simple_http_connection_handler<t_connection_context>::simple_http_connection_handler(i_service_endpoint *psnd_hndlr, config_type &config) : m_state(http_state_retriving_comand_line),
-																																			m_body_transfer_type(http_body_transfer_undefined),
-																																			m_is_stop_handling(false),
-																																			m_len_summary(0),
-																																			m_len_remain(0),
-																																			m_config(config),
-																																			m_want_close(false),
-																																			m_newlines(0),
-																																			m_psnd_hndlr(psnd_hndlr)
+simple_http_connection_handler<t_connection_context>::simple_http_connection_handler(i_service_endpoint* psnd_hndlr, config_type& config) :
+	m_state(http_state_retriving_comand_line),
+	m_body_transfer_type(http_body_transfer_undefined),
+	m_is_stop_handling(false),
+	m_len_summary(0),
+	m_len_remain(0),
+	m_config(config),
+	m_want_close(false),
+	m_newlines(0),
+	m_psnd_hndlr(psnd_hndlr)
 {
 }
 //--------------------------------------------------------------------------------------------
@@ -217,9 +216,9 @@ bool simple_http_connection_handler<t_connection_context>::set_ready_state()
 }
 //--------------------------------------------------------------------------------------------
 template <class t_connection_context>
-bool simple_http_connection_handler<t_connection_context>::handle_recv(const void *ptr, size_t cb)
+bool simple_http_connection_handler<t_connection_context>::handle_recv(const void* ptr, size_t cb)
 {
-	std::string buf((const char *)ptr, cb);
+	std::string buf((const char*)ptr, cb);
 	//GULPSF_PRINT("HTTP_RECV: {}\r\n{}", ptr , buf);
 	//file_io_utils::save_string_to_file(string_tools::get_current_module_folder() + "/" + boost::lexical_cast<std::string>(ptr), std::string((const char*)ptr, cb));
 
@@ -230,7 +229,7 @@ bool simple_http_connection_handler<t_connection_context>::handle_recv(const voi
 }
 //--------------------------------------------------------------------------------------------
 template <class t_connection_context>
-bool simple_http_connection_handler<t_connection_context>::handle_buff_in(std::string &buf)
+bool simple_http_connection_handler<t_connection_context>::handle_buff_in(std::string& buf)
 {
 
 	size_t ndel;
@@ -318,7 +317,7 @@ bool simple_http_connection_handler<t_connection_context>::handle_buff_in(std::s
 	return true;
 }
 //--------------------------------------------------------------------------------------------
-inline bool analize_http_method(const boost::smatch &result, http::http_method &method, int &http_ver_major, int &http_ver_minor)
+inline bool analize_http_method(const boost::smatch& result, http::http_method& method, int& http_ver_major, int& http_ver_minor)
 {
 	GULPS_CHECK_AND_ASSERT_MES(result[0].matched, false, "simple_http_connection_handler::analize_http_method() assert failed...");
 	http_ver_major = boost::lexical_cast<int>(result[11]);
@@ -378,7 +377,7 @@ bool simple_http_connection_handler<t_connection_context>::handle_invoke_query_l
 }
 //--------------------------------------------------------------------------------------------
 template <class t_connection_context>
-std::string::size_type simple_http_connection_handler<t_connection_context>::match_end_of_header(const std::string &buf)
+std::string::size_type simple_http_connection_handler<t_connection_context>::match_end_of_header(const std::string& buf)
 {
 
 	//Here we returning head size, including terminating sequence (\r\n\r\n or \n\n)
@@ -487,14 +486,14 @@ bool simple_http_connection_handler<t_connection_context>::handle_query_measure(
 }
 //--------------------------------------------------------------------------------------------
 template <class t_connection_context>
-bool simple_http_connection_handler<t_connection_context>::parse_cached_header(http_header_info &body_info, const std::string &m_cache_to_process, size_t pos)
+bool simple_http_connection_handler<t_connection_context>::parse_cached_header(http_header_info& body_info, const std::string& m_cache_to_process, size_t pos)
 {
 	STATIC_REGEXP_EXPR_1(rexp_mach_field,
-						 "\n?((Connection)|(Referer)|(Content-Length)|(Content-Type)|(Transfer-Encoding)|(Content-Encoding)|(Host)|(Cookie)|(User-Agent)|(Origin)"
-						 //  12            3         4                5              6                   7                  8      9        10           11
-						 "|([\\w-]+?)) ?: ?((.*?)(\r?\n))[^\t ]",
-						 //11             1213   14
-						 boost::regex::icase | boost::regex::normal);
+		"\n?((Connection)|(Referer)|(Content-Length)|(Content-Type)|(Transfer-Encoding)|(Content-Encoding)|(Host)|(Cookie)|(User-Agent)|(Origin)"
+		//  12            3         4                5              6                   7                  8      9        10           11
+		"|([\\w-]+?)) ?: ?((.*?)(\r?\n))[^\t ]",
+		//11             1213   14
+		boost::regex::icase | boost::regex::normal);
 
 	boost::smatch result;
 	std::string::const_iterator it_current_bound = m_cache_to_process.begin();
@@ -542,7 +541,7 @@ bool simple_http_connection_handler<t_connection_context>::parse_cached_header(h
 }
 //-----------------------------------------------------------------------------------
 template <class t_connection_context>
-bool simple_http_connection_handler<t_connection_context>::get_len_from_content_lenght(const std::string &str, size_t &OUT len)
+bool simple_http_connection_handler<t_connection_context>::get_len_from_content_lenght(const std::string& str, size_t& OUT len)
 {
 	STATIC_REGEXP_EXPR_1(rexp_mach_field, "\\d+", boost::regex::normal);
 	std::string res;
@@ -555,7 +554,7 @@ bool simple_http_connection_handler<t_connection_context>::get_len_from_content_
 }
 //-----------------------------------------------------------------------------------
 template <class t_connection_context>
-bool simple_http_connection_handler<t_connection_context>::handle_request_and_send_response(const http::http_request_info &query_info)
+bool simple_http_connection_handler<t_connection_context>::handle_request_and_send_response(const http::http_request_info& query_info)
 {
 	http_response_info response{};
 	//	GULPS_CHECK_AND_ASSERT_MES(res, res, "handle_request(query_info, response) returned false" );
@@ -576,14 +575,14 @@ bool simple_http_connection_handler<t_connection_context>::handle_request_and_se
 
 	GULPSF_LOG_L3("HTTP_RESPONSE_HEAD: << \r\n{}", response_data);
 
-	m_psnd_hndlr->do_send((void *)response_data.data(), response_data.size());
+	m_psnd_hndlr->do_send((void*)response_data.data(), response_data.size());
 	if((response.m_body.size() && (query_info.m_http_method != http::http_method_head)) || (query_info.m_http_method == http::http_method_options))
-		m_psnd_hndlr->do_send((void *)response.m_body.data(), response.m_body.size());
+		m_psnd_hndlr->do_send((void*)response.m_body.data(), response.m_body.size());
 	return res;
 }
 //-----------------------------------------------------------------------------------
 template <class t_connection_context>
-bool simple_http_connection_handler<t_connection_context>::handle_request(const http::http_request_info &query_info, http_response_info &response)
+bool simple_http_connection_handler<t_connection_context>::handle_request(const http::http_request_info& query_info, http_response_info& response)
 {
 
 	std::string uri_to_path = query_info.m_uri_content.m_path;
@@ -596,7 +595,7 @@ bool simple_http_connection_handler<t_connection_context>::handle_request(const 
 	m_config.m_lock.unlock();
 	if(!file_io_utils::load_file_to_string(destination_file_path.c_str(), response.m_body))
 	{
-		GULPSF_WARN("URI '{}' [{}] Not Found (404 )", query_info.m_full_request_str.substr(0, query_info.m_full_request_str.size() - 2) , destination_file_path );
+		GULPSF_WARN("URI '{}' [{}] Not Found (404 )", query_info.m_full_request_str.substr(0, query_info.m_full_request_str.size() - 2), destination_file_path);
 		response.m_body = get_not_found_response_body(query_info.m_URI);
 		response.m_response_code = 404;
 		response.m_response_comment = "Not found";
@@ -613,7 +612,7 @@ bool simple_http_connection_handler<t_connection_context>::handle_request(const 
 }
 //-----------------------------------------------------------------------------------
 template <class t_connection_context>
-std::string simple_http_connection_handler<t_connection_context>::get_response_header(const http_response_info &response)
+std::string simple_http_connection_handler<t_connection_context>::get_response_header(const http_response_info& response)
 {
 	std::string buf = "HTTP/1.1 ";
 	buf += boost::lexical_cast<std::string>(response.m_response_code) + " " + response.m_response_comment + "\r\n" +
@@ -671,7 +670,7 @@ std::string simple_http_connection_handler<t_connection_context>::get_response_h
 }
 //-----------------------------------------------------------------------------------
 template <class t_connection_context>
-std::string simple_http_connection_handler<t_connection_context>::get_file_mime_tipe(const std::string &path)
+std::string simple_http_connection_handler<t_connection_context>::get_file_mime_tipe(const std::string& path)
 {
 	std::string result;
 	std::string ext = string_tools::get_extension(path);
@@ -696,7 +695,7 @@ std::string simple_http_connection_handler<t_connection_context>::get_file_mime_
 }
 //-----------------------------------------------------------------------------------
 template <class t_connection_context>
-std::string simple_http_connection_handler<t_connection_context>::get_not_found_response_body(const std::string &URI)
+std::string simple_http_connection_handler<t_connection_context>::get_not_found_response_body(const std::string& URI)
 {
 	std::string body =
 		"<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\r\n"
@@ -713,16 +712,16 @@ std::string simple_http_connection_handler<t_connection_context>::get_not_found_
 }
 //--------------------------------------------------------------------------------------------
 template <class t_connection_context>
-bool simple_http_connection_handler<t_connection_context>::slash_to_back_slash(std::string &str)
+bool simple_http_connection_handler<t_connection_context>::slash_to_back_slash(std::string& str)
 {
 	for(std::string::iterator it = str.begin(); it != str.end(); it++)
 		if('/' == *it)
 			*it = '\\';
 	return true;
 }
-}
-}
-}
+} // namespace http
+} // namespace net_utils
+} // namespace epee
 
 //--------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------

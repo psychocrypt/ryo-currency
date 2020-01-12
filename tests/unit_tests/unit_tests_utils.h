@@ -40,8 +40,8 @@ extern boost::filesystem::path data_dir;
 class call_counter
 {
   public:
-	call_counter()
-		: m_counter(0)
+	call_counter() :
+		m_counter(0)
 	{
 	}
 
@@ -64,7 +64,7 @@ class call_counter
   private:
 	std::atomic<size_t> m_counter;
 };
-}
+} // namespace unit_test
 
 #define ASSERT_EQ_MAP(val, map, key)     \
 	do                                   \

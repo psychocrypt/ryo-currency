@@ -37,9 +37,11 @@
 class SignatureFuzzer : public Fuzzer
 {
   public:
-	SignatureFuzzer() : Fuzzer(), wallet(cryptonote::TESTNET) {}
+	SignatureFuzzer() :
+		Fuzzer(),
+		wallet(cryptonote::TESTNET) {}
 	virtual int init();
-	virtual int run(const std::string &filename);
+	virtual int run(const std::string& filename);
 
   private:
 	tools::wallet2 wallet;
@@ -48,7 +50,7 @@ class SignatureFuzzer : public Fuzzer
 
 int SignatureFuzzer::init()
 {
-	static const char *const spendkey_hex = "0b4f47697ec99c3de6579304e5f25c68b07afbe55b71d99620bf6cbf4e45a80f";
+	static const char* const spendkey_hex = "0b4f47697ec99c3de6579304e5f25c68b07afbe55b71d99620bf6cbf4e45a80f";
 	crypto::secret_key spendkey;
 	epee::string_tools::hex_to_pod(spendkey_hex, spendkey);
 
@@ -65,7 +67,7 @@ int SignatureFuzzer::init()
 			return 1;
 		}
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		std::cerr << "Error on SignatureFuzzer::init: " << e.what() << std::endl;
 		return 1;
@@ -73,7 +75,7 @@ int SignatureFuzzer::init()
 	return 0;
 }
 
-int SignatureFuzzer::run(const std::string &filename)
+int SignatureFuzzer::run(const std::string& filename)
 {
 	std::string s;
 
@@ -89,7 +91,7 @@ int SignatureFuzzer::run(const std::string &filename)
 	return 0;
 }
 
-int main(int argc, const char **argv)
+int main(int argc, const char** argv)
 {
 	SignatureFuzzer fuzzer;
 	return run_fuzzer(argc, argv, fuzzer);

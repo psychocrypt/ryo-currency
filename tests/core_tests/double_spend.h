@@ -43,13 +43,13 @@ class gen_double_spend_base : public test_chain_unit_base
 
 	gen_double_spend_base();
 
-	bool check_tx_verification_context(const cryptonote::tx_verification_context &tvc, bool tx_added, size_t event_idx, const cryptonote::transaction &tx);
-	bool check_block_verification_context(const cryptonote::block_verification_context &bvc, size_t event_idx, const cryptonote::block &block);
+	bool check_tx_verification_context(const cryptonote::tx_verification_context& tvc, bool tx_added, size_t event_idx, const cryptonote::transaction& tx);
+	bool check_block_verification_context(const cryptonote::block_verification_context& bvc, size_t event_idx, const cryptonote::block& block);
 
-	bool mark_last_valid_block(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events);
-	bool mark_invalid_tx(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events);
-	bool mark_invalid_block(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events);
-	bool check_double_spend(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events);
+	bool mark_last_valid_block(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events);
+	bool mark_invalid_tx(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events);
+	bool mark_invalid_block(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events);
+	bool check_double_spend(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events);
 
   private:
 	cryptonote::block m_last_valid_block;
@@ -66,7 +66,7 @@ struct gen_double_spend_in_tx : public gen_double_spend_base<gen_double_spend_in
 	static const uint64_t expected_bob_balance = send_amount;
 	static const uint64_t expected_alice_balance = 0;
 
-	bool generate(std::vector<test_event_entry> &events) const;
+	bool generate(std::vector<test_event_entry>& events) const;
 };
 
 template <bool txs_keeped_by_block>
@@ -78,7 +78,7 @@ struct gen_double_spend_in_the_same_block : public gen_double_spend_base<gen_dou
 	static const uint64_t expected_bob_balance = send_amount;
 	static const uint64_t expected_alice_balance = 0;
 
-	bool generate(std::vector<test_event_entry> &events) const;
+	bool generate(std::vector<test_event_entry>& events) const;
 };
 
 template <bool txs_keeped_by_block>
@@ -90,7 +90,7 @@ struct gen_double_spend_in_different_blocks : public gen_double_spend_base<gen_d
 	static const uint64_t expected_bob_balance = 0;
 	static const uint64_t expected_alice_balance = send_amount - TESTS_DEFAULT_FEE;
 
-	bool generate(std::vector<test_event_entry> &events) const;
+	bool generate(std::vector<test_event_entry>& events) const;
 };
 
 template <bool txs_keeped_by_block>
@@ -102,7 +102,7 @@ struct gen_double_spend_in_alt_chain_in_the_same_block : public gen_double_spend
 	static const uint64_t expected_bob_balance = send_amount;
 	static const uint64_t expected_alice_balance = 0;
 
-	bool generate(std::vector<test_event_entry> &events) const;
+	bool generate(std::vector<test_event_entry>& events) const;
 };
 
 template <bool txs_keeped_by_block>
@@ -114,7 +114,7 @@ struct gen_double_spend_in_alt_chain_in_different_blocks : public gen_double_spe
 	static const uint64_t expected_bob_balance = send_amount;
 	static const uint64_t expected_alice_balance = 0;
 
-	bool generate(std::vector<test_event_entry> &events) const;
+	bool generate(std::vector<test_event_entry>& events) const;
 };
 
 class gen_double_spend_in_different_chains : public test_chain_unit_base
@@ -125,9 +125,9 @@ class gen_double_spend_in_different_chains : public test_chain_unit_base
 
 	gen_double_spend_in_different_chains();
 
-	bool generate(std::vector<test_event_entry> &events) const;
+	bool generate(std::vector<test_event_entry>& events) const;
 
-	bool check_double_spend(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events);
+	bool check_double_spend(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events);
 };
 
 #define INIT_DOUBLE_SPEND_TEST()                                           \

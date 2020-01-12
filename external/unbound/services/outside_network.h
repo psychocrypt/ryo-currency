@@ -67,7 +67,8 @@ struct query_info;
  * Send queries to outside servers and wait for answers from servers.
  * Contains answer-listen sockets.
  */
-struct outside_network {
+struct outside_network
+{
 	/** Base for select calls */
 	struct comm_base* base;
 	/** pointer to time in seconds */
@@ -145,7 +146,7 @@ struct outside_network {
 	 * The file descriptors are -1 if they are free, and need to be 
 	 * opened for the tcp connection. Can be used for ip4 and ip6.
 	 */
-	struct pending_tcp **tcp_conns;
+	struct pending_tcp** tcp_conns;
 	/** number of tcp communication points. */
 	size_t num_tcp;
 	/** number of tcp communication points in use. */
@@ -162,7 +163,8 @@ struct outside_network {
  * Outgoing interface. Ports available and currently used are tracked
  * per interface
  */
-struct port_if {
+struct port_if
+{
 	/** address ready to allocate new socket (except port no). */
 	struct sockaddr_storage addr;
 	/** length of addr field */
@@ -190,7 +192,8 @@ struct port_if {
 /**
  * Outgoing commpoint for UDP port.
  */
-struct port_comm {
+struct port_comm
+{
 	/** next in free list */
 	struct port_comm* next;
 	/** which port number (when in use) */
@@ -208,7 +211,8 @@ struct port_comm {
 /**
  * A query that has an answer pending for it.
  */
-struct pending {
+struct pending
+{
 	/** redblacktree entry, key is the pending struct(id, addr). */
 	rbnode_type node;
 	/** the ID for the query. int so that a value out of range can
@@ -246,7 +250,8 @@ struct pending {
 /**
  * Pending TCP query to server.
  */
-struct pending_tcp {
+struct pending_tcp
+{
 	/** next in list of free tcp comm points, or NULL. */
 	struct pending_tcp* next_free;
 	/** the ID for the query; checked in reply */
@@ -260,7 +265,8 @@ struct pending_tcp {
 /**
  * Query waiting for TCP buffer.
  */
-struct waiting_tcp {
+struct waiting_tcp
+{
 	/** 
 	 * next in waiting list.
 	 * if pkt==0, this points to the pending_tcp structure.
@@ -295,7 +301,8 @@ struct waiting_tcp {
 /**
  * Callback to party interested in serviced query results.
  */
-struct service_callback {
+struct service_callback
+{
 	/** next in callback list */
 	struct service_callback* next;
 	/** callback function */
@@ -315,7 +322,8 @@ struct service_callback {
  * complete with retries and timeouts. A number of interested parties can
  * receive a callback.
  */
-struct serviced_query {
+struct serviced_query
+{
 	/** The rbtree node, key is this record */
 	rbnode_type node;
 	/** The query that needs to be answered. Starts with flags u16,
@@ -343,7 +351,8 @@ struct serviced_query {
 	/** qtype */
 	int qtype;
 	/** current status */
-	enum serviced_query_status {
+	enum serviced_query_status
+	{
 		/** initial status */
 		serviced_initial,
 		/** UDP with EDNS sent */
@@ -362,9 +371,9 @@ struct serviced_query {
 		serviced_query_TCP_EDNS_fallback,
 		/** send UDP query with EDNS1480 (or 1280) */
 		serviced_query_UDP_EDNS_FRAG
-	} 	
-		/** variable with current status */ 
-		status;
+	}
+	/** variable with current status */
+	status;
 	/** true if serviced_query is scheduled for deletion already */
 	int to_be_deleted;
 	/** number of UDP retries */
@@ -414,11 +423,11 @@ struct serviced_query {
  */
 struct outside_network* outside_network_create(struct comm_base* base,
 	size_t bufsize, size_t num_ports, char** ifs, int num_ifs,
-	int do_ip4, int do_ip6, size_t num_tcp, struct infra_cache* infra, 
-	struct ub_randstate* rnd, int use_caps_for_id, int* availports, 
+	int do_ip4, int do_ip6, size_t num_tcp, struct infra_cache* infra,
+	struct ub_randstate* rnd, int use_caps_for_id, int* availports,
 	int numavailports, size_t unwanted_threshold, int tcp_mss,
 	void (*unwanted_action)(void*), void* unwanted_param, int do_udp,
-	void* sslctx, int delayclose, struct dt_env *dtenv);
+	void* sslctx, int delayclose, struct dt_env* dtenv);
 
 /**
  * Delete outside_network structure.
@@ -599,28 +608,28 @@ int outnet_tcp_connect(int s, struct sockaddr_storage* addr, socklen_t addrlen);
 
 /** callback for incoming udp answers from the network */
 int outnet_udp_cb(struct comm_point* c, void* arg, int error,
-	struct comm_reply *reply_info);
+	struct comm_reply* reply_info);
 
 /** callback for pending tcp connections */
 int outnet_tcp_cb(struct comm_point* c, void* arg, int error,
-	struct comm_reply *reply_info);
+	struct comm_reply* reply_info);
 
 /** callback for udp timeout */
-void pending_udp_timer_cb(void *arg);
+void pending_udp_timer_cb(void* arg);
 
 /** callback for udp delay for timeout */
-void pending_udp_timer_delay_cb(void *arg);
+void pending_udp_timer_delay_cb(void* arg);
 
 /** callback for outgoing TCP timer event */
 void outnet_tcptimer(void* arg);
 
 /** callback for serviced query UDP answers */
 int serviced_udp_callback(struct comm_point* c, void* arg, int error,
-        struct comm_reply* rep);
+	struct comm_reply* rep);
 
 /** TCP reply or error callback for serviced queries */
 int serviced_tcp_callback(struct comm_point* c, void* arg, int error,
-        struct comm_reply* rep);
+	struct comm_reply* rep);
 
 /** compare function of pending rbtree */
 int pending_cmp(const void* key1, const void* key2);

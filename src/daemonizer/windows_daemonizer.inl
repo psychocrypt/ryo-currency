@@ -79,10 +79,10 @@ std::string get_argument_string(int argc, char* argv[])
 	}
 	return result;
 }
-}
+} // namespace
 
 inline void init_options(
-	boost::program_options::options_description &hidden_options, boost::program_options::options_description &normal_options)
+	boost::program_options::options_description& hidden_options, boost::program_options::options_description& normal_options)
 {
 	command_line::add_arg(normal_options, arg_install_service);
 	command_line::add_arg(normal_options, arg_uninstall_service);
@@ -111,7 +111,7 @@ inline boost::filesystem::path get_default_data_dir()
 }
 
 inline boost::filesystem::path get_relative_path_base(
-	boost::program_options::variables_map const &vm)
+	boost::program_options::variables_map const& vm)
 {
 	if(command_line::has_arg(vm, arg_is_service))
 	{
@@ -132,9 +132,9 @@ inline boost::filesystem::path get_relative_path_base(
 
 template <typename T_executor>
 inline bool daemonize(
-	int argc, char* argv[], T_executor &&executor // universal ref
+	int argc, char* argv[], T_executor&& executor // universal ref
 	,
-	boost::program_options::variables_map const &vm)
+	boost::program_options::variables_map const& vm)
 {
 	std::string arguments = get_argument_string(argc, argv);
 
@@ -181,4 +181,4 @@ inline bool daemonize(
 
 	return false;
 }
-}
+} // namespace daemonizer

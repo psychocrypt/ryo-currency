@@ -64,7 +64,8 @@ struct daemon_remote;
 struct query_info;
 
 /** worker commands */
-enum worker_commands {
+enum worker_commands
+{
 	/** make the worker quit */
 	worker_cmd_quit,
 	/** obtain statistics */
@@ -79,7 +80,8 @@ enum worker_commands {
  * Structure holding working information for unbound.
  * Holds globally visible information.
  */
-struct worker {
+struct worker
+{
 	/** the thread number (in daemon array). First in struct for debug. */
 	int thread_num;
 	/** global shared daemon structure */
@@ -149,7 +151,7 @@ struct worker* worker_create(struct daemon* daemon, int id, int* ports, int n);
  * @param do_sigs: if true, worker installs signal handlers.
  * @return: false on error.
  */
-int worker_init(struct worker* worker, struct config_file *cfg, 
+int worker_init(struct worker* worker, struct config_file* cfg,
 	struct listen_port* ports, int do_sigs);
 
 /**

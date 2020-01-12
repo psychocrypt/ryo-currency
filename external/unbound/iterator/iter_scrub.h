@@ -62,7 +62,7 @@ struct iter_env;
  * @param ie: iterator module environment data.
  * @return: false if the message is total waste. true if scrubbed with success.
  */
-int scrub_message(struct sldns_buffer* pkt, struct msg_parse* msg, 
+int scrub_message(struct sldns_buffer* pkt, struct msg_parse* msg,
 	struct query_info* qinfo, uint8_t* zonename, struct regional* regional,
 	struct module_env* env, struct iter_env* ie);
 

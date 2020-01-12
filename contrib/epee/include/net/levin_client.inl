@@ -31,18 +31,16 @@
 
 #include "common/gulps.hpp"
 
-
-
 namespace epee
 {
 namespace levin
 {
-inline bool levin_client_impl::connect(u_long ip, int port, unsigned int timeout, const std::string &bind_ip)
+inline bool levin_client_impl::connect(u_long ip, int port, unsigned int timeout, const std::string& bind_ip)
 {
 	return m_transport.connect(string_tools::get_ip_string_from_int32(ip), port, timeout, timeout, bind_ip);
 }
 //------------------------------------------------------------------------------
-inline bool levin_client_impl::connect(const std::string &addr, int port, unsigned int timeout, const std::string &bind_ip)
+inline bool levin_client_impl::connect(const std::string& addr, int port, unsigned int timeout, const std::string& bind_ip)
 {
 	return m_transport.connect(addr, port, timeout, timeout, bind_ip);
 }
@@ -66,7 +64,7 @@ inline levin_client_impl::~levin_client_impl()
 	disconnect();
 }
 //------------------------------------------------------------------------------
-inline int levin_client_impl::invoke(int command, const std::string &in_buff, std::string &buff_out)
+inline int levin_client_impl::invoke(int command, const std::string& in_buff, std::string& buff_out)
 {
 	if(!is_connected())
 		return -1;
@@ -86,7 +84,7 @@ inline int levin_client_impl::invoke(int command, const std::string &in_buff, st
 	if(!m_transport.recv_n(local_buff, sizeof(bucket_head)))
 		return -1;
 
-	head = *(bucket_head *)local_buff.data();
+	head = *(bucket_head*)local_buff.data();
 
 	if(head.m_signature != LEVIN_SIGNATURE)
 	{
@@ -100,7 +98,7 @@ inline int levin_client_impl::invoke(int command, const std::string &in_buff, st
 	return head.m_return_code;
 }
 //------------------------------------------------------------------------------
-inline int levin_client_impl::notify(int command, const std::string &in_buff)
+inline int levin_client_impl::notify(int command, const std::string& in_buff)
 {
 	if(!is_connected())
 		return -1;
@@ -111,7 +109,7 @@ inline int levin_client_impl::notify(int command, const std::string &in_buff)
 	head.m_have_to_return_data = false;
 	head.m_command = command;
 
-	if(!m_transport.send((const char *)&head, sizeof(head)))
+	if(!m_transport.send((const char*)&head, sizeof(head)))
 		return -1;
 
 	if(!m_transport.send(in_buff))
@@ -122,7 +120,7 @@ inline int levin_client_impl::notify(int command, const std::string &in_buff)
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-inline int levin_client_impl2::invoke(int command, const std::string &in_buff, std::string &buff_out)
+inline int levin_client_impl2::invoke(int command, const std::string& in_buff, std::string& buff_out)
 {
 	if(!is_connected())
 		return -1;
@@ -144,7 +142,7 @@ inline int levin_client_impl2::invoke(int command, const std::string &in_buff, s
 	if(!m_transport.recv_n(local_buff, sizeof(bucket_head2)))
 		return -1;
 
-	head = *(bucket_head2 *)local_buff.data();
+	head = *(bucket_head2*)local_buff.data();
 
 	if(head.m_signature != LEVIN_SIGNATURE)
 	{
@@ -158,7 +156,7 @@ inline int levin_client_impl2::invoke(int command, const std::string &in_buff, s
 	return head.m_return_code;
 }
 //------------------------------------------------------------------------------
-inline int levin_client_impl2::notify(int command, const std::string &in_buff)
+inline int levin_client_impl2::notify(int command, const std::string& in_buff)
 {
 	if(!is_connected())
 		return -1;
@@ -171,7 +169,7 @@ inline int levin_client_impl2::notify(int command, const std::string &in_buff)
 	head.m_protocol_version = LEVIN_PROTOCOL_VER_1;
 	head.m_flags = LEVIN_PACKET_REQUEST;
 
-	if(!m_transport.send((const char *)&head, sizeof(head)))
+	if(!m_transport.send((const char*)&head, sizeof(head)))
 		return -1;
 
 	if(!m_transport.send(in_buff))
@@ -179,6 +177,6 @@ inline int levin_client_impl2::notify(int command, const std::string &in_buff)
 
 	return 1;
 }
-}
-}
+} // namespace levin
+} // namespace epee
 //------------------------------------------------------------------------------

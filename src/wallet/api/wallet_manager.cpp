@@ -55,8 +55,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 
-
-
 namespace epee
 {
 unsigned int g_test_dbg_lock_sleep = 0;
@@ -65,47 +63,47 @@ unsigned int g_test_dbg_lock_sleep = 0;
 namespace Ryo
 {
 
-Wallet *WalletManagerImpl::createWallet(const std::string &path, const std::string &password,
-										const std::string &language, NetworkType nettype)
+Wallet* WalletManagerImpl::createWallet(const std::string& path, const std::string& password,
+	const std::string& language, NetworkType nettype)
 {
-	WalletImpl *wallet = new WalletImpl(nettype);
+	WalletImpl* wallet = new WalletImpl(nettype);
 	wallet->create(path, password, language);
 	return wallet;
 }
 
-Wallet *WalletManagerImpl::openWallet(const std::string &path, const std::string &password, NetworkType nettype)
+Wallet* WalletManagerImpl::openWallet(const std::string& path, const std::string& password, NetworkType nettype)
 {
-	WalletImpl *wallet = new WalletImpl(nettype);
+	WalletImpl* wallet = new WalletImpl(nettype);
 	wallet->open(path, password);
 	//Refresh addressBook
 	wallet->addressBook()->refresh();
 	return wallet;
 }
 
-Wallet *WalletManagerImpl::recoveryWallet(const std::string &path, const std::string &mnemonic, NetworkType nettype, uint64_t restoreHeight)
+Wallet* WalletManagerImpl::recoveryWallet(const std::string& path, const std::string& mnemonic, NetworkType nettype, uint64_t restoreHeight)
 {
 	return recoveryWallet(path, "", mnemonic, nettype, restoreHeight);
 }
 
-Wallet *WalletManagerImpl::createWalletFromKeys(const std::string &path,
-												const std::string &language,
-												NetworkType nettype,
-												uint64_t restoreHeight,
-												const std::string &addressString,
-												const std::string &viewKeyString,
-												const std::string &spendKeyString)
+Wallet* WalletManagerImpl::createWalletFromKeys(const std::string& path,
+	const std::string& language,
+	NetworkType nettype,
+	uint64_t restoreHeight,
+	const std::string& addressString,
+	const std::string& viewKeyString,
+	const std::string& spendKeyString)
 {
 	return createWalletFromKeys(path, "", language, nettype, restoreHeight,
-								addressString, viewKeyString, spendKeyString);
+		addressString, viewKeyString, spendKeyString);
 }
 
-Wallet *WalletManagerImpl::recoveryWallet(const std::string &path,
-										  const std::string &password,
-										  const std::string &mnemonic,
-										  NetworkType nettype,
-										  uint64_t restoreHeight)
+Wallet* WalletManagerImpl::recoveryWallet(const std::string& path,
+	const std::string& password,
+	const std::string& mnemonic,
+	NetworkType nettype,
+	uint64_t restoreHeight)
 {
-	WalletImpl *wallet = new WalletImpl(nettype);
+	WalletImpl* wallet = new WalletImpl(nettype);
 	if(restoreHeight > 0)
 	{
 		wallet->setRefreshFromBlockHeight(restoreHeight);
@@ -114,16 +112,16 @@ Wallet *WalletManagerImpl::recoveryWallet(const std::string &path,
 	return wallet;
 }
 
-Wallet *WalletManagerImpl::createWalletFromKeys(const std::string &path,
-												const std::string &password,
-												const std::string &language,
-												NetworkType nettype,
-												uint64_t restoreHeight,
-												const std::string &addressString,
-												const std::string &viewKeyString,
-												const std::string &spendKeyString)
+Wallet* WalletManagerImpl::createWalletFromKeys(const std::string& path,
+	const std::string& password,
+	const std::string& language,
+	NetworkType nettype,
+	uint64_t restoreHeight,
+	const std::string& addressString,
+	const std::string& viewKeyString,
+	const std::string& spendKeyString)
 {
-	WalletImpl *wallet = new WalletImpl(nettype);
+	WalletImpl* wallet = new WalletImpl(nettype);
 	if(restoreHeight > 0)
 	{
 		wallet->setRefreshFromBlockHeight(restoreHeight);
@@ -132,9 +130,9 @@ Wallet *WalletManagerImpl::createWalletFromKeys(const std::string &path,
 	return wallet;
 }
 
-bool WalletManagerImpl::closeWallet(Wallet *wallet, bool store)
+bool WalletManagerImpl::closeWallet(Wallet* wallet, bool store)
 {
-	WalletImpl *wallet_ = dynamic_cast<WalletImpl *>(wallet);
+	WalletImpl* wallet_ = dynamic_cast<WalletImpl*>(wallet);
 	if(!wallet_)
 		return false;
 	bool result = wallet_->close(store);
@@ -149,7 +147,7 @@ bool WalletManagerImpl::closeWallet(Wallet *wallet, bool store)
 	return result;
 }
 
-bool WalletManagerImpl::walletExists(const std::string &path)
+bool WalletManagerImpl::walletExists(const std::string& path)
 {
 	bool keys_file_exists;
 	bool wallet_file_exists;
@@ -161,12 +159,12 @@ bool WalletManagerImpl::walletExists(const std::string &path)
 	return false;
 }
 
-bool WalletManagerImpl::verifyWalletPassword(const std::string &keys_file_name, const std::string &password, bool no_spend_key) const
+bool WalletManagerImpl::verifyWalletPassword(const std::string& keys_file_name, const std::string& password, bool no_spend_key) const
 {
 	return tools::wallet2::verify_password(keys_file_name, password, no_spend_key, hw::get_device("default"));
 }
 
-std::vector<std::string> WalletManagerImpl::findWallets(const std::string &path)
+std::vector<std::string> WalletManagerImpl::findWallets(const std::string& path)
 {
 	std::vector<std::string> result;
 	boost::filesystem::path work_dir(path);
@@ -207,7 +205,7 @@ std::string WalletManagerImpl::errorString() const
 	return m_errorString;
 }
 
-void WalletManagerImpl::setDaemonAddress(const std::string &address)
+void WalletManagerImpl::setDaemonAddress(const std::string& address)
 {
 	m_daemonAddress = address;
 	if(m_http_client.is_connected())
@@ -215,7 +213,7 @@ void WalletManagerImpl::setDaemonAddress(const std::string &address)
 	m_http_client.set_server(address, boost::none);
 }
 
-bool WalletManagerImpl::connected(uint32_t *version)
+bool WalletManagerImpl::connected(uint32_t* version)
 {
 	epee::json_rpc::request<cryptonote::COMMAND_RPC_GET_VERSION::request> req_t = AUTO_VAL_INIT(req_t);
 	epee::json_rpc::response<cryptonote::COMMAND_RPC_GET_VERSION::response, std::string> resp_t = AUTO_VAL_INIT(resp_t);
@@ -293,7 +291,7 @@ bool WalletManagerImpl::isMining()
 	return mres.active;
 }
 
-bool WalletManagerImpl::startMining(const std::string &address, uint32_t threads, bool background_mining, bool ignore_battery)
+bool WalletManagerImpl::startMining(const std::string& address, uint32_t threads, bool background_mining, bool ignore_battery)
 {
 	cryptonote::COMMAND_RPC_START_MINING::request mreq;
 	cryptonote::COMMAND_RPC_START_MINING::response mres;
@@ -318,7 +316,7 @@ bool WalletManagerImpl::stopMining()
 	return mres.status == CORE_RPC_STATUS_OK;
 }
 
-std::tuple<bool, std::string, std::string, std::string, std::string> WalletManager::checkUpdates(const std::string &software, std::string subdir)
+std::tuple<bool, std::string, std::string, std::string, std::string> WalletManager::checkUpdates(const std::string& software, std::string subdir)
 {
 #ifdef BUILD_TAG
 	static const char buildtag[] = BOOST_PP_STRINGIZE(BUILD_TAG);
@@ -344,10 +342,10 @@ std::tuple<bool, std::string, std::string, std::string, std::string> WalletManag
 }
 
 ///////////////////// WalletManagerFactory implementation //////////////////////
-WalletManager *WalletManagerFactory::getWalletManager()
+WalletManager* WalletManagerFactory::getWalletManager()
 {
 
-	static WalletManagerImpl *g_walletManager = nullptr;
+	static WalletManagerImpl* g_walletManager = nullptr;
 
 	if(!g_walletManager)
 	{
@@ -362,8 +360,8 @@ void WalletManagerFactory::setLogLevel(int level)
 	mlog_set_log_level(level);
 }
 
-void WalletManagerFactory::setLogCategories(const std::string &categories)
+void WalletManagerFactory::setLogCategories(const std::string& categories)
 {
 	mlog_set_log(categories.c_str());
 }
-}
+} // namespace Ryo

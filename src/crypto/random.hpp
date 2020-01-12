@@ -50,7 +50,8 @@ struct prng_handle;
 class prng
 {
 	GULPS_CAT_MAJOR("random");
-public:
+
+  public:
 	prng() {}
 	~prng();
 
@@ -76,7 +77,7 @@ public:
 		return inst;
 	}
 
-private:
+  private:
 	// This stops us from allocating system resources earlier than needed
 	void start();
 	void generate_system_random_bytes(uint8_t* result, size_t n);

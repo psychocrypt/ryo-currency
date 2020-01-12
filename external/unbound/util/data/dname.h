@@ -281,7 +281,7 @@ int dname_is_wild(uint8_t* dname);
  * @param mlabs: number of labels that matched exactly (the shared topdomain).
  * @return: 0 for equal, -1 smaller, or +1 d1 larger than d2.
  */
-int dname_canon_lab_cmp(uint8_t* d1, int labs1, uint8_t* d2, int labs2, 
+int dname_canon_lab_cmp(uint8_t* d1, int labs1, uint8_t* d2, int labs2,
 	int* mlabs);
 
 /**

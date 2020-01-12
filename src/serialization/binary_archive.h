@@ -80,20 +80,21 @@ struct binary_archive_base
 
 	typedef uint8_t variant_tag_type;
 
-	explicit binary_archive_base(stream_type &s) : stream_(s) {}
+	explicit binary_archive_base(stream_type& s) :
+		stream_(s) {}
 
 	/* definition of standard API functions */
-	void tag(const char *) {}
+	void tag(const char*) {}
 	void begin_object() {}
 	void end_object() {}
 	void begin_variant() {}
 	void end_variant() {}
 	/* I just want to leave a comment saying how this line really shows
      flaws in the ownership model of many OOP languages, that is all. */
-	stream_type &stream() { return stream_; }
+	stream_type& stream() { return stream_; }
 
   protected:
-	stream_type &stream_;
+	stream_type& stream_;
 };
 
 /* \struct binary_archive
@@ -113,7 +114,8 @@ template <>
 struct binary_archive<false> : public binary_archive_base<std::istream, false>
 {
 
-	explicit binary_archive(stream_type &s) : base_type(s)
+	explicit binary_archive(stream_type& s) :
+		base_type(s)
 	{
 		stream_type::streampos pos = stream_.tellg();
 		stream_.seekg(0, std::ios_base::end);
@@ -122,9 +124,9 @@ struct binary_archive<false> : public binary_archive_base<std::istream, false>
 	}
 
 	template <class T>
-	void serialize_int(T &v)
+	void serialize_int(T& v)
 	{
-		serialize_uint(*(typename boost::make_unsigned<T>::type *)&v);
+		serialize_uint(*(typename boost::make_unsigned<T>::type*)&v);
 	}
 
 	/*! \fn serialize_uint
@@ -132,7 +134,7 @@ struct binary_archive<false> : public binary_archive_base<std::istream, false>
    * \brief serializes an unsigned integer
    */
 	template <class T>
-	void serialize_uint(T &v, size_t width = sizeof(T))
+	void serialize_uint(T& v, size_t width = sizeof(T))
 	{
 		T ret = 0;
 		unsigned shift = 0;
@@ -148,25 +150,25 @@ struct binary_archive<false> : public binary_archive_base<std::istream, false>
 		v = ret;
 	}
 
-	void serialize_blob(void *buf, size_t len, const char *delimiter = "")
+	void serialize_blob(void* buf, size_t len, const char* delimiter = "")
 	{
-		stream_.read((char *)buf, len);
+		stream_.read((char*)buf, len);
 	}
 
 	template <class T>
-	void serialize_varint(T &v)
+	void serialize_varint(T& v)
 	{
-		serialize_uvarint(*(typename boost::make_unsigned<T>::type *)(&v));
+		serialize_uvarint(*(typename boost::make_unsigned<T>::type*)(&v));
 	}
 
 	template <class T>
-	void serialize_uvarint(T &v)
+	void serialize_uvarint(T& v)
 	{
 		typedef std::istreambuf_iterator<char> it;
 		tools::read_varint(it(stream_), it(), v); // XXX handle failure
 	}
 
-	void begin_array(size_t &s)
+	void begin_array(size_t& s)
 	{
 		serialize_varint(s);
 	}
@@ -175,10 +177,10 @@ struct binary_archive<false> : public binary_archive_base<std::istream, false>
 	void delimit_array() {}
 	void end_array() {}
 
-	void begin_string(const char *delimiter /*="\""*/) {}
-	void end_string(const char *delimiter /*="\""*/) {}
+	void begin_string(const char* delimiter /*="\""*/) {}
+	void end_string(const char* delimiter /*="\""*/) {}
 
-	void read_variant_tag(variant_tag_type &t)
+	void read_variant_tag(variant_tag_type& t)
 	{
 		serialize_int(t);
 	}
@@ -199,7 +201,8 @@ struct binary_archive<false> : public binary_archive_base<std::istream, false>
 template <>
 struct binary_archive<true> : public binary_archive_base<std::ostream, true>
 {
-	explicit binary_archive(stream_type &s) : base_type(s) {}
+	explicit binary_archive(stream_type& s) :
+		base_type(s) {}
 
 	template <class T>
 	void serialize_int(T v)
@@ -217,19 +220,19 @@ struct binary_archive<true> : public binary_archive_base<std::ostream, true>
 		}
 	}
 
-	void serialize_blob(void *buf, size_t len, const char *delimiter = "")
+	void serialize_blob(void* buf, size_t len, const char* delimiter = "")
 	{
-		stream_.write((char *)buf, len);
+		stream_.write((char*)buf, len);
 	}
 
 	template <class T>
-	void serialize_varint(T &v)
+	void serialize_varint(T& v)
 	{
-		serialize_uvarint(*(typename boost::make_unsigned<T>::type *)(&v));
+		serialize_uvarint(*(typename boost::make_unsigned<T>::type*)(&v));
 	}
 
 	template <class T>
-	void serialize_uvarint(T &v)
+	void serialize_uvarint(T& v)
 	{
 		typedef std::ostreambuf_iterator<char> it;
 		tools::write_varint(it(stream_), v);
@@ -242,8 +245,8 @@ struct binary_archive<true> : public binary_archive_base<std::ostream, true>
 	void delimit_array() {}
 	void end_array() {}
 
-	void begin_string(const char *delimiter = "\"") {}
-	void end_string(const char *delimiter = "\"") {}
+	void begin_string(const char* delimiter = "\"") {}
+	void end_string(const char* delimiter = "\"") {}
 
 	void write_variant_tag(variant_tag_type t)
 	{

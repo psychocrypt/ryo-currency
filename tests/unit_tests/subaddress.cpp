@@ -47,7 +47,7 @@ class WalletSubaddress : public ::testing::Test
 		{
 			w1.generate_legacy("", password, recovery_key, false);
 		}
-		catch(const std::exception &e)
+		catch(const std::exception& e)
 		{
 			std::cout << "failed to generate wallet: " << e.what() << std::endl;
 			throw e;
@@ -89,7 +89,7 @@ TEST_F(WalletSubaddress, OutOfBoundsIndexes)
 	{
 		w1.get_subaddress_label({1, 0});
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		EXPECT_STREQ("index_major is out of bound", e.what());
 	}
@@ -97,7 +97,7 @@ TEST_F(WalletSubaddress, OutOfBoundsIndexes)
 	{
 		w1.get_subaddress_label({0, 2});
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		EXPECT_STREQ("index.minor is out of bound", e.what());
 	}

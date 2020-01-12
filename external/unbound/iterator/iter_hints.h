@@ -50,7 +50,8 @@ struct delegpt;
 /**
  * Iterator hints structure
  */
-struct iter_hints {
+struct iter_hints
+{
 	/** 
 	 * Hints are stored in this tree. Sort order is specially chosen.
 	 * first sorted on qclass. Then on dname in nsec-like order, so that
@@ -65,7 +66,8 @@ struct iter_hints {
 /**
  * Iterator hints for a particular stub.
  */
-struct iter_hints_stub {
+struct iter_hints_stub
+{
 	/** tree sorted by name, class */
 	struct name_tree_node node;
 	/** delegation point with hint information for this stub. malloced. */
@@ -126,7 +128,7 @@ int hints_next_root(struct iter_hints* hints, uint16_t* qclass);
  * @return: A priming delegation point if there is a stub hint that must
  *         be primed, otherwise null.
  */
-struct iter_hints_stub* hints_lookup_stub(struct iter_hints* hints, 
+struct iter_hints_stub* hints_lookup_stub(struct iter_hints* hints,
 	uint8_t* qname, uint16_t qclass, struct delegpt* dp);
 
 /**

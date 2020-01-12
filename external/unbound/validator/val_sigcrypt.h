@@ -59,7 +59,8 @@ struct sldns_buffer;
 /**
  * Storage for algorithm needs.  DNSKEY algorithms.
  */
-struct algo_needs {
+struct algo_needs
+{
 	/** the algorithms (8-bit) with each a number.
 	 * 0: not marked.
 	 * 1: marked 'necessary but not yet fulfilled'
@@ -160,7 +161,7 @@ int ds_digest_match_dnskey(struct module_env* env,
  * @param dnskey_idx: index of RR in rrset.
  * @return the keytag or 0 for badly formatted DNSKEYs.
  */
-uint16_t dnskey_calc_keytag(struct ub_packed_rrset_key* dnskey_rrset, 
+uint16_t dnskey_calc_keytag(struct ub_packed_rrset_key* dnskey_rrset,
 	size_t dnskey_idx);
 
 /**
@@ -168,7 +169,7 @@ uint16_t dnskey_calc_keytag(struct ub_packed_rrset_key* dnskey_rrset,
  * @param ds_rrset: DS rrset
  * @param ds_idx: index of RR in DS rrset.
  * @return the keytag or 0 for badly formatted DSs.
- */ 
+ */
 uint16_t ds_get_keytag(struct ub_packed_rrset_key* ds_rrset, size_t ds_idx);
 
 /** 
@@ -177,7 +178,7 @@ uint16_t ds_get_keytag(struct ub_packed_rrset_key* ds_rrset, size_t ds_idx);
  * @param dnskey_idx: index of RR in rrset.
  * @return true if supported.
  */
-int dnskey_algo_is_supported(struct ub_packed_rrset_key* dnskey_rrset, 
+int dnskey_algo_is_supported(struct ub_packed_rrset_key* dnskey_rrset,
 	size_t dnskey_idx);
 
 /** 
@@ -186,7 +187,7 @@ int dnskey_algo_is_supported(struct ub_packed_rrset_key* dnskey_rrset,
  * @param ds_idx: index of RR in DS rrset.
  * @return true if supported.
  */
-int ds_digest_algo_is_supported(struct ub_packed_rrset_key* ds_rrset, 
+int ds_digest_algo_is_supported(struct ub_packed_rrset_key* ds_rrset,
 	size_t ds_idx);
 
 /**
@@ -203,7 +204,7 @@ int ds_get_digest_algo(struct ub_packed_rrset_key* ds_rrset, size_t ds_idx);
  * @param ds_idx: index of RR in DS rrset.
  * @return true if supported.
  */
-int ds_key_algo_is_supported(struct ub_packed_rrset_key* ds_rrset, 
+int ds_key_algo_is_supported(struct ub_packed_rrset_key* ds_rrset,
 	size_t ds_idx);
 
 /**
@@ -245,8 +246,8 @@ uint16_t dnskey_get_flags(struct ub_packed_rrset_key* k, size_t idx);
  *	UNCHECKED on allocation errors, unsupported algorithms, malformed data,
  *	and BOGUS on verification failures (no keys match any signatures).
  */
-enum sec_status dnskeyset_verify_rrset(struct module_env* env, 
-	struct val_env* ve, struct ub_packed_rrset_key* rrset, 
+enum sec_status dnskeyset_verify_rrset(struct module_env* env,
+	struct val_env* ve, struct ub_packed_rrset_key* rrset,
 	struct ub_packed_rrset_key* dnskey, uint8_t* sigalg, char** reason,
 	sldns_pkt_section section, struct module_qstate* qstate);
 
@@ -263,8 +264,8 @@ enum sec_status dnskeyset_verify_rrset(struct module_env* env,
  * @return secure if *this* key signs any of the signatures on rrset.
  *	unchecked on error or and bogus on bad signature.
  */
-enum sec_status dnskey_verify_rrset(struct module_env* env, 
-	struct val_env* ve, struct ub_packed_rrset_key* rrset, 
+enum sec_status dnskey_verify_rrset(struct module_env* env,
+	struct val_env* ve, struct ub_packed_rrset_key* rrset,
 	struct ub_packed_rrset_key* dnskey, size_t dnskey_idx, char** reason,
 	sldns_pkt_section section, struct module_qstate* qstate);
 
@@ -284,9 +285,9 @@ enum sec_status dnskey_verify_rrset(struct module_env* env,
  * @return secure if any key signs *this* signature. bogus if no key signs it,
  *	or unchecked on error.
  */
-enum sec_status dnskeyset_verify_rrset_sig(struct module_env* env, 
-	struct val_env* ve, time_t now, struct ub_packed_rrset_key* rrset, 
-	struct ub_packed_rrset_key* dnskey, size_t sig_idx, 
+enum sec_status dnskeyset_verify_rrset_sig(struct module_env* env,
+	struct val_env* ve, time_t now, struct ub_packed_rrset_key* rrset,
+	struct ub_packed_rrset_key* dnskey, size_t sig_idx,
 	struct rbtree_type** sortree, char** reason, sldns_pkt_section section,
 	struct module_qstate* qstate);
 
@@ -311,9 +312,9 @@ enum sec_status dnskeyset_verify_rrset_sig(struct module_env* env,
  * @return secure if this key signs this signature. unchecked on error or 
  *	bogus if it did not validate.
  */
-enum sec_status dnskey_verify_rrset_sig(struct regional* region, 
+enum sec_status dnskey_verify_rrset_sig(struct regional* region,
 	struct sldns_buffer* buf, struct val_env* ve, time_t now,
-	struct ub_packed_rrset_key* rrset, struct ub_packed_rrset_key* dnskey, 
+	struct ub_packed_rrset_key* rrset, struct ub_packed_rrset_key* dnskey,
 	size_t dnskey_idx, size_t sig_idx,
 	struct rbtree_type** sortree, int* buf_canon, char** reason,
 	sldns_pkt_section section, struct module_qstate* qstate);

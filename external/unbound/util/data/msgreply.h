@@ -60,13 +60,14 @@ struct dns_msg;
 
 /** calculate the prefetch TTL as 90% of original. Calculation
  * without numerical overflow (uin32_t) */
-#define PREFETCH_TTL_CALC(ttl) ((ttl) - (ttl)/10)
+#define PREFETCH_TTL_CALC(ttl) ((ttl) - (ttl) / 10)
 
 /**
  * Structure to store query information that makes answers to queries
  * different.
  */
-struct query_info {
+struct query_info
+{
 	/** 
 	 * Salient data on the query: qname, in wireformat. 
 	 * can be allocated or a pointer to outside buffer.
@@ -101,7 +102,8 @@ struct query_info {
 /**
  * Information to reference an rrset
  */
-struct rrset_ref {
+struct rrset_ref
+{
 	/** the key with lock, and ptr to packed data. */
 	struct ub_packed_rrset_key* key;
 	/** id needed */
@@ -122,7 +124,8 @@ struct rrset_ref {
  * for easy of the generation. It is allocated packed when it is copied
  * from the region allocation to the malloc allocation.
  */
-struct reply_info {
+struct reply_info
+{
 	/** the flags for the answer, host byte order. */
 	uint16_t flags;
 
@@ -170,7 +173,7 @@ struct reply_info {
 	size_t an_numrrsets;
 
 	/** Count of authority section RRsets */
-	size_t ns_numrrsets; 
+	size_t ns_numrrsets;
 	/** Count of additional section RRsets */
 	size_t ar_numrrsets;
 
@@ -208,7 +211,8 @@ struct reply_info {
 /**
  * Structure to keep hash table entry for message replies.
  */
-struct msgreply_entry {
+struct msgreply_entry
+{
 	/** the hash table key */
 	struct query_info key;
 	/** the hash table entry, data is struct reply_info* */
@@ -232,8 +236,8 @@ struct msgreply_entry {
  */
 struct reply_info*
 construct_reply_info_base(struct regional* region, uint16_t flags, size_t qd,
-		time_t ttl, time_t prettl, size_t an, size_t ns, size_t ar,
-		size_t total, enum sec_status sec);
+	time_t ttl, time_t prettl, size_t an, size_t ns, size_t ar,
+	size_t total, enum sec_status sec);
 
 /** 
  * Parse wire query into a queryinfo structure, return 0 on parse error. 
@@ -263,7 +267,7 @@ int query_info_parse(struct query_info* m, struct sldns_buffer* query);
  *	o SERVFAIL for memory allocation errors.
  */
 int reply_info_parse(struct sldns_buffer* pkt, struct alloc_cache* alloc,
-	struct query_info* qinf, struct reply_info** rep, 
+	struct query_info* qinf, struct reply_info** rep,
 	struct regional* region, struct edns_data* edns);
 
 /**
@@ -282,7 +286,7 @@ int reply_info_parse(struct sldns_buffer* pkt, struct alloc_cache* alloc,
  * @return 0 if allocation failed.
  */
 int parse_create_msg(struct sldns_buffer* pkt, struct msg_parse* msg,
-        struct alloc_cache* alloc, struct query_info* qinf,
+	struct alloc_cache* alloc, struct query_info* qinf,
 	struct reply_info** rep, struct regional* region);
 
 /** get msg reply struct (in temp region) */
@@ -327,14 +331,14 @@ void query_info_clear(struct query_info* m);
 size_t msgreply_sizefunc(void* k, void* d);
 
 /** delete msgreply_entry key structure */
-void query_entry_delete(void *q, void* arg);
+void query_entry_delete(void* q, void* arg);
 
 /** delete reply_info data structure */
 void reply_info_delete(void* d, void* arg);
 
 /** calculate hash value of query_info, lowercases the qname,
  * uses CD flag for AAAA qtype */
-hashvalue_type query_info_hash(struct query_info *q, uint16_t flags);
+hashvalue_type query_info_hash(struct query_info* q, uint16_t flags);
 
 /**
  * Setup query info entry
@@ -357,7 +361,7 @@ struct msgreply_entry* query_info_entrysetup(struct query_info* q,
  *	and no rrset_ref array in the reply is built up.
  * @return new reply info or NULL on memory error.
  */
-struct reply_info* reply_info_copy(struct reply_info* rep, 
+struct reply_info* reply_info_copy(struct reply_info* rep,
 	struct alloc_cache* alloc, struct regional* region);
 
 /**
@@ -387,7 +391,7 @@ int reply_info_alloc_rrset_keys(struct reply_info* rep,
  * @return false on alloc failure.
  */
 int parse_copy_decompress_rrset(struct sldns_buffer* pkt, struct msg_parse* msg,
-	struct rrset_parse *pset, struct regional* region, 
+	struct rrset_parse* pset, struct regional* region,
 	struct ub_packed_rrset_key* pk);
 
 /**
@@ -483,9 +487,9 @@ void log_dns_msg(const char* str, struct query_info* qinfo,
  *                    the cache, or an outside network.
  * @param rmsg: sldns buffer packet.
  */
-void log_reply_info(enum verbosity_value v, struct query_info *qinf,
-	struct sockaddr_storage *addr, socklen_t addrlen, struct timeval dur,
-	int cached, struct sldns_buffer *rmsg);
+void log_reply_info(enum verbosity_value v, struct query_info* qinf,
+	struct sockaddr_storage* addr, socklen_t addrlen, struct timeval dur,
+	int cached, struct sldns_buffer* rmsg);
 
 /**
  * Print string with neat domain name, type, class from query info.
@@ -493,7 +497,7 @@ void log_reply_info(enum verbosity_value v, struct query_info *qinf,
  * @param str: string of message.
  * @param qinf: query info structure with name, type and class.
  */
-void log_query_info(enum verbosity_value v, const char* str, 
+void log_query_info(enum verbosity_value v, const char* str,
 	struct query_info* qinf);
 
 /**
@@ -634,7 +638,7 @@ int inplace_cb_query_call(struct module_env* env, struct query_info* qinfo,
  * @param qstate: module qstate.
  * @return false on failure (a callback function returned an error).
  */
-int inplace_cb_edns_back_parsed_call(struct module_env* env, 
+int inplace_cb_edns_back_parsed_call(struct module_env* env,
 	struct module_qstate* qstate);
 
 /**

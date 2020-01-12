@@ -66,6 +66,7 @@ namespace cryptonote
 class address_validator
 {
 	GULPS_CAT_MAJOR("addr_val");
+
   public:
 	address_validator() = default;
 
@@ -84,8 +85,8 @@ class address_validator
 
 	/*! create command line options */
 	void init_options(
-		boost::program_options::options_description &desc,
-		boost::program_options::positional_options_description &pos_option);
+		boost::program_options::options_description& desc,
+		boost::program_options::positional_options_description& pos_option);
 
 	/*! validate parsed command line options
      *
@@ -110,7 +111,7 @@ class address_validator
      * @param attr[out] attributes of an address
      * @param return 0 if address is valid else !=0
      */
-	bool evaluate_address_attributes(const std::string &net_type, const std::string &addr_str, address_attributes &attr);
+	bool evaluate_address_attributes(const std::string& net_type, const std::string& addr_str, address_attributes& attr);
 
 	/*! print json output of an address
      *
@@ -119,7 +120,7 @@ class address_validator
      * @param attr address attributes
      * @param separator separator character, e.g '\n`, ' '
      */
-	void print(writer &out, const std::string &addr_str, const address_attributes &attr, const char separator);
+	void print(writer& out, const std::string& addr_str, const address_attributes& attr, const char separator);
 
 	/*! vector of input addresses */
 	std::vector<std::string> m_address_strs;
@@ -142,4 +143,4 @@ class address_validator
      */
 	bool m_human;
 };
-}
+} // namespace cryptonote

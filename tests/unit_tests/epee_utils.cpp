@@ -59,11 +59,11 @@ bool can_construct()
 {
 	const unsigned count =
 		unsigned(std::is_constructible<Destination, Source>()) +
-		unsigned(std::is_constructible<Destination, Source &>()) +
+		unsigned(std::is_constructible<Destination, Source&>()) +
 		unsigned(std::is_convertible<Source, Destination>()) +
-		unsigned(std::is_convertible<Source &, Destination>()) +
+		unsigned(std::is_convertible<Source&, Destination>()) +
 		unsigned(std::is_assignable<Destination, Source>()) +
-		unsigned(std::is_assignable<Destination, Source &>());
+		unsigned(std::is_assignable<Destination, Source&>());
 	EXPECT_TRUE(count == 6 || count == 0) << "Mismatch on construction results - " << count << " were true";
 	return count == 6;
 }
@@ -86,7 +86,7 @@ static_assert(epee::span<char>().empty(), "test failure");
 static_assert(epee::span<char>(nullptr).empty(), "test failure");
 static_assert(epee::span<const char>("foo", 2).size() == 2, "test failure");
 
-std::string std_to_hex(const std::vector<unsigned char> &source)
+std::string std_to_hex(const std::vector<unsigned char>& source)
 {
 	std::stringstream out;
 	out << std::hex;
@@ -138,29 +138,29 @@ std::vector<unsigned char> get_all_bytes()
 #else
 #define CHECK_LESS_ENDIAN(lhs, rhs) CHECK_LESS(lhs, rhs)
 #endif
-}
+} // namespace
 
 TEST(Span, Traits)
 {
 	EXPECT_TRUE((std::is_same<std::size_t, typename epee::span<char>::size_type>()));
 	EXPECT_TRUE((std::is_same<std::ptrdiff_t, typename epee::span<char>::difference_type>()));
 	EXPECT_TRUE((std::is_same<char, typename epee::span<char>::value_type>()));
-	EXPECT_TRUE((std::is_same<char *, typename epee::span<char>::pointer>()));
-	EXPECT_TRUE((std::is_same<const char *, typename epee::span<char>::const_pointer>()));
-	EXPECT_TRUE((std::is_same<char *, typename epee::span<char>::iterator>()));
-	EXPECT_TRUE((std::is_same<const char *, typename epee::span<char>::const_iterator>()));
-	EXPECT_TRUE((std::is_same<char &, typename epee::span<char>::reference>()));
-	EXPECT_TRUE((std::is_same<const char &, typename epee::span<char>::const_reference>()));
+	EXPECT_TRUE((std::is_same<char*, typename epee::span<char>::pointer>()));
+	EXPECT_TRUE((std::is_same<const char*, typename epee::span<char>::const_pointer>()));
+	EXPECT_TRUE((std::is_same<char*, typename epee::span<char>::iterator>()));
+	EXPECT_TRUE((std::is_same<const char*, typename epee::span<char>::const_iterator>()));
+	EXPECT_TRUE((std::is_same<char&, typename epee::span<char>::reference>()));
+	EXPECT_TRUE((std::is_same<const char&, typename epee::span<char>::const_reference>()));
 
 	EXPECT_TRUE((std::is_same<std::size_t, typename epee::span<const char>::size_type>()));
 	EXPECT_TRUE((std::is_same<std::ptrdiff_t, typename epee::span<const char>::difference_type>()));
 	EXPECT_TRUE((std::is_same<const char, typename epee::span<const char>::value_type>()));
-	EXPECT_TRUE((std::is_same<const char *, typename epee::span<const char>::pointer>()));
-	EXPECT_TRUE((std::is_same<const char *, typename epee::span<const char>::const_pointer>()));
-	EXPECT_TRUE((std::is_same<const char *, typename epee::span<const char>::iterator>()));
-	EXPECT_TRUE((std::is_same<const char *, typename epee::span<const char>::const_iterator>()));
-	EXPECT_TRUE((std::is_same<const char &, typename epee::span<const char>::reference>()));
-	EXPECT_TRUE((std::is_same<const char &, typename epee::span<const char>::const_reference>()));
+	EXPECT_TRUE((std::is_same<const char*, typename epee::span<const char>::pointer>()));
+	EXPECT_TRUE((std::is_same<const char*, typename epee::span<const char>::const_pointer>()));
+	EXPECT_TRUE((std::is_same<const char*, typename epee::span<const char>::iterator>()));
+	EXPECT_TRUE((std::is_same<const char*, typename epee::span<const char>::const_iterator>()));
+	EXPECT_TRUE((std::is_same<const char&, typename epee::span<const char>::reference>()));
+	EXPECT_TRUE((std::is_same<const char&, typename epee::span<const char>::const_reference>()));
 }
 
 TEST(Span, MutableConstruction)
@@ -170,9 +170,9 @@ TEST(Span, MutableConstruction)
 	};
 
 	EXPECT_TRUE(std::is_constructible<epee::span<char>>());
-	EXPECT_TRUE((std::is_constructible<epee::span<char>, char *, std::size_t>()));
-	EXPECT_FALSE((std::is_constructible<epee::span<char>, const char *, std::size_t>()));
-	EXPECT_FALSE((std::is_constructible<epee::span<char>, unsigned char *, std::size_t>()));
+	EXPECT_TRUE((std::is_constructible<epee::span<char>, char*, std::size_t>()));
+	EXPECT_FALSE((std::is_constructible<epee::span<char>, const char*, std::size_t>()));
+	EXPECT_FALSE((std::is_constructible<epee::span<char>, unsigned char*, std::size_t>()));
 
 	EXPECT_TRUE((can_construct<epee::span<char>, std::nullptr_t>()));
 	EXPECT_TRUE((can_construct<epee::span<char>, char(&)[1]>()));
@@ -199,9 +199,9 @@ TEST(Span, ImmutableConstruction)
 	};
 
 	EXPECT_TRUE(std::is_constructible<epee::span<const char>>());
-	EXPECT_TRUE((std::is_constructible<epee::span<const char>, char *, std::size_t>()));
-	EXPECT_TRUE((std::is_constructible<epee::span<const char>, const char *, std::size_t>()));
-	EXPECT_FALSE((std::is_constructible<epee::span<const char>, unsigned char *, std::size_t>()));
+	EXPECT_TRUE((std::is_constructible<epee::span<const char>, char*, std::size_t>()));
+	EXPECT_TRUE((std::is_constructible<epee::span<const char>, const char*, std::size_t>()));
+	EXPECT_FALSE((std::is_constructible<epee::span<const char>, unsigned char*, std::size_t>()));
 
 	EXPECT_FALSE((can_construct<epee::span<const char>, std::string>()));
 	EXPECT_FALSE((can_construct<epee::span<const char>, std::vector<char>>()));
@@ -381,7 +381,7 @@ TEST(StringTools, BuffToHex)
 	EXPECT_EQ(
 		std_to_hex(all_bytes),
 		(epee::string_tools::buff_to_hex_nodelimer(
-			std::string{reinterpret_cast<const char *>(all_bytes.data()), all_bytes.size()})));
+			std::string{reinterpret_cast<const char*>(all_bytes.data()), all_bytes.size()})));
 }
 
 TEST(StringTools, PodToHex)
@@ -522,9 +522,9 @@ TEST(NetUtils, NetworkAddress)
 
 	struct custom_address
 	{
-		constexpr static bool equal(const custom_address &) noexcept { return false; }
-		constexpr static bool less(const custom_address &) noexcept { return false; }
-		constexpr static bool is_same_host(const custom_address &) noexcept { return false; }
+		constexpr static bool equal(const custom_address&) noexcept { return false; }
+		constexpr static bool less(const custom_address&) noexcept { return false; }
+		constexpr static bool is_same_host(const custom_address&) noexcept { return false; }
 		constexpr static bool is_loopback() noexcept { return false; }
 		constexpr static bool is_local() noexcept { return false; }
 		static std::string str() { return {}; }
@@ -637,7 +637,7 @@ TEST(NetUtils, NetworkAddress)
 	EXPECT_NO_THROW(address1.as<custom_address>());
 }
 
-static bool is_local(const char *s)
+static bool is_local(const char* s)
 {
 	uint32_t ip;
 	GULPS_CHECK_AND_ASSERT_THROW_MES(epee::string_tools::get_ip_int32_from_string(ip, s), std::string("Invalid IP address: ") + s);

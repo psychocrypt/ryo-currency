@@ -31,17 +31,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 	if(argc < 3)
 	{
 		fprintf(stderr, "usage: %s <filename> <hash>\n", argv[0]);
 		return 1;
 	}
-	const char *filename = argv[1];
-	const char *hash = argv[2];
+	const char* filename = argv[1];
+	const char* hash = argv[2];
 
-	FILE *f = fopen(filename, "a+");
+	FILE* f = fopen(filename, "a+");
 	if(!f)
 	{
 		fprintf(stderr, "error opening file %s: %s\n", filename, strerror(errno));

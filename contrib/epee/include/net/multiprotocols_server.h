@@ -37,7 +37,7 @@ namespace net_utils
 {
 //typedef cp_server_impl<net_utils::protocol_switcher> multiprotocol_server;
 typedef boosted_tcp_server<net_utils::protocol_switcher> boosted_multiprotocol_server;
-}
-}
+} // namespace net_utils
+} // namespace epee
 
 #endif //_MULTIPROTOCOLS_SERVER_H_

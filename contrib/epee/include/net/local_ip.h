@@ -51,12 +51,12 @@ inline bool is_ip_local(uint32_t ip)
 {
 	//Note - we are working in litte endian here
 	const ipv4_net_range local_ranges[] = {
-		{ 0x0000000a, bits_to_mask(8)  }, // 10.0.0.0/8 
-		{ 0x0000a8c0, bits_to_mask(16) }, // 192.168.0.0/16
-		{ 0x000010ac, bits_to_mask(12) }  // 172.16.0.0/12
+		{0x0000000a, bits_to_mask(8)},  // 10.0.0.0/8
+		{0x0000a8c0, bits_to_mask(16)}, // 192.168.0.0/16
+		{0x000010ac, bits_to_mask(12)}  // 172.16.0.0/12
 	};
 
-	for(size_t i=0; i < countof(local_ranges); i++)
+	for(size_t i = 0; i < countof(local_ranges); i++)
 	{
 		if((ip & local_ranges[i].netmask) == local_ranges[i].address)
 			return true;
@@ -70,5 +70,5 @@ inline bool is_ip_loopback(uint32_t ip)
 	// 127.0.0.0/8
 	return (ip & 0x000000ff) == 0x0000007f;
 }
-}
-}
+} // namespace net_utils
+} // namespace epee

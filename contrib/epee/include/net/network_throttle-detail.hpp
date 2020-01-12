@@ -45,6 +45,7 @@ namespace net_utils
 class network_throttle : public i_network_throttle
 {
 	GULPS_CAT_MAJOR("epee_net_tht_det");
+
   private:
 	struct packet_info
 	{
@@ -71,9 +72,9 @@ class network_throttle : public i_network_throttle
 
 	// each sample is now 1 second
   public:
-	network_throttle(const std::string &nameshort, const std::string &name, int window_size = -1);
+	network_throttle(const std::string& nameshort, const std::string& name, int window_size = -1);
 	virtual ~network_throttle();
-	virtual void set_name(const std::string &name);
+	virtual void set_name(const std::string& name);
 	virtual void set_target_speed(network_speed_kbps target);
 	virtual network_speed_kbps get_target_speed();
 
@@ -86,7 +87,7 @@ class network_throttle : public i_network_throttle
 	virtual double get_time_seconds() const; ///< timer that we use, time in seconds, monotionic
 
 	// time calculations:
-	virtual void calculate_times(size_t packet_size, calculate_times_struct &cts, bool dbg, double force_window) const; ///< MAIN LOGIC (see base class for info)
+	virtual void calculate_times(size_t packet_size, calculate_times_struct& cts, bool dbg, double force_window) const; ///< MAIN LOGIC (see base class for info)
 
 	virtual network_time_seconds get_sleep_time_after_tick(size_t packet_size); ///< increase the timer if needed, and get the package size
 	virtual network_time_seconds get_sleep_time(size_t packet_size) const;		///< gets the Delay (recommended Delay time) from calc. (not safe: only if time didnt change?) TODO
@@ -98,7 +99,7 @@ class network_throttle : public i_network_throttle
   private:
 	virtual network_time_seconds time_to_slot(network_time_seconds t) const { return std::floor(t); } // convert exact time eg 13.7 to rounded time for slot number in history 13
 	virtual void _handle_trafic_exact(size_t packet_size, size_t orginal_size);
-	virtual void logger_handle_net(const std::string &filename, double time, size_t size);
+	virtual void logger_handle_net(const std::string& filename, double time, size_t size);
 };
 
 /***
@@ -112,7 +113,7 @@ struct network_throttle_bw
 	network_throttle m_out;   ///< for outgoing traffic that we just sent (this is exact usually)
 
   public:
-	network_throttle_bw(const std::string &name1);
+	network_throttle_bw(const std::string& name1);
 };
 
 } // namespace net_utils

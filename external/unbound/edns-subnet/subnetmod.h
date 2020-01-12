@@ -51,7 +51,8 @@
 /**
  * Global state for the subnet module.
  */
-struct subnet_env {
+struct subnet_env
+{
 	/** shared message cache
 	 * key: struct query_info*
 	 * data: struct subnet_msg_cache_data* */
@@ -63,20 +64,22 @@ struct subnet_env {
 	lock_rw_type biglock;
 };
 
-struct subnet_msg_cache_data {
+struct subnet_msg_cache_data
+{
 	struct addrtree* tree4;
 	struct addrtree* tree6;
 };
 
-struct subnet_qstate {
+struct subnet_qstate
+{
 	/** We need the hash for both cache lookup and insert */
 	hashvalue_type qinfo_hash;
 	/** ecs_data for client communication */
-	struct ecs_data	ecs_client_in;
-	struct ecs_data	ecs_client_out;
+	struct ecs_data ecs_client_in;
+	struct ecs_data ecs_client_out;
 	/** ecss data for server communication */
-	struct ecs_data	ecs_server_in;
-	struct ecs_data	ecs_server_out;
+	struct ecs_data ecs_server_in;
+	struct ecs_data ecs_server_out;
 	int subnet_downstream;
 	int subnet_sent;
 };
@@ -111,7 +114,7 @@ void subnetmod_clear(struct module_qstate* qstate, int id);
 size_t subnetmod_get_mem(struct module_env* env, int id);
 
 /** Wrappers for static functions to unit test */
-size_t unittest_wrapper_subnetmod_sizefunc(void *elemptr);
+size_t unittest_wrapper_subnetmod_sizefunc(void* elemptr);
 
 /** Whitelist check, called just before query is sent upstream. */
 int ecs_whitelist_check(struct query_info* qinfo, uint16_t flags,

@@ -12,7 +12,8 @@
 /* Structure to store the result of the parsing of UPnP
  * descriptions of Internet Gateway Devices */
 #define MINIUPNPC_URL_MAXSIZE (128)
-struct IGDdatas_service {
+struct IGDdatas_service
+{
 	char controlurl[MINIUPNPC_URL_MAXSIZE];
 	char eventsuburl[MINIUPNPC_URL_MAXSIZE];
 	char scpdurl[MINIUPNPC_URL_MAXSIZE];
@@ -20,7 +21,8 @@ struct IGDdatas_service {
 	/*char devicetype[MINIUPNPC_URL_MAXSIZE];*/
 };
 
-struct IGDdatas {
+struct IGDdatas
+{
 	char cureltname[MINIUPNPC_URL_MAXSIZE];
 	char urlbase[MINIUPNPC_URL_MAXSIZE];
 	char presentationurl[MINIUPNPC_URL_MAXSIZE];
@@ -39,11 +41,11 @@ struct IGDdatas {
 	struct IGDdatas_service tmp;
 };
 
-void IGDstartelt(void *, const char *, int);
-void IGDendelt(void *, const char *, int);
-void IGDdata(void *, const char *, int);
+void IGDstartelt(void*, const char*, int);
+void IGDendelt(void*, const char*, int);
+void IGDdata(void*, const char*, int);
 #ifdef DEBUG
-void printIGD(struct IGDdatas *);
+void printIGD(struct IGDdatas*);
 #endif /* DEBUG */
 
 #endif /* IGD_DESC_PARSE_H_INCLUDED */

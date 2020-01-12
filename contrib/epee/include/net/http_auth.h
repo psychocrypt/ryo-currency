@@ -36,8 +36,6 @@
 #include <string>
 #include <utility>
 
-
-
 namespace epee
 {
 namespace net_utils
@@ -46,9 +44,12 @@ namespace http
 {
 struct login
 {
-	login() : username(), password() {}
-	login(std::string username_, wipeable_string password_)
-		: username(std::move(username_)), password(std::move(password_))
+	login() :
+		username(),
+		password() {}
+	login(std::string username_, wipeable_string password_) :
+		username(std::move(username_)),
+		password(std::move(password_))
 	{
 	}
 
@@ -62,8 +63,10 @@ class http_server_auth
   public:
 	struct session
 	{
-		session(login credentials_)
-			: credentials(std::move(credentials_)), nonce(), counter(0)
+		session(login credentials_) :
+			credentials(std::move(credentials_)),
+			nonce(),
+			counter(0)
 		{
 		}
 
@@ -72,11 +75,13 @@ class http_server_auth
 		std::uint32_t counter;
 	};
 
-	http_server_auth() : user(), rng() {}
-	http_server_auth(login credentials, std::function<void(size_t, uint8_t *)> r);
+	http_server_auth() :
+		user(),
+		rng() {}
+	http_server_auth(login credentials, std::function<void(size_t, uint8_t*)> r);
 
 	//! \return Auth response, or `boost::none` iff `request` had valid auth.
-	boost::optional<http_response_info> get_response(const http_request_info &request)
+	boost::optional<http_response_info> get_response(const http_request_info& request)
 	{
 		if(user)
 			return do_get_response(request);
@@ -84,11 +89,11 @@ class http_server_auth
 	}
 
   private:
-	boost::optional<http_response_info> do_get_response(const http_request_info &request);
+	boost::optional<http_response_info> do_get_response(const http_request_info& request);
 
 	boost::optional<session> user;
 
-	std::function<void(size_t, uint8_t *)> rng;
+	std::function<void(size_t, uint8_t*)> rng;
 };
 
 //! Implements RFC 2617 digest auth. Digests from RFC 7616 can be added.
@@ -104,19 +109,28 @@ class http_client_auth
 
 	struct session
 	{
-		session(login credentials_)
-			: credentials(std::move(credentials_)), server(), counter(0)
+		session(login credentials_) :
+			credentials(std::move(credentials_)),
+			server(),
+			counter(0)
 		{
 		}
 
 		struct keys
 		{
 			using algorithm =
-				std::function<std::string(const session &, boost::string_ref, boost::string_ref)>;
+				std::function<std::string(const session&, boost::string_ref, boost::string_ref)>;
 
-			keys() : nonce(), opaque(), realm(), generator() {}
-			keys(std::string nonce_, std::string opaque_, std::string realm_, algorithm generator_)
-				: nonce(std::move(nonce_)), opaque(std::move(opaque_)), realm(std::move(realm_)), generator(std::move(generator_))
+			keys() :
+				nonce(),
+				opaque(),
+				realm(),
+				generator() {}
+			keys(std::string nonce_, std::string opaque_, std::string realm_, algorithm generator_) :
+				nonce(std::move(nonce_)),
+				opaque(std::move(opaque_)),
+				realm(std::move(realm_)),
+				generator(std::move(generator_))
 			{
 			}
 
@@ -131,7 +145,8 @@ class http_client_auth
 		std::uint32_t counter;
 	};
 
-	http_client_auth() : user() {}
+	http_client_auth() :
+		user() {}
 	http_client_auth(login credentials);
 
 	/*!
@@ -145,7 +160,7 @@ class http_client_auth
           and `kSuccess` if `get_auth_field` is ready to generate authorization
           fields.
       */
-	status handle_401(const http_response_info &response)
+	status handle_401(const http_response_info& response)
 	{
 		if(user)
 			return do_handle_401(response);
@@ -168,11 +183,11 @@ class http_client_auth
 	}
 
   private:
-	status do_handle_401(const http_response_info &);
+	status do_handle_401(const http_response_info&);
 	boost::optional<std::pair<std::string, std::string>> do_get_auth_field(boost::string_ref, boost::string_ref);
 
 	boost::optional<session> user;
 };
-}
-}
-}
+} // namespace http
+} // namespace net_utils
+} // namespace epee

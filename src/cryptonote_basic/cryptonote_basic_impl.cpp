@@ -68,7 +68,9 @@ namespace cryptonote
 
 struct integrated_address
 {
-	integrated_address(account_public_address adr, crypto::hash8 payment_id) : adr(adr), payment_id(payment_id) {}
+	integrated_address(account_public_address adr, crypto::hash8 payment_id) :
+		adr(adr),
+		payment_id(payment_id) {}
 
 	account_public_address adr;
 	crypto::hash8 payment_id;
@@ -86,7 +88,8 @@ struct integrated_address
 
 struct kurz_address
 {
-	kurz_address(crypto::public_key m_public_key) : m_public_key(m_public_key) {}
+	kurz_address(crypto::public_key m_public_key) :
+		m_public_key(m_public_key) {}
 
 	crypto::public_key m_public_key;
 
@@ -126,7 +129,7 @@ bool get_dev_fund_amount(uint64_t height, uint64_t& amount)
 		return false; // No dev fund output needed because the dev fund has ended
 
 	if(height % config<NETTYPE>::DEV_FUND_PERIOD != 0)
-		return false;  // No dev fund output needed because it isn't on the period
+		return false; // No dev fund output needed because it isn't on the period
 
 	amount = config<NETTYPE>::DEV_FUND_AMOUNT / config<NETTYPE>::DEV_FUND_LENGTH;
 	return true;
@@ -152,7 +155,7 @@ uint64_t get_base_reward_tabular(uint64_t height, uint64_t already_generated_coi
 	return base_reward;
 }
 
-bool get_block_reward(network_type nettype, size_t median_size, size_t current_block_size, uint64_t already_generated_coins, uint64_t &reward, uint64_t height)
+bool get_block_reward(network_type nettype, size_t median_size, size_t current_block_size, uint64_t already_generated_coins, uint64_t& reward, uint64_t height)
 {
 	uint64_t base_reward = get_base_reward_tabular(height, already_generated_coins);
 
@@ -195,9 +198,9 @@ bool get_block_reward(network_type nettype, size_t median_size, size_t current_b
 	return true;
 }
 //------------------------------------------------------------------------------------
-uint8_t get_account_address_checksum(const public_address_outer_blob &bl)
+uint8_t get_account_address_checksum(const public_address_outer_blob& bl)
 {
-	const unsigned char *pbuf = reinterpret_cast<const unsigned char *>(&bl);
+	const unsigned char* pbuf = reinterpret_cast<const unsigned char*>(&bl);
 	uint8_t summ = 0;
 	for(size_t i = 0; i != sizeof(public_address_outer_blob) - 1; i++)
 		summ += pbuf[i];
@@ -205,9 +208,9 @@ uint8_t get_account_address_checksum(const public_address_outer_blob &bl)
 	return summ;
 }
 //------------------------------------------------------------------------------------
-uint8_t get_account_integrated_address_checksum(const public_integrated_address_outer_blob &bl)
+uint8_t get_account_integrated_address_checksum(const public_integrated_address_outer_blob& bl)
 {
-	const unsigned char *pbuf = reinterpret_cast<const unsigned char *>(&bl);
+	const unsigned char* pbuf = reinterpret_cast<const unsigned char*>(&bl);
 	uint8_t summ = 0;
 	for(size_t i = 0; i != sizeof(public_integrated_address_outer_blob) - 1; i++)
 		summ += pbuf[i];
@@ -216,7 +219,7 @@ uint8_t get_account_integrated_address_checksum(const public_integrated_address_
 }
 //-----------------------------------------------------------------------
 template <network_type NETTYPE>
-std::string get_public_address_as_str(bool subaddress, account_public_address const &adr)
+std::string get_public_address_as_str(bool subaddress, account_public_address const& adr)
 {
 	uint64_t address_prefix;
 	if(adr.m_spend_public_key == adr.m_view_public_key)
@@ -240,13 +243,13 @@ std::string get_public_address_as_str(bool subaddress, account_public_address co
 	}
 }
 
-template std::string get_public_address_as_str<MAINNET>(bool subaddress, const account_public_address &adr);
-template std::string get_public_address_as_str<TESTNET>(bool subaddress, const account_public_address &adr);
-template std::string get_public_address_as_str<STAGENET>(bool subaddress, const account_public_address &adr);
+template std::string get_public_address_as_str<MAINNET>(bool subaddress, const account_public_address& adr);
+template std::string get_public_address_as_str<TESTNET>(bool subaddress, const account_public_address& adr);
+template std::string get_public_address_as_str<STAGENET>(bool subaddress, const account_public_address& adr);
 
 //-----------------------------------------------------------------------
 template <network_type NETTYPE>
-std::string get_account_integrated_address_as_str(account_public_address const &adr, crypto::hash8 const &payment_id)
+std::string get_account_integrated_address_as_str(account_public_address const& adr, crypto::hash8 const& payment_id)
 {
 	uint64_t integrated_address_prefix = config<NETTYPE>::RYO_LONG_INTEGRATED_ADDRESS_BASE58_PREFIX;
 
@@ -254,12 +257,12 @@ std::string get_account_integrated_address_as_str(account_public_address const &
 	return tools::base58::encode_addr(integrated_address_prefix, t_serializable_object_to_blob(iadr));
 }
 
-template std::string get_account_integrated_address_as_str<MAINNET>(account_public_address const &adr, crypto::hash8 const &payment_id);
-template std::string get_account_integrated_address_as_str<TESTNET>(account_public_address const &adr, crypto::hash8 const &payment_id);
-template std::string get_account_integrated_address_as_str<STAGENET>(account_public_address const &adr, crypto::hash8 const &payment_id);
+template std::string get_account_integrated_address_as_str<MAINNET>(account_public_address const& adr, crypto::hash8 const& payment_id);
+template std::string get_account_integrated_address_as_str<TESTNET>(account_public_address const& adr, crypto::hash8 const& payment_id);
+template std::string get_account_integrated_address_as_str<STAGENET>(account_public_address const& adr, crypto::hash8 const& payment_id);
 
 //-----------------------------------------------------------------------
-bool is_coinbase(const transaction &tx)
+bool is_coinbase(const transaction& tx)
 {
 	if(tx.vin.size() != 1)
 		return false;
@@ -271,7 +274,7 @@ bool is_coinbase(const transaction &tx)
 }
 //-----------------------------------------------------------------------
 template <network_type NETTYPE>
-bool get_account_address_from_str(address_parse_info &info, std::string const &str)
+bool get_account_address_from_str(address_parse_info& info, std::string const& str)
 {
 	blobdata data;
 	uint64_t prefix;
@@ -300,7 +303,7 @@ bool get_account_address_from_str(address_parse_info &info, std::string const &s
 	case config<NETTYPE>::RYO_KURZ_ADDRESS_BASE58_PREFIX:
 		info.is_kurz = true;
 		break;
-/* Kurz subaddress are impossible to generate yet, so parsig them should error out
+		/* Kurz subaddress are impossible to generate yet, so parsig them should error out
 	case config<NETTYPE>::RYO_KURZ_SUBADDRESS_BASE58_PREFIX:
 		info.is_subaddress = true;
 		info.is_kurz = true;
@@ -352,24 +355,24 @@ bool get_account_address_from_str(address_parse_info &info, std::string const &s
 	return true;
 }
 
-template bool get_account_address_from_str<MAINNET>(address_parse_info &, std::string const &);
-template bool get_account_address_from_str<TESTNET>(address_parse_info &, std::string const &);
-template bool get_account_address_from_str<STAGENET>(address_parse_info &, std::string const &);
+template bool get_account_address_from_str<MAINNET>(address_parse_info&, std::string const&);
+template bool get_account_address_from_str<TESTNET>(address_parse_info&, std::string const&);
+template bool get_account_address_from_str<STAGENET>(address_parse_info&, std::string const&);
 
 //--------------------------------------------------------------------------------
-bool operator==(const cryptonote::transaction &a, const cryptonote::transaction &b)
+bool operator==(const cryptonote::transaction& a, const cryptonote::transaction& b)
 {
 	return cryptonote::get_transaction_hash(a) == cryptonote::get_transaction_hash(b);
 }
 
-bool operator==(const cryptonote::block &a, const cryptonote::block &b)
+bool operator==(const cryptonote::block& a, const cryptonote::block& b)
 {
 	return cryptonote::get_block_hash(a) == cryptonote::get_block_hash(b);
 }
-}
+} // namespace cryptonote
 
 //--------------------------------------------------------------------------------
-bool parse_hash256(const std::string str_hash, crypto::hash &hash)
+bool parse_hash256(const std::string str_hash, crypto::hash& hash)
 {
 	std::string buf;
 	bool res = epee::string_tools::parse_hexstr_to_binbuff(str_hash, buf);
@@ -380,7 +383,7 @@ bool parse_hash256(const std::string str_hash, crypto::hash &hash)
 	}
 	else
 	{
-		buf.copy(reinterpret_cast<char *>(&hash), sizeof(crypto::hash));
+		buf.copy(reinterpret_cast<char*>(&hash), sizeof(crypto::hash));
 		return true;
 	}
 }

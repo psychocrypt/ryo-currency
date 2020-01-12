@@ -67,7 +67,7 @@ constexpr bool precision_loss()
 }
 
 template <typename Source, typename Type>
-void convert_numeric(Source source, Type &i)
+void convert_numeric(Source source, Type& i)
 {
 	static_assert(
 		(std::is_same<Type, char>() && std::is_same<Source, int>()) ||
@@ -85,7 +85,7 @@ void convert_numeric(Source source, Type &i)
 }
 
 template <typename Type>
-void to_int(const rapidjson::Value &val, Type &i)
+void to_int(const rapidjson::Value& val, Type& i)
 {
 	if(!val.IsInt())
 	{
@@ -94,7 +94,7 @@ void to_int(const rapidjson::Value &val, Type &i)
 	convert_numeric(val.GetInt(), i);
 }
 template <typename Type>
-void to_int64(const rapidjson::Value &val, Type &i)
+void to_int64(const rapidjson::Value& val, Type& i)
 {
 	if(!val.IsInt64())
 	{
@@ -104,7 +104,7 @@ void to_int64(const rapidjson::Value &val, Type &i)
 }
 
 template <typename Type>
-void to_uint(const rapidjson::Value &val, Type &i)
+void to_uint(const rapidjson::Value& val, Type& i)
 {
 	if(!val.IsUint())
 	{
@@ -113,7 +113,7 @@ void to_uint(const rapidjson::Value &val, Type &i)
 	convert_numeric(val.GetUint(), i);
 }
 template <typename Type>
-void to_uint64(const rapidjson::Value &val, Type &i)
+void to_uint64(const rapidjson::Value& val, Type& i)
 {
 	if(!val.IsUint64())
 	{
@@ -121,14 +121,14 @@ void to_uint64(const rapidjson::Value &val, Type &i)
 	}
 	convert_numeric(val.GetUint64(), i);
 }
-}
+} // namespace
 
-void toJsonValue(rapidjson::Document &doc, const std::string &i, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const std::string& i, rapidjson::Value& val)
 {
 	val = rapidjson::Value(i.c_str(), doc.GetAllocator());
 }
 
-void fromJsonValue(const rapidjson::Value &val, std::string &str)
+void fromJsonValue(const rapidjson::Value& val, std::string& str)
 {
 	if(!val.IsString())
 	{
@@ -138,12 +138,12 @@ void fromJsonValue(const rapidjson::Value &val, std::string &str)
 	str = val.GetString();
 }
 
-void toJsonValue(rapidjson::Document &doc, bool i, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, bool i, rapidjson::Value& val)
 {
 	val.SetBool(i);
 }
 
-void fromJsonValue(const rapidjson::Value &val, bool &b)
+void fromJsonValue(const rapidjson::Value& val, bool& b)
 {
 	if(!val.IsBool())
 	{
@@ -152,84 +152,84 @@ void fromJsonValue(const rapidjson::Value &val, bool &b)
 	b = val.GetBool();
 }
 
-void fromJsonValue(const rapidjson::Value &val, unsigned char &i)
+void fromJsonValue(const rapidjson::Value& val, unsigned char& i)
 {
 	to_uint(val, i);
 }
 
-void fromJsonValue(const rapidjson::Value &val, char &i)
+void fromJsonValue(const rapidjson::Value& val, char& i)
 {
 	to_int(val, i);
 }
 
-void fromJsonValue(const rapidjson::Value &val, signed char &i)
+void fromJsonValue(const rapidjson::Value& val, signed char& i)
 {
 	to_int(val, i);
 }
 
-void fromJsonValue(const rapidjson::Value &val, unsigned short &i)
+void fromJsonValue(const rapidjson::Value& val, unsigned short& i)
 {
 	to_uint(val, i);
 }
 
-void fromJsonValue(const rapidjson::Value &val, short &i)
+void fromJsonValue(const rapidjson::Value& val, short& i)
 {
 	to_int(val, i);
 }
 
-void toJsonValue(rapidjson::Document &doc, const unsigned int i, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const unsigned int i, rapidjson::Value& val)
 {
 	val = rapidjson::Value(i);
 }
 
-void fromJsonValue(const rapidjson::Value &val, unsigned int &i)
+void fromJsonValue(const rapidjson::Value& val, unsigned int& i)
 {
 	to_uint(val, i);
 }
 
-void toJsonValue(rapidjson::Document &doc, const int i, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const int i, rapidjson::Value& val)
 {
 	val = rapidjson::Value(i);
 }
 
-void fromJsonValue(const rapidjson::Value &val, int &i)
+void fromJsonValue(const rapidjson::Value& val, int& i)
 {
 	to_int(val, i);
 }
 
-void toJsonValue(rapidjson::Document &doc, const unsigned long long i, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const unsigned long long i, rapidjson::Value& val)
 {
 	static_assert(!precision_loss<unsigned long long, std::uint64_t>(), "precision loss");
 	val = rapidjson::Value(std::uint64_t(i));
 }
 
-void fromJsonValue(const rapidjson::Value &val, unsigned long long &i)
+void fromJsonValue(const rapidjson::Value& val, unsigned long long& i)
 {
 	to_uint64(val, i);
 }
 
-void toJsonValue(rapidjson::Document &doc, const long long i, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const long long i, rapidjson::Value& val)
 {
 	static_assert(!precision_loss<long long, std::int64_t>(), "precision loss");
 	val = rapidjson::Value(std::int64_t(i));
 }
 
-void fromJsonValue(const rapidjson::Value &val, long long &i)
+void fromJsonValue(const rapidjson::Value& val, long long& i)
 {
 	to_int64(val, i);
 }
 
-void fromJsonValue(const rapidjson::Value &val, unsigned long &i)
+void fromJsonValue(const rapidjson::Value& val, unsigned long& i)
 {
 	to_uint64(val, i);
 }
 
-void fromJsonValue(const rapidjson::Value &val, long &i)
+void fromJsonValue(const rapidjson::Value& val, long& i)
 {
 	to_int64(val, i);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::transaction &tx, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::transaction& tx, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -242,7 +242,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::transaction &tx, ra
 	INSERT_INTO_JSON_OBJECT(val, doc, ringct, tx.rct_signatures);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::transaction &tx)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::transaction& tx)
 {
 	if(!val.IsObject())
 	{
@@ -258,7 +258,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::transaction &tx)
 	GET_FROM_JSON_OBJECT(val, tx.rct_signatures, ringct);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::block &b, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::block& b, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -271,7 +271,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::block &b, rapidjson
 	INSERT_INTO_JSON_OBJECT(val, doc, tx_hashes, b.tx_hashes);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::block &b)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::block& b)
 {
 	if(!val.IsObject())
 	{
@@ -287,7 +287,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::block &b)
 	GET_FROM_JSON_OBJECT(val, b.tx_hashes, tx_hashes);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_v &txin, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::txin_v& txin, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -295,22 +295,22 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_v &txin, rapid
 	{
 		using result_type = void;
 
-		rapidjson::Document &doc;
-		rapidjson::Value &val;
+		rapidjson::Document& doc;
+		rapidjson::Value& val;
 
-		void operator()(cryptonote::txin_to_key const &input) const
+		void operator()(cryptonote::txin_to_key const& input) const
 		{
 			INSERT_INTO_JSON_OBJECT(val, doc, to_key, input);
 		}
-		void operator()(cryptonote::txin_gen const &input) const
+		void operator()(cryptonote::txin_gen const& input) const
 		{
 			INSERT_INTO_JSON_OBJECT(val, doc, gen, input);
 		}
-		void operator()(cryptonote::txin_to_script const &input) const
+		void operator()(cryptonote::txin_to_script const& input) const
 		{
 			INSERT_INTO_JSON_OBJECT(val, doc, to_script, input);
 		}
-		void operator()(cryptonote::txin_to_scripthash const &input) const
+		void operator()(cryptonote::txin_to_scripthash const& input) const
 		{
 			INSERT_INTO_JSON_OBJECT(val, doc, to_scripthash, input);
 		}
@@ -318,7 +318,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_v &txin, rapid
 	boost::apply_visitor(add_input{doc, val}, txin);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_v &txin)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::txin_v& txin)
 {
 	if(!val.IsObject())
 	{
@@ -330,7 +330,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_v &txin)
 		throw MISSING_KEY("Invalid input object");
 	}
 
-	for(auto const &elem : val.GetObject())
+	for(auto const& elem : val.GetObject())
 	{
 		if(elem.name == "to_key")
 		{
@@ -359,14 +359,14 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_v &txin)
 	}
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_gen &txin, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::txin_gen& txin, rapidjson::Value& val)
 {
 	val.SetObject();
 
 	INSERT_INTO_JSON_OBJECT(val, doc, height, txin.height);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_gen &txin)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::txin_gen& txin)
 {
 	if(!val.IsObject())
 	{
@@ -376,7 +376,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_gen &txin)
 	GET_FROM_JSON_OBJECT(val, txin.height, height);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_to_script &txin, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::txin_to_script& txin, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -385,7 +385,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_to_script &txi
 	INSERT_INTO_JSON_OBJECT(val, doc, sigset, txin.sigset);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_to_script &txin)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::txin_to_script& txin)
 {
 	if(!val.IsObject())
 	{
@@ -397,7 +397,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_to_script &txin
 	GET_FROM_JSON_OBJECT(val, txin.sigset, sigset);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_to_scripthash &txin, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::txin_to_scripthash& txin, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -407,7 +407,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_to_scripthash 
 	INSERT_INTO_JSON_OBJECT(val, doc, sigset, txin.sigset);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_to_scripthash &txin)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::txin_to_scripthash& txin)
 {
 	if(!val.IsObject())
 	{
@@ -420,7 +420,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_to_scripthash &
 	GET_FROM_JSON_OBJECT(val, txin.sigset, sigset);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_to_key &txin, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::txin_to_key& txin, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -429,7 +429,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::txin_to_key &txin, 
 	INSERT_INTO_JSON_OBJECT(val, doc, key_image, txin.k_image);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_to_key &txin)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::txin_to_key& txin)
 {
 	if(!val.IsObject())
 	{
@@ -441,7 +441,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::txin_to_key &txin)
 	GET_FROM_JSON_OBJECT(val, txin.k_image, key_image);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::txout_to_script &txout, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::txout_to_script& txout, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -449,7 +449,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::txout_to_script &tx
 	INSERT_INTO_JSON_OBJECT(val, doc, script, txout.script);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::txout_to_script &txout)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::txout_to_script& txout)
 {
 	if(!val.IsObject())
 	{
@@ -460,14 +460,14 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::txout_to_script &txo
 	GET_FROM_JSON_OBJECT(val, txout.script, script);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::txout_to_scripthash &txout, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::txout_to_scripthash& txout, rapidjson::Value& val)
 {
 	val.SetObject();
 
 	INSERT_INTO_JSON_OBJECT(val, doc, hash, txout.hash);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::txout_to_scripthash &txout)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::txout_to_scripthash& txout)
 {
 	if(!val.IsObject())
 	{
@@ -477,14 +477,14 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::txout_to_scripthash 
 	GET_FROM_JSON_OBJECT(val, txout.hash, hash);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::txout_to_key &txout, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::txout_to_key& txout, rapidjson::Value& val)
 {
 	val.SetObject();
 
 	INSERT_INTO_JSON_OBJECT(val, doc, key, txout.key);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::txout_to_key &txout)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::txout_to_key& txout)
 {
 	if(!val.IsObject())
 	{
@@ -494,7 +494,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::txout_to_key &txout)
 	GET_FROM_JSON_OBJECT(val, txout.key, key);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::tx_out &txout, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::tx_out& txout, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -504,18 +504,18 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::tx_out &txout, rapi
 	{
 		using result_type = void;
 
-		rapidjson::Document &doc;
-		rapidjson::Value &val;
+		rapidjson::Document& doc;
+		rapidjson::Value& val;
 
-		void operator()(cryptonote::txout_to_key const &output) const
+		void operator()(cryptonote::txout_to_key const& output) const
 		{
 			INSERT_INTO_JSON_OBJECT(val, doc, to_key, output);
 		}
-		void operator()(cryptonote::txout_to_script const &output) const
+		void operator()(cryptonote::txout_to_script const& output) const
 		{
 			INSERT_INTO_JSON_OBJECT(val, doc, to_script, output);
 		}
-		void operator()(cryptonote::txout_to_scripthash const &output) const
+		void operator()(cryptonote::txout_to_scripthash const& output) const
 		{
 			INSERT_INTO_JSON_OBJECT(val, doc, to_scripthash, output);
 		}
@@ -523,7 +523,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::tx_out &txout, rapi
 	boost::apply_visitor(add_output{doc, val}, txout.target);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::tx_out &txout)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::tx_out& txout)
 {
 	if(!val.IsObject())
 	{
@@ -535,7 +535,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::tx_out &txout)
 		throw MISSING_KEY("Invalid input object");
 	}
 
-	for(auto const &elem : val.GetObject())
+	for(auto const& elem : val.GetObject())
 	{
 		if(elem.name == "amount")
 		{
@@ -563,11 +563,11 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::tx_out &txout)
 	}
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::connection_info &info, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::connection_info& info, rapidjson::Value& val)
 {
 	val.SetObject();
 
-	auto &al = doc.GetAllocator();
+	auto& al = doc.GetAllocator();
 	INSERT_INTO_JSON_OBJECT(val, doc, incoming, info.incoming);
 	INSERT_INTO_JSON_OBJECT(val, doc, localhost, info.localhost);
 	INSERT_INTO_JSON_OBJECT(val, doc, local_ip, info.local_ip);
@@ -594,7 +594,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::connection_info &in
 	INSERT_INTO_JSON_OBJECT(val, doc, current_upload, info.current_upload);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::connection_info &info)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::connection_info& info)
 {
 	if(!val.IsObject())
 	{
@@ -627,7 +627,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::connection_info &inf
 	GET_FROM_JSON_OBJECT(val, info.current_upload, current_upload);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::block_complete_entry &blk, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::block_complete_entry& blk, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -635,7 +635,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::block_complete_entr
 	INSERT_INTO_JSON_OBJECT(val, doc, transactions, blk.txs);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::block_complete_entry &blk)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::block_complete_entry& blk)
 {
 	if(!val.IsObject())
 	{
@@ -646,7 +646,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::block_complete_entry
 	GET_FROM_JSON_OBJECT(val, blk.txs, transactions);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::block_with_transactions &blk, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::block_with_transactions& blk, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -654,7 +654,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::block_with_tra
 	INSERT_INTO_JSON_OBJECT(val, doc, transactions, blk.transactions);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::block_with_transactions &blk)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::block_with_transactions& blk)
 {
 	if(!val.IsObject())
 	{
@@ -665,7 +665,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::block_with_tran
 	GET_FROM_JSON_OBJECT(val, blk.transactions, transactions);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::transaction_info &tx_info, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::transaction_info& tx_info, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -674,7 +674,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::transaction_in
 	INSERT_INTO_JSON_OBJECT(val, doc, transaction, tx_info.transaction);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::transaction_info &tx_info)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::transaction_info& tx_info)
 {
 	if(!val.IsObject())
 	{
@@ -686,7 +686,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::transaction_inf
 	GET_FROM_JSON_OBJECT(val, tx_info.transaction, transaction);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::output_key_and_amount_index &out, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::output_key_and_amount_index& out, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -694,7 +694,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::output_key_and
 	INSERT_INTO_JSON_OBJECT(val, doc, key, out.key);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::output_key_and_amount_index &out)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::output_key_and_amount_index& out)
 {
 	if(!val.IsObject())
 	{
@@ -705,7 +705,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::output_key_and_
 	GET_FROM_JSON_OBJECT(val, out.key, key);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::amount_with_random_outputs &out, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::amount_with_random_outputs& out, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -713,7 +713,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::amount_with_ra
 	INSERT_INTO_JSON_OBJECT(val, doc, outputs, out.outputs);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::amount_with_random_outputs &out)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::amount_with_random_outputs& out)
 {
 	if(!val.IsObject())
 	{
@@ -724,7 +724,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::amount_with_ran
 	GET_FROM_JSON_OBJECT(val, out.outputs, outputs);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::peer &peer, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::peer& peer, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -734,7 +734,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::peer &peer, ra
 	INSERT_INTO_JSON_OBJECT(val, doc, last_seen, peer.last_seen);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::peer &peer)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::peer& peer)
 {
 	if(!val.IsObject())
 	{
@@ -747,7 +747,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::peer &peer)
 	GET_FROM_JSON_OBJECT(val, peer.last_seen, last_seen);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::tx_in_pool &tx, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::tx_in_pool& tx, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -767,7 +767,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::tx_in_pool &tx
 	INSERT_INTO_JSON_OBJECT(val, doc, double_spend_seen, tx.double_spend_seen);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::tx_in_pool &tx)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::tx_in_pool& tx)
 {
 	if(!val.IsObject())
 	{
@@ -789,7 +789,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::tx_in_pool &tx)
 	GET_FROM_JSON_OBJECT(val, tx.double_spend_seen, double_spend_seen);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::hard_fork_info &info, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::hard_fork_info& info, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -803,7 +803,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::hard_fork_info
 	INSERT_INTO_JSON_OBJECT(val, doc, earliest_height, info.earliest_height);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::hard_fork_info &info)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::hard_fork_info& info)
 {
 	if(!val.IsObject())
 	{
@@ -820,7 +820,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::hard_fork_info 
 	GET_FROM_JSON_OBJECT(val, info.earliest_height, earliest_height);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::output_amount_count &out, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::output_amount_count& out, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -830,7 +830,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::output_amount_
 	INSERT_INTO_JSON_OBJECT(val, doc, recent_count, out.recent_count);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::output_amount_count &out)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::output_amount_count& out)
 {
 	if(!val.IsObject())
 	{
@@ -843,7 +843,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::output_amount_c
 	GET_FROM_JSON_OBJECT(val, out.recent_count, recent_count);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::output_amount_and_index &out, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::output_amount_and_index& out, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -851,7 +851,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::output_amount_
 	INSERT_INTO_JSON_OBJECT(val, doc, index, out.index);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::output_amount_and_index &out)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::output_amount_and_index& out)
 {
 	if(!val.IsObject())
 	{
@@ -862,7 +862,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::output_amount_a
 	GET_FROM_JSON_OBJECT(val, out.index, index);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::output_key_mask_unlocked &out, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::output_key_mask_unlocked& out, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -871,7 +871,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::output_key_mas
 	INSERT_INTO_JSON_OBJECT(val, doc, unlocked, out.unlocked);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::output_key_mask_unlocked &out)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::output_key_mask_unlocked& out)
 {
 	if(!val.IsObject())
 	{
@@ -883,7 +883,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::output_key_mask
 	GET_FROM_JSON_OBJECT(val, out.unlocked, unlocked);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::error &err, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::error& err, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -892,7 +892,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::error &err, ra
 	INSERT_INTO_JSON_OBJECT(val, doc, message, err.message);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::error &error)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::error& error)
 {
 	if(!val.IsObject())
 	{
@@ -904,7 +904,7 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::error &error)
 	GET_FROM_JSON_OBJECT(val, error.message, message);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::BlockHeaderResponse &response, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::BlockHeaderResponse& response, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -920,7 +920,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::BlockHeaderRes
 	INSERT_INTO_JSON_OBJECT(val, doc, reward, response.reward);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::BlockHeaderResponse &response)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::BlockHeaderResponse& response)
 {
 	if(!val.IsObject())
 	{
@@ -939,13 +939,13 @@ void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::BlockHeaderResp
 	GET_FROM_JSON_OBJECT(val, response.reward, reward);
 }
 
-void toJsonValue(rapidjson::Document &doc, const rct::rctSig &sig, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const rct::rctSig& sig, rapidjson::Value& val)
 {
 	using boost::adaptors::transform;
 
 	val.SetObject();
 
-	const auto just_mask = [](rct::ctkey const &key) -> rct::key const & {
+	const auto just_mask = [](rct::ctkey const& key) -> rct::key const& {
 		return key.mask;
 	};
 
@@ -968,7 +968,7 @@ void toJsonValue(rapidjson::Document &doc, const rct::rctSig &sig, rapidjson::Va
 	}
 }
 
-void fromJsonValue(const rapidjson::Value &val, rct::rctSig &sig)
+void fromJsonValue(const rapidjson::Value& val, rct::rctSig& sig)
 {
 	using boost::adaptors::transform;
 
@@ -987,7 +987,7 @@ void fromJsonValue(const rapidjson::Value &val, rct::rctSig &sig)
 	// prunable
 	{
 		OBJECT_HAS_MEMBER_OR_THROW(val, "prunable");
-		const auto &prunable = val["prunable"];
+		const auto& prunable = val["prunable"];
 
 		rct::keyV pseudo_outs;
 
@@ -1000,13 +1000,13 @@ void fromJsonValue(const rapidjson::Value &val, rct::rctSig &sig)
 	}
 
 	sig.outPk.reserve(commitments.size());
-	for(rct::key const &commitment : commitments)
+	for(rct::key const& commitment : commitments)
 	{
 		sig.outPk.push_back({{}, commitment});
 	}
 }
 
-void toJsonValue(rapidjson::Document &doc, const rct::ecdhTuple &tuple, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const rct::ecdhTuple& tuple, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -1014,7 +1014,7 @@ void toJsonValue(rapidjson::Document &doc, const rct::ecdhTuple &tuple, rapidjso
 	INSERT_INTO_JSON_OBJECT(val, doc, amount, tuple.amount);
 }
 
-void fromJsonValue(const rapidjson::Value &val, rct::ecdhTuple &tuple)
+void fromJsonValue(const rapidjson::Value& val, rct::ecdhTuple& tuple)
 {
 	if(!val.IsObject())
 	{
@@ -1025,7 +1025,7 @@ void fromJsonValue(const rapidjson::Value &val, rct::ecdhTuple &tuple)
 	GET_FROM_JSON_OBJECT(val, tuple.amount, amount);
 }
 
-void toJsonValue(rapidjson::Document &doc, const rct::rangeSig &sig, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const rct::rangeSig& sig, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -1035,7 +1035,7 @@ void toJsonValue(rapidjson::Document &doc, const rct::rangeSig &sig, rapidjson::
 	INSERT_INTO_JSON_OBJECT(val, doc, Ci, keyVector);
 }
 
-void fromJsonValue(const rapidjson::Value &val, rct::rangeSig &sig)
+void fromJsonValue(const rapidjson::Value& val, rct::rangeSig& sig)
 {
 	if(!val.IsObject())
 	{
@@ -1062,7 +1062,7 @@ void fromJsonValue(const rapidjson::Value &val, rct::rangeSig &sig)
 	}
 }
 
-void toJsonValue(rapidjson::Document &doc, const rct::Bulletproof &p, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const rct::Bulletproof& p, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -1080,7 +1080,7 @@ void toJsonValue(rapidjson::Document &doc, const rct::Bulletproof &p, rapidjson:
 	INSERT_INTO_JSON_OBJECT(val, doc, t, p.t);
 }
 
-void fromJsonValue(const rapidjson::Value &val, rct::Bulletproof &p)
+void fromJsonValue(const rapidjson::Value& val, rct::Bulletproof& p)
 {
 	if(!val.IsObject())
 	{
@@ -1101,7 +1101,7 @@ void fromJsonValue(const rapidjson::Value &val, rct::Bulletproof &p)
 	GET_FROM_JSON_OBJECT(val, p.t, t);
 }
 
-void toJsonValue(rapidjson::Document &doc, const rct::boroSig &sig, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const rct::boroSig& sig, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -1114,7 +1114,7 @@ void toJsonValue(rapidjson::Document &doc, const rct::boroSig &sig, rapidjson::V
 	INSERT_INTO_JSON_OBJECT(val, doc, ee, sig.ee);
 }
 
-void fromJsonValue(const rapidjson::Value &val, rct::boroSig &sig)
+void fromJsonValue(const rapidjson::Value& val, rct::boroSig& sig)
 {
 	if(!val.IsObject())
 	{
@@ -1148,7 +1148,7 @@ void fromJsonValue(const rapidjson::Value &val, rct::boroSig &sig)
 	GET_FROM_JSON_OBJECT(val, sig.ee, ee);
 }
 
-void toJsonValue(rapidjson::Document &doc, const rct::mgSig &sig, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const rct::mgSig& sig, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -1156,7 +1156,7 @@ void toJsonValue(rapidjson::Document &doc, const rct::mgSig &sig, rapidjson::Val
 	INSERT_INTO_JSON_OBJECT(val, doc, cc, sig.cc);
 }
 
-void fromJsonValue(const rapidjson::Value &val, rct::mgSig &sig)
+void fromJsonValue(const rapidjson::Value& val, rct::mgSig& sig)
 {
 	if(!val.IsObject())
 	{
@@ -1167,7 +1167,7 @@ void fromJsonValue(const rapidjson::Value &val, rct::mgSig &sig)
 	GET_FROM_JSON_OBJECT(val, sig.cc, cc);
 }
 
-void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::DaemonInfo &info, rapidjson::Value &val)
+void toJsonValue(rapidjson::Document& doc, const cryptonote::rpc::DaemonInfo& info, rapidjson::Value& val)
 {
 	val.SetObject();
 
@@ -1191,7 +1191,7 @@ void toJsonValue(rapidjson::Document &doc, const cryptonote::rpc::DaemonInfo &in
 	INSERT_INTO_JSON_OBJECT(val, doc, start_time, info.start_time);
 }
 
-void fromJsonValue(const rapidjson::Value &val, cryptonote::rpc::DaemonInfo &info)
+void fromJsonValue(const rapidjson::Value& val, cryptonote::rpc::DaemonInfo& info)
 {
 	if(!val.IsObject())
 	{

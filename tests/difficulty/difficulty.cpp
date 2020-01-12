@@ -42,7 +42,7 @@ using namespace std;
 
 #define DEFAULT_TEST_DIFFICULTY_TARGET 240
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	if(argc != 2)
 	{

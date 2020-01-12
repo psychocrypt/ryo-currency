@@ -49,7 +49,8 @@ struct module_qstate;
  * The outbound list. This structure is part of the module specific query
  * state.
  */
-struct outbound_list {
+struct outbound_list
+{
 	/** The linked list of outbound query entries. */
 	struct outbound_entry* first;
 };
@@ -58,7 +59,8 @@ struct outbound_list {
  * Outbound list entry. A serviced query sent by a module processing the
  * query from the qstate. Double linked list to aid removal.
  */
-struct outbound_entry {
+struct outbound_entry
+{
 	/** next in list */
 	struct outbound_entry* next;
 	/** prev in list */
@@ -90,7 +92,7 @@ void outbound_list_clear(struct outbound_list* list);
  * @param e: entry to add, it is only half initialised at call start, fully
  *	initialised at call end.
  */
-void outbound_list_insert(struct outbound_list* list, 
+void outbound_list_insert(struct outbound_list* list,
 	struct outbound_entry* e);
 
 /**
@@ -99,7 +101,7 @@ void outbound_list_insert(struct outbound_list* list,
  * @param list: the list to remove from.
  * @param e: the entry to remove.
  */
-void outbound_list_remove(struct outbound_list* list, 
+void outbound_list_remove(struct outbound_list* list,
 	struct outbound_entry* e);
 
 #endif /* SERVICES_OUTBOUND_LIST_H */

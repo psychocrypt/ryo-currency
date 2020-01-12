@@ -8,7 +8,7 @@
 #ifndef MACROS_H_INCLUDED
 #define MACROS_H_INCLUDED
 
-#define UNUSED(arg)	(void)(arg)
+#define UNUSED(arg) (void)(arg)
 
 #include <stdint.h>
 
@@ -19,17 +19,17 @@
  * from an unsigned char array in network order (big endian).
  * Avoid pointer casting, so avoid accessing unaligned memory, which
  * can crash with some cpu's */
-INLINE uint32_t readnu32(const uint8_t * p)
+INLINE uint32_t readnu32(const uint8_t* p)
 {
 	return (p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3]);
 }
 #define READNU32(p) readnu32(p)
-INLINE uint16_t readnu16(const uint8_t * p)
+INLINE uint16_t readnu16(const uint8_t* p)
 {
 	return (p[0] << 8 | p[1]);
 }
 #define READNU16(p) readnu16(p)
-INLINE void writenu32(uint8_t * p, uint32_t n)
+INLINE void writenu32(uint8_t* p, uint32_t n)
 {
 	p[0] = (n & 0xff000000) >> 24;
 	p[1] = (n & 0xff0000) >> 16;
@@ -37,7 +37,7 @@ INLINE void writenu32(uint8_t * p, uint32_t n)
 	p[3] = n & 0xff;
 }
 #define WRITENU32(p, n) writenu32(p, n)
-INLINE void writenu16(uint8_t * p, uint16_t n)
+INLINE void writenu16(uint8_t* p, uint16_t n)
 {
 	p[0] = (n & 0xff00) >> 8;
 	p[1] = n & 0xff;

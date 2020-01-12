@@ -39,16 +39,17 @@ namespace epee
 
 namespace debug
 {
-inline unsigned int &g_test_dbg_lock_sleep()
+inline unsigned int& g_test_dbg_lock_sleep()
 {
 	static unsigned int value = 0;
 	return value;
 }
-}
+} // namespace debug
 
 struct simple_event
 {
-	simple_event() : m_rised(false)
+	simple_event() :
+		m_rised(false)
 	{
 	}
 
@@ -81,7 +82,7 @@ class critical_section
 
   public:
 	//to make copy fake!
-	critical_section(const critical_section &section)
+	critical_section(const critical_section& section)
 	{
 	}
 
@@ -110,7 +111,7 @@ class critical_section
 	}
 
 	// to make copy fake
-	critical_section &operator=(const critical_section &section)
+	critical_section& operator=(const critical_section& section)
 	{
 		return *this;
 	}
@@ -119,13 +120,15 @@ class critical_section
 template <class t_lock>
 class critical_region_t
 {
-	t_lock &m_locker;
+	t_lock& m_locker;
 	bool m_unlocked;
 
-	critical_region_t(const critical_region_t &) {}
+	critical_region_t(const critical_region_t&) {}
 
   public:
-	critical_region_t(t_lock &cs) : m_locker(cs), m_unlocked(false)
+	critical_region_t(t_lock& cs) :
+		m_locker(cs),
+		m_unlocked(false)
 	{
 		m_locker.lock();
 	}
@@ -185,7 +188,8 @@ class shared_critical_section
 class shared_guard
 {
   public:
-	shared_guard(shared_critical_section &ref_sec) : m_ref_sec(ref_sec)
+	shared_guard(shared_critical_section& ref_sec) :
+		m_ref_sec(ref_sec)
 	{
 		m_ref_sec.lock_shared();
 	}
@@ -196,13 +200,14 @@ class shared_guard
 	}
 
   private:
-	shared_critical_section &m_ref_sec;
+	shared_critical_section& m_ref_sec;
 };
 
 class exclusive_guard
 {
   public:
-	exclusive_guard(shared_critical_section &ref_sec) : m_ref_sec(ref_sec)
+	exclusive_guard(shared_critical_section& ref_sec) :
+		m_ref_sec(ref_sec)
 	{
 		m_ref_sec.lock_exclusive();
 	}
@@ -213,16 +218,16 @@ class exclusive_guard
 	}
 
   private:
-	shared_critical_section &m_ref_sec;
+	shared_critical_section& m_ref_sec;
 };
 #endif
 
 #define SHARED_CRITICAL_REGION_BEGIN(x) \
 	{                                   \
-	shared_guard critical_region_var(x)
+		shared_guard critical_region_var(x)
 #define EXCLUSIVE_CRITICAL_REGION_BEGIN(x) \
 	{                                      \
-	exclusive_guard critical_region_var(x)
+		exclusive_guard critical_region_var(x)
 
 #define CRITICAL_REGION_LOCAL(x)                                                                          \
 	{                                                                                                     \
@@ -232,7 +237,7 @@ class exclusive_guard
 #define CRITICAL_REGION_BEGIN(x)                                                                          \
 	{                                                                                                     \
 		boost::this_thread::sleep_for(boost::chrono::milliseconds(epee::debug::g_test_dbg_lock_sleep())); \
-	epee::critical_region_t<decltype(x)> critical_region_var(x)
+		epee::critical_region_t<decltype(x)> critical_region_var(x)
 #define CRITICAL_REGION_LOCAL1(x)                                                                         \
 	{                                                                                                     \
 		boost::this_thread::sleep_for(boost::chrono::milliseconds(epee::debug::g_test_dbg_lock_sleep())); \
@@ -241,12 +246,12 @@ class exclusive_guard
 #define CRITICAL_REGION_BEGIN1(x)                                                                         \
 	{                                                                                                     \
 		boost::this_thread::sleep_for(boost::chrono::milliseconds(epee::debug::g_test_dbg_lock_sleep())); \
-	epee::critical_region_t<decltype(x)> critical_region_var1(x)
+		epee::critical_region_t<decltype(x)> critical_region_var1(x)
 
 #define CRITICAL_REGION_END() }
 
 #if defined(WINDWOS_PLATFORM)
-inline const char *get_wait_for_result_as_text(DWORD res)
+inline const char* get_wait_for_result_as_text(DWORD res)
 {
 	switch(res)
 	{
@@ -265,6 +270,6 @@ inline const char *get_wait_for_result_as_text(DWORD res)
 	}
 }
 #endif
-}
+} // namespace epee
 
 #endif

@@ -57,10 +57,11 @@ namespace Ryo
 
 AddressBook::~AddressBook() {}
 
-AddressBookImpl::AddressBookImpl(WalletImpl *wallet)
-	: m_wallet(wallet), m_errorCode(Status_Ok) {}
+AddressBookImpl::AddressBookImpl(WalletImpl* wallet) :
+	m_wallet(wallet),
+	m_errorCode(Status_Ok) {}
 
-bool AddressBookImpl::addRow(const std::string &dst_addr, const std::string &payment_id_str, const std::string &description)
+bool AddressBookImpl::addRow(const std::string& dst_addr, const std::string& payment_id_str, const std::string& description)
 {
 	clearStatus();
 
@@ -123,7 +124,7 @@ void AddressBookImpl::refresh()
 	std::vector<tools::wallet2::address_book_row> rows = m_wallet->m_wallet->get_address_book();
 	for(size_t i = 0; i < rows.size(); ++i)
 	{
-		tools::wallet2::address_book_row *row = &rows.at(i);
+		tools::wallet2::address_book_row* row = &rows.at(i);
 
 		std::string payment_id = (row->m_payment_id == crypto::null_hash) ? "" : epee::string_tools::pod_to_hex(row->m_payment_id);
 		std::string address = cryptonote::get_account_address_as_str(m_wallet->m_wallet->nettype(), row->m_is_subaddress, row->m_address);
@@ -139,7 +140,7 @@ void AddressBookImpl::refresh()
 				payment_id = "";
 			}
 		}
-		AddressBookRow *abr = new AddressBookRow(i, address, payment_id, row->m_description);
+		AddressBookRow* abr = new AddressBookRow(i, address, payment_id, row->m_description);
 		m_rows.push_back(abr);
 	}
 }
@@ -153,13 +154,13 @@ bool AddressBookImpl::deleteRow(std::size_t rowId)
 	return r;
 }
 
-int AddressBookImpl::lookupPaymentID(const std::string &payment_id) const
+int AddressBookImpl::lookupPaymentID(const std::string& payment_id) const
 {
 	// turn short ones into long ones for comparison
 	const std::string long_payment_id = payment_id + std::string(64 - payment_id.size(), '0');
 
 	int idx = -1;
-	for(const auto &row : m_rows)
+	for(const auto& row : m_rows)
 	{
 		++idx;
 		// this does short/short and long/long
@@ -191,7 +192,7 @@ void AddressBookImpl::clearStatus()
 	m_errorCode = 0;
 }
 
-std::vector<AddressBookRow *> AddressBookImpl::getAll() const
+std::vector<AddressBookRow*> AddressBookImpl::getAll() const
 {
 	return m_rows;
 }
@@ -201,4 +202,4 @@ AddressBookImpl::~AddressBookImpl()
 	clearRows();
 }
 
-} // namespace
+} // namespace Ryo

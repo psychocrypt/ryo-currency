@@ -63,7 +63,7 @@ namespace cryptonote
 template class t_cryptonote_protocol_handler<cryptonote::core>;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 	GULPS_TRY_ENTRY();
 

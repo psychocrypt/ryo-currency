@@ -42,10 +42,11 @@ class content_encoding_gzip : public i_sub_handler
 		*  Function content_encoding_gzip : Constructor
 		*
 		*/
-	inline content_encoding_gzip(i_target_handler *powner_filter, bool is_deflate_mode = false) : m_powner_filter(powner_filter),
-																								  m_is_stream_ended(false),
-																								  m_is_deflate_mode(is_deflate_mode),
-																								  m_is_first_update_in(true)
+	inline content_encoding_gzip(i_target_handler* powner_filter, bool is_deflate_mode = false) :
+		m_powner_filter(powner_filter),
+		m_is_stream_ended(false),
+		m_is_deflate_mode(is_deflate_mode),
+		m_is_first_update_in(true)
 	{
 		memset(&m_zstream_in, 0, sizeof(m_zstream_in));
 		memset(&m_zstream_out, 0, sizeof(m_zstream_out));
@@ -74,7 +75,7 @@ class content_encoding_gzip : public i_sub_handler
 		*  Function update_in : Entry point for income data
 		*
 		*/
-	inline virtual bool update_in(std::string &piece_of_transfer)
+	inline virtual bool update_in(std::string& piece_of_transfer)
 	{
 
 		bool is_first_time_here = m_is_first_update_in;
@@ -99,14 +100,14 @@ class content_encoding_gzip : public i_sub_handler
 		{
 
 			//fill buffers
-			m_zstream_in.next_in = (Bytef *)m_pre_decode.data();
+			m_zstream_in.next_in = (Bytef*)m_pre_decode.data();
 			m_zstream_in.avail_in = (uInt)m_pre_decode.size();
-			m_zstream_in.next_out = (Bytef *)current_decode_buff.data();
+			m_zstream_in.next_out = (Bytef*)current_decode_buff.data();
 			m_zstream_in.avail_out = (uInt)ungzip_size;
 
 			int flag = Z_SYNC_FLUSH;
 			int ret = inflate(&m_zstream_in, flag);
-			GULPS_CHECK_AND_ASSERT_MES(ret >= 0 || m_zstream_in.avail_out || m_is_deflate_mode, false, "content_encoding_gzip::update_in() Failed to inflate. err = " , ret);
+			GULPS_CHECK_AND_ASSERT_MES(ret >= 0 || m_zstream_in.avail_out || m_is_deflate_mode, false, "content_encoding_gzip::update_in() Failed to inflate. err = ", ret);
 
 			if(Z_STREAM_END == ret)
 				m_is_stream_ended = true;
@@ -120,7 +121,7 @@ class content_encoding_gzip : public i_sub_handler
 						(((0x8 + 0x7 * 0x10) * 0x100 + 30) / 31 * 31) & 0xFF,
 					};
 				inflateReset(&m_zstream_in);
-				m_zstream_in.next_in = (Bytef *)dummy_head;
+				m_zstream_in.next_in = (Bytef*)dummy_head;
 				m_zstream_in.avail_in = sizeof(dummy_head);
 
 				ret = inflate(&m_zstream_in, Z_NO_FLUSH);
@@ -130,7 +131,7 @@ class content_encoding_gzip : public i_sub_handler
 					m_pre_decode.swap(piece_of_transfer);
 					return false;
 				}
-				m_zstream_in.next_in = (Bytef *)m_pre_decode.data();
+				m_zstream_in.next_in = (Bytef*)m_pre_decode.data();
 				m_zstream_in.avail_in = (uInt)m_pre_decode.size();
 
 				ret = inflate(&m_zstream_in, Z_NO_FLUSH);
@@ -170,7 +171,7 @@ class content_encoding_gzip : public i_sub_handler
 		*  Function stop : Entry point for stop signal and flushing cached data buffer.
 		*
 		*/
-	inline virtual void stop(std::string &OUT collect_remains)
+	inline virtual void stop(std::string& OUT collect_remains)
 	{
 	}
 
@@ -179,7 +180,7 @@ class content_encoding_gzip : public i_sub_handler
 	/*! \brief
 		*	Pointer to parent HTTP-parser
 		*/
-	i_target_handler *m_powner_filter;
+	i_target_handler* m_powner_filter;
 	/*! \brief
 		*	ZLIB object for income stream
 		*/
@@ -209,7 +210,7 @@ class content_encoding_gzip : public i_sub_handler
 		*/
 	bool m_is_first_update_in;
 };
-}
-}
+} // namespace net_utils
+} // namespace epee
 
 #endif //_GZIP_ENCODING_H_

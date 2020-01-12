@@ -60,12 +60,12 @@ namespace epee
 namespace string_tools
 {
 //----------------------------------------------------------------------------
-inline std::string get_str_from_guid_a(const boost::uuids::uuid &rid)
+inline std::string get_str_from_guid_a(const boost::uuids::uuid& rid)
 {
 	return boost::lexical_cast<std::string>(rid);
 }
 //----------------------------------------------------------------------------
-inline bool get_guid_from_string(OUT boost::uuids::uuid &inetifer, const std::string &str_id)
+inline bool get_guid_from_string(OUT boost::uuids::uuid& inetifer, const std::string& str_id)
 {
 	std::string local_str_id = str_id;
 	if(local_str_id.size() < 36)
@@ -88,13 +88,13 @@ inline bool get_guid_from_string(OUT boost::uuids::uuid &inetifer, const std::st
 	}
 }
 //----------------------------------------------------------------------------
-inline std::string buff_to_hex_nodelimer(const std::string &src)
+inline std::string buff_to_hex_nodelimer(const std::string& src)
 {
 	return to_hex::string(to_byte_span(to_span(src)));
 }
 //----------------------------------------------------------------------------
 template <class CharT>
-bool parse_hexstr_to_binbuff(const std::basic_string<CharT> &s, std::basic_string<CharT> &res, bool allow_partial_byte = false)
+bool parse_hexstr_to_binbuff(const std::basic_string<CharT>& s, std::basic_string<CharT>& res, bool allow_partial_byte = false)
 {
 	res.clear();
 	if(!allow_partial_byte && (s.size() & 1))
@@ -107,7 +107,7 @@ bool parse_hexstr_to_binbuff(const std::basic_string<CharT> &s, std::basic_strin
 			CharT byte_str[3];
 			size_t copied = s.copy(byte_str, 2, 2 * i);
 			byte_str[copied] = CharT(0);
-			CharT *endptr;
+			CharT* endptr;
 			v = strtoul(byte_str, &endptr, 16);
 			if(v < 0 || 0xFF < v || endptr != byte_str + copied)
 			{
@@ -125,7 +125,7 @@ bool parse_hexstr_to_binbuff(const std::basic_string<CharT> &s, std::basic_strin
 }
 //----------------------------------------------------------------------------
 template <class t_pod_type>
-bool parse_tpod_from_hex_string(const std::string &str_hash, t_pod_type &t_pod)
+bool parse_tpod_from_hex_string(const std::string& str_hash, t_pod_type& t_pod)
 {
 	static_assert(std::is_pod<t_pod_type>::value, "expected pod type");
 	std::string buf;
@@ -136,15 +136,15 @@ bool parse_tpod_from_hex_string(const std::string &str_hash, t_pod_type &t_pod)
 	}
 	else
 	{
-		buf.copy(reinterpret_cast<char *>(&t_pod), sizeof(t_pod_type));
+		buf.copy(reinterpret_cast<char*>(&t_pod), sizeof(t_pod_type));
 		return true;
 	}
 }
 //----------------------------------------------------------------------------
 PUSH_WARNINGS
-DISABLE_GCC_WARNING(maybe-uninitialized)
+DISABLE_GCC_WARNING(maybe - uninitialized)
 template <class XType>
-inline bool get_xtype_from_string(OUT XType &val, const std::string &str_id)
+inline bool get_xtype_from_string(OUT XType& val, const std::string& str_id)
 {
 	if(std::is_integral<XType>::value && !std::numeric_limits<XType>::is_signed && !std::is_same<XType, bool>::value)
 	{
@@ -160,7 +160,7 @@ inline bool get_xtype_from_string(OUT XType &val, const std::string &str_id)
 		val = boost::lexical_cast<XType>(str_id);
 		return true;
 	}
-	catch(const std::exception & /*e*/)
+	catch(const std::exception& /*e*/)
 	{
 		//const char* pmsg = e.what();
 		return false;
@@ -175,7 +175,7 @@ inline bool get_xtype_from_string(OUT XType &val, const std::string &str_id)
 POP_WARNINGS
 //----------------------------------------------------------------------------
 template <class XType>
-inline bool xtype_to_string(const XType &val, std::string &str)
+inline bool xtype_to_string(const XType& val, std::string& str)
 {
 	try
 	{
@@ -191,9 +191,9 @@ inline bool xtype_to_string(const XType &val, std::string &str)
 //----------------------------------------------------------------------------
 std::string get_ip_string_from_int32(uint32_t ip);
 //----------------------------------------------------------------------------
-bool get_ip_int32_from_string(uint32_t &ip, const std::string &ip_str);
+bool get_ip_int32_from_string(uint32_t& ip, const std::string& ip_str);
 //----------------------------------------------------------------------------
-inline bool parse_peer_from_string(uint32_t &ip, uint16_t &port, const std::string &addres)
+inline bool parse_peer_from_string(uint32_t& ip, uint16_t& port, const std::string& addres)
 {
 	//parse ip and address
 	std::string::size_type p = addres.find(':');
@@ -231,19 +231,19 @@ inline std::string num_to_string_fast(int64_t val)
 }
 //----------------------------------------------------------------------------
 
-inline bool compare_no_case(const std::string &str1, const std::string &str2)
+inline bool compare_no_case(const std::string& str1, const std::string& str2)
 {
 
 	return !boost::iequals(str1, str2);
 }
 //----------------------------------------------------------------------------
-inline std::string &get_current_module_name()
+inline std::string& get_current_module_name()
 {
 	static std::string module_name;
 	return module_name;
 }
 //----------------------------------------------------------------------------
-inline std::string &get_current_module_folder()
+inline std::string& get_current_module_folder()
 {
 	static std::string module_folder;
 	return module_folder;
@@ -259,7 +259,7 @@ inline std::string get_current_module_path()
 }
 #endif
 //----------------------------------------------------------------------------
-inline bool set_module_name_and_folder(const std::string &path_to_process_)
+inline bool set_module_name_and_folder(const std::string& path_to_process_)
 {
 	std::string path_to_process = path_to_process_;
 #ifdef _WIN32
@@ -281,7 +281,7 @@ inline bool set_module_name_and_folder(const std::string &path_to_process_)
 }
 
 //----------------------------------------------------------------------------
-inline bool trim_left(std::string &str)
+inline bool trim_left(std::string& str)
 {
 	for(std::string::iterator it = str.begin(); it != str.end() && isspace(static_cast<unsigned char>(*it));)
 		str.erase(str.begin());
@@ -289,7 +289,7 @@ inline bool trim_left(std::string &str)
 	return true;
 }
 //----------------------------------------------------------------------------
-inline bool trim_right(std::string &str)
+inline bool trim_right(std::string& str)
 {
 
 	for(std::string::reverse_iterator it = str.rbegin(); it != str.rend() && isspace(static_cast<unsigned char>(*it));)
@@ -298,7 +298,7 @@ inline bool trim_right(std::string &str)
 	return true;
 }
 //----------------------------------------------------------------------------
-inline std::string &trim(std::string &str)
+inline std::string& trim(std::string& str)
 {
 
 	trim_left(str);
@@ -306,7 +306,7 @@ inline std::string &trim(std::string &str)
 	return str;
 }
 //----------------------------------------------------------------------------
-inline std::string trim(const std::string &str_)
+inline std::string trim(const std::string& str_)
 {
 	std::string str = str_;
 	trim_left(str);
@@ -327,14 +327,14 @@ inline std::string pad_string(std::string s, size_t n, char c = ' ', bool prepen
 }
 //----------------------------------------------------------------------------
 template <class t_pod_type>
-std::string pod_to_hex(const t_pod_type &s)
+std::string pod_to_hex(const t_pod_type& s)
 {
 	static_assert(std::is_standard_layout<t_pod_type>(), "expected standard layout type");
 	return to_hex::string(as_byte_span(s));
 }
 //----------------------------------------------------------------------------
 template <class t_pod_type>
-bool hex_to_pod(const std::string &hex_str, t_pod_type &s)
+bool hex_to_pod(const std::string& hex_str, t_pod_type& s)
 {
 	static_assert(std::is_pod<t_pod_type>::value, "expected pod type");
 	std::string hex_str_tr = trim(hex_str);
@@ -346,19 +346,19 @@ bool hex_to_pod(const std::string &hex_str, t_pod_type &s)
 	if(bin_buff.size() != sizeof(s))
 		return false;
 
-	s = *(t_pod_type *)bin_buff.data();
+	s = *(t_pod_type*)bin_buff.data();
 	return true;
 }
 //----------------------------------------------------------------------------
 template <class t_pod_type>
-bool hex_to_pod(const std::string &hex_str, tools::scrubbed<t_pod_type> &s)
+bool hex_to_pod(const std::string& hex_str, tools::scrubbed<t_pod_type>& s)
 {
 	return hex_to_pod(hex_str, unwrap(s));
 }
 //----------------------------------------------------------------------------
-bool validate_hex(uint64_t length, const std::string &str);
+bool validate_hex(uint64_t length, const std::string& str);
 //----------------------------------------------------------------------------
-inline std::string get_extension(const std::string &str)
+inline std::string get_extension(const std::string& str)
 {
 	std::string res;
 	std::string::size_type pos = str.rfind('.');
@@ -369,7 +369,7 @@ inline std::string get_extension(const std::string &str)
 	return res;
 }
 //----------------------------------------------------------------------------
-inline std::string cut_off_extension(const std::string &str)
+inline std::string cut_off_extension(const std::string& str)
 {
 	std::string res;
 	std::string::size_type pos = str.rfind('.');
@@ -379,6 +379,6 @@ inline std::string cut_off_extension(const std::string &str)
 	res = str.substr(0, pos);
 	return res;
 }
-}
-}
+} // namespace string_tools
+} // namespace epee
 #endif //_STRING_TOOLS_H_

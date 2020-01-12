@@ -93,7 +93,7 @@ class DNSResolver
    *
    * @return vector of strings containing ipv4 addresses
    */
-	std::vector<std::string> get_ipv4(const std::string &url, bool &dnssec_available, bool &dnssec_valid);
+	std::vector<std::string> get_ipv4(const std::string& url, bool& dnssec_available, bool& dnssec_valid);
 
 	/**
    * @brief gets ipv6 addresses from DNS query
@@ -105,7 +105,7 @@ class DNSResolver
    *
    * @return vector of strings containing ipv6 addresses
    */
-	std::vector<std::string> get_ipv6(const std::string &url, bool &dnssec_available, bool &dnssec_valid);
+	std::vector<std::string> get_ipv6(const std::string& url, bool& dnssec_available, bool& dnssec_valid);
 
 	/**
    * @brief gets all TXT records from a DNS query for the supplied URL;
@@ -116,7 +116,7 @@ class DNSResolver
    * @return A vector of strings containing a TXT record; or an empty vector
    */
 	// TODO: modify this to accommodate DNSSEC
-	std::vector<std::string> get_txt_record(const std::string &url, bool &dnssec_available, bool &dnssec_valid);
+	std::vector<std::string> get_txt_record(const std::string& url, bool& dnssec_available, bool& dnssec_valid);
 
 	/**
    * @brief Gets a DNS address from OpenAlias format
@@ -128,14 +128,14 @@ class DNSResolver
    *
    * @return dns_addr  DNS address
    */
-	std::string get_dns_format_from_oa_address(const std::string &oa_addr);
+	std::string get_dns_format_from_oa_address(const std::string& oa_addr);
 
 	/**
    * @brief Gets the singleton instance of DNSResolver
    *
    * @return returns a pointer to the singleton
    */
-	static DNSResolver &instance();
+	static DNSResolver& instance();
 
 	/**
    * @brief Gets a new instance of DNSResolver
@@ -156,7 +156,7 @@ class DNSResolver
    * @return A vector of strings containing the requested record; or an empty vector
    */
 	// TODO: modify this to accommodate DNSSEC
-	std::vector<std::string> get_record(const std::string &url, int record_type, std::string (*reader)(const char *, size_t), bool &dnssec_available, bool &dnssec_valid);
+	std::vector<std::string> get_record(const std::string& url, int record_type, std::string (*reader)(const char*, size_t), bool& dnssec_available, bool& dnssec_valid);
 
 	/**
    * @brief Checks a string to see if it looks like a URL
@@ -165,18 +165,18 @@ class DNSResolver
    *
    * @return true if it looks enough like a URL, false if not
    */
-	bool check_address_syntax(const char *addr) const;
+	bool check_address_syntax(const char* addr) const;
 
-	DNSResolverData *m_data;
+	DNSResolverData* m_data;
 }; // class DNSResolver
 
 namespace dns_utils
 {
 
-bool load_txt_records_from_dns(std::vector<std::string> &records, const std::vector<std::string> &dns_urls);
+bool load_txt_records_from_dns(std::vector<std::string>& records, const std::vector<std::string>& dns_urls);
 
-std::vector<std::string> parse_dns_public(const char *s);
+std::vector<std::string> parse_dns_public(const char* s);
 
-} // namespace tools::dns_utils
+} // namespace dns_utils
 
 } // namespace tools

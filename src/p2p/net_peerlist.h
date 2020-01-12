@@ -89,21 +89,21 @@ class peerlist_manager
 		CRITICAL_REGION_LOCAL(m_peerlist_lock);
 		return m_peers_gray.size();
 	}
-	bool merge_peerlist(const std::list<peerlist_entry> &outer_bs);
-	bool get_peerlist_head(std::list<peerlist_entry> &bs_head, uint32_t depth = P2P_DEFAULT_PEERS_IN_HANDSHAKE);
-	bool get_peerlist_full(std::list<peerlist_entry> &pl_gray, std::list<peerlist_entry> &pl_white);
-	bool get_white_peer_by_index(peerlist_entry &p, size_t i);
-	bool get_gray_peer_by_index(peerlist_entry &p, size_t i);
-	bool append_with_peer_white(const peerlist_entry &pr);
-	bool append_with_peer_gray(const peerlist_entry &pr);
-	bool append_with_peer_anchor(const anchor_peerlist_entry &ple);
-	bool set_peer_just_seen(peerid_type peer, const epee::net_utils::network_address &addr);
-	bool set_peer_unreachable(const peerlist_entry &pr);
-	bool is_host_allowed(const epee::net_utils::network_address &address);
-	bool get_random_gray_peer(peerlist_entry &pe);
-	bool remove_from_peer_gray(const peerlist_entry &pe);
-	bool get_and_empty_anchor_peerlist(std::vector<anchor_peerlist_entry> &apl);
-	bool remove_from_peer_anchor(const epee::net_utils::network_address &addr);
+	bool merge_peerlist(const std::list<peerlist_entry>& outer_bs);
+	bool get_peerlist_head(std::list<peerlist_entry>& bs_head, uint32_t depth = P2P_DEFAULT_PEERS_IN_HANDSHAKE);
+	bool get_peerlist_full(std::list<peerlist_entry>& pl_gray, std::list<peerlist_entry>& pl_white);
+	bool get_white_peer_by_index(peerlist_entry& p, size_t i);
+	bool get_gray_peer_by_index(peerlist_entry& p, size_t i);
+	bool append_with_peer_white(const peerlist_entry& pr);
+	bool append_with_peer_gray(const peerlist_entry& pr);
+	bool append_with_peer_anchor(const anchor_peerlist_entry& ple);
+	bool set_peer_just_seen(peerid_type peer, const epee::net_utils::network_address& addr);
+	bool set_peer_unreachable(const peerlist_entry& pr);
+	bool is_host_allowed(const epee::net_utils::network_address& address);
+	bool get_random_gray_peer(peerlist_entry& pe);
+	bool remove_from_peer_gray(const peerlist_entry& pe);
+	bool get_and_empty_anchor_peerlist(std::vector<anchor_peerlist_entry>& apl);
+	bool remove_from_peer_anchor(const epee::net_utils::network_address& addr);
 
   private:
 	struct by_time
@@ -118,32 +118,35 @@ class peerlist_manager
 
 	struct modify_all_but_id
 	{
-		modify_all_but_id(const peerlist_entry &ple) : m_ple(ple) {}
-		void operator()(peerlist_entry &e)
+		modify_all_but_id(const peerlist_entry& ple) :
+			m_ple(ple) {}
+		void operator()(peerlist_entry& e)
 		{
 			e.id = m_ple.id;
 		}
 
 	  private:
-		const peerlist_entry &m_ple;
+		const peerlist_entry& m_ple;
 	};
 
 	struct modify_all
 	{
-		modify_all(const peerlist_entry &ple) : m_ple(ple) {}
-		void operator()(peerlist_entry &e)
+		modify_all(const peerlist_entry& ple) :
+			m_ple(ple) {}
+		void operator()(peerlist_entry& e)
 		{
 			e = m_ple;
 		}
 
 	  private:
-		const peerlist_entry &m_ple;
+		const peerlist_entry& m_ple;
 	};
 
 	struct modify_last_seen
 	{
-		modify_last_seen(time_t last_seen) : m_last_seen(last_seen) {}
-		void operator()(peerlist_entry &e)
+		modify_last_seen(time_t last_seen) :
+			m_last_seen(last_seen) {}
+		void operator()(peerlist_entry& e)
 		{
 			e.last_seen = m_last_seen;
 		}
@@ -183,32 +186,32 @@ class peerlist_manager
 
   public:
 	template <class Archive, class List, class Element, class t_version_type>
-	void serialize_peers(Archive &a, List &list, Element ple, const t_version_type ver)
+	void serialize_peers(Archive& a, List& list, Element ple, const t_version_type ver)
 	{
 		if(typename Archive::is_saving())
 		{
 			uint64_t size = list.size();
-			a &size;
+			a& size;
 			for(auto p : list)
 			{
-				a &p;
+				a& p;
 			}
 		}
 		else
 		{
 			uint64_t size;
-			a &size;
+			a& size;
 			list.clear();
 			while(size--)
 			{
-				a &ple;
+				a& ple;
 				list.insert(ple);
 			}
 		}
 	}
 
 	template <class Archive, class t_version_type>
-	void serialize(Archive &a, const t_version_type ver)
+	void serialize(Archive& a, const t_version_type ver)
 	{
 		// at v6, we drop existing peerlists, because annoying change
 		if(ver < 6)
@@ -229,7 +232,7 @@ class peerlist_manager
 	}
 
   private:
-	bool peers_indexed_from_old(const peers_indexed_old &pio, peers_indexed &pi);
+	bool peers_indexed_from_old(const peers_indexed_old& pio, peers_indexed& pi);
 	void trim_white_peerlist();
 	void trim_gray_peerlist();
 
@@ -254,7 +257,7 @@ inline bool peerlist_manager::deinit()
 	return true;
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::peers_indexed_from_old(const peers_indexed_old &pio, peers_indexed &pi)
+inline bool peerlist_manager::peers_indexed_from_old(const peers_indexed_old& pio, peers_indexed& pi)
 {
 	for(auto x : pio)
 	{
@@ -272,7 +275,7 @@ inline void peerlist_manager::trim_gray_peerlist()
 {
 	while(m_peers_gray.size() > P2P_LOCAL_GRAY_PEERLIST_LIMIT)
 	{
-		peers_indexed::index<by_time>::type &sorted_index = m_peers_gray.get<by_time>();
+		peers_indexed::index<by_time>::type& sorted_index = m_peers_gray.get<by_time>();
 		sorted_index.erase(sorted_index.begin());
 	}
 }
@@ -281,15 +284,15 @@ inline void peerlist_manager::trim_white_peerlist()
 {
 	while(m_peers_white.size() > P2P_LOCAL_WHITE_PEERLIST_LIMIT)
 	{
-		peers_indexed::index<by_time>::type &sorted_index = m_peers_white.get<by_time>();
+		peers_indexed::index<by_time>::type& sorted_index = m_peers_white.get<by_time>();
 		sorted_index.erase(sorted_index.begin());
 	}
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::merge_peerlist(const std::list<peerlist_entry> &outer_bs)
+inline bool peerlist_manager::merge_peerlist(const std::list<peerlist_entry>& outer_bs)
 {
 	CRITICAL_REGION_LOCAL(m_peerlist_lock);
-	for(const peerlist_entry &be : outer_bs)
+	for(const peerlist_entry& be : outer_bs)
 	{
 		append_with_peer_gray(be);
 	}
@@ -298,29 +301,29 @@ inline bool peerlist_manager::merge_peerlist(const std::list<peerlist_entry> &ou
 	return true;
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::get_white_peer_by_index(peerlist_entry &p, size_t i)
+inline bool peerlist_manager::get_white_peer_by_index(peerlist_entry& p, size_t i)
 {
 	CRITICAL_REGION_LOCAL(m_peerlist_lock);
 	if(i >= m_peers_white.size())
 		return false;
 
-	peers_indexed::index<by_time>::type &by_time_index = m_peers_white.get<by_time>();
+	peers_indexed::index<by_time>::type& by_time_index = m_peers_white.get<by_time>();
 	p = *epee::misc_utils::move_it_backward(--by_time_index.end(), i);
 	return true;
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::get_gray_peer_by_index(peerlist_entry &p, size_t i)
+inline bool peerlist_manager::get_gray_peer_by_index(peerlist_entry& p, size_t i)
 {
 	CRITICAL_REGION_LOCAL(m_peerlist_lock);
 	if(i >= m_peers_gray.size())
 		return false;
 
-	peers_indexed::index<by_time>::type &by_time_index = m_peers_gray.get<by_time>();
+	peers_indexed::index<by_time>::type& by_time_index = m_peers_gray.get<by_time>();
 	p = *epee::misc_utils::move_it_backward(--by_time_index.end(), i);
 	return true;
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::is_host_allowed(const epee::net_utils::network_address &address)
+inline bool peerlist_manager::is_host_allowed(const epee::net_utils::network_address& address)
 {
 	//never allow loopback ip
 	if(address.is_loopback())
@@ -332,13 +335,13 @@ inline bool peerlist_manager::is_host_allowed(const epee::net_utils::network_add
 	return true;
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::get_peerlist_head(std::list<peerlist_entry> &bs_head, uint32_t depth)
+inline bool peerlist_manager::get_peerlist_head(std::list<peerlist_entry>& bs_head, uint32_t depth)
 {
 
 	CRITICAL_REGION_LOCAL(m_peerlist_lock);
-	peers_indexed::index<by_time>::type &by_time_index = m_peers_white.get<by_time>();
+	peers_indexed::index<by_time>::type& by_time_index = m_peers_white.get<by_time>();
 	uint32_t cnt = 0;
-	for(const peers_indexed::value_type &vl : boost::adaptors::reverse(by_time_index))
+	for(const peers_indexed::value_type& vl : boost::adaptors::reverse(by_time_index))
 	{
 		if(!vl.last_seen)
 			continue;
@@ -351,17 +354,17 @@ inline bool peerlist_manager::get_peerlist_head(std::list<peerlist_entry> &bs_he
 	return true;
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::get_peerlist_full(std::list<peerlist_entry> &pl_gray, std::list<peerlist_entry> &pl_white)
+inline bool peerlist_manager::get_peerlist_full(std::list<peerlist_entry>& pl_gray, std::list<peerlist_entry>& pl_white)
 {
 	CRITICAL_REGION_LOCAL(m_peerlist_lock);
-	peers_indexed::index<by_time>::type &by_time_index_gr = m_peers_gray.get<by_time>();
-	for(const peers_indexed::value_type &vl : boost::adaptors::reverse(by_time_index_gr))
+	peers_indexed::index<by_time>::type& by_time_index_gr = m_peers_gray.get<by_time>();
+	for(const peers_indexed::value_type& vl : boost::adaptors::reverse(by_time_index_gr))
 	{
 		pl_gray.push_back(vl);
 	}
 
-	peers_indexed::index<by_time>::type &by_time_index_wt = m_peers_white.get<by_time>();
-	for(const peers_indexed::value_type &vl : boost::adaptors::reverse(by_time_index_wt))
+	peers_indexed::index<by_time>::type& by_time_index_wt = m_peers_white.get<by_time>();
+	for(const peers_indexed::value_type& vl : boost::adaptors::reverse(by_time_index_wt))
 	{
 		pl_white.push_back(vl);
 	}
@@ -369,7 +372,7 @@ inline bool peerlist_manager::get_peerlist_full(std::list<peerlist_entry> &pl_gr
 	return true;
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::set_peer_just_seen(peerid_type peer, const epee::net_utils::network_address &addr)
+inline bool peerlist_manager::set_peer_just_seen(peerid_type peer, const epee::net_utils::network_address& addr)
 {
 	GULPS_TRY_ENTRY();
 	CRITICAL_REGION_LOCAL(m_peerlist_lock);
@@ -382,7 +385,7 @@ inline bool peerlist_manager::set_peer_just_seen(peerid_type peer, const epee::n
 	GULPS_CATCH_ENTRY_L0("peerlist_manager::set_peer_just_seen()", false);
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::append_with_peer_white(const peerlist_entry &ple)
+inline bool peerlist_manager::append_with_peer_white(const peerlist_entry& ple)
 {
 	GULPS_TRY_ENTRY();
 	if(!is_host_allowed(ple.adr))
@@ -412,7 +415,7 @@ inline bool peerlist_manager::append_with_peer_white(const peerlist_entry &ple)
 	GULPS_CATCH_ENTRY_L0("peerlist_manager::append_with_peer_white()", false);
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::append_with_peer_gray(const peerlist_entry &ple)
+inline bool peerlist_manager::append_with_peer_gray(const peerlist_entry& ple)
 {
 	GULPS_TRY_ENTRY();
 	if(!is_host_allowed(ple.adr))
@@ -441,7 +444,7 @@ inline bool peerlist_manager::append_with_peer_gray(const peerlist_entry &ple)
 	GULPS_CATCH_ENTRY_L0("peerlist_manager::append_with_peer_gray()", false);
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::append_with_peer_anchor(const anchor_peerlist_entry &ple)
+inline bool peerlist_manager::append_with_peer_anchor(const anchor_peerlist_entry& ple)
 {
 	GULPS_TRY_ENTRY();
 
@@ -459,7 +462,7 @@ inline bool peerlist_manager::append_with_peer_anchor(const anchor_peerlist_entr
 	GULPS_CATCH_ENTRY_L0("peerlist_manager::append_with_peer_anchor()", false);
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::get_random_gray_peer(peerlist_entry &pe)
+inline bool peerlist_manager::get_random_gray_peer(peerlist_entry& pe)
 {
 	GULPS_TRY_ENTRY();
 
@@ -472,7 +475,7 @@ inline bool peerlist_manager::get_random_gray_peer(peerlist_entry &pe)
 
 	size_t random_index = crypto::rand<size_t>() % m_peers_gray.size();
 
-	peers_indexed::index<by_time>::type &by_time_index = m_peers_gray.get<by_time>();
+	peers_indexed::index<by_time>::type& by_time_index = m_peers_gray.get<by_time>();
 	pe = *epee::misc_utils::move_it_backward(--by_time_index.end(), random_index);
 
 	return true;
@@ -480,7 +483,7 @@ inline bool peerlist_manager::get_random_gray_peer(peerlist_entry &pe)
 	GULPS_CATCH_ENTRY_L0("peerlist_manager::get_random_gray_peer()", false);
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::remove_from_peer_gray(const peerlist_entry &pe)
+inline bool peerlist_manager::remove_from_peer_gray(const peerlist_entry& pe)
 {
 	GULPS_TRY_ENTRY();
 
@@ -498,7 +501,7 @@ inline bool peerlist_manager::remove_from_peer_gray(const peerlist_entry &pe)
 	GULPS_CATCH_ENTRY_L0("peerlist_manager::remove_from_peer_gray()", false);
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::get_and_empty_anchor_peerlist(std::vector<anchor_peerlist_entry> &apl)
+inline bool peerlist_manager::get_and_empty_anchor_peerlist(std::vector<anchor_peerlist_entry>& apl)
 {
 	GULPS_TRY_ENTRY();
 
@@ -507,7 +510,7 @@ inline bool peerlist_manager::get_and_empty_anchor_peerlist(std::vector<anchor_p
 	auto begin = m_peers_anchor.get<by_time>().begin();
 	auto end = m_peers_anchor.get<by_time>().end();
 
-	std::for_each(begin, end, [&apl](const anchor_peerlist_entry &a) {
+	std::for_each(begin, end, [&apl](const anchor_peerlist_entry& a) {
 		apl.push_back(a);
 	});
 
@@ -518,7 +521,7 @@ inline bool peerlist_manager::get_and_empty_anchor_peerlist(std::vector<anchor_p
 	GULPS_CATCH_ENTRY_L0("peerlist_manager::get_and_empty_anchor_peerlist()", false);
 }
 //--------------------------------------------------------------------------------------------------
-inline bool peerlist_manager::remove_from_peer_anchor(const epee::net_utils::network_address &addr)
+inline bool peerlist_manager::remove_from_peer_anchor(const epee::net_utils::network_address& addr)
 {
 	GULPS_TRY_ENTRY();
 
@@ -536,6 +539,6 @@ inline bool peerlist_manager::remove_from_peer_anchor(const epee::net_utils::net
 	GULPS_CATCH_ENTRY_L0("peerlist_manager::remove_from_peer_anchor()", false);
 }
 //--------------------------------------------------------------------------------------------------
-}
+} // namespace nodetool
 
 BOOST_CLASS_VERSION(nodetool::peerlist_manager, CURRENT_PEERLIST_STORAGE_ARCHIVE_VER)

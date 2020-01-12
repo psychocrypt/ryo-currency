@@ -47,7 +47,8 @@ struct module_env;
 /**
  * Stack of modules.
  */
-struct module_stack {
+struct module_stack
+{
 	/** the number of modules */
 	int num;
 	/** the module callbacks, array of num_modules length (ref only) */

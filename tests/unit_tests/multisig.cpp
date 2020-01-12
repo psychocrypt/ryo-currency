@@ -37,19 +37,19 @@ GULPS_CAT_MAJOR("test");
 
 static const struct
 {
-	const char *address;
-	const char *spendkey;
+	const char* address;
+	const char* spendkey;
 } test_addresses[] =
 	{
 		// working with legacy address because new ryo addresses can not be recreated out of the spendkey
 		{"RYoTr1KP7tgJFQ4bTWto4MhM3qT4YA8gV3smuJyxucJgBDdCWehV4btgcyNb11MAUC7t9yPDUCwAoREVdyVNankWERkEddsUix3",
-		 "ee0085dbecc26a02415b0b7abab1ce0ef2b18a393d35e39ef5720dd5ba058806"},
+			"ee0085dbecc26a02415b0b7abab1ce0ef2b18a393d35e39ef5720dd5ba058806"},
 		{"RYoTr2S1o1efcYh16gDXipgq2zypYd6pBJ6iofYemM9P3YUy815iS5ujDfmmNhbWGJPs17nNjxYTNh8LkJdvP7Y4QrD3xC5Xhxy",
-		 "3fadeb3d58152b98db2e2788bdb57fdc5269e1cd8feb287d915b26a3f8ce610e"},
+			"3fadeb3d58152b98db2e2788bdb57fdc5269e1cd8feb287d915b26a3f8ce610e"},
 		{"RYoTqzWU3x38P6uzJpXose4wxRx53RZXc6wipiTFqnuADaZdNYLcV8z9XSSsdcVQjKgkumTat2nJAZ1TYNL6w4bTQqm4apJepaw",
-		 "2a69fc7813c5b9af92f133d841c0859571956c2e544b5eab58d97c9df59ff000"}};
+			"2a69fc7813c5b9af92f133d841c0859571956c2e544b5eab58d97c9df59ff000"}};
 
-static void make_wallet(unsigned int idx, tools::wallet2 &wallet)
+static void make_wallet(unsigned int idx, tools::wallet2& wallet)
 {
 	ASSERT_TRUE(idx < sizeof(test_addresses) / sizeof(test_addresses[0]));
 
@@ -63,14 +63,14 @@ static void make_wallet(unsigned int idx, tools::wallet2 &wallet)
 		wallet.generate_legacy("", "", spendkey);
 		ASSERT_TRUE(test_addresses[idx].address == wallet.get_account().get_public_address_str(cryptonote::TESTNET));
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		GULPS_ERROR("Error creating test wallet: ", e.what());
 		ASSERT_TRUE(0);
 	}
 }
 
-static void make_M_2_wallet(tools::wallet2 &wallet0, tools::wallet2 &wallet1, unsigned int M)
+static void make_M_2_wallet(tools::wallet2& wallet0, tools::wallet2& wallet1, unsigned int M)
 {
 	ASSERT_TRUE(M <= 2);
 
@@ -104,7 +104,7 @@ static void make_M_2_wallet(tools::wallet2 &wallet0, tools::wallet2 &wallet1, un
 	ASSERT_TRUE(total == 2);
 }
 
-static void make_M_3_wallet(tools::wallet2 &wallet0, tools::wallet2 &wallet1, tools::wallet2 &wallet2, unsigned int M)
+static void make_M_3_wallet(tools::wallet2& wallet0, tools::wallet2& wallet1, tools::wallet2& wallet2, unsigned int M)
 {
 	ASSERT_TRUE(M <= 3);
 

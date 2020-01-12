@@ -62,26 +62,30 @@ class span
 	using value_type = T;
 	using size_type = std::size_t;
 	using difference_type = std::ptrdiff_t;
-	using pointer = T *;
-	using const_pointer = const T *;
-	using reference = T &;
-	using const_reference = const T &;
+	using pointer = T*;
+	using const_pointer = const T*;
+	using reference = T&;
+	using const_reference = const T&;
 	using iterator = pointer;
 	using const_iterator = const_pointer;
 
-	constexpr span() noexcept : ptr(nullptr), len(0) {}
-	constexpr span(std::nullptr_t) noexcept : span() {}
+	constexpr span() noexcept :
+		ptr(nullptr),
+		len(0) {}
+	constexpr span(std::nullptr_t) noexcept :
+		span() {}
 
-	constexpr span(T *const src_ptr, const std::size_t count) noexcept
-		: ptr(src_ptr),
-		  len(count) {}
+	constexpr span(T* const src_ptr, const std::size_t count) noexcept :
+		ptr(src_ptr),
+		len(count) {}
 
 	//! Conversion from C-array. Prevents common bugs with sizeof + arrays.
 	template <std::size_t N>
-	constexpr span(T (&src)[N]) noexcept : span(src, N) {}
+	constexpr span(T (&src)[N]) noexcept :
+		span(src, N) {}
 
-	constexpr span(const span &) noexcept = default;
-	span &operator=(const span &) noexcept = default;
+	constexpr span(const span&) noexcept = default;
+	span& operator=(const span&) noexcept = default;
 
 	constexpr iterator begin() const noexcept { return ptr; }
 	constexpr const_iterator cbegin() const noexcept { return ptr; }
@@ -95,13 +99,13 @@ class span
 	constexpr std::size_t size_bytes() const noexcept { return size() * sizeof(value_type); }
 
   private:
-	T *ptr;
+	T* ptr;
 	std::size_t len;
 };
 
 //! \return `span<const T::value_type>` from a STL compatible `src`.
 template <typename T>
-constexpr span<const typename T::value_type> to_span(const T &src)
+constexpr span<const typename T::value_type> to_span(const T& src)
 {
 	// compiler provides diagnostic if size() is not size_t.
 	return {src.data(), src.size()};
@@ -118,15 +122,15 @@ template <typename T>
 span<const std::uint8_t> to_byte_span(const span<const T> src) noexcept
 {
 	static_assert(!has_padding<T>(), "source type may have padding");
-	return {reinterpret_cast<const std::uint8_t *>(src.data()), src.size_bytes()};
+	return {reinterpret_cast<const std::uint8_t*>(src.data()), src.size_bytes()};
 }
 
 //! \return `span<const std::uint8_t>` which represents the bytes at `&src`.
 template <typename T>
-span<const std::uint8_t> as_byte_span(const T &src) noexcept
+span<const std::uint8_t> as_byte_span(const T& src) noexcept
 {
 	static_assert(!std::is_empty<T>(), "empty types will not work -> sizeof == 1");
 	static_assert(!has_padding<T>(), "source type may have padding");
-	return {reinterpret_cast<const std::uint8_t *>(std::addressof(src)), sizeof(T)};
+	return {reinterpret_cast<const std::uint8_t*>(std::addressof(src)), sizeof(T)};
 }
-}
+} // namespace epee

@@ -51,9 +51,9 @@ namespace
 const uint64_t rnd_11 = 475921;
 const uint64_t rnd_20 = 360934;
 const uint64_t rnd_29 = 799665;
-}
+} // namespace
 
-bool gen_ring_signature_1::generate(std::vector<test_event_entry> &events) const
+bool gen_ring_signature_1::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -95,7 +95,7 @@ bool gen_ring_signature_1::generate(std::vector<test_event_entry> &events) const
 	return true;
 }
 
-bool gen_ring_signature_1::check_balances_1(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events)
+bool gen_ring_signature_1::check_balances_1(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events)
 {
 	DEFINE_TESTS_ERROR_CONTEXT("gen_ring_signature_1::check_balances_1");
 
@@ -116,7 +116,7 @@ bool gen_ring_signature_1::check_balances_1(cryptonote::core &c, size_t ev_index
 	return true;
 }
 
-bool gen_ring_signature_1::check_balances_2(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events)
+bool gen_ring_signature_1::check_balances_2(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events)
 {
 	DEFINE_TESTS_ERROR_CONTEXT("gen_ring_signature_1::check_balances_2");
 
@@ -147,7 +147,7 @@ gen_ring_signature_2::gen_ring_signature_2()
  * Bob has 4 inputs by 13 coins. He sends 4 * 13 coins to Alice, using ring signature with nmix = 3. Each Bob's input
  * is used as mix for 3 others.
  */
-bool gen_ring_signature_2::generate(std::vector<test_event_entry> &events) const
+bool gen_ring_signature_2::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 
@@ -175,7 +175,7 @@ bool gen_ring_signature_2::generate(std::vector<test_event_entry> &events) const
 	return true;
 }
 
-bool gen_ring_signature_2::check_balances_1(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events)
+bool gen_ring_signature_2::check_balances_1(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events)
 {
 	DEFINE_TESTS_ERROR_CONTEXT("gen_ring_signature_2::check_balances_1");
 
@@ -196,7 +196,7 @@ bool gen_ring_signature_2::check_balances_1(cryptonote::core &c, size_t ev_index
 	return true;
 }
 
-bool gen_ring_signature_2::check_balances_2(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events)
+bool gen_ring_signature_2::check_balances_2(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events)
 {
 	DEFINE_TESTS_ERROR_CONTEXT("gen_ring_signature_2::check_balances_2");
 
@@ -217,8 +217,9 @@ bool gen_ring_signature_2::check_balances_2(cryptonote::core &c, size_t ev_index
 ////////
 // class gen_ring_signature_big;
 
-gen_ring_signature_big::gen_ring_signature_big()
-	: m_test_size(100), m_tx_amount(MK_COINS(29))
+gen_ring_signature_big::gen_ring_signature_big() :
+	m_test_size(100),
+	m_tx_amount(MK_COINS(29))
 {
 	REGISTER_CALLBACK("check_balances_1", gen_ring_signature_big::check_balances_1);
 	REGISTER_CALLBACK("check_balances_2", gen_ring_signature_big::check_balances_2);
@@ -231,7 +232,7 @@ gen_ring_signature_big::gen_ring_signature_big()
  * - Create transaction with ring signature from account[99] to Alice with nmix = 99.
  * - Check balances.
  */
-bool gen_ring_signature_big::generate(std::vector<test_event_entry> &events) const
+bool gen_ring_signature_big::generate(std::vector<test_event_entry>& events) const
 {
 	std::vector<account_base> accounts(m_test_size);
 	std::vector<block> blocks;
@@ -283,7 +284,7 @@ bool gen_ring_signature_big::generate(std::vector<test_event_entry> &events) con
 	return true;
 }
 
-bool gen_ring_signature_big::check_balances_1(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events)
+bool gen_ring_signature_big::check_balances_1(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events)
 {
 	DEFINE_TESTS_ERROR_CONTEXT("gen_ring_signature_big::check_balances_1");
 
@@ -303,7 +304,7 @@ bool gen_ring_signature_big::check_balances_1(cryptonote::core &c, size_t ev_ind
 
 	for(size_t i = 2; i < 1 + m_test_size; ++i)
 	{
-		const account_base &an_account = boost::get<account_base>(events[i]);
+		const account_base& an_account = boost::get<account_base>(events[i]);
 		uint64_t balance = m_tx_amount + TESTS_DEFAULT_FEE * i;
 		CHECK_EQ(balance, get_balance(an_account, chain, mtx));
 	}
@@ -311,7 +312,7 @@ bool gen_ring_signature_big::check_balances_1(cryptonote::core &c, size_t ev_ind
 	return true;
 }
 
-bool gen_ring_signature_big::check_balances_2(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events)
+bool gen_ring_signature_big::check_balances_2(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events)
 {
 	DEFINE_TESTS_ERROR_CONTEXT("gen_ring_signature_big::check_balances_2");
 
@@ -328,14 +329,14 @@ bool gen_ring_signature_big::check_balances_2(cryptonote::core &c, size_t ev_ind
 
 	for(size_t i = 2; i < 1 + m_test_size; ++i)
 	{
-		const account_base &an_account = boost::get<account_base>(events[i]);
+		const account_base& an_account = boost::get<account_base>(events[i]);
 		uint64_t balance = m_tx_amount + TESTS_DEFAULT_FEE * i;
 		CHECK_EQ(balance, get_balance(an_account, chain, mtx));
 	}
 
 	std::vector<size_t> tx_outs;
 	uint64_t transfered;
-	const transaction &tx = boost::get<transaction>(events[events.size() - 3]);
+	const transaction& tx = boost::get<transaction>(events[events.size() - 3]);
 	lookup_acc_outs(m_alice_account.get_keys(), boost::get<transaction>(events[events.size() - 3]), get_tx_pub_key_from_extra(tx), get_additional_tx_pub_keys_from_extra(tx), tx_outs, transfered);
 	CHECK_EQ(m_tx_amount, transfered);
 

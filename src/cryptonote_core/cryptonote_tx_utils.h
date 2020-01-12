@@ -54,7 +54,7 @@
 namespace cryptonote
 {
 //---------------------------------------------------------------
-bool construct_miner_tx(network_type nettype, size_t height, size_t median_size, uint64_t already_generated_coins, size_t current_block_size, uint64_t fee, const account_public_address &miner_address, transaction &tx, const blobdata &extra_nonce = blobdata());
+bool construct_miner_tx(network_type nettype, size_t height, size_t median_size, uint64_t already_generated_coins, size_t current_block_size, uint64_t fee, const account_public_address& miner_address, transaction& tx, const blobdata& extra_nonce = blobdata());
 
 struct tx_source_entry
 {
@@ -70,7 +70,7 @@ struct tx_source_entry
 	rct::key mask;												 //ringct amount mask
 	rct::multisig_kLRki multisig_kLRki;							 //multisig info
 
-	void push_output(uint64_t idx, const crypto::public_key &k, uint64_t amount) { outputs.push_back(std::make_pair(idx, rct::ctkey({rct::pk2rct(k), rct::zeroCommit(amount)}))); }
+	void push_output(uint64_t idx, const crypto::public_key& k, uint64_t amount) { outputs.push_back(std::make_pair(idx, rct::ctkey({rct::pk2rct(k), rct::zeroCommit(amount)}))); }
 
 	BEGIN_SERIALIZE_OBJECT()
 	FIELD(outputs)
@@ -94,8 +94,14 @@ struct tx_destination_entry
 	account_public_address addr; //destination address
 	bool is_subaddress;
 
-	tx_destination_entry() : amount(0), addr(AUTO_VAL_INIT(addr)), is_subaddress(false) {}
-	tx_destination_entry(uint64_t a, const account_public_address &ad, bool is_subaddress) : amount(a), addr(ad), is_subaddress(is_subaddress) {}
+	tx_destination_entry() :
+		amount(0),
+		addr(AUTO_VAL_INIT(addr)),
+		is_subaddress(false) {}
+	tx_destination_entry(uint64_t a, const account_public_address& ad, bool is_subaddress) :
+		amount(a),
+		addr(ad),
+		is_subaddress(is_subaddress) {}
 
 	BEGIN_SERIALIZE_OBJECT()
 	VARINT_FIELD(amount)
@@ -105,13 +111,13 @@ struct tx_destination_entry
 };
 
 //---------------------------------------------------------------
-crypto::public_key get_destination_view_key_pub(const std::vector<tx_destination_entry> &destinations, const boost::optional<cryptonote::account_public_address> &change_addr, bool allow_any_key = false);
-bool construct_tx(const account_keys &sender_account_keys, std::vector<tx_source_entry> &sources, const std::vector<tx_destination_entry> &destinations, const boost::optional<cryptonote::account_public_address> &change_addr, const crypto::uniform_payment_id* payment_id, transaction &tx, uint64_t unlock_time);
-bool construct_tx_with_tx_key(const account_keys &sender_account_keys, const std::unordered_map<crypto::public_key, subaddress_index> &subaddresses, std::vector<tx_source_entry> &sources, std::vector<tx_destination_entry> &destinations, const boost::optional<cryptonote::account_public_address> &change_addr, const crypto::uniform_payment_id* payment_id, transaction &tx, uint64_t unlock_time, const crypto::secret_key &tx_key, const std::vector<crypto::secret_key> &additional_tx_keys, bool bulletproof = false, rct::multisig_out *msout = NULL);
-bool construct_tx_and_get_tx_key(const account_keys &sender_account_keys, const std::unordered_map<crypto::public_key, subaddress_index> &subaddresses, std::vector<tx_source_entry> &sources, std::vector<tx_destination_entry> &destinations, const boost::optional<cryptonote::account_public_address> &change_addr, const crypto::uniform_payment_id* payment_id, transaction &tx, uint64_t unlock_time, crypto::secret_key &tx_key, std::vector<crypto::secret_key> &additional_tx_keys, bool bulletproof = false, rct::multisig_out *msout = NULL);
+crypto::public_key get_destination_view_key_pub(const std::vector<tx_destination_entry>& destinations, const boost::optional<cryptonote::account_public_address>& change_addr, bool allow_any_key = false);
+bool construct_tx(const account_keys& sender_account_keys, std::vector<tx_source_entry>& sources, const std::vector<tx_destination_entry>& destinations, const boost::optional<cryptonote::account_public_address>& change_addr, const crypto::uniform_payment_id* payment_id, transaction& tx, uint64_t unlock_time);
+bool construct_tx_with_tx_key(const account_keys& sender_account_keys, const std::unordered_map<crypto::public_key, subaddress_index>& subaddresses, std::vector<tx_source_entry>& sources, std::vector<tx_destination_entry>& destinations, const boost::optional<cryptonote::account_public_address>& change_addr, const crypto::uniform_payment_id* payment_id, transaction& tx, uint64_t unlock_time, const crypto::secret_key& tx_key, const std::vector<crypto::secret_key>& additional_tx_keys, bool bulletproof = false, rct::multisig_out* msout = NULL);
+bool construct_tx_and_get_tx_key(const account_keys& sender_account_keys, const std::unordered_map<crypto::public_key, subaddress_index>& subaddresses, std::vector<tx_source_entry>& sources, std::vector<tx_destination_entry>& destinations, const boost::optional<cryptonote::account_public_address>& change_addr, const crypto::uniform_payment_id* payment_id, transaction& tx, uint64_t unlock_time, crypto::secret_key& tx_key, std::vector<crypto::secret_key>& additional_tx_keys, bool bulletproof = false, rct::multisig_out* msout = NULL);
 
-bool generate_genesis_block(network_type nettype, block &bl, std::string const &genesis_tx, uint32_t nonce);
-}
+bool generate_genesis_block(network_type nettype, block& bl, std::string const& genesis_tx, uint32_t nonce);
+} // namespace cryptonote
 
 BOOST_CLASS_VERSION(cryptonote::tx_source_entry, 1)
 BOOST_CLASS_VERSION(cryptonote::tx_destination_entry, 1)
@@ -121,29 +127,29 @@ namespace boost
 namespace serialization
 {
 template <class Archive>
-inline void serialize(Archive &a, cryptonote::tx_source_entry &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, cryptonote::tx_source_entry& x, const boost::serialization::version_type ver)
 {
-	a &x.outputs;
-	a &x.real_output;
-	a &x.real_out_tx_key;
-	a &x.real_output_in_tx_index;
-	a &x.amount;
-	a &x.rct;
-	a &x.mask;
+	a& x.outputs;
+	a& x.real_output;
+	a& x.real_out_tx_key;
+	a& x.real_output_in_tx_index;
+	a& x.amount;
+	a& x.rct;
+	a& x.mask;
 	if(ver < 1)
 		return;
-	a &x.multisig_kLRki;
-	a &x.real_out_additional_tx_keys;
+	a& x.multisig_kLRki;
+	a& x.real_out_additional_tx_keys;
 }
 
 template <class Archive>
-inline void serialize(Archive &a, cryptonote::tx_destination_entry &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, cryptonote::tx_destination_entry& x, const boost::serialization::version_type ver)
 {
-	a &x.amount;
-	a &x.addr;
+	a& x.amount;
+	a& x.addr;
 	if(ver < 1)
 		return;
-	a &x.is_subaddress;
+	a& x.is_subaddress;
 }
-}
-}
+} // namespace serialization
+} // namespace boost

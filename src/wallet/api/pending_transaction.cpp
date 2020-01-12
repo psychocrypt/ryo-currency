@@ -63,8 +63,8 @@ namespace Ryo
 
 PendingTransaction::~PendingTransaction() {}
 
-PendingTransactionImpl::PendingTransactionImpl(WalletImpl &wallet)
-	: m_wallet(wallet)
+PendingTransactionImpl::PendingTransactionImpl(WalletImpl& wallet) :
+	m_wallet(wallet)
 {
 	m_status = Status_Ok;
 }
@@ -86,12 +86,12 @@ string PendingTransactionImpl::errorString() const
 std::vector<std::string> PendingTransactionImpl::txid() const
 {
 	std::vector<std::string> txid;
-	for(const auto &pt : m_pending_tx)
+	for(const auto& pt : m_pending_tx)
 		txid.push_back(epee::string_tools::pod_to_hex(cryptonote::get_transaction_hash(pt.tx)));
 	return txid;
 }
 
-bool PendingTransactionImpl::commit(const std::string &filename, bool overwrite)
+bool PendingTransactionImpl::commit(const std::string& filename, bool overwrite)
 {
 
 	LOG_PRINT_L3("m_pending_tx size: " << m_pending_tx.size());
@@ -127,25 +127,25 @@ bool PendingTransactionImpl::commit(const std::string &filename, bool overwrite)
 			m_wallet.pauseRefresh();
 			while(!m_pending_tx.empty())
 			{
-				auto &ptx = m_pending_tx.back();
+				auto& ptx = m_pending_tx.back();
 				m_wallet.m_wallet->commit_tx(ptx);
 				// if no exception, remove element from vector
 				m_pending_tx.pop_back();
 			} // TODO: extract method;
 		}
 	}
-	catch(const tools::error::daemon_busy &)
+	catch(const tools::error::daemon_busy&)
 	{
 		// TODO: make it translatable with "tr"?
 		m_errorString = tr("daemon is busy. Please try again later.");
 		m_status = Status_Error;
 	}
-	catch(const tools::error::no_connection_to_daemon &)
+	catch(const tools::error::no_connection_to_daemon&)
 	{
 		m_errorString = tr("no connection to daemon. Please make sure daemon is running.");
 		m_status = Status_Error;
 	}
-	catch(const tools::error::tx_rejected &e)
+	catch(const tools::error::tx_rejected& e)
 	{
 		std::ostringstream writer(m_errorString);
 		writer << (boost::format(tr("transaction %s was rejected by daemon with status: ")) % get_transaction_hash(e.tx())) << e.status();
@@ -155,7 +155,7 @@ bool PendingTransactionImpl::commit(const std::string &filename, bool overwrite)
 		if(!reason.empty())
 			m_errorString += string(tr(". Reason: ")) + reason;
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		m_errorString = string(tr("Unknown exception: ")) + e.what();
 		m_status = Status_Error;
@@ -174,9 +174,9 @@ bool PendingTransactionImpl::commit(const std::string &filename, bool overwrite)
 uint64_t PendingTransactionImpl::amount() const
 {
 	uint64_t result = 0;
-	for(const auto &ptx : m_pending_tx)
+	for(const auto& ptx : m_pending_tx)
 	{
-		for(const auto &dest : ptx.dests)
+		for(const auto& dest : ptx.dests)
 		{
 			result += dest.amount;
 		}
@@ -187,7 +187,7 @@ uint64_t PendingTransactionImpl::amount() const
 uint64_t PendingTransactionImpl::dust() const
 {
 	uint64_t result = 0;
-	for(const auto &ptx : m_pending_tx)
+	for(const auto& ptx : m_pending_tx)
 	{
 		result += ptx.dust;
 	}
@@ -197,7 +197,7 @@ uint64_t PendingTransactionImpl::dust() const
 uint64_t PendingTransactionImpl::fee() const
 {
 	uint64_t result = 0;
-	for(const auto &ptx : m_pending_tx)
+	for(const auto& ptx : m_pending_tx)
 	{
 		result += ptx.fee;
 	}
@@ -212,7 +212,7 @@ uint64_t PendingTransactionImpl::txCount() const
 std::vector<uint32_t> PendingTransactionImpl::subaddrAccount() const
 {
 	std::vector<uint32_t> result;
-	for(const auto &ptx : m_pending_tx)
+	for(const auto& ptx : m_pending_tx)
 		result.push_back(ptx.construction_data.subaddr_account);
 	return result;
 }
@@ -220,8 +220,8 @@ std::vector<uint32_t> PendingTransactionImpl::subaddrAccount() const
 std::vector<std::set<uint32_t>> PendingTransactionImpl::subaddrIndices() const
 {
 	std::vector<std::set<uint32_t>> result;
-	for(const auto &ptx : m_pending_tx)
+	for(const auto& ptx : m_pending_tx)
 		result.push_back(ptx.construction_data.subaddr_indices);
 	return result;
 }
-}
+} // namespace Ryo

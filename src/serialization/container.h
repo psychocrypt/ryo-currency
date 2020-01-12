@@ -53,32 +53,32 @@ namespace serialization
 namespace detail
 {
 template <typename Archive, class T>
-bool serialize_container_element(Archive &ar, T &e)
+bool serialize_container_element(Archive& ar, T& e)
 {
 	return ::do_serialize(ar, e);
 }
 
 template <typename Archive>
-bool serialize_container_element(Archive &ar, uint32_t &e)
+bool serialize_container_element(Archive& ar, uint32_t& e)
 {
 	ar.serialize_varint(e);
 	return true;
 }
 
 template <typename Archive>
-bool serialize_container_element(Archive &ar, uint64_t &e)
+bool serialize_container_element(Archive& ar, uint64_t& e)
 {
 	ar.serialize_varint(e);
 	return true;
 }
 
 template <typename C>
-void do_reserve(C &c, size_t N) {}
-}
-}
+void do_reserve(C& c, size_t N) {}
+} // namespace detail
+} // namespace serialization
 
 template <template <bool> class Archive, typename C>
-bool do_serialize_container(Archive<false> &ar, C &v)
+bool do_serialize_container(Archive<false>& ar, C& v)
 {
 	size_t cnt;
 	ar.begin_array(cnt);
@@ -111,7 +111,7 @@ bool do_serialize_container(Archive<false> &ar, C &v)
 }
 
 template <template <bool> class Archive, typename C>
-bool do_serialize_container(Archive<true> &ar, C &v)
+bool do_serialize_container(Archive<true>& ar, C& v)
 {
 	size_t cnt = v.size();
 	ar.begin_array(cnt);
@@ -121,7 +121,7 @@ bool do_serialize_container(Archive<true> &ar, C &v)
 			return false;
 		if(i != v.begin())
 			ar.delimit_array();
-		if(!::serialization::detail::serialize_container_element(ar, const_cast<typename C::value_type &>(*i)))
+		if(!::serialization::detail::serialize_container_element(ar, const_cast<typename C::value_type&>(*i)))
 			return false;
 		if(!ar.stream().good())
 			return false;

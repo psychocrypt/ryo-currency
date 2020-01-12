@@ -68,7 +68,8 @@ struct auth_chunk;
 /**
  * Authoritative zones, shared.
  */
-struct auth_zones {
+struct auth_zones
+{
 	/** lock on the authzone trees */
 	lock_rw_type lock;
 	/** rbtree of struct auth_zone */
@@ -83,7 +84,8 @@ struct auth_zones {
  * Auth zone.  Authoritative data, that is fetched from instead of sending
  * packets to the internet.
  */
-struct auth_zone {
+struct auth_zone
+{
 	/** rbtree node, key is name and class */
 	rbnode_type node;
 
@@ -127,7 +129,8 @@ struct auth_zone {
 /**
  * Auth data. One domain name, and the RRs to go with it.
  */
-struct auth_data {
+struct auth_data
+{
 	/** rbtree node, key is name only */
 	rbnode_type node;
 	/** domain name */
@@ -147,7 +150,8 @@ struct auth_data {
 /**
  * A auth data RRset
  */
-struct auth_rrset {
+struct auth_rrset
+{
 	/** next in list */
 	struct auth_rrset* next;
 	/** RR type in host byteorder */
@@ -169,7 +173,8 @@ struct auth_rrset {
  * lookup in the main zonetree.  If the zone has no transfers, this
  * structure is not created.
  */
-struct auth_xfer {
+struct auth_xfer
+{
 	/** rbtree node, key is name and class */
 	rbnode_type node;
 
@@ -253,7 +258,8 @@ struct auth_xfer {
  * The probe worker, if it detects nothing has to be done picks up this task,
  * if unowned.
  */
-struct auth_nextprobe {
+struct auth_nextprobe
+{
 	/* Worker pointer. NULL means unowned. */
 	struct worker* worker;
 	/* module env for this task */
@@ -279,7 +285,8 @@ struct auth_nextprobe {
  * another worker is performing the nextprobe task (and that worker keeps
  * waiting uninterrupted).
  */
-struct auth_probe {
+struct auth_probe
+{
 	/* Worker pointer. NULL means unowned. */
 	struct worker* worker;
 	/* module env for this task */
@@ -319,7 +326,8 @@ struct auth_probe {
  * Once done, make sure the nextprobe waiting task is running, whether done
  * with failure or success.  If failure, use shorter timeout for wait time.
  */
-struct auth_transfer {
+struct auth_transfer
+{
 	/* Worker pointer. NULL means unowned. */
 	struct worker* worker;
 	/* module env for this task */
@@ -379,7 +387,8 @@ struct auth_transfer {
 };
 
 /** list of addresses */
-struct auth_addr {
+struct auth_addr
+{
 	/** next in list */
 	struct auth_addr* next;
 	/** IP address */
@@ -389,7 +398,8 @@ struct auth_addr {
 };
 
 /** auth zone master upstream, and the config settings for it */
-struct auth_master {
+struct auth_master
+{
 	/** next master in list */
 	struct auth_master* next;
 	/** master IP address (and port), or hostname, string */
@@ -409,7 +419,8 @@ struct auth_master {
 };
 
 /** auth zone master zone transfer data chunk */
-struct auth_chunk {
+struct auth_chunk
+{
 	/** next chunk in list */
 	struct auth_chunk* next;
 	/** the data from this chunk, this is what was received.
@@ -576,13 +587,13 @@ void auth_xfer_timer(void* arg);
 
 /** callback for commpoint udp replies to task_probe */
 int auth_xfer_probe_udp_callback(struct comm_point* c, void* arg, int err,
-        struct comm_reply* repinfo);
+	struct comm_reply* repinfo);
 /** callback for task_transfer tcp connections */
 int auth_xfer_transfer_tcp_callback(struct comm_point* c, void* arg, int err,
-        struct comm_reply* repinfo);
+	struct comm_reply* repinfo);
 /** callback for task_transfer http connections */
 int auth_xfer_transfer_http_callback(struct comm_point* c, void* arg, int err,
-        struct comm_reply* repinfo);
+	struct comm_reply* repinfo);
 /** xfer probe timeout callback, part of task_probe */
 void auth_xfer_probe_timer_callback(void* arg);
 /** mesh callback for task_probe on lookup of host names */

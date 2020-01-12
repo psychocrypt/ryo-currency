@@ -11,9 +11,9 @@
 #include "common/gulps.hpp"
 
 #define BEGIN_JSONRPC2_MAP(t_connection_context)                                                        \
-	bool handle_rpc_request(const std::string &req_data,                                                \
-							std::string &resp_data,                                                     \
-							t_connection_context &m_conn_context)                                       \
+	bool handle_rpc_request(const std::string& req_data,                                                \
+		std::string& resp_data,                                                                         \
+		t_connection_context& m_conn_context)                                                           \
 	{                                                                                                   \
 		bool handled = false;                                                                           \
 		uint64_t ticks = epee::misc_utils::get_tick_count();                                            \
@@ -39,43 +39,46 @@
 		if(false)                                                                                       \
 			return true; //just a stub to have "else if"
 
-#define PREPARE_JSONRPC2_OBJECTS_FROM_JSON(command_type)                                                                                                                                       \
-	handled = true;                                                                                                                                                                            \
-	boost::value_initialized<epee::json_rpc::request<command_type::request>> req_;                                                                                                             \
-	epee::json_rpc::request<command_type::request> &req = static_cast<epee::json_rpc::request<command_type::request> &>(req_);                                                                 \
-	if(!req.load(ps))                                                                                                                                                                          \
-	{                                                                                                                                                                                          \
-		epee::net_utils::jsonrpc2::make_error_resp_json(-32602, "Invalid params", resp_data, req.id);                                                                                          \
-		return true;                                                                                                                                                                           \
-	}                                                                                                                                                                                          \
-	uint64_t ticks1 = epee::misc_utils::get_tick_count();                                                                                                                                      \
-	boost::value_initialized<epee::json_rpc::response<command_type::response, epee::json_rpc::dummy_error>> resp_;                                                                             \
-	epee::json_rpc::response<command_type::response, epee::json_rpc::dummy_error> &resp = static_cast<epee::json_rpc::response<command_type::response, epee::json_rpc::dummy_error> &>(resp_); \
-	resp.jsonrpc = "2.0";                                                                                                                                                                      \
+#define PREPARE_JSONRPC2_OBJECTS_FROM_JSON(command_type)                                                                                                                                      \
+	handled = true;                                                                                                                                                                           \
+	boost::value_initialized<epee::json_rpc::request<command_type::request>> req_;                                                                                                            \
+	epee::json_rpc::request<command_type::request>& req = static_cast<epee::json_rpc::request<command_type::request>&>(req_);                                                                 \
+	if(!req.load(ps))                                                                                                                                                                         \
+	{                                                                                                                                                                                         \
+		epee::net_utils::jsonrpc2::make_error_resp_json(-32602, "Invalid params", resp_data, req.id);                                                                                         \
+		return true;                                                                                                                                                                          \
+	}                                                                                                                                                                                         \
+	uint64_t ticks1 = epee::misc_utils::get_tick_count();                                                                                                                                     \
+	boost::value_initialized<epee::json_rpc::response<command_type::response, epee::json_rpc::dummy_error>> resp_;                                                                            \
+	epee::json_rpc::response<command_type::response, epee::json_rpc::dummy_error>& resp = static_cast<epee::json_rpc::response<command_type::response, epee::json_rpc::dummy_error>&>(resp_); \
+	resp.jsonrpc = "2.0";                                                                                                                                                                     \
 	resp.id = req.id;
 
-#define FINALIZE_JSONRPC2_OBJECTS_TO_JSON(method_name)               \
-	uint64_t ticks2 = epee::misc_utils::get_tick_count();            \
-	epee::serialization::store_t_to_json(resp, resp_data, 0, false); \
-	resp_data += "\n";                                               \
-	uint64_t ticks3 = epee::misc_utils::get_tick_count();            \
-	{GULPS_CAT_MAJOR("epee_jsrpc_serv"); GULPS_LOG_L2("[{}] processed with {}/{}/{}ms", method_name, ticks1 - ticks, ticks2 - ticks1, ticks3 - ticks2);}
+#define FINALIZE_JSONRPC2_OBJECTS_TO_JSON(method_name)                                                                 \
+	uint64_t ticks2 = epee::misc_utils::get_tick_count();                                                              \
+	epee::serialization::store_t_to_json(resp, resp_data, 0, false);                                                   \
+	resp_data += "\n";                                                                                                 \
+	uint64_t ticks3 = epee::misc_utils::get_tick_count();                                                              \
+	{                                                                                                                  \
+		GULPS_CAT_MAJOR("epee_jsrpc_serv");                                                                            \
+		GULPS_LOG_L2("[{}] processed with {}/{}/{}ms", method_name, ticks1 - ticks, ticks2 - ticks1, ticks3 - ticks2); \
+	}
 
-#define MAP_JSONRPC2_WE(method_name, callback_f, command_type)                                                                   \
-	else if(callback_name == method_name)                                                                                        \
-	{                                                                                                                            \
-		PREPARE_JSONRPC2_OBJECTS_FROM_JSON(command_type)                                                                         \
-		epee::json_rpc::error_response fail_resp = AUTO_VAL_INIT(fail_resp);                                                     \
-		fail_resp.jsonrpc = "2.0";                                                                                               \
-		fail_resp.id = req.id;                                                                                                   \
-		if(!callback_f(req.params, resp.result, fail_resp.error, m_conn_context))                                                \
-		{                                                                                                                        \
-			epee::serialization::store_t_to_json(static_cast<epee::json_rpc::error_response &>(fail_resp), resp_data, 0, false); \
-			resp_data += "\n";                                                                                                   \
-			return true;                                                                                                         \
-		}                                                                                                                        \
-		FINALIZE_JSONRPC2_OBJECTS_TO_JSON(method_name)                                                                           \
-		return true;                                                                                                             \
+#define MAP_JSONRPC2_WE(method_name, callback_f, command_type)                                                                  \
+	else if(callback_name == method_name)                                                                                       \
+	{                                                                                                                           \
+		PREPARE_JSONRPC2_OBJECTS_FROM_JSON(command_type)                                                                        \
+		epee::json_rpc::error_response fail_resp = AUTO_VAL_INIT(fail_resp);                                                    \
+		fail_resp.jsonrpc = "2.0";                                                                                              \
+		fail_resp.id = req.id;                                                                                                  \
+		if(!callback_f(req.params, resp.result, fail_resp.error, m_conn_context))                                               \
+		{                                                                                                                       \
+			epee::serialization::store_t_to_json(static_cast<epee::json_rpc::error_response&>(fail_resp), resp_data, 0, false); \
+			resp_data += "\n";                                                                                                  \
+			return true;                                                                                                        \
+		}                                                                                                                       \
+		FINALIZE_JSONRPC2_OBJECTS_TO_JSON(method_name)                                                                          \
+		return true;                                                                                                            \
 	}
 
 #define END_JSONRPC2_MAP()                                                                       \

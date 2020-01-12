@@ -90,8 +90,8 @@ int iter_apply_cfg(struct iter_env* iter_env, struct config_file* cfg);
  * @return best target or NULL if no target.
  *	if not null, that target is removed from the result list in the dp.
  */
-struct delegpt_addr* iter_server_selection(struct iter_env* iter_env, 
-	struct module_env* env, struct delegpt* dp, uint8_t* name, 
+struct delegpt_addr* iter_server_selection(struct iter_env* iter_env,
+	struct module_env* env, struct delegpt* dp, uint8_t* name,
 	size_t namelen, uint16_t qtype, int* dnssec_lame,
 	int* chase_to_rd, int open_target, struct sock_list* blacklist);
 
@@ -102,7 +102,7 @@ struct delegpt_addr* iter_server_selection(struct iter_env* iter_env,
  * @param regional: regional to use for allocation.
  * @return newly allocated dns_msg, or NULL on memory error.
  */
-struct dns_msg* dns_alloc_msg(struct sldns_buffer* pkt, struct msg_parse* msg, 
+struct dns_msg* dns_alloc_msg(struct sldns_buffer* pkt, struct msg_parse* msg,
 	struct regional* regional);
 
 /**
@@ -170,7 +170,7 @@ void iter_mark_pside_cycle_targets(struct module_qstate* qstate,
  * @param dp: delegpt to check.
  * @return true if dp is useless.
  */
-int iter_dp_is_useless(struct query_info* qinfo, uint16_t qflags, 
+int iter_dp_is_useless(struct query_info* qinfo, uint16_t qflags,
 	struct delegpt* dp);
 
 /**
@@ -183,7 +183,7 @@ int iter_dp_is_useless(struct query_info* qinfo, uint16_t qflags,
  * point above qname.
  */
 int iter_indicates_dnssec_fwd(struct module_env* env,
-	struct query_info *qinfo);
+	struct query_info* qinfo);
 
 /**
  * See if delegation is expected to have DNSSEC information (RRSIGs) in 
@@ -220,7 +220,7 @@ int iter_msg_has_dnssec(struct dns_msg* msg);
  * @return true if message is certain to be from zone in dp->name.
  *	false if not sure (empty msg), or not from the zone.
  */
-int iter_msg_from_zone(struct dns_msg* msg, struct delegpt* dp, 
+int iter_msg_from_zone(struct dns_msg* msg, struct delegpt* dp,
 	enum response_type type, uint16_t dclass);
 
 /**
@@ -259,7 +259,7 @@ int caps_failed_rcode(struct reply_info* rep);
  * @param rrset: the rrset to store (copied).
  * Failure to store is logged, but otherwise ignored.
  */
-void iter_store_parentside_rrset(struct module_env* env, 
+void iter_store_parentside_rrset(struct module_env* env,
 	struct ub_packed_rrset_key* rrset);
 
 /**
@@ -278,7 +278,7 @@ void iter_store_parentside_NS(struct module_env* env, struct reply_info* rep);
  * @param rep: delegation response or answer response, to glean TTL from.
  * (malloc) failure is logged but otherwise ignored.
  */
-void iter_store_parentside_neg(struct module_env* env, 
+void iter_store_parentside_neg(struct module_env* env,
 	struct query_info* qinfo, struct reply_info* rep);
 
 /**

@@ -54,7 +54,7 @@ namespace tools
 class t_http_connection
 {
   private:
-	epee::net_utils::http::http_simple_client *mp_http_client;
+	epee::net_utils::http::http_simple_client* mp_http_client;
 	bool m_ok;
 
   public:
@@ -63,8 +63,9 @@ class t_http_connection
 		return std::chrono::minutes(3) + std::chrono::seconds(30);
 	}
 
-	t_http_connection(epee::net_utils::http::http_simple_client *p_http_client)
-		: mp_http_client(p_http_client), m_ok(false)
+	t_http_connection(epee::net_utils::http::http_simple_client* p_http_client) :
+		mp_http_client(p_http_client),
+		m_ok(false)
 	{
 		m_ok = mp_http_client->connect(TIMEOUT());
 	}

@@ -54,13 +54,13 @@ namespace Ryo
 namespace Utils
 {
 
-bool isAddressLocal(const std::string &address)
+bool isAddressLocal(const std::string& address)
 {
 	try
 	{
 		return tools::is_local_address(address);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		MERROR("error: " << e.what());
 		return false;
@@ -71,6 +71,6 @@ void onStartup()
 {
 	tools::on_startup();
 }
-}
+} // namespace Utils
 
-} // namespace
+} // namespace Ryo

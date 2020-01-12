@@ -58,27 +58,28 @@ namespace tools
 class ringdb
 {
 	GULPS_CAT_MAJOR("ringdb");
+
   public:
-	ringdb(std::string filename, const std::string &genesis);
+	ringdb(std::string filename, const std::string& genesis);
 	~ringdb();
 
-	bool add_rings(const crypto::chacha_key &chacha_key, const cryptonote::transaction_prefix &tx);
-	bool remove_rings(const crypto::chacha_key &chacha_key, const cryptonote::transaction_prefix &tx);
-	bool get_ring(const crypto::chacha_key &chacha_key, const crypto::key_image &key_image, std::vector<uint64_t> &outs);
-	bool set_ring(const crypto::chacha_key &chacha_key, const crypto::key_image &key_image, const std::vector<uint64_t> &outs, bool relative);
+	bool add_rings(const crypto::chacha_key& chacha_key, const cryptonote::transaction_prefix& tx);
+	bool remove_rings(const crypto::chacha_key& chacha_key, const cryptonote::transaction_prefix& tx);
+	bool get_ring(const crypto::chacha_key& chacha_key, const crypto::key_image& key_image, std::vector<uint64_t>& outs);
+	bool set_ring(const crypto::chacha_key& chacha_key, const crypto::key_image& key_image, const std::vector<uint64_t>& outs, bool relative);
 
-	bool blackball(const crypto::public_key &output);
-	bool unblackball(const crypto::public_key &output);
-	bool blackballed(const crypto::public_key &output);
+	bool blackball(const crypto::public_key& output);
+	bool unblackball(const crypto::public_key& output);
+	bool blackballed(const crypto::public_key& output);
 	bool clear_blackballs();
 
   private:
-	bool blackball_worker(const crypto::public_key &output, int op);
+	bool blackball_worker(const crypto::public_key& output, int op);
 
   private:
 	std::string filename;
-	MDB_env *env;
+	MDB_env* env;
 	MDB_dbi dbi_rings;
 	MDB_dbi dbi_blackballs;
 };
-}
+} // namespace tools

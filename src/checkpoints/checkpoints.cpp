@@ -89,7 +89,7 @@ checkpoints::checkpoints()
 {
 }
 //---------------------------------------------------------------------------
-bool checkpoints::add_checkpoint(uint64_t height, const std::string &hash_str)
+bool checkpoints::add_checkpoint(uint64_t height, const std::string& hash_str)
 {
 	crypto::hash h = crypto::null_hash;
 	bool r = epee::string_tools::parse_tpod_from_hex_string(hash_str, h);
@@ -109,7 +109,7 @@ bool checkpoints::is_in_checkpoint_zone(uint64_t height) const
 	return !m_points.empty() && (height <= (--m_points.end())->first);
 }
 //---------------------------------------------------------------------------
-bool checkpoints::check_block(uint64_t height, const crypto::hash &h, bool &is_a_checkpoint) const
+bool checkpoints::check_block(uint64_t height, const crypto::hash& h, bool& is_a_checkpoint) const
 {
 	auto it = m_points.find(height);
 	is_a_checkpoint = it != m_points.end();
@@ -128,7 +128,7 @@ bool checkpoints::check_block(uint64_t height, const crypto::hash &h, bool &is_a
 	}
 }
 //---------------------------------------------------------------------------
-bool checkpoints::check_block(uint64_t height, const crypto::hash &h) const
+bool checkpoints::check_block(uint64_t height, const crypto::hash& h) const
 {
 	bool ignored;
 	return check_block(height, h, ignored);
@@ -154,19 +154,19 @@ uint64_t checkpoints::get_max_height() const
 {
 	std::map<uint64_t, crypto::hash>::const_iterator highest =
 		std::max_element(m_points.begin(), m_points.end(),
-						 (boost::bind(&std::map<uint64_t, crypto::hash>::value_type::first, _1) <
-						  boost::bind(&std::map<uint64_t, crypto::hash>::value_type::first, _2)));
+			(boost::bind(&std::map<uint64_t, crypto::hash>::value_type::first, _1) <
+				boost::bind(&std::map<uint64_t, crypto::hash>::value_type::first, _2)));
 	return highest->first;
 }
 //---------------------------------------------------------------------------
-const std::map<uint64_t, crypto::hash> &checkpoints::get_points() const
+const std::map<uint64_t, crypto::hash>& checkpoints::get_points() const
 {
 	return m_points;
 }
 
-bool checkpoints::check_for_conflicts(const checkpoints &other) const
+bool checkpoints::check_for_conflicts(const checkpoints& other) const
 {
-	for(auto &pt : other.get_points())
+	for(auto& pt : other.get_points())
 	{
 		if(m_points.count(pt.first))
 		{
@@ -180,9 +180,9 @@ bool checkpoints::init_default_checkpoints(network_type nettype)
 {
 	if(nettype == TESTNET)
 	{
-		ADD_CHECKPOINT(1,      "770309bd74bcebf90eb6f1197ad51601f917314088c5b1343316a4f581c51193");
-		ADD_CHECKPOINT(10,     "d5f139ed1cdc14ff2dda722de9ee2236f4030d18670e4ef6b41ab74e57a0a816");
-		ADD_CHECKPOINT(50000,  "3d251e3802cc5f6721babf8762bc13fdbc57df694c59759f3baba8d28b7d97c0");
+		ADD_CHECKPOINT(1, "770309bd74bcebf90eb6f1197ad51601f917314088c5b1343316a4f581c51193");
+		ADD_CHECKPOINT(10, "d5f139ed1cdc14ff2dda722de9ee2236f4030d18670e4ef6b41ab74e57a0a816");
+		ADD_CHECKPOINT(50000, "3d251e3802cc5f6721babf8762bc13fdbc57df694c59759f3baba8d28b7d97c0");
 		ADD_CHECKPOINT(122670, "6ba1f78526997681363b2800c942fc56d3a92ac462e3393ba27d0c5611614193"); // ryo
 		ADD_CHECKPOINT(129749, "8393ff500fd806fd2364416076b7231af623d614dc080bfd1c7d59102c14c25a");
 		return true;
@@ -193,17 +193,17 @@ bool checkpoints::init_default_checkpoints(network_type nettype)
 	}
 	else
 	{
-		ADD_CHECKPOINT(1,      "82e8f378ea29d152146b6317903249751b809e97c0b6655f86e120b9de95c38a");
-		ADD_CHECKPOINT(10,     "e097b62bba41e5fd583d3a68de074cddd77c85a6158b031d963232146494a2d6");
-		ADD_CHECKPOINT(100,    "f3bd44c626cc12d449183ca84b58615d792523ba229385ff6717ab29a3e88926");
-		ADD_CHECKPOINT(1000,   "d284c992cb570f86c2e0bcfaa552b1d73bd40417e1c2a40f82bc6432217f0873");
-		ADD_CHECKPOINT(3000,   "81e040955b710dc5a5056668c4eaf3fbc4da2f72c0a63763250ede32a92e0f06");
-		ADD_CHECKPOINT(5000,   "e838c077bc66356d9bb321d4eb60f0851ef766f0619ddc4c6568a0f149aacea0");
-		ADD_CHECKPOINT(10000,  "360b96c3d0a5202c548672d550700d982ca15ad5627f70bce0a89dda840b3611");
-		ADD_CHECKPOINT(20000,  "603a45b60dd92ef4524c80d58411d09480b4668c54bc08dd651d838832bd399e");
-		ADD_CHECKPOINT(21300,  "d0a76e98ebb4d8e928d931a1807bba11a2fafdf544c119761b0ed6de4e1898cf"); // v2 fork
-		ADD_CHECKPOINT(50000,  "ae36641cf06ed788375bfb32f0038cbcd98f1d7bfb09937148fb1a57c6b52dd8");
-		ADD_CHECKPOINT(75000,  "b26f4e1225569da282b77659020bace52e5e89abbdee33e9e52266b1e71803a5");
+		ADD_CHECKPOINT(1, "82e8f378ea29d152146b6317903249751b809e97c0b6655f86e120b9de95c38a");
+		ADD_CHECKPOINT(10, "e097b62bba41e5fd583d3a68de074cddd77c85a6158b031d963232146494a2d6");
+		ADD_CHECKPOINT(100, "f3bd44c626cc12d449183ca84b58615d792523ba229385ff6717ab29a3e88926");
+		ADD_CHECKPOINT(1000, "d284c992cb570f86c2e0bcfaa552b1d73bd40417e1c2a40f82bc6432217f0873");
+		ADD_CHECKPOINT(3000, "81e040955b710dc5a5056668c4eaf3fbc4da2f72c0a63763250ede32a92e0f06");
+		ADD_CHECKPOINT(5000, "e838c077bc66356d9bb321d4eb60f0851ef766f0619ddc4c6568a0f149aacea0");
+		ADD_CHECKPOINT(10000, "360b96c3d0a5202c548672d550700d982ca15ad5627f70bce0a89dda840b3611");
+		ADD_CHECKPOINT(20000, "603a45b60dd92ef4524c80d58411d09480b4668c54bc08dd651d838832bd399e");
+		ADD_CHECKPOINT(21300, "d0a76e98ebb4d8e928d931a1807bba11a2fafdf544c119761b0ed6de4e1898cf"); // v2 fork
+		ADD_CHECKPOINT(50000, "ae36641cf06ed788375bfb32f0038cbcd98f1d7bfb09937148fb1a57c6b52dd8");
+		ADD_CHECKPOINT(75000, "b26f4e1225569da282b77659020bace52e5e89abbdee33e9e52266b1e71803a5");
 		ADD_CHECKPOINT(100000, "ffe474fe8353f90700c8138ddea3547d5c1e4a6facb1df85897e7a6e4daab540");
 		ADD_CHECKPOINT(116520, "da1cb8f30305cd5fad7d6c33b3ed88fede053e0926102d8e544b65e93e33a08b"); // v3 fork
 		ADD_CHECKPOINT(137500, "86a5ccbf6ef872e074a63440b980f0543b3177745bf2c6fd268f93164a277e8b"); // ryo fork
@@ -215,7 +215,7 @@ bool checkpoints::init_default_checkpoints(network_type nettype)
 	return true;
 }
 
-bool checkpoints::load_checkpoints_from_json(const std::string &json_hashfile_fullpath)
+bool checkpoints::load_checkpoints_from_json(const std::string& json_hashfile_fullpath)
 {
 	boost::system::error_code errcode;
 	if(!(boost::filesystem::exists(json_hashfile_fullpath, errcode)))
@@ -227,7 +227,7 @@ bool checkpoints::load_checkpoints_from_json(const std::string &json_hashfile_fu
 	GULPS_LOG_L1("Adding checkpoints from blockchain hashfile");
 
 	uint64_t prev_max_height = get_max_height();
-	GULPSF_LOG_L1("Hard-coded max checkpoint height is {}",  prev_max_height);
+	GULPSF_LOG_L1("Hard-coded max checkpoint height is {}", prev_max_height);
 	t_hash_json hashes;
 	if(!epee::serialization::load_t_from_json_file(hashes, json_hashfile_fullpath))
 	{
@@ -240,12 +240,12 @@ bool checkpoints::load_checkpoints_from_json(const std::string &json_hashfile_fu
 		height = it->height;
 		if(height <= prev_max_height)
 		{
-			GULPSF_LOG_L1("ignoring checkpoint height {}",  height);
+			GULPSF_LOG_L1("ignoring checkpoint height {}", height);
 		}
 		else
 		{
 			std::string blockhash = it->hash;
-			GULPSF_LOG_L1("Adding checkpoint height {}, hash={}", height,  blockhash);
+			GULPSF_LOG_L1("Adding checkpoint height {}, hash={}", height, blockhash);
 			ADD_CHECKPOINT(height, blockhash);
 		}
 		++it;
@@ -270,7 +270,7 @@ bool checkpoints::load_checkpoints_from_dns(network_type nettype)
 	if(!tools::dns_utils::load_txt_records_from_dns(records, nettype == TESTNET ? testnet_dns_urls : nettype == STAGENET ? stagenet_dns_urls : dns_urls))
 		return true; // why true ?
 
-	for(const auto &record : records)
+	for(const auto& record : records)
 	{
 		auto pos = record.find(":");
 		if(pos != std::string::npos)
@@ -300,7 +300,7 @@ bool checkpoints::load_checkpoints_from_dns(network_type nettype)
 	return true;
 }
 
-bool checkpoints::load_new_checkpoints(const std::string &json_hashfile_fullpath, network_type nettype, bool dns)
+bool checkpoints::load_new_checkpoints(const std::string& json_hashfile_fullpath, network_type nettype, bool dns)
 {
 	bool result;
 
@@ -312,4 +312,4 @@ bool checkpoints::load_new_checkpoints(const std::string &json_hashfile_fullpath
 
 	return result;
 }
-}
+} // namespace cryptonote

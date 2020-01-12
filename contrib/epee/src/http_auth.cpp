@@ -111,31 +111,31 @@ struct md5_
 	struct update
 	{
 		template <typename T>
-		void operator()(const T &arg) const
+		void operator()(const T& arg) const
 		{
-			const boost::iterator_range<const char *> data(boost::as_literal(arg));
+			const boost::iterator_range<const char*> data(boost::as_literal(arg));
 			md5::MD5Update(
 				std::addressof(ctx),
-				reinterpret_cast<const std::uint8_t *>(data.begin()),
+				reinterpret_cast<const std::uint8_t*>(data.begin()),
 				data.size());
 		}
-		void operator()(const std::string &arg) const
+		void operator()(const std::string& arg) const
 		{
 			(*this)(boost::string_ref(arg));
 		}
-		void operator()(const epee::wipeable_string &arg) const
+		void operator()(const epee::wipeable_string& arg) const
 		{
 			md5::MD5Update(
 				std::addressof(ctx),
-				reinterpret_cast<const std::uint8_t *>(arg.data()),
+				reinterpret_cast<const std::uint8_t*>(arg.data()),
 				arg.size());
 		}
 
-		md5::MD5_CTX &ctx;
+		md5::MD5_CTX& ctx;
 	};
 
 	template <typename... T>
-	std::array<char, 32> operator()(const T &... args) const
+	std::array<char, 32> operator()(const T&... args) const
 	{
 		md5::MD5_CTX ctx{};
 		md5::MD5Init(std::addressof(ctx));
@@ -186,13 +186,13 @@ struct http_list_separator_
 };
 constexpr const http_list_separator_ http_list_separator{};
 
-std::string to_string(boost::iterator_range<const char *> source)
+std::string to_string(boost::iterator_range<const char*> source)
 {
 	return {source.begin(), source.size()};
 }
 
 template <typename T>
-void add_first_field(std::string &str, const char *const name, const T &value)
+void add_first_field(std::string& str, const char* const name, const T& value)
 {
 	str.append(name);
 	str.push_back(equal_sign);
@@ -200,7 +200,7 @@ void add_first_field(std::string &str, const char *const name, const T &value)
 }
 
 template <typename T>
-void add_field(std::string &str, const char *const name, const T &value)
+void add_field(std::string& str, const char* const name, const T& value)
 {
 	str.push_back(comma);
 	add_first_field(str, name, value);
@@ -211,7 +211,7 @@ using quoted_result = boost::joined_range<
 	const boost::joined_range<const boost::string_ref, const T>, const boost::string_ref>;
 
 template <typename T>
-quoted_result<T> quoted(const T &arg)
+quoted_result<T> quoted(const T& arg)
 {
 	return boost::range::join(boost::range::join(ceref(u8"\""), arg), ceref(u8"\""));
 }
@@ -220,22 +220,22 @@ quoted_result<T> quoted(const T &arg)
 
 template <typename Digest>
 typename std::result_of<Digest()>::type generate_a1(
-	Digest digest, const http::login &creds, const boost::string_ref realm)
+	Digest digest, const http::login& creds, const boost::string_ref realm)
 {
 	return digest(creds.username, u8":", realm, u8":", creds.password);
 }
 
 template <typename Digest>
 typename std::result_of<Digest()>::type generate_a1(
-	Digest digest, const http::http_client_auth::session &user)
+	Digest digest, const http::http_client_auth::session& user)
 {
 	return generate_a1(std::move(digest), user.credentials, user.server.realm);
 }
 
 template <typename T>
-void init_client_value(std::string &str,
-					   const boost::string_ref algorithm, const http::http_client_auth::session &user,
-					   const boost::string_ref uri, const T &response)
+void init_client_value(std::string& str,
+	const boost::string_ref algorithm, const http::http_client_auth::session& user,
+	const boost::string_ref uri, const T& response)
 {
 	str.append(u8"Digest ");
 	add_first_field(str, u8"algorithm", algorithm);
@@ -252,10 +252,11 @@ void init_client_value(std::string &str,
 template <typename Digest>
 struct old_algorithm
 {
-	explicit old_algorithm(Digest digest_) : digest(std::move(digest_)) {}
+	explicit old_algorithm(Digest digest_) :
+		digest(std::move(digest_)) {}
 
-	std::string operator()(const http::http_client_auth::session &user,
-						   const boost::string_ref method, const boost::string_ref uri) const
+	std::string operator()(const http::http_client_auth::session& user,
+		const boost::string_ref method, const boost::string_ref uri) const
 	{
 		const auto response = digest(
 			generate_a1(digest, user), u8":", user.server.nonce, u8":", digest(method, u8":", uri));
@@ -273,10 +274,11 @@ struct old_algorithm
 template <typename Digest>
 struct auth_algorithm
 {
-	explicit auth_algorithm(Digest digest_) : digest(std::move(digest_)) {}
+	explicit auth_algorithm(Digest digest_) :
+		digest(std::move(digest_)) {}
 
-	std::string operator()(const http::http_client_auth::session &user,
-						   const boost::string_ref method, const boost::string_ref uri) const
+	std::string operator()(const http::http_client_auth::session& user,
+		const boost::string_ref method, const boost::string_ref uri) const
 	{
 		namespace karma = boost::spirit::karma;
 		using counter_type = decltype(user.counter);
@@ -312,7 +314,7 @@ struct auth_algorithm
 //! Processes client "Authorization" and server "WWW-authenticate" HTTP fields
 struct auth_message
 {
-	using iterator = const char *;
+	using iterator = const char*;
 	enum status
 	{
 		kFail = 0,
@@ -322,12 +324,12 @@ struct auth_message
 
 	//! \return Status of the `response` field from the client
 	static status verify(const boost::string_ref method, const boost::string_ref request,
-						 const http::http_server_auth::session &user)
+		const http::http_server_auth::session& user)
 	{
 		const auto parsed = parse(request);
 		if(parsed &&
-		   boost::equals(parsed->username, user.credentials.username) &&
-		   boost::fusion::any(digest_algorithms, has_valid_response{*parsed, user, method}))
+			boost::equals(parsed->username, user.credentials.username) &&
+			boost::fusion::any(digest_algorithms, has_valid_response{*parsed, user, method}))
 		{
 			if(boost::equals(parsed->nonce, user.nonce))
 			{
@@ -344,18 +346,18 @@ struct auth_message
 
 	//! \return Information needed to generate client authentication `response`s.
 	static http::http_client_auth::session::keys extract(
-		const http::http_response_info &response, const bool is_first)
+		const http::http_response_info& response, const bool is_first)
 	{
 		using field = std::pair<std::string, std::string>;
 
 		server_parameters best{};
 
-		const std::list<field> &fields = response.m_header_info.m_etc_fields;
+		const std::list<field>& fields = response.m_header_info.m_etc_fields;
 		auto current = fields.begin();
 		const auto end = fields.end();
 		while(true)
 		{
-			current = std::find_if(current, end, [](const field &value) {
+			current = std::find_if(current, end, [](const field& value) {
 				return boost::equals(server_auth_field, value.first, ascii_iequal);
 			});
 			if(current == end)
@@ -377,8 +379,17 @@ struct auth_message
 	}
 
   private:
-	explicit auth_message()
-		: algorithm(), cnonce(), nc(), nonce(), qop(), realm(), response(), stale(), uri(), username()
+	explicit auth_message() :
+		algorithm(),
+		cnonce(),
+		nc(),
+		nonce(),
+		qop(),
+		realm(),
+		response(),
+		stale(),
+		uri(),
+		username()
 	{
 	}
 
@@ -386,16 +397,22 @@ struct auth_message
 	{
 		struct parser
 		{
-			using field_parser = std::function<bool(const parser &, iterator &, iterator, auth_message &)>;
+			using field_parser = std::function<bool(const parser&, iterator&, iterator, auth_message&)>;
 
-			explicit parser() : field_table(), skip_whitespace(), header(), quoted_string(), token(), fields()
+			explicit parser() :
+				field_table(),
+				skip_whitespace(),
+				header(),
+				quoted_string(),
+				token(),
+				fields()
 			{
 				using namespace std::placeholders;
 				namespace qi = boost::spirit::qi;
 
 				struct parse_nc
 				{
-					bool operator()(const parser &, iterator &current, const iterator end, auth_message &result) const
+					bool operator()(const parser&, iterator& current, const iterator end, auth_message& result) const
 					{
 						return qi::parse(
 							current, end,
@@ -405,27 +422,27 @@ struct auth_message
 				};
 				struct parse_token
 				{
-					bool operator()(const parser &parse, iterator &current, const iterator end,
-									boost::iterator_range<iterator> &result) const
+					bool operator()(const parser& parse, iterator& current, const iterator end,
+						boost::iterator_range<iterator>& result) const
 					{
 						return qi::parse(current, end, parse.token, result);
 					}
 				};
 				struct parse_string
 				{
-					bool operator()(const parser &parse, iterator &current, const iterator end,
-									boost::iterator_range<iterator> &result) const
+					bool operator()(const parser& parse, iterator& current, const iterator end,
+						boost::iterator_range<iterator>& result) const
 					{
 						return qi::parse(current, end, parse.quoted_string, result);
 					}
-					bool operator()(const parser &parse, iterator &current, const iterator end) const
+					bool operator()(const parser& parse, iterator& current, const iterator end) const
 					{
 						return qi::parse(current, end, parse.quoted_string);
 					}
 				};
 				struct parse_response
 				{
-					bool operator()(const parser &, iterator &current, const iterator end, auth_message &result) const
+					bool operator()(const parser&, iterator& current, const iterator end, auth_message& result) const
 					{
 						using byte = qi::uint_parser<std::uint8_t, 16, 2, 2>;
 						return qi::parse(
@@ -492,29 +509,29 @@ struct auth_message
 	struct has_valid_response
 	{
 		template <typename Digest, typename Result>
-		Result generate_old_response(Digest digest, const Result &key, const Result &auth) const
+		Result generate_old_response(Digest digest, const Result& key, const Result& auth) const
 		{
 			return digest(key, u8":", request.nonce, u8":", auth);
 		}
 
 		template <typename Digest, typename Result>
-		Result generate_new_response(Digest digest, const Result &key, const Result &auth) const
+		Result generate_new_response(Digest digest, const Result& key, const Result& auth) const
 		{
 			return digest(
 				key, u8":", request.nonce, u8":", request.nc, u8":", request.cnonce, u8":", request.qop, u8":", auth);
 		}
 
 		template <typename Result>
-		bool check(const Result &result) const
+		bool check(const Result& result) const
 		{
 			return boost::equals(request.response, result, ascii_iequal);
 		}
 
 		template <typename Digest>
-		bool operator()(const Digest &digest) const
+		bool operator()(const Digest& digest) const
 		{
 			if(boost::starts_with(request.algorithm, Digest::name, ascii_iequal) ||
-			   (request.algorithm.empty() && std::is_same<md5_, Digest>::value))
+				(request.algorithm.empty() && std::is_same<md5_, Digest>::value))
 			{
 				auto key = generate_a1(digest, user.credentials, auth_realm);
 				if(boost::ends_with(request.algorithm, sess_algo, ascii_iequal))
@@ -535,8 +552,8 @@ struct auth_message
 			return false;
 		}
 
-		const auth_message &request;
-		const http::http_server_auth::session &user;
+		const auth_message& request;
+		const http::http_server_auth::session& user;
 		const boost::string_ref method;
 	};
 
@@ -551,14 +568,24 @@ struct auth_message
 
 	struct server_parameters
 	{
-		server_parameters()
-			: nonce(), opaque(), realm(), stale(), value_generator(), index(boost::fusion::size(digest_algorithms))
+		server_parameters() :
+			nonce(),
+			opaque(),
+			realm(),
+			stale(),
+			value_generator(),
+			index(boost::fusion::size(digest_algorithms))
 		{
 		}
 
 		template <typename DigestIter>
-		explicit server_parameters(const auth_message &request, const DigestIter &digest)
-			: nonce(request.nonce), opaque(request.opaque), stale(request.stale), realm(request.realm), value_generator(), index(boost::fusion::distance(boost::fusion::begin(digest_algorithms), digest))
+		explicit server_parameters(const auth_message& request, const DigestIter& digest) :
+			nonce(request.nonce),
+			opaque(request.opaque),
+			stale(request.stale),
+			realm(request.realm),
+			value_generator(),
+			index(boost::fusion::distance(boost::fusion::begin(digest_algorithms), digest))
 		{
 			using digest_type = typename boost::fusion::result_of::value_of<DigestIter>::type;
 
@@ -601,7 +628,7 @@ struct auth_message
 	struct matches_algorithm
 	{
 		template <typename DigestIter>
-		server_parameters operator()(server_parameters current, const DigestIter &digest) const
+		server_parameters operator()(server_parameters current, const DigestIter& digest) const
 		{
 			if(!current.value_generator)
 			{
@@ -612,7 +639,7 @@ struct auth_message
 			}
 			return current;
 		}
-		const auth_message &response;
+		const auth_message& response;
 	};
 
 	boost::iterator_range<iterator> algorithm;
@@ -631,7 +658,7 @@ struct auth_message
 struct add_challenge
 {
 	template <typename Digest>
-	void operator()(const Digest &digest) const
+	void operator()(const Digest& digest) const
 	{
 		static constexpr const auto fvalue = ceref(u8"Digest qop=\"auth\"");
 
@@ -651,7 +678,7 @@ struct add_challenge
 	}
 
 	const boost::string_ref nonce;
-	std::list<std::pair<std::string, std::string>> &fields;
+	std::list<std::pair<std::string, std::string>>& fields;
 	const bool is_stale;
 };
 
@@ -669,7 +696,7 @@ http::http_response_info create_digest_response(const boost::string_ref nonce, c
 
 	return rc;
 }
-}
+} // namespace
 
 namespace epee
 {
@@ -677,18 +704,19 @@ namespace net_utils
 {
 namespace http
 {
-http_server_auth::http_server_auth(login credentials, std::function<void(size_t, uint8_t *)> r)
-	: user(session{std::move(credentials)}), rng(std::move(r))
+http_server_auth::http_server_auth(login credentials, std::function<void(size_t, uint8_t*)> r) :
+	user(session{std::move(credentials)}),
+	rng(std::move(r))
 {
 }
 
-boost::optional<http_response_info> http_server_auth::do_get_response(const http_request_info &request)
+boost::optional<http_response_info> http_server_auth::do_get_response(const http_request_info& request)
 {
 	assert(user);
 	using field = std::pair<std::string, std::string>;
 
-	const std::list<field> &fields = request.m_header_info.m_etc_fields;
-	const auto auth = boost::find_if(fields, [](const field &value) {
+	const std::list<field>& fields = request.m_header_info.m_etc_fields;
+	const auto auth = boost::find_if(fields, [](const field& value) {
 		return boost::equals(client_auth_field, value.first, ascii_iequal);
 	});
 
@@ -719,12 +747,12 @@ boost::optional<http_response_info> http_server_auth::do_get_response(const http
 	return create_digest_response(user->nonce, is_stale);
 }
 
-http_client_auth::http_client_auth(login credentials)
-	: user(session{std::move(credentials)})
+http_client_auth::http_client_auth(login credentials) :
+	user(session{std::move(credentials)})
 {
 }
 
-http_client_auth::status http_client_auth::do_handle_401(const http_response_info &response)
+http_client_auth::status http_client_auth::do_handle_401(const http_response_info& response)
 {
 	assert(user);
 	const bool first_auth = (user->counter == 0);
@@ -748,6 +776,6 @@ boost::optional<std::pair<std::string, std::string>> http_client_auth::do_get_au
 	}
 	return boost::none;
 }
-}
-}
-}
+} // namespace http
+} // namespace net_utils
+} // namespace epee

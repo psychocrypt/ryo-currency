@@ -12,19 +12,18 @@
 
 #ifdef IGD_V2
 /* IGD v2 */
-#define DEVICE_TYPE_IGD     "urn:schemas-upnp-org:device:InternetGatewayDevice:2"
-#define DEVICE_TYPE_WAN     "urn:schemas-upnp-org:device:WANDevice:2"
-#define DEVICE_TYPE_WANC    "urn:schemas-upnp-org:device:WANConnectionDevice:2"
+#define DEVICE_TYPE_IGD "urn:schemas-upnp-org:device:InternetGatewayDevice:2"
+#define DEVICE_TYPE_WAN "urn:schemas-upnp-org:device:WANDevice:2"
+#define DEVICE_TYPE_WANC "urn:schemas-upnp-org:device:WANConnectionDevice:2"
 #define SERVICE_TYPE_WANIPC "urn:schemas-upnp-org:service:WANIPConnection:2"
-#define SERVICE_ID_WANIPC   "urn:upnp-org:serviceId:WANIPConn1"
+#define SERVICE_ID_WANIPC "urn:upnp-org:serviceId:WANIPConn1"
 #else
 /* IGD v1 */
-#define DEVICE_TYPE_IGD     "urn:schemas-upnp-org:device:InternetGatewayDevice:1"
-#define DEVICE_TYPE_WAN     "urn:schemas-upnp-org:device:WANDevice:1"
-#define DEVICE_TYPE_WANC    "urn:schemas-upnp-org:device:WANConnectionDevice:1"
+#define DEVICE_TYPE_IGD "urn:schemas-upnp-org:device:InternetGatewayDevice:1"
+#define DEVICE_TYPE_WAN "urn:schemas-upnp-org:device:WANDevice:1"
+#define DEVICE_TYPE_WANC "urn:schemas-upnp-org:device:WANConnectionDevice:1"
 #define SERVICE_TYPE_WANIPC "urn:schemas-upnp-org:service:WANIPConnection:1"
-#define SERVICE_ID_WANIPC   "urn:upnp-org:serviceId:WANIPConn1"
+#define SERVICE_ID_WANIPC "urn:upnp-org:serviceId:WANIPConn1"
 #endif
 
 #endif
-

@@ -74,5 +74,5 @@ private:
 		return val_is_uninitialized;
 	}*/
 };
-}
+} // namespace epee
 #endif //_STATIC_INITIALIZER_H_

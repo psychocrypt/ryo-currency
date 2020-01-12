@@ -11,26 +11,26 @@
 #include "miniupnpc_declspec.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-struct UPNPDev {
-	struct UPNPDev * pNext;
-	char * descURL;
-	char * st;
-	char * usn;
-	unsigned int scope_id;
-	char buffer[3];
-};
+	struct UPNPDev
+	{
+		struct UPNPDev* pNext;
+		char* descURL;
+		char* st;
+		char* usn;
+		unsigned int scope_id;
+		char buffer[3];
+	};
 
-/* freeUPNPDevlist()
+	/* freeUPNPDevlist()
  * free list returned by upnpDiscover() */
-MINIUPNP_LIBSPEC void freeUPNPDevlist(struct UPNPDev * devlist);
-
+	MINIUPNP_LIBSPEC void freeUPNPDevlist(struct UPNPDev* devlist);
 
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif /* UPNPDEV_H_INCLUDED */

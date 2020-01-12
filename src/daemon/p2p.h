@@ -52,20 +52,19 @@
 
 #include "common/gulps.hpp"
 
-
-
 namespace daemonize
 {
 
 class t_p2p final
 {
 	GULPS_CAT_MAJOR("daemon_p2p");
+
   private:
 	typedef cryptonote::t_cryptonote_protocol_handler<cryptonote::core> t_protocol_raw;
 	typedef nodetool::node_server<t_protocol_raw> t_node_server;
 
   public:
-	static void init_options(boost::program_options::options_description &option_spec)
+	static void init_options(boost::program_options::options_description& option_spec)
 	{
 		t_node_server::init_options(option_spec);
 	}
@@ -75,8 +74,8 @@ class t_p2p final
 
   public:
 	t_p2p(
-		boost::program_options::variables_map const &vm, t_protocol &protocol)
-		: m_server{protocol.get()}
+		boost::program_options::variables_map const& vm, t_protocol& protocol) :
+		m_server{protocol.get()}
 	{
 		//initialize objects
 		GULPS_GLOBAL_PRINT("Initializing p2p server...");
@@ -87,7 +86,7 @@ class t_p2p final
 		GULPS_GLOBAL_PRINT("p2p server initialized OK");
 	}
 
-	t_node_server &get()
+	t_node_server& get()
 	{
 		return m_server;
 	}
@@ -117,4 +116,4 @@ class t_p2p final
 		}
 	}
 };
-}
+} // namespace daemonize

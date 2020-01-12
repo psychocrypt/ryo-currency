@@ -42,7 +42,6 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #include "common/i18n.h"
 #include "common/util.h"
 #include "file_io_utils.h"
@@ -69,7 +68,7 @@ static std::map<std::string, std::string> i18n_entries;
 
 std::string i18n_get_language()
 {
-	const char *e;
+	const char* e;
 
 	e = getenv("LANG");
 	i18n_log("LANG=" << e);
@@ -87,12 +86,12 @@ std::string i18n_get_language()
 	return language;
 }
 
-static uint32_t be32(const unsigned char *data)
+static uint32_t be32(const unsigned char* data)
 {
 	return (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
 }
 
-static std::string utf16(const unsigned char *data, uint32_t len)
+static std::string utf16(const unsigned char* data, uint32_t len)
 {
 	std::string s;
 	while(len >= 2)
@@ -136,16 +135,16 @@ static std::string utf16(const unsigned char *data, uint32_t len)
 	return s;
 }
 
-static std::string utf8(const unsigned char *data, uint32_t len)
+static std::string utf8(const unsigned char* data, uint32_t len)
 {
 	/* assume well formedness */
-	return std::string((const char *)data, len);
+	return std::string((const char*)data, len);
 }
 
-int i18n_set_language(const char *directory, const char *base, std::string language)
+int i18n_set_language(const char* directory, const char* base, std::string language)
 {
 	std::string filename, contents;
-	const unsigned char *data;
+	const unsigned char* data;
 	size_t datalen;
 	size_t idx;
 	unsigned char chunk_type;
@@ -180,7 +179,7 @@ int i18n_set_language(const char *directory, const char *base, std::string langu
 		if(!find_embedded_file(filename, contents))
 		{
 			i18n_log("Embedded translations file not found: " << filename);
-			const char *underscore = strchr(language.c_str(), '_');
+			const char* underscore = strchr(language.c_str(), '_');
 			if(underscore)
 			{
 				std::string fallback_language = std::string(language, 0, underscore - language.c_str());
@@ -212,7 +211,7 @@ int i18n_set_language(const char *directory, const char *base, std::string langu
 		}
 	}
 
-	data = (const unsigned char *)contents.c_str();
+	data = (const unsigned char*)contents.c_str();
 	datalen = contents.size();
 	idx = 0;
 	i18n_log("Translations file size: " << datalen);
@@ -359,7 +358,7 @@ int i18n_set_language(const char *directory, const char *base, std::string langu
 }
 
 /* The entries is constant by that time */
-const char *i18n_translate(const char *s, const std::string &context)
+const char* i18n_translate(const char* s, const std::string& context)
 {
 	const std::string key = context + std::string("", 1) + s;
 	std::map<std::string, std::string>::const_iterator i = i18n_entries.find(key);

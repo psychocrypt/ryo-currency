@@ -63,7 +63,7 @@ GULPS_CAT_MAJOR("test");
 
 BOOST_CLASS_VERSION(nodetool::node_server<cryptonote::t_cryptonote_protocol_handler<tests::proxy_core>>, 1);
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 
 #ifdef WIN32
@@ -76,8 +76,6 @@ int main(int argc, char *argv[])
 	string_tools::set_module_name_and_folder(argv[0]);
 
 	//set up logging options
-
-
 
 	po::options_description desc("Allowed options");
 	command_line::add_arg(desc, cryptonote::arg_data_dir);
@@ -92,7 +90,7 @@ int main(int argc, char *argv[])
 	if(!r)
 		return 1;
 
-	std::cout << "Module folder: " <<  argv[0] << std::endl;
+	std::cout << "Module folder: " << argv[0] << std::endl;
 	std::cout << "Node starting ..." << std::endl;
 
 	//create objects and link them
@@ -155,7 +153,7 @@ string tx2str(const cryptonote::transaction& tx, const cryptonote::hash256& tx_h
     return ss.str();
 }*/
 
-bool tests::proxy_core::handle_incoming_tx(const cryptonote::blobdata &tx_blob, cryptonote::tx_verification_context &tvc, bool keeped_by_block, bool relayed, bool do_not_relay)
+bool tests::proxy_core::handle_incoming_tx(const cryptonote::blobdata& tx_blob, cryptonote::tx_verification_context& tvc, bool keeped_by_block, bool relayed, bool do_not_relay)
 {
 	if(!keeped_by_block)
 		return true;
@@ -183,11 +181,11 @@ bool tests::proxy_core::handle_incoming_tx(const cryptonote::blobdata &tx_blob, 
 	return true;
 }
 
-bool tests::proxy_core::handle_incoming_txs(const std::list<blobdata> &tx_blobs, std::vector<tx_verification_context> &tvc, bool keeped_by_block, bool relayed, bool do_not_relay)
+bool tests::proxy_core::handle_incoming_txs(const std::list<blobdata>& tx_blobs, std::vector<tx_verification_context>& tvc, bool keeped_by_block, bool relayed, bool do_not_relay)
 {
 	tvc.resize(tx_blobs.size());
 	size_t i = 0;
-	for(const auto &tx_blob : tx_blobs)
+	for(const auto& tx_blob : tx_blobs)
 	{
 		if(!handle_incoming_tx(tx_blob, tvc[i], keeped_by_block, relayed, do_not_relay))
 			return false;
@@ -196,7 +194,7 @@ bool tests::proxy_core::handle_incoming_txs(const std::list<blobdata> &tx_blobs,
 	return true;
 }
 
-bool tests::proxy_core::handle_incoming_block(const cryptonote::blobdata &block_blob, cryptonote::block_verification_context &bvc, bool update_miner_blocktemplate)
+bool tests::proxy_core::handle_incoming_block(const cryptonote::blobdata& block_blob, cryptonote::block_verification_context& bvc, bool update_miner_blocktemplate)
 {
 	block b = AUTO_VAL_INIT(b);
 
@@ -230,19 +228,19 @@ bool tests::proxy_core::handle_incoming_block(const cryptonote::blobdata &block_
 	return true;
 }
 
-bool tests::proxy_core::get_short_chain_history(std::list<crypto::hash> &ids)
+bool tests::proxy_core::get_short_chain_history(std::list<crypto::hash>& ids)
 {
 	build_short_history(ids, m_lastblk);
 	return true;
 }
 
-void tests::proxy_core::get_blockchain_top(uint64_t &height, crypto::hash &top_id)
+void tests::proxy_core::get_blockchain_top(uint64_t& height, crypto::hash& top_id)
 {
 	height = 0;
 	top_id = get_block_hash(m_genesis);
 }
 
-bool tests::proxy_core::init(const boost::program_options::variables_map & /*vm*/)
+bool tests::proxy_core::init(const boost::program_options::variables_map& /*vm*/)
 {
 	generate_genesis_block(MAINNET, m_genesis, config<MAINNET>::GENESIS_TX, config<MAINNET>::GENESIS_NONCE);
 	crypto::hash h = get_block_hash(m_genesis);
@@ -253,14 +251,14 @@ bool tests::proxy_core::init(const boost::program_options::variables_map & /*vm*
 	return true;
 }
 
-bool tests::proxy_core::have_block(const crypto::hash &id)
+bool tests::proxy_core::have_block(const crypto::hash& id)
 {
 	if(m_hash2blkidx.end() == m_hash2blkidx.find(id))
 		return false;
 	return true;
 }
 
-void tests::proxy_core::build_short_history(std::list<crypto::hash> &m_history, const crypto::hash &m_start)
+void tests::proxy_core::build_short_history(std::list<crypto::hash>& m_history, const crypto::hash& m_start)
 {
 	m_history.push_front(get_block_hash(m_genesis));
 	/*std::unordered_map<crypto::hash, tests::block_index>::const_iterator cit = m_hash2blkidx.find(m_lastblk);
@@ -276,7 +274,7 @@ void tests::proxy_core::build_short_history(std::list<crypto::hash> &m_history, 
     } while (m_hash2blkidx.end() != cit && get_block_hash(cit->second.blk) != cit->first);*/
 }
 
-bool tests::proxy_core::add_block(const crypto::hash &_id, const crypto::hash &_longhash, const cryptonote::block &_blk, const cryptonote::blobdata &_blob)
+bool tests::proxy_core::add_block(const crypto::hash& _id, const crypto::hash& _longhash, const cryptonote::block& _blk, const cryptonote::blobdata& _blob)
 {
 	size_t height = 0;
 

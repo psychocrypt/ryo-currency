@@ -38,10 +38,11 @@ class copyable_atomic : public std::atomic<uint32_t>
 	{
 		store(value);
 	}
-	copyable_atomic(const copyable_atomic &a) : std::atomic<uint32_t>(a.load())
+	copyable_atomic(const copyable_atomic& a) :
+		std::atomic<uint32_t>(a.load())
 	{
 	}
-	copyable_atomic &operator=(const copyable_atomic &a)
+	copyable_atomic& operator=(const copyable_atomic& a)
 	{
 		store(a.load());
 		return *this;
@@ -55,4 +56,4 @@ class copyable_atomic : public std::atomic<uint32_t>
 		return std::atomic<uint32_t>::operator++(fake);
 	}
 };
-}
+} // namespace epee

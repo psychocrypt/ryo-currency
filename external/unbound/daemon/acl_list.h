@@ -51,7 +51,8 @@ struct regional;
  * Enumeration of access control options for an address range.
  * Allow or deny access.
  */
-enum acl_access {
+enum acl_access
+{
 	/** disallow any access whatsoever, drop it */
 	acl_deny = 0,
 	/** disallow access, send a polite 'REFUSED' reply */
@@ -69,7 +70,8 @@ enum acl_access {
 /**
  * Access control storage structure
  */
-struct acl_list {
+struct acl_list
+{
 	/** regional for allocation */
 	struct regional* region;
 	/** 
@@ -83,7 +85,8 @@ struct acl_list {
  *
  * An address span with access control information
  */
-struct acl_addr {
+struct acl_addr
+{
 	/** node in address tree */
 	struct addr_tree_node node;
 	/** access control on this netblock */
@@ -143,7 +146,7 @@ enum acl_access acl_get_control(struct acl_addr* acl);
  */
 struct acl_addr*
 acl_addr_lookup(struct acl_list* acl, struct sockaddr_storage* addr,
-        socklen_t addrlen);
+	socklen_t addrlen);
 
 /**
  * Get memory used by acl structure.

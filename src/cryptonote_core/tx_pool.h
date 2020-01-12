@@ -77,7 +77,7 @@ typedef std::pair<std::pair<double, std::time_t>, crypto::hash> tx_by_fee_and_re
 class txCompare
 {
   public:
-	bool operator()(const tx_by_fee_and_receive_time_entry &a, const tx_by_fee_and_receive_time_entry &b)
+	bool operator()(const tx_by_fee_and_receive_time_entry& a, const tx_by_fee_and_receive_time_entry& b)
 	{
 		// sort by greatest first, not least
 		if(a.first.first > b.first.first)
@@ -120,7 +120,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @param bchs a Blockchain class instance, for getting chain info
      */
-	tx_memory_pool(Blockchain &bchs);
+	tx_memory_pool(Blockchain& bchs);
 
 	/**
      * @copydoc add_tx(transaction&, tx_verification_context&, bool, bool, uint8_t)
@@ -128,7 +128,7 @@ class tx_memory_pool : boost::noncopyable
      * @param id the transaction's hash
      * @param blob_size the transaction's size
      */
-	bool add_tx(transaction &tx, const crypto::hash &id, size_t blob_size, tx_verification_context &tvc, bool kept_by_block, bool relayed, bool do_not_relay);
+	bool add_tx(transaction& tx, const crypto::hash& id, size_t blob_size, tx_verification_context& tvc, bool kept_by_block, bool relayed, bool do_not_relay);
 
 	/**
      * @brief add a transaction to the transaction pool
@@ -147,7 +147,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true if the transaction passes validations, otherwise false
      */
-	bool add_tx(transaction &tx, tx_verification_context &tvc, bool kept_by_block, bool relayed, bool do_not_relay);
+	bool add_tx(transaction& tx, tx_verification_context& tvc, bool kept_by_block, bool relayed, bool do_not_relay);
 
 	/**
      * @brief takes a transaction with the given hash from the pool
@@ -162,7 +162,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true unless the transaction cannot be found in the pool
      */
-	bool take_tx(const crypto::hash &id, transaction &tx, size_t &blob_size, uint64_t &fee, bool &relayed, bool &do_not_relay, bool &double_spend_seen);
+	bool take_tx(const crypto::hash& id, transaction& tx, size_t& blob_size, uint64_t& fee, bool& relayed, bool& do_not_relay, bool& double_spend_seen);
 
 	/**
      * @brief checks if the pool has a transaction with the given hash
@@ -171,7 +171,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true if the transaction is in the pool, otherwise false
      */
-	bool have_tx(const crypto::hash &id) const;
+	bool have_tx(const crypto::hash& id) const;
 
 	/**
      * @brief action to take when notified of a block added to the blockchain
@@ -183,7 +183,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true
      */
-	bool on_blockchain_inc(uint64_t new_block_height, const crypto::hash &top_block_id);
+	bool on_blockchain_inc(uint64_t new_block_height, const crypto::hash& top_block_id);
 
 	/**
      * @brief action to take when notified of a block removed from the blockchain
@@ -195,7 +195,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true
      */
-	bool on_blockchain_dec(uint64_t new_block_height, const crypto::hash &top_block_id);
+	bool on_blockchain_dec(uint64_t new_block_height, const crypto::hash& top_block_id);
 
 	/**
      * @brief action to take periodically
@@ -249,7 +249,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true
      */
-	bool fill_block_template(block &bl, size_t median_size, uint64_t already_generated_coins, size_t &total_size, uint64_t &fee, uint64_t &expected_reward, uint64_t height);
+	bool fill_block_template(block& bl, size_t median_size, uint64_t already_generated_coins, size_t& total_size, uint64_t& fee, uint64_t& expected_reward, uint64_t height);
 
 	/**
      * @brief get a list of all transactions in the pool
@@ -258,7 +258,7 @@ class tx_memory_pool : boost::noncopyable
      * @param include_unrelayed_txes include unrelayed txes in the result
      *
      */
-	void get_transactions(std::list<transaction> &txs, bool include_unrelayed_txes = true) const;
+	void get_transactions(std::list<transaction>& txs, bool include_unrelayed_txes = true) const;
 
 	/**
      * @brief get a list of all transaction hashes in the pool
@@ -267,7 +267,7 @@ class tx_memory_pool : boost::noncopyable
      * @param include_unrelayed_txes include unrelayed txes in the result
      *
      */
-	void get_transaction_hashes(std::vector<crypto::hash> &txs, bool include_unrelayed_txes = true) const;
+	void get_transaction_hashes(std::vector<crypto::hash>& txs, bool include_unrelayed_txes = true) const;
 
 	/**
      * @brief get (size, fee, receive time) for all transaction in the pool
@@ -276,7 +276,7 @@ class tx_memory_pool : boost::noncopyable
      * @param include_unrelayed_txes include unrelayed txes in the result
      *
      */
-	void get_transaction_backlog(std::vector<tx_backlog_entry> &backlog, bool include_unrelayed_txes = true) const;
+	void get_transaction_backlog(std::vector<tx_backlog_entry>& backlog, bool include_unrelayed_txes = true) const;
 
 	/**
      * @brief get a summary statistics of all transaction hashes in the pool
@@ -285,7 +285,7 @@ class tx_memory_pool : boost::noncopyable
      * @param include_unrelayed_txes include unrelayed txes in the result
      *
      */
-	void get_transaction_stats(struct txpool_stats &stats, bool include_unrelayed_txes = true) const;
+	void get_transaction_stats(struct txpool_stats& stats, bool include_unrelayed_txes = true) const;
 
 	/**
      * @brief get information about all transactions and key images in the pool
@@ -298,7 +298,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true
      */
-	bool get_transactions_and_spent_keys_info(std::vector<tx_info> &tx_infos, std::vector<spent_key_image_info> &key_image_infos, bool include_sensitive_data = true) const;
+	bool get_transactions_and_spent_keys_info(std::vector<tx_info>& tx_infos, std::vector<spent_key_image_info>& key_image_infos, bool include_sensitive_data = true) const;
 
 	/**
      * @brief get information about all transactions and key images in the pool
@@ -310,7 +310,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true
      */
-	bool get_pool_for_rpc(std::vector<cryptonote::rpc::tx_in_pool> &tx_infos, cryptonote::rpc::key_images_with_tx_hashes &key_image_infos) const;
+	bool get_pool_for_rpc(std::vector<cryptonote::rpc::tx_in_pool>& tx_infos, cryptonote::rpc::key_images_with_tx_hashes& key_image_infos) const;
 
 	/**
      * @brief check for presence of key images in the pool
@@ -320,7 +320,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true
      */
-	bool check_for_key_images(const std::vector<crypto::key_image> &key_images, std::vector<bool> spent) const;
+	bool check_for_key_images(const std::vector<crypto::key_image>& key_images, std::vector<bool> spent) const;
 
 	/**
      * @brief get a specific transaction from the pool
@@ -330,7 +330,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true if the transaction is found, otherwise false
      */
-	bool get_transaction(const crypto::hash &h, cryptonote::blobdata &txblob) const;
+	bool get_transaction(const crypto::hash& h, cryptonote::blobdata& txblob) const;
 
 	/**
      * @brief get a list of all relayable transactions and their hashes
@@ -345,14 +345,14 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true
      */
-	bool get_relayable_transactions(std::list<std::pair<crypto::hash, cryptonote::blobdata>> &txs) const;
+	bool get_relayable_transactions(std::list<std::pair<crypto::hash, cryptonote::blobdata>>& txs) const;
 
 	/**
      * @brief tell the pool that certain transactions were just relayed
      *
      * @param txs the list of transactions (and their hashes)
      */
-	void set_relayed(const std::list<std::pair<crypto::hash, cryptonote::blobdata>> &txs);
+	void set_relayed(const std::list<std::pair<crypto::hash, cryptonote::blobdata>>& txs);
 
 	/**
      * @brief get the total number of transactions in the pool
@@ -446,7 +446,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true on success, false on error
      */
-	bool insert_key_images(const transaction &tx, bool kept_by_block);
+	bool insert_key_images(const transaction& tx, bool kept_by_block);
 
 	/**
      * @brief remove old transactions from the pool
@@ -466,7 +466,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true if the spent key image is present, otherwise false
      */
-	bool have_tx_keyimg_as_spent(const crypto::key_image &key_im) const;
+	bool have_tx_keyimg_as_spent(const crypto::key_image& key_im) const;
 
 	/**
      * @brief check if any spent key image in a transaction is in the pool
@@ -480,7 +480,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true if any spent key images are present in the pool, otherwise false
      */
-	bool have_tx_keyimges_as_spent(const transaction &tx) const;
+	bool have_tx_keyimges_as_spent(const transaction& tx) const;
 
 	/**
      * @brief forget a transaction's spent key images
@@ -493,7 +493,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return false if any key images to be removed cannot be found, otherwise true
      */
-	bool remove_transaction_keyimages(const transaction &tx);
+	bool remove_transaction_keyimages(const transaction& tx);
 
 	/**
      * @brief check if any of a transaction's spent key images are present in a given set
@@ -503,7 +503,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true if any key images present in the set, otherwise false
      */
-	static bool have_key_images(const std::unordered_set<crypto::key_image> &kic, const transaction &tx);
+	static bool have_key_images(const std::unordered_set<crypto::key_image>& kic, const transaction& tx);
 
 	/**
      * @brief append the key images from a transaction to the given set
@@ -513,7 +513,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return false if any append fails, otherwise true
      */
-	static bool append_key_images(std::unordered_set<crypto::key_image> &kic, const transaction &tx);
+	static bool append_key_images(std::unordered_set<crypto::key_image>& kic, const transaction& tx);
 
 	/**
      * @brief check if a transaction is a valid candidate for inclusion in a block
@@ -522,12 +522,12 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return true if the transaction is good to go, otherwise false
      */
-	bool is_transaction_ready_to_go(txpool_tx_meta_t &txd, transaction &tx) const;
+	bool is_transaction_ready_to_go(txpool_tx_meta_t& txd, transaction& tx) const;
 
 	/**
      * @brief mark all transactions double spending the one passed
      */
-	void mark_double_spend(const transaction &tx);
+	void mark_double_spend(const transaction& tx);
 
 	/**
      * @brief prune lowest fee/byte txes till we're not above bytes
@@ -573,7 +573,7 @@ class tx_memory_pool : boost::noncopyable
      *
      * @return an iterator, possibly to the end of the container if not found
      */
-	sorted_tx_container::iterator find_tx_in_sorted_container(const crypto::hash &id) const;
+	sorted_tx_container::iterator find_tx_in_sorted_container(const crypto::hash& id) const;
 
 	//! transactions which are unlikely to be included in blocks
 	/*! These transactions are kept in RAM in case they *are* included
@@ -581,38 +581,38 @@ class tx_memory_pool : boost::noncopyable
      */
 	std::unordered_set<crypto::hash> m_timed_out_transactions;
 
-	Blockchain &m_blockchain; //!< reference to the Blockchain object
+	Blockchain& m_blockchain; //!< reference to the Blockchain object
 
 	size_t m_txpool_max_size;
 	size_t m_txpool_size;
 };
-}
+} // namespace cryptonote
 
 namespace boost
 {
 namespace serialization
 {
 template <class archive_t>
-void serialize(archive_t &ar, cryptonote::tx_memory_pool::tx_details &td, const unsigned int version)
+void serialize(archive_t& ar, cryptonote::tx_memory_pool::tx_details& td, const unsigned int version)
 {
-	ar &td.blob_size;
-	ar &td.fee;
-	ar &td.tx;
-	ar &td.max_used_block_height;
-	ar &td.max_used_block_id;
-	ar &td.last_failed_height;
-	ar &td.last_failed_id;
-	ar &td.receive_time;
-	ar &td.last_relayed_time;
-	ar &td.relayed;
+	ar& td.blob_size;
+	ar& td.fee;
+	ar& td.tx;
+	ar& td.max_used_block_height;
+	ar& td.max_used_block_id;
+	ar& td.last_failed_height;
+	ar& td.last_failed_id;
+	ar& td.receive_time;
+	ar& td.last_relayed_time;
+	ar& td.relayed;
 	if(version < 11)
 		return;
-	ar &td.kept_by_block;
+	ar& td.kept_by_block;
 	if(version < 12)
 		return;
-	ar &td.do_not_relay;
+	ar& td.do_not_relay;
 }
-}
-}
+} // namespace serialization
+} // namespace boost
 BOOST_CLASS_VERSION(cryptonote::tx_memory_pool, CURRENT_MEMPOOL_ARCHIVE_VER)
 BOOST_CLASS_VERSION(cryptonote::tx_memory_pool::tx_details, CURRENT_MEMPOOL_TX_DETAILS_ARCHIVE_VER)

@@ -81,7 +81,8 @@ extern int check_locking_order;
  * It is copied to a holding buffer to compare against later.
  * Note that it may encompass the lock structure.
  */
-struct protected_area {
+struct protected_area
+{
 	/** where the memory region starts */
 	void* region;
 	/** size of the region */
@@ -95,7 +96,8 @@ struct protected_area {
 /**
  * Per thread information for locking debug wrappers. 
  */
-struct thr_check {
+struct thr_check
+{
 	/** thread id */
 	pthread_t id;
 	/** real thread func */
@@ -121,13 +123,14 @@ struct thr_check {
 /**
  * One structure for all types of locks.
  */
-struct checked_lock {
+struct checked_lock
+{
 	/** mutex for exclusive access to this structure */
 	pthread_mutex_t lock;
 	/** list of memory regions protected by this checked lock */
 	struct protected_area* prot;
 	/** where was this lock created */
-	const char* create_func, *create_file;
+	const char *create_func, *create_file;
 	/** where was this lock created */
 	int create_line;
 	/** unique instance identifier */
@@ -141,7 +144,7 @@ struct checked_lock {
 	/** how many threads are waiting for this lock */
 	int wait_count;
 	/** who touched it last */
-	const char* holder_func, *holder_file;
+	const char *holder_func, *holder_file;
 	/** who touched it last */
 	int holder_line;
 	/** who owns the lock now */
@@ -155,7 +158,8 @@ struct checked_lock {
 	struct checked_lock* prev_held_lock[THRDEBUG_MAX_THREADS];
 
 	/** type of lock */
-	enum check_lock_type {
+	enum check_lock_type
+	{
 		/** basic mutex */
 		check_lock_mutex,
 		/** fast spinlock */
@@ -300,11 +304,20 @@ void checklock_thrjoin(pthread_t thread);
  * i.e. there can be contention and readlocks stored in checked_lock, while
  * the protected area stays the same, even though it contains (ptr to) lock.
  */
-struct checked_lock_rw { struct checked_lock* c_rw; };
+struct checked_lock_rw
+{
+	struct checked_lock* c_rw;
+};
 /** structures to enable compiler type checking on the locks. */
-struct checked_lock_mutex { struct checked_lock* c_m; };
+struct checked_lock_mutex
+{
+	struct checked_lock* c_m;
+};
 /** structures to enable compiler type checking on the locks. */
-struct checked_lock_spl { struct checked_lock* c_spl; };
+struct checked_lock_spl
+{
+	struct checked_lock* c_spl;
+};
 
 /** debugging rwlock */
 typedef struct checked_lock_rw lock_rw_type;

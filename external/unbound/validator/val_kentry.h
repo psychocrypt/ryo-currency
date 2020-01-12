@@ -52,7 +52,8 @@ struct ub_packed_rrset_key;
  * This is what is stored in the key cache.
  * This is the key part for the cache; the key entry key.
  */
-struct key_entry_key {
+struct key_entry_key
+{
 	/** lru hash entry */
 	struct lruhash_entry entry;
 	/** name of the key */
@@ -73,7 +74,8 @@ struct key_entry_key {
  * 	isbad=1:		bad key
  * 	isbad=0 && rrset=0:	insecure space.
  */
-struct key_entry_data {
+struct key_entry_data
+{
 	/** the TTL of this entry (absolute time) */
 	time_t ttl;
 	/** the key rrdata. can be NULL to signal keyless name. */
@@ -111,7 +113,7 @@ void key_entry_hash(struct key_entry_key* kk);
  * @param region: where to allocate it
  * @return newly region-allocated entry or NULL on a failure to allocate.
  */
-struct key_entry_key* key_entry_copy_toregion(struct key_entry_key* kkey, 
+struct key_entry_key* key_entry_copy_toregion(struct key_entry_key* kkey,
 	struct regional* region);
 
 /**
@@ -169,7 +171,7 @@ char* key_entry_get_reason(struct key_entry_key* kkey);
  * @return new key entry or NULL on alloc failure
  */
 struct key_entry_key* key_entry_create_null(struct regional* region,
-	uint8_t* name, size_t namelen, uint16_t dclass, time_t ttl, 
+	uint8_t* name, size_t namelen, uint16_t dclass, time_t ttl,
 	time_t now);
 
 /**
@@ -184,7 +186,7 @@ struct key_entry_key* key_entry_create_null(struct regional* region,
  * @return new key entry or NULL on alloc failure
  */
 struct key_entry_key* key_entry_create_rrset(struct regional* region,
-        uint8_t* name, size_t namelen, uint16_t dclass, 
+	uint8_t* name, size_t namelen, uint16_t dclass,
 	struct ub_packed_rrset_key* rrset, uint8_t* sigalg, time_t now);
 
 /**

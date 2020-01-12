@@ -37,7 +37,7 @@ using namespace epee::string_tools;
 namespace
 {
 template <typename T>
-void do_pos_test(T expected, const std::string &str)
+void do_pos_test(T expected, const std::string& str)
 {
 	T val;
 	ASSERT_TRUE(get_xtype_from_string(val, str));
@@ -45,12 +45,12 @@ void do_pos_test(T expected, const std::string &str)
 }
 
 template <typename T>
-void do_neg_test(const std::string &str)
+void do_neg_test(const std::string& str)
 {
 	T val;
 	ASSERT_FALSE(get_xtype_from_string(val, str));
 }
-}
+} // namespace
 
 #define TEST_pos(int_type, expected, str)                            \
 	TEST(get_xtype_from_string, handles_pos_##int_type##_##expected) \

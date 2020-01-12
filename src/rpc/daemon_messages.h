@@ -54,7 +54,7 @@
 	class classname                        \
 	{                                      \
 	  public:                              \
-		static const char *const name;
+		static const char* const name;
 
 #define BEGIN_RPC_MESSAGE_REQUEST                                \
 	class Request : public Message                               \
@@ -62,8 +62,8 @@
 	  public:                                                    \
 		Request() {}                                             \
 		~Request() {}                                            \
-		rapidjson::Value toJson(rapidjson::Document &doc) const; \
-		void fromJson(rapidjson::Value &val);
+		rapidjson::Value toJson(rapidjson::Document& doc) const; \
+		void fromJson(rapidjson::Value& val);
 
 #define BEGIN_RPC_MESSAGE_RESPONSE                               \
 	class Response : public Message                              \
@@ -71,8 +71,8 @@
 	  public:                                                    \
 		Response() {}                                            \
 		~Response() {}                                           \
-		rapidjson::Value toJson(rapidjson::Document &doc) const; \
-		void fromJson(rapidjson::Value &val);
+		rapidjson::Value toJson(rapidjson::Document& doc) const; \
+		void fromJson(rapidjson::Value& val);
 
 #define END_RPC_MESSAGE_REQUEST \
 	}                           \

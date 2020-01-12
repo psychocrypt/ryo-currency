@@ -381,7 +381,7 @@ static rct::rctSig make_sample_simple_rct_sig(int n_inputs, const uint64_t input
 }
 
 static bool range_proof_test(bool expected_valid,
-							 int n_inputs, const uint64_t input_amounts[], int n_outputs, const uint64_t output_amounts[], bool last_is_fee, bool simple)
+	int n_inputs, const uint64_t input_amounts[], int n_outputs, const uint64_t output_amounts[], bool last_is_fee, bool simple)
 {
 	//compute rct data
 	bool valid;
@@ -392,7 +392,7 @@ static bool range_proof_test(bool expected_valid,
 		if(simple)
 		{
 			s = make_sample_simple_rct_sig(n_inputs, input_amounts, last_is_fee ? n_outputs - 1 : n_outputs, output_amounts, last_is_fee ? output_amounts[n_outputs - 1] : 0);
-			valid = verRctSemanticsSimple(s)  && verRctNonSemanticsSimple(s);
+			valid = verRctSemanticsSimple(s) && verRctNonSemanticsSimple(s);
 		}
 		else
 		{
@@ -400,7 +400,7 @@ static bool range_proof_test(bool expected_valid,
 			valid = verRct(s, true) && verRct(s, false);
 		}
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
 		valid = false;
 	}
@@ -1126,7 +1126,7 @@ TEST(ringct, aggregated)
 {
 	static const size_t N_PROOFS = 16;
 	std::vector<rctSig> s(N_PROOFS);
-	std::vector<const rctSig *> sp(N_PROOFS);
+	std::vector<const rctSig*> sp(N_PROOFS);
 
 	for(size_t n = 0; n < N_PROOFS; ++n)
 	{

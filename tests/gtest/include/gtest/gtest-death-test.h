@@ -197,7 +197,7 @@ class GTEST_API_ ExitedWithCode
 
   private:
 	// No implementation - assignment is unsupported.
-	void operator=(const ExitedWithCode &other);
+	void operator=(const ExitedWithCode& other);
 
 	const int exit_code_;
 };

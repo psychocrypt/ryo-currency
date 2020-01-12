@@ -46,8 +46,9 @@
 
 #pragma once
 
-extern "C" {
+extern "C"
+{
 #include "crypto/crypto-ops.h"
 }
 
-void sc_reduce32copy(unsigned char *scopy, const unsigned char *s);
+void sc_reduce32copy(unsigned char* scopy, const unsigned char* s);

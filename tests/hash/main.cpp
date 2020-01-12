@@ -46,66 +46,67 @@ typedef crypto::hash chash;
 
 PUSH_WARNINGS
 DISABLE_VS_WARNINGS(4297)
-extern "C" {
-static void hash_tree(const void *data, size_t length, char *hash)
+extern "C"
 {
-	if((length & 31) != 0)
+	static void hash_tree(const void* data, size_t length, char* hash)
 	{
-		throw ios_base::failure("Invalid input length for tree_hash");
+		if((length & 31) != 0)
+		{
+			throw ios_base::failure("Invalid input length for tree_hash");
+		}
+		tree_hash((const char(*)[crypto::HASH_SIZE])data, length >> 5, hash);
 	}
-	tree_hash((const char(*)[crypto::HASH_SIZE])data, length >> 5, hash);
-}
-static void cn_pow_hash_original(const void *data, size_t length, char *hash)
-{
-	cn_pow_hash_v2 ctx;
-	cn_pow_hash_v1 ctx_v1 = cn_pow_hash_v1::make_borrowed(ctx);
-	ctx_v1.hash(data, length, hash);
-}
-static void cn_pow_hash_heavy(const void *data, size_t length, char *hash)
-{
-	cn_pow_hash_v2 ctx;
-	ctx.hash(data, length, hash);
-}
-static void hash_extra_blake(const void *data, size_t length, char *hash)
-{
-	if(length != 200)
+	static void cn_pow_hash_original(const void* data, size_t length, char* hash)
 	{
-		throw ios_base::failure("Invalid input length for hash_extra_blake");
+		cn_pow_hash_v2 ctx;
+		cn_pow_hash_v1 ctx_v1 = cn_pow_hash_v1::make_borrowed(ctx);
+		ctx_v1.hash(data, length, hash);
 	}
-	blake256_hash((uint8_t*)data, (uint8_t*)hash);
-}
-static void hash_extra_groestl(const void *data, size_t length, char *hash)
-{
-	if(length != 200)
+	static void cn_pow_hash_heavy(const void* data, size_t length, char* hash)
 	{
-		throw ios_base::failure("Invalid input length for hash_extra_groestl");
+		cn_pow_hash_v2 ctx;
+		ctx.hash(data, length, hash);
 	}
-	groestl_hash((uint8_t*)data, (uint8_t*)hash);
-}
-static void hash_extra_jh(const void *data, size_t length, char *hash)
-{
-	if(length != 200)
+	static void hash_extra_blake(const void* data, size_t length, char* hash)
 	{
-		throw ios_base::failure("Invalid input length for hash_extra_jh");
+		if(length != 200)
+		{
+			throw ios_base::failure("Invalid input length for hash_extra_blake");
+		}
+		blake256_hash((uint8_t*)data, (uint8_t*)hash);
 	}
-	jh_hash((uint8_t*)data, (uint8_t*)hash);
-}
-static void hash_extra_skein(const void *data, size_t length, char *hash)
-{
-	if(length != 200)
+	static void hash_extra_groestl(const void* data, size_t length, char* hash)
 	{
-		throw ios_base::failure("Invalid input length for hash_extra_skein");
+		if(length != 200)
+		{
+			throw ios_base::failure("Invalid input length for hash_extra_groestl");
+		}
+		groestl_hash((uint8_t*)data, (uint8_t*)hash);
 	}
-	skein_hash((uint8_t*)data, (uint8_t*)hash);
-}
+	static void hash_extra_jh(const void* data, size_t length, char* hash)
+	{
+		if(length != 200)
+		{
+			throw ios_base::failure("Invalid input length for hash_extra_jh");
+		}
+		jh_hash((uint8_t*)data, (uint8_t*)hash);
+	}
+	static void hash_extra_skein(const void* data, size_t length, char* hash)
+	{
+		if(length != 200)
+		{
+			throw ios_base::failure("Invalid input length for hash_extra_skein");
+		}
+		skein_hash((uint8_t*)data, (uint8_t*)hash);
+	}
 } // extern "C"
 POP_WARNINGS
 
-extern "C" typedef void hash_f(const void *, size_t, char *);
+extern "C" typedef void hash_f(const void*, size_t, char*);
 struct hash_func
 {
 	const string name;
-	hash_f &f;
+	hash_f& f;
 } hashes[] = {
 	{"fast", cn_fast_hash},
 	{"pow-original", cn_pow_hash_original},
@@ -114,13 +115,12 @@ struct hash_func
 	{"extra-groestl", hash_extra_groestl},
 	{"extra-jh", hash_extra_jh},
 	{"extra-skein", hash_extra_skein},
-	{"pow-heavy", cn_pow_hash_heavy}
-};
+	{"pow-heavy", cn_pow_hash_heavy}};
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-	hash_f *f;
-	hash_func *hf;
+	hash_f* f;
+	hash_func* hf;
 	fstream input;
 	vector<char> data;
 	chash expected, actual;
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 		input.exceptions(ios_base::badbit | ios_base::failbit | ios_base::eofbit);
 		input.clear(input.rdstate());
 		get(input, data);
-		f(data.data(), data.size(), (char *)&actual);
+		f(data.data(), data.size(), (char*)&actual);
 		if(expected != actual)
 		{
 			size_t i;
@@ -178,13 +178,13 @@ int main(int argc, char *argv[])
 				 << "Expected hash: ";
 			for(i = 0; i < 32; i++)
 			{
-				cerr << setbase(16) << setw(2) << setfill('0') << int(reinterpret_cast<unsigned char *>(&expected)[i]);
+				cerr << setbase(16) << setw(2) << setfill('0') << int(reinterpret_cast<unsigned char*>(&expected)[i]);
 			}
 			cerr << endl
 				 << "Actual hash: ";
 			for(i = 0; i < 32; i++)
 			{
-				cerr << setbase(16) << setw(2) << setfill('0') << int(reinterpret_cast<unsigned char *>(&actual)[i]);
+				cerr << setbase(16) << setw(2) << setfill('0') << int(reinterpret_cast<unsigned char*>(&actual)[i]);
 			}
 			cerr << endl;
 			error = true;

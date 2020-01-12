@@ -77,7 +77,8 @@ struct respip_client_info;
 /** 
  * Mesh of query states
  */
-struct mesh_area {
+struct mesh_area
+{
 	/** active module stack */
 	struct module_stack mods;
 	/** environment for new states */
@@ -153,7 +154,8 @@ struct mesh_area {
  * The entire structure is allocated in a region, this region is the qstate
  * region. All parts (rbtree nodes etc) are also allocated in the region.
  */
-struct mesh_state {
+struct mesh_state
+{
 	/** node in mesh_area all tree, key is this struct. Must be first. */
 	rbnode_type node;
 	/** node in mesh_area runnable tree, key is this struct */
@@ -179,8 +181,12 @@ struct mesh_state {
 	/** next in linked list for reply states */
 	struct mesh_state* next;
 	/** if this state is in the forever list, jostle list, or neither */
-	enum mesh_list_select { mesh_no_list, mesh_forever_list, 
-		mesh_jostle_list } list_select;
+	enum mesh_list_select
+	{
+		mesh_no_list,
+		mesh_forever_list,
+		mesh_jostle_list
+	} list_select;
 	/** pointer to this state for uniqueness or NULL */
 	struct mesh_state* unique;
 
@@ -192,7 +198,8 @@ struct mesh_state {
  * Rbtree reference to a mesh_state.
  * Used in super_set and sub_set. 
  */
-struct mesh_state_ref {
+struct mesh_state_ref
+{
 	/** node in rbtree for set, key is this structure */
 	rbnode_type node;
 	/** the mesh state */
@@ -202,7 +209,8 @@ struct mesh_state_ref {
 /**
  * Reply to a client
  */
-struct mesh_reply {
+struct mesh_reply
+{
 	/** next in reply list */
 	struct mesh_reply* next;
 	/** the query reply destination, packet buffer and where to send. */
@@ -225,13 +233,14 @@ struct mesh_reply {
  * Mesh result callback func.
  * called as func(cb_arg, rcode, buffer_with_reply, security, why_bogus);
  */
-typedef void (*mesh_cb_func_type)(void*, int, struct sldns_buffer*, enum sec_status, 
+typedef void (*mesh_cb_func_type)(void*, int, struct sldns_buffer*, enum sec_status,
 	char*);
 
 /**
  * Callback to result routine
  */
-struct mesh_cb {
+struct mesh_cb
+{
 	/** next in list */
 	struct mesh_cb* next;
 	/** edns data from query */
@@ -259,7 +268,7 @@ struct mesh_cb {
  * @param env: environment for new queries.
  * @return mesh: the new mesh or NULL on error.
  */
-struct mesh_area* mesh_create(struct module_stack* stack, 
+struct mesh_area* mesh_create(struct module_stack* stack,
 	struct module_env* env);
 
 /**
@@ -304,7 +313,7 @@ void mesh_new_client(struct mesh_area* mesh, struct query_info* qinfo,
  * @return 0 on error.
  */
 int mesh_new_callback(struct mesh_area* mesh, struct query_info* qinfo,
-	uint16_t qflags, struct edns_data* edns, struct sldns_buffer* buf, 
+	uint16_t qflags, struct edns_data* edns, struct sldns_buffer* buf,
 	uint16_t qid, mesh_cb_func_type cb, void* cb_arg);
 
 /**
@@ -396,7 +405,7 @@ int mesh_attach_sub(struct module_qstate* qstate, struct query_info* qinfo,
  * @return: false on error, true if success (and init may be needed).
  */
 int mesh_add_sub(struct module_qstate* qstate, struct query_info* qinfo,
-        uint16_t qflags, int prime, int valrec, struct module_qstate** newq,
+	uint16_t qflags, int prime, int valrec, struct module_qstate** newq,
 	struct mesh_state** sub);
 
 /**
@@ -537,7 +546,7 @@ int mesh_state_add_reply(struct mesh_state* s, struct edns_data* edns,
  * @return: 0 on alloc error.
  */
 int mesh_state_add_cb(struct mesh_state* s, struct edns_data* edns,
-        struct sldns_buffer* buf, mesh_cb_func_type cb, void* cb_arg,
+	struct sldns_buffer* buf, mesh_cb_func_type cb, void* cb_arg,
 	uint16_t qid, uint16_t qflags);
 
 /**
@@ -549,7 +558,7 @@ int mesh_state_add_cb(struct mesh_state* s, struct edns_data* edns,
  * @param ev: event the mstate. Others get event_pass.
  * @param e: if a reply, its outbound entry.
  */
-void mesh_run(struct mesh_area* mesh, struct mesh_state* mstate, 
+void mesh_run(struct mesh_area* mesh, struct mesh_state* mstate,
 	enum module_ev ev, struct outbound_entry* e);
 
 /**

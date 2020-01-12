@@ -16,8 +16,7 @@
  * @param ttl	multicast TTL
  * @return socket
  */
-int
-OpenAndConfSSDPReceiveSocket(int ipv6, unsigned char ttl);
+int OpenAndConfSSDPReceiveSocket(int ipv6, unsigned char ttl);
 
 /**
  * Add or Drop the multicast membership for SSDP on the interface
@@ -26,8 +25,6 @@ OpenAndConfSSDPReceiveSocket(int ipv6, unsigned char ttl);
  * @param ipv6	IPv6 or IPv4
  * @param drop	0 to add, 1 to drop
  * return -1 on error, 0 on success */
-int
-AddDropMulticastMembership(int s, struct lan_addr_s * lan_addr, int ipv6, int drop);
+int AddDropMulticastMembership(int s, struct lan_addr_s* lan_addr, int ipv6, int drop);
 
 #endif
-

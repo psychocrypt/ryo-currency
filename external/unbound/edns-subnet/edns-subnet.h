@@ -49,7 +49,8 @@
 /**
  * ECS option
  */
-struct ecs_data {
+struct ecs_data
+{
 	uint16_t subnet_addr_fam;
 	uint8_t subnet_source_mask;
 	uint8_t subnet_scope_mask;
@@ -61,7 +62,6 @@ struct ecs_data {
  * copy the first n BITS from src to dst iff both src and dst 
  * are large enough, return 0 on succes
  */
-int
-copy_clear(uint8_t* dst, size_t dstlen, uint8_t* src, size_t srclen, size_t n);
+int copy_clear(uint8_t* dst, size_t dstlen, uint8_t* src, size_t srclen, size_t n);
 
 #endif /* EDNSSUBNET_EDNSSUBNET_H */

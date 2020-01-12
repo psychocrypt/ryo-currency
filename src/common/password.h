@@ -62,22 +62,22 @@ class password_container
 	password_container() noexcept;
 
 	//! `password` is used as password
-	password_container(std::string &&password) noexcept;
+	password_container(std::string&& password) noexcept;
 
 	//! \return A password from stdin TTY prompt or `std::cin` pipe.
-	static boost::optional<password_container> prompt(bool verify, const char *mesage = "Password");
+	static boost::optional<password_container> prompt(bool verify, const char* mesage = "Password");
 	static std::atomic<bool> is_prompting;
 
-	password_container(const password_container &) = delete;
-	password_container(password_container &&rhs) = default;
+	password_container(const password_container&) = delete;
+	password_container(password_container&& rhs) = default;
 
 	//! Wipes internal password
 	~password_container() noexcept;
 
-	password_container &operator=(const password_container &) = delete;
-	password_container &operator=(password_container &&) = default;
+	password_container& operator=(const password_container&) = delete;
+	password_container& operator=(password_container&&) = default;
 
-	const epee::wipeable_string &password() const noexcept { return m_password; }
+	const epee::wipeable_string& password() const noexcept { return m_password; }
 
   private:
 	epee::wipeable_string m_password;
@@ -100,15 +100,15 @@ struct login
        \return The username and password, or boost::none if
          `password_container::prompt` fails.
      */
-	static boost::optional<login> parse(std::string &&userpass, bool verify, const std::function<boost::optional<password_container>(bool)> &prompt);
+	static boost::optional<login> parse(std::string&& userpass, bool verify, const std::function<boost::optional<password_container>(bool)>& prompt);
 
-	login(const login &) = delete;
-	login(login &&) = default;
+	login(const login&) = delete;
+	login(login&&) = default;
 	~login() = default;
-	login &operator=(const login &) = delete;
-	login &operator=(login &&) = default;
+	login& operator=(const login&) = delete;
+	login& operator=(login&&) = default;
 
 	std::string username;
 	password_container password;
 };
-}
+} // namespace tools

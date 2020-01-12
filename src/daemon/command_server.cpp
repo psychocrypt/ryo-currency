@@ -48,16 +48,16 @@
 #include "version.h"
 #include <boost/algorithm/string.hpp>
 
-
-
 namespace daemonize
 {
 
 namespace p = std::placeholders;
 
 t_command_server::t_command_server(
-	uint32_t ip, uint16_t port, const boost::optional<tools::login> &login, bool is_rpc, cryptonote::core_rpc_server *rpc_server)
-	: m_parser(ip, port, login, is_rpc, rpc_server), m_command_lookup(), m_is_rpc(is_rpc)
+	uint32_t ip, uint16_t port, const boost::optional<tools::login>& login, bool is_rpc, cryptonote::core_rpc_server* rpc_server) :
+	m_parser(ip, port, login, is_rpc, rpc_server),
+	m_command_lookup(),
+	m_is_rpc(is_rpc)
 {
 	m_command_lookup.set_handler(
 		"help", std::bind(&t_command_server::help, this, p::_1), "help [<command>]", "Show the help section or the documentation about a <command>.");
@@ -143,12 +143,12 @@ t_command_server::t_command_server(
 		"version", std::bind(&t_command_parser_executor::version, &m_parser, p::_1), "Print version information.");
 }
 
-bool t_command_server::process_command_str(const std::string &cmd)
+bool t_command_server::process_command_str(const std::string& cmd)
 {
 	return m_command_lookup.process_command_str(cmd);
 }
 
-bool t_command_server::process_command_vec(const std::vector<std::string> &cmd)
+bool t_command_server::process_command_vec(const std::vector<std::string>& cmd)
 {
 	bool result = m_command_lookup.process_command_vec(cmd);
 	if(!result)
@@ -176,7 +176,7 @@ void t_command_server::stop_handling()
 	m_command_lookup.stop_handling();
 }
 
-bool t_command_server::help(const std::vector<std::string> &args)
+bool t_command_server::help(const std::vector<std::string>& args)
 {
 	if(args.empty())
 	{
@@ -201,7 +201,7 @@ std::string t_command_server::get_commands_str()
 	return ss.str();
 }
 
-std::string t_command_server::get_command_usage(const std::vector<std::string> &args)
+std::string t_command_server::get_command_usage(const std::vector<std::string>& args)
 {
 	std::pair<std::string, std::string> documentation = m_command_lookup.get_documentation(args);
 	std::stringstream ss;

@@ -5,13 +5,11 @@
  * This software is subject to the conditions detailed
  * in the LICENCE file provided within the distribution */
 
-#ifndef  GETROUTE_H_INCLUDED
-#define  GETROUTE_H_INCLUDED
+#ifndef GETROUTE_H_INCLUDED
+#define GETROUTE_H_INCLUDED
 
-int
-get_src_for_route_to(const struct sockaddr * dst,
-                     void * src, size_t * src_len,
-                     int * index);
+int get_src_for_route_to(const struct sockaddr* dst,
+	void* src, size_t* src_len,
+	int* index);
 
 #endif
-

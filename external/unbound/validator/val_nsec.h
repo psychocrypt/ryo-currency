@@ -73,7 +73,7 @@ struct key_entry_key;
  *	UNCHECKED: there was no way to prove anything (no NSECs, unknown algo).
  */
 enum sec_status val_nsec_prove_nodata_dsreply(struct module_env* env,
-	struct val_env* ve, struct query_info* qinfo, 
+	struct val_env* ve, struct query_info* qinfo,
 	struct reply_info* rep, struct key_entry_key* kkey,
 	time_t* proof_ttl, char** reason, struct module_qstate* qstate);
 
@@ -112,7 +112,7 @@ int nsec_has_type(struct ub_packed_rrset_key* nsec, uint16_t type);
  * 	nextcloser of qname.
  * @return true if NSEC proves this.
  */
-int nsec_proves_nodata(struct ub_packed_rrset_key* nsec, 
+int nsec_proves_nodata(struct ub_packed_rrset_key* nsec,
 	struct query_info* qinfo, uint8_t** wc);
 
 /**
@@ -123,7 +123,7 @@ int nsec_proves_nodata(struct ub_packed_rrset_key* nsec,
  * @param qname: what was queried.
  * @return true if proven.
  */
-int val_nsec_proves_name_error(struct ub_packed_rrset_key* nsec, 
+int val_nsec_proves_name_error(struct ub_packed_rrset_key* nsec,
 	uint8_t* qname);
 
 /**
@@ -133,7 +133,7 @@ int val_nsec_proves_name_error(struct ub_packed_rrset_key* nsec,
  * @param wc: wildcard (without *. label)
  * @return true if proven.
  */
-int val_nsec_proves_positive_wildcard(struct ub_packed_rrset_key* nsec, 
+int val_nsec_proves_positive_wildcard(struct ub_packed_rrset_key* nsec,
 	struct query_info* qinf, uint8_t* wc);
 
 /**
@@ -144,7 +144,7 @@ int val_nsec_proves_positive_wildcard(struct ub_packed_rrset_key* nsec,
  * @param nsec: the nsec RRset.
  * @return closest encloser dname or NULL on error (bad nsec RRset).
  */
-uint8_t* nsec_closest_encloser(uint8_t* qname, 
+uint8_t* nsec_closest_encloser(uint8_t* qname,
 	struct ub_packed_rrset_key* nsec);
 
 /**
@@ -155,7 +155,7 @@ uint8_t* nsec_closest_encloser(uint8_t* qname,
  * @param qnamelen: length of qname.
  * @return true if proven.
  */
-int val_nsec_proves_no_wc(struct ub_packed_rrset_key* nsec, uint8_t* qname, 
+int val_nsec_proves_no_wc(struct ub_packed_rrset_key* nsec, uint8_t* qname,
 	size_t qnamelen);
 
 /**
@@ -179,6 +179,6 @@ int val_nsec_check_dlv(struct query_info* qinfo,
  * 	the qname.
  */
 int val_nsec_proves_insecuredelegation(struct ub_packed_rrset_key* nsec,
-        struct query_info* qinfo);
+	struct query_info* qinfo);
 
 #endif /* VALIDATOR_VAL_NSEC_H */

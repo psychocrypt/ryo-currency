@@ -15,21 +15,20 @@
  * Previous versions of the specification defined 5351
  * as the port for address change announces. */
 #define NATPMP_PORT (5351)
-#define NATPMP_NOTIF_PORT	(5350)
-#define NATPMP_NOTIF_ADDR	("224.0.0.1")
+#define NATPMP_NOTIF_PORT (5350)
+#define NATPMP_NOTIF_ADDR ("224.0.0.1")
 
-int OpenAndConfNATPMPSockets(int * sockets);
+int OpenAndConfNATPMPSockets(int* sockets);
 
 /* receiveraddr is only used with IPV6 sockets */
-int ReceiveNATPMPOrPCPPacket(int s, struct sockaddr * senderaddr,
-                             socklen_t * senderaddrlen,
-                             struct sockaddr_in6 * receiveraddr,
-                             unsigned char * msg_buff, size_t msg_buff_size);
+int ReceiveNATPMPOrPCPPacket(int s, struct sockaddr* senderaddr,
+	socklen_t* senderaddrlen,
+	struct sockaddr_in6* receiveraddr,
+	unsigned char* msg_buff, size_t msg_buff_size);
 
-void ProcessIncomingNATPMPPacket(int s, unsigned char * msg_buff, int len,
-                                 struct sockaddr_in * senderaddr);
+void ProcessIncomingNATPMPPacket(int s, unsigned char* msg_buff, int len,
+	struct sockaddr_in* senderaddr);
 
-void SendNATPMPPublicAddressChangeNotification(int * sockets, int n_sockets);
+void SendNATPMPPublicAddressChangeNotification(int* sockets, int n_sockets);
 
 #endif
-

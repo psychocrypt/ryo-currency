@@ -10,14 +10,11 @@
 
 /* ExecuteSoapAction():
  * this method executes the requested Soap Action */
-void
-ExecuteSoapAction(struct upnphttp *, const char *, int);
+void ExecuteSoapAction(struct upnphttp*, const char*, int);
 
 /* SoapError():
  * sends a correct SOAP error with an UPNPError code and
  * description */
-void
-SoapError(struct upnphttp * h, int errCode, const char * errDesc);
+void SoapError(struct upnphttp* h, int errCode, const char* errDesc);
 
 #endif
-

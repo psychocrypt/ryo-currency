@@ -117,41 +117,42 @@ typedef boost::uuids::uuid uuid;
 
 class test_levin_server : public levin::levin_commands_handler<>
 {
-	test_levin_server(const test_levin_server &) {}
+	test_levin_server(const test_levin_server&) {}
+
   public:
 	test_levin_server() {}
-	void set_thread_prefix(const std::string &pref)
+	void set_thread_prefix(const std::string& pref)
 	{
 		m_net_server.set_threads_prefix(pref);
 	}
 	template <class calback_t>
-	bool connect_async(const std::string adr, const std::string &port, uint32_t conn_timeot, calback_t cb, const std::string &bind_ip = "0.0.0.0")
+	bool connect_async(const std::string adr, const std::string& port, uint32_t conn_timeot, calback_t cb, const std::string& bind_ip = "0.0.0.0")
 	{
 		return m_net_server.connect_async(adr, port, conn_timeot, cb, bind_ip);
 	}
 
-	bool connect(const std::string adr, const std::string &port, uint32_t conn_timeot, net_utils::connection_context_base &cn, const std::string &bind_ip = "0.0.0.0")
+	bool connect(const std::string adr, const std::string& port, uint32_t conn_timeot, net_utils::connection_context_base& cn, const std::string& bind_ip = "0.0.0.0")
 	{
 		return m_net_server.connect(adr, port, conn_timeot, cn, bind_ip);
 	}
-	void close(net_utils::connection_context_base &cn)
+	void close(net_utils::connection_context_base& cn)
 	{
 		m_net_server.get_config_object().close(cn.m_connection_id);
 	}
 
 	template <class t_request, class t_response>
-	bool invoke(uuid con_id, int command, t_request &req, t_response &resp)
+	bool invoke(uuid con_id, int command, t_request& req, t_response& resp)
 	{
 		return invoke_remote_command(con_id, command, req, resp, m_net_server.get_config_object());
 	}
 
 	template <class t_response, class t_request, class callback_t>
-	bool invoke_async(uuid con_id, int command, t_request &req, callback_t cb)
+	bool invoke_async(uuid con_id, int command, t_request& req, callback_t cb)
 	{
 		return async_invoke_remote_command<t_response>(con_id, command, req, m_net_server.get_config_object(), cb);
 	}
 
-	bool init(const std::string &bind_port = "", const std::string &bind_ip = "0.0.0.0")
+	bool init(const std::string& bind_port = "", const std::string& bind_ip = "0.0.0.0")
 	{
 		m_net_server.get_config_object().set_handler(this);
 		m_net_server.get_config_object().m_invoke_timeout = 1000;
@@ -201,13 +202,13 @@ class test_levin_server : public levin::levin_commands_handler<>
 	END_INVOKE_MAP()
 
 	//----------------- commands handlers ----------------------------------------------
-	int handle_1(int command, COMMAND_EXAMPLE_1::request &arg, COMMAND_EXAMPLE_1::response &rsp, const net_utils::connection_context_base &context)
+	int handle_1(int command, COMMAND_EXAMPLE_1::request& arg, COMMAND_EXAMPLE_1::response& rsp, const net_utils::connection_context_base& context)
 	{
 		LOG_PRINT_L0("on_command_1: id " << arg.example_id_data << "---->>");
 		COMMAND_EXAMPLE_2::request arg_ = AUTO_VAL_INIT(arg_);
 		arg_.example_id_data = arg.example_id_data;
 		COMMAND_EXAMPLE_2::response rsp_ = AUTO_VAL_INIT(rsp_);
-		invoke_async<COMMAND_EXAMPLE_2::response>(context.m_connection_id, COMMAND_EXAMPLE_2::ID, arg_, [](int code, const COMMAND_EXAMPLE_2::response &rsp, const net_utils::connection_context_base &context) {
+		invoke_async<COMMAND_EXAMPLE_2::response>(context.m_connection_id, COMMAND_EXAMPLE_2::ID, arg_, [](int code, const COMMAND_EXAMPLE_2::response& rsp, const net_utils::connection_context_base& context) {
 			if(code < 0)
 			{
 				LOG_PRINT_RED_L0("on_command_1: command_2 failed to invoke");
@@ -221,7 +222,7 @@ class test_levin_server : public levin::levin_commands_handler<>
 		LOG_PRINT_L0("on_command_1: id " << arg.example_id_data << "<<----");
 		return true;
 	}
-	int handle_2(int command, COMMAND_EXAMPLE_2::request &arg, COMMAND_EXAMPLE_2::response &rsp, const net_utils::connection_context_base &context)
+	int handle_2(int command, COMMAND_EXAMPLE_2::request& arg, COMMAND_EXAMPLE_2::response& rsp, const net_utils::connection_context_base& context)
 	{
 		LOG_PRINT_L0("on_command_2: id " << arg.example_id_data);
 		rsp.example_id_data = arg.example_id_data;
@@ -302,7 +303,7 @@ inline bool do_run_test_server()
 	return true;
 }
 
-inline bool do_test2_work_with_srv(test_levin_server &srv, int port)
+inline bool do_test2_work_with_srv(test_levin_server& srv, int port)
 {
 	uint64_t i = 0;
 	boost::mutex wait_event;
@@ -310,16 +311,16 @@ inline bool do_test2_work_with_srv(test_levin_server &srv, int port)
 	while(true)
 	{
 		net_utils::connection_context_base cntxt_local = AUTO_VAL_INIT(cntxt_local);
-		bool r = srv.connect_async("127.0.0.1", string_tools::num_to_string_fast(port), 5000, [&srv, &port, &wait_event, &i, &cntxt_local](const net_utils::connection_context_base &cntxt, const boost::system::error_code &ec) {
-			GULPS_CHECK_AND_ASSERT_MES(!ec, void(), "Some problems at connect, message: " , ec.message());
+		bool r = srv.connect_async("127.0.0.1", string_tools::num_to_string_fast(port), 5000, [&srv, &port, &wait_event, &i, &cntxt_local](const net_utils::connection_context_base& cntxt, const boost::system::error_code& ec) {
+			GULPS_CHECK_AND_ASSERT_MES(!ec, void(), "Some problems at connect, message: ", ec.message());
 			cntxt_local = cntxt;
 			LOG_PRINT_L0("Invoking command 1 to " << port);
 			COMMAND_EXAMPLE_1::request arg = AUTO_VAL_INIT(arg);
 			arg.example_id_data = i;
 			/*vc2010 workaround*/
 			int port_ = port;
-			boost::mutex &wait_event_ = wait_event;
-			int r = srv.invoke_async<COMMAND_EXAMPLE_1::request>(cntxt.m_connection_id, COMMAND_EXAMPLE_1::ID, arg, [port_, &wait_event_](int code, const COMMAND_EXAMPLE_1::request &rsp, const net_utils::connection_context_base &cntxt) {
+			boost::mutex& wait_event_ = wait_event;
+			int r = srv.invoke_async<COMMAND_EXAMPLE_1::request>(cntxt.m_connection_id, COMMAND_EXAMPLE_1::ID, arg, [port_, &wait_event_](int code, const COMMAND_EXAMPLE_1::request& rsp, const net_utils::connection_context_base& cntxt) {
 				GULPS_CHECK_AND_ASSERT_MES(code > 0, void(), "Failed to invoke");
 				LOG_PRINT_L0("command 1 invoke to " << port_ << " OK.");
 				wait_event_.unlock();
@@ -385,5 +386,5 @@ inline bool do_run_test_server_async_connect()
 
 	return true;
 }
-}
-}
+} // namespace tests
+} // namespace epee

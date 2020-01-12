@@ -77,7 +77,7 @@ void dp(bool a)
 	GULPS_PRINT("\n");
 }
 
-void dp(const char *a, int l)
+void dp(const char* a, int l)
 {
 	int j = 0;
 	GULPS_PRINT("\"");
@@ -137,7 +137,7 @@ void dp(bits amountb)
 	GULPS_PRINT("\n");
 }
 
-void dp(const char *st)
+void dp(const char* st)
 {
 	GULPSF_PRINT("{}\n", st);
 }
@@ -145,7 +145,7 @@ void dp(const char *st)
 //Various Conversions
 
 //uint long long to 32 byte key
-void d2h(key &amounth, const ryo_amount in)
+void d2h(key& amounth, const ryo_amount in)
 {
 	sc_0(amounth.bytes);
 	ryo_amount val = in;
@@ -194,7 +194,7 @@ void d2b(bits amountb, ryo_amount val)
 //32 byte key to uint long long
 // if the key holds a value > 2^64
 // then the value in the first 8 bytes is returned
-ryo_amount h2d(const key &test)
+ryo_amount h2d(const key& test)
 {
 	ryo_amount vali = 0;
 	int j = 0;
@@ -206,7 +206,7 @@ ryo_amount h2d(const key &test)
 }
 
 //32 byte key to int[64]
-void h2b(bits amountb2, const key &test)
+void h2b(bits amountb2, const key& test)
 {
 	int val = 0, i = 0, j = 0;
 	for(j = 0; j < 8; j++)
@@ -228,7 +228,7 @@ void h2b(bits amountb2, const key &test)
 }
 
 //int[64] to 32 byte key
-void b2h(key &amountdh, const bits amountb2)
+void b2h(key& amountdh, const bits amountb2)
 {
 	int byte, i, j;
 	for(j = 0; j < 8; j++)
@@ -259,23 +259,23 @@ ryo_amount b2d(bits amountb)
 	return vali;
 }
 
-size_t n_bulletproof_amounts(const Bulletproof &proof)
+size_t n_bulletproof_amounts(const Bulletproof& proof)
 {
 	GULPS_CHECK_AND_ASSERT_MES(proof.L.size() >= 6, 0, "Invalid bulletproof L size");
 	GULPS_CHECK_AND_ASSERT_MES(proof.L.size() == proof.R.size(), 0, "Mismatched bulletproof L/R size");
 	static const size_t extra_bits = 4;
 	static_assert((1 << extra_bits) == cryptonote::common_config::BULLETPROOF_MAX_OUTPUTS, "log2(BULLETPROOF_MAX_OUTPUTS) is out of date");
 	GULPS_CHECK_AND_ASSERT_MES(proof.L.size() <= 6 + extra_bits, 0, "Invalid bulletproof L size");
-	GULPS_CHECK_AND_ASSERT_MES(proof.V.size() <= (1u<<(proof.L.size()-6)), 0, "Invalid bulletproof V/L");
-	GULPS_CHECK_AND_ASSERT_MES(proof.V.size() * 2 > (1u<<(proof.L.size()-6)), 0, "Invalid bulletproof V/L");
+	GULPS_CHECK_AND_ASSERT_MES(proof.V.size() <= (1u << (proof.L.size() - 6)), 0, "Invalid bulletproof V/L");
+	GULPS_CHECK_AND_ASSERT_MES(proof.V.size() * 2 > (1u << (proof.L.size() - 6)), 0, "Invalid bulletproof V/L");
 	GULPS_CHECK_AND_ASSERT_MES(proof.V.size() > 0, 0, "Empty bulletproof");
 	return proof.V.size();
 }
 
-size_t n_bulletproof_amounts(const std::vector<Bulletproof> &proofs)
+size_t n_bulletproof_amounts(const std::vector<Bulletproof>& proofs)
 {
 	size_t n = 0;
-	for(const Bulletproof &proof: proofs)
+	for(const Bulletproof& proof : proofs)
 	{
 		size_t n2 = n_bulletproof_amounts(proof);
 		GULPS_CHECK_AND_ASSERT_MES(n2 < std::numeric_limits<uint32_t>::max() - n, 0, "Invalid number of bulletproofs");
@@ -286,7 +286,7 @@ size_t n_bulletproof_amounts(const std::vector<Bulletproof> &proofs)
 	return n;
 }
 
-size_t n_bulletproof_max_amounts(const Bulletproof &proof)
+size_t n_bulletproof_max_amounts(const Bulletproof& proof)
 {
 	GULPS_CHECK_AND_ASSERT_MES(proof.L.size() >= 6, 0, "Invalid bulletproof L size");
 	GULPS_CHECK_AND_ASSERT_MES(proof.L.size() == proof.R.size(), 0, "Mismatched bulletproof L/R size");
@@ -296,18 +296,18 @@ size_t n_bulletproof_max_amounts(const Bulletproof &proof)
 	return 1 << (proof.L.size() - 6);
 }
 
-size_t n_bulletproof_max_amounts(const std::vector<Bulletproof> &proofs)
+size_t n_bulletproof_max_amounts(const std::vector<Bulletproof>& proofs)
 {
 	size_t n = 0;
-	for (const Bulletproof &proof: proofs)
+	for(const Bulletproof& proof : proofs)
 	{
 		size_t n2 = n_bulletproof_max_amounts(proof);
 		GULPS_CHECK_AND_ASSERT_MES(n2 < std::numeric_limits<uint32_t>::max() - n, 0, "Invalid number of bulletproofs");
-		if (n2 == 0)
+		if(n2 == 0)
 			return 0;
 		n += n2;
 	}
 	return n;
 }
 
-}
+} // namespace rct

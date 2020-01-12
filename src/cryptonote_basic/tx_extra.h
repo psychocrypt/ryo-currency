@@ -68,7 +68,7 @@ struct tx_extra_padding
 
 	// load
 	template <template <bool> class Archive>
-	bool do_serialize(Archive<false> &ar)
+	bool do_serialize(Archive<false>& ar)
 	{
 		// size - 1 - because of variant tag
 		for(size = 1; size <= TX_EXTRA_PADDING_MAX_COUNT; ++size)
@@ -93,7 +93,7 @@ struct tx_extra_padding
 
 	// store
 	template <template <bool> class Archive>
-	bool do_serialize(Archive<true> &ar)
+	bool do_serialize(Archive<true>& ar)
 	{
 		if(TX_EXTRA_PADDING_MAX_COUNT < size)
 			return false;
@@ -133,9 +133,10 @@ struct tx_extra_merge_mining_tag
 {
 	struct serialize_helper
 	{
-		tx_extra_merge_mining_tag &mm_tag;
+		tx_extra_merge_mining_tag& mm_tag;
 
-		serialize_helper(tx_extra_merge_mining_tag &mm_tag_) : mm_tag(mm_tag_)
+		serialize_helper(tx_extra_merge_mining_tag& mm_tag_) :
+			mm_tag(mm_tag_)
 		{
 		}
 
@@ -150,7 +151,7 @@ struct tx_extra_merge_mining_tag
 
 	// load
 	template <template <bool> class Archive>
-	bool do_serialize(Archive<false> &ar)
+	bool do_serialize(Archive<false>& ar)
 	{
 		std::string field;
 		if(!::do_serialize(ar, field))
@@ -164,7 +165,7 @@ struct tx_extra_merge_mining_tag
 
 	// store
 	template <template <bool> class Archive>
-	bool do_serialize(Archive<true> &ar)
+	bool do_serialize(Archive<true>& ar)
 	{
 		std::ostringstream oss;
 		binary_archive<true> oar(oss);
@@ -209,9 +210,10 @@ struct tx_extra_mysterious_minergate
 //   varint tag;
 //   varint size;
 //   varint data[];
-typedef boost::variant<tx_extra_padding, tx_extra_pub_key, tx_extra_nonce, tx_extra_merge_mining_tag, 
-	tx_extra_additional_pub_keys, tx_extra_uniform_payment_id, tx_extra_mysterious_minergate> tx_extra_field;
-}
+typedef boost::variant<tx_extra_padding, tx_extra_pub_key, tx_extra_nonce, tx_extra_merge_mining_tag,
+	tx_extra_additional_pub_keys, tx_extra_uniform_payment_id, tx_extra_mysterious_minergate>
+	tx_extra_field;
+} // namespace cryptonote
 
 VARIANT_TAG(binary_archive, cryptonote::tx_extra_padding, TX_EXTRA_TAG_PADDING);
 VARIANT_TAG(binary_archive, cryptonote::tx_extra_pub_key, TX_EXTRA_TAG_PUBKEY);

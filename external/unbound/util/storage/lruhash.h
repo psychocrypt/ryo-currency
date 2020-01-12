@@ -111,9 +111,9 @@ struct lruhash_bin;
 struct lruhash_entry;
 
 /** default start size for hash arrays */
-#define HASH_DEFAULT_STARTARRAY		1024 /* entries in array */
+#define HASH_DEFAULT_STARTARRAY 1024 /* entries in array */
 /** default max memory for hash arrays */
-#define HASH_DEFAULT_MAXMEM		4*1024*1024 /* bytes */
+#define HASH_DEFAULT_MAXMEM 4 * 1024 * 1024 /* bytes */
 
 /** the type of a hash value */
 typedef uint32_t hashvalue_type;
@@ -144,7 +144,8 @@ typedef void (*lruhash_markdelfunc_type)(void*);
 /**
  * Hash table that keeps LRU list of entries.
  */
-struct lruhash {
+struct lruhash
+{
 	/** lock for exclusive access, to the lookup array */
 	lock_quick_type lock;
 	/** the size function for entries in this table */
@@ -183,7 +184,8 @@ struct lruhash {
 /**
  * A single bin with a linked list of entries in it.
  */
-struct lruhash_bin {
+struct lruhash_bin
+{
 	/** 
 	 * Lock for exclusive access to the linked list
 	 * This lock makes deletion of items safe in this overflow list.
@@ -200,7 +202,8 @@ struct lruhash_bin {
  * This structure is designed as part of key struct. And key pointer helps
  * to get the surrounding structure. Data should be allocated on its own.
  */
-struct lruhash_entry {
+struct lruhash_entry
+{
 	/** 
 	 * rwlock for access to the contents of the entry
 	 * Note that it does _not_ cover the lru_ and overflow_ ptrs.
@@ -269,7 +272,7 @@ void lruhash_clear(struct lruhash* table);
  * @param data: the data.
  * @param cb_override: if not null overrides the cb_arg for the deletefunc.
  */
-void lruhash_insert(struct lruhash* table, hashvalue_type hash, 
+void lruhash_insert(struct lruhash* table, hashvalue_type hash,
 	struct lruhash_entry* entry, void* data, void* cb_override);
 
 /**
@@ -331,7 +334,7 @@ void lru_demote(struct lruhash* table, struct lruhash_entry* entry);
  *     or to the entry argument if it was not.
  */
 struct lruhash_entry* lruhash_insert_or_retrieve(struct lruhash* table, hashvalue_type hash,
-        struct lruhash_entry* entry, void* data, void* cb_arg);
+	struct lruhash_entry* entry, void* data, void* cb_arg);
 
 /************************* Internal functions ************************/
 /*** these are only exposed for unit tests. ***/
@@ -359,7 +362,7 @@ void bin_delete(struct lruhash* table, struct lruhash_bin* bin);
  * @param key: key to look for.
  * @return: the entry or NULL if not found.
  */
-struct lruhash_entry* bin_find_entry(struct lruhash* table, 
+struct lruhash_entry* bin_find_entry(struct lruhash* table,
 	struct lruhash_bin* bin, hashvalue_type hash, void* key);
 
 /**
@@ -368,7 +371,7 @@ struct lruhash_entry* bin_find_entry(struct lruhash* table,
  * @param bin: hash bin to look into.
  * @param entry: entry ptr that needs removal.
  */
-void bin_overflow_remove(struct lruhash_bin* bin, 
+void bin_overflow_remove(struct lruhash_bin* bin,
 	struct lruhash_entry* entry);
 
 /**
@@ -381,7 +384,7 @@ void bin_overflow_remove(struct lruhash_bin* bin,
  * @param newa: new increased array.
  * @param newmask: new lookup mask.
  */
-void bin_split(struct lruhash* table, struct lruhash_bin* newa, 
+void bin_split(struct lruhash* table, struct lruhash_bin* newa,
 	int newmask);
 
 /** 
@@ -441,6 +444,6 @@ size_t lruhash_get_mem(struct lruhash* table);
  * @param arg: user argument to func.
  */
 void lruhash_traverse(struct lruhash* h, int wr,
-        void (*func)(struct lruhash_entry*, void*), void* arg);
+	void (*func)(struct lruhash_entry*, void*), void* arg);
 
 #endif /* UTIL_STORAGE_LRUHASH_H */

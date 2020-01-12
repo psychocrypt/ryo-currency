@@ -61,21 +61,19 @@
 #include "cryptonote_basic/cryptonote_basic.h"
 #include "rpc/core_rpc_server.h"
 
-
-
 namespace daemonize
 {
 
 class t_rpc_command_executor final
 {
   private:
-	tools::t_rpc_client *m_rpc_client;
-	cryptonote::core_rpc_server *m_rpc_server;
+	tools::t_rpc_client* m_rpc_client;
+	cryptonote::core_rpc_server* m_rpc_server;
 	bool m_is_rpc;
 
   public:
 	t_rpc_command_executor(
-		uint32_t ip, uint16_t port, const boost::optional<tools::login> &user, bool is_rpc = true, cryptonote::core_rpc_server *rpc_server = NULL);
+		uint32_t ip, uint16_t port, const boost::optional<tools::login>& user, bool is_rpc = true, cryptonote::core_rpc_server* rpc_server = NULL);
 
 	~t_rpc_command_executor();
 
@@ -99,7 +97,7 @@ class t_rpc_command_executor final
 
 	bool set_log_level(int8_t level);
 
-	bool set_log_categories(const std::string &categories);
+	bool set_log_categories(const std::string& categories);
 
 	bool print_height();
 
@@ -109,7 +107,7 @@ class t_rpc_command_executor final
 
 	bool print_transaction(crypto::hash transaction_hash, bool include_hex, bool include_json);
 
-	bool is_key_image_spent(const crypto::key_image &ki);
+	bool is_key_image_spent(const crypto::key_image& ki);
 
 	bool print_transaction_pool_long();
 
@@ -141,13 +139,13 @@ class t_rpc_command_executor final
 
 	bool print_bans();
 
-	bool ban(const std::string &ip, time_t seconds);
+	bool ban(const std::string& ip, time_t seconds);
 
-	bool unban(const std::string &ip);
+	bool unban(const std::string& ip);
 
-	bool flush_txpool(const std::string &txid);
+	bool flush_txpool(const std::string& txid);
 
-	bool output_histogram(const std::vector<uint64_t> &amounts, uint64_t min_count, uint64_t max_count);
+	bool output_histogram(const std::vector<uint64_t>& amounts, uint64_t min_count, uint64_t max_count);
 
 	bool print_coinbase_tx_sum(uint64_t height, uint64_t count);
 
@@ -155,9 +153,9 @@ class t_rpc_command_executor final
 
 	bool print_blockchain_dynamic_stats(uint64_t nblocks);
 
-	bool update(const std::string &command);
+	bool update(const std::string& command);
 
-	bool relay_tx(const std::string &txid);
+	bool relay_tx(const std::string& txid);
 
 	bool sync_info();
 };

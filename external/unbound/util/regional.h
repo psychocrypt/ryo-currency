@@ -88,20 +88,20 @@ struct regional* regional_create(void);
  * @return: newly allocated regional.
  */
 struct regional* regional_create_custom(size_t size);
-	
+
 /**
  * Free all memory associated with regional. Only keeps the first block with
  * the regional inside it.
  * @param r: the region.
  */
-void regional_free_all(struct regional *r);
+void regional_free_all(struct regional* r);
 
 /**
  * Destroy regional.  All memory associated with regional is freed as if
  * regional_free_all was called, as well as destroying the regional struct.
  * @param r: to delete.
  */
-void regional_destroy(struct regional *r);
+void regional_destroy(struct regional* r);
 
 /**
  * Allocate size bytes of memory inside regional.  The memory is
@@ -110,7 +110,7 @@ void regional_destroy(struct regional *r);
  * @param size: number of bytes.
  * @return: pointer to memory allocated.
  */
-void *regional_alloc(struct regional *r, size_t size);
+void* regional_alloc(struct regional* r, size_t size);
 
 /**
  * Allocate size bytes of memory inside regional and copy INIT into it.
@@ -121,7 +121,7 @@ void *regional_alloc(struct regional *r, size_t size);
  * @param size: number of bytes.
  * @return: pointer to memory allocated.
  */
-void *regional_alloc_init(struct regional* r, const void *init, size_t size);
+void* regional_alloc_init(struct regional* r, const void* init, size_t size);
 
 /**
  * Allocate size bytes of memory inside regional that are initialized to
@@ -131,7 +131,7 @@ void *regional_alloc_init(struct regional* r, const void *init, size_t size);
  * @param size: number of bytes.
  * @return: pointer to memory allocated.
  */
-void *regional_alloc_zero(struct regional *r, size_t size);
+void* regional_alloc_zero(struct regional* r, size_t size);
 
 /**
  * Duplicate string and allocate the result in regional.
@@ -139,10 +139,10 @@ void *regional_alloc_zero(struct regional *r, size_t size);
  * @param string: null terminated string.
  * @return: pointer to memory allocated.
  */
-char *regional_strdup(struct regional *r, const char *string);
+char* regional_strdup(struct regional* r, const char* string);
 
 /** Debug print regional statistics to log */
-void regional_log_stats(struct regional *r);
+void regional_log_stats(struct regional* r);
 
 /** get total memory size in use by region */
 size_t regional_get_mem(struct regional* r);

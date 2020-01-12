@@ -56,7 +56,7 @@ one_block::one_block()
 	REGISTER_CALLBACK("verify_1", one_block::verify_1);
 }
 
-bool one_block::generate(std::vector<test_event_entry> &events)
+bool one_block::generate(std::vector<test_event_entry>& events)
 {
 	uint64_t ts_start = 1338224400;
 
@@ -67,7 +67,7 @@ bool one_block::generate(std::vector<test_event_entry> &events)
 	return true;
 }
 
-bool one_block::verify_1(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events)
+bool one_block::verify_1(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events)
 {
 	DEFINE_TESTS_ERROR_CONTEXT("one_block::verify_1");
 
@@ -102,7 +102,7 @@ gen_simple_chain_001::gen_simple_chain_001()
 	REGISTER_CALLBACK("verify_callback_2", gen_simple_chain_001::verify_callback_2);
 }
 
-bool gen_simple_chain_001::generate(std::vector<test_event_entry> &events)
+bool gen_simple_chain_001::generate(std::vector<test_event_entry>& events)
 {
 	uint64_t ts_start = 1338224400;
 
@@ -151,12 +151,12 @@ bool gen_simple_chain_001::generate(std::vector<test_event_entry> &events)
 	return true;
 }
 
-bool gen_simple_chain_001::verify_callback_1(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events)
+bool gen_simple_chain_001::verify_callback_1(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events)
 {
 	return true;
 }
 
-bool gen_simple_chain_001::verify_callback_2(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events)
+bool gen_simple_chain_001::verify_callback_2(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events)
 {
 	return true;
 }

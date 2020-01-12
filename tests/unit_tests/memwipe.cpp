@@ -38,17 +38,17 @@ GULPS_CAT_MAJOR("test");
 // it works in the normal case
 static void test(bool wipe)
 {
-	char *foo = (char *)malloc(4);
+	char* foo = (char*)malloc(4);
 	ASSERT_TRUE(foo != NULL);
 	intptr_t foop = (intptr_t)foo;
 	strcpy(foo, "bar");
-	void *bar = wipe ? memwipe(foo, 3) : memset(foo, 0, 3);
+	void* bar = wipe ? memwipe(foo, 3) : memset(foo, 0, 3);
 	ASSERT_EQ(foo, bar);
 	free(foo);
-	char *quux = (char *)malloc(4); // same size, just after free, so we're likely to get the same, depending on the allocator
+	char* quux = (char*)malloc(4); // same size, just after free, so we're likely to get the same, depending on the allocator
 	if((intptr_t)quux == foop)
 	{
-		std::cout << std::hex << std::setw(8) << std::setfill('0') << *(uint32_t *)quux << std::endl;
+		std::cout << std::hex << std::setw(8) << std::setfill('0') << *(uint32_t*)quux << std::endl;
 		if(wipe)
 		{
 			ASSERT_TRUE(memcmp(quux, "bar", 3));

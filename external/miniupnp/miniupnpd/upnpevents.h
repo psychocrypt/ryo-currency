@@ -13,36 +13,35 @@
 #include "config.h"
 
 #ifdef ENABLE_EVENTS
-enum subscriber_service_enum {
- EWanCFG = 1,
- EWanIPC,
+enum subscriber_service_enum
+{
+	EWanCFG = 1,
+	EWanIPC,
 #ifdef ENABLE_L3F_SERVICE
- EL3F,
+	EL3F,
 #endif
 #ifdef ENABLE_6FC_SERVICE
- E6FC,
+	E6FC,
 #endif
 #ifdef ENABLE_DP_SERVICE
- EDP,
+	EDP,
 #endif
 };
 
-void
-upnp_event_var_change_notify(enum subscriber_service_enum service);
+void upnp_event_var_change_notify(enum subscriber_service_enum service);
 
-const char *
-upnpevents_addSubscriber(const char * eventurl,
-                         const char * callback, int callbacklen,
-                         int timeout);
+const char*
+upnpevents_addSubscriber(const char* eventurl,
+	const char* callback, int callbacklen,
+	int timeout);
 
-int
-upnpevents_removeSubscriber(const char * sid, int sidlen);
+int upnpevents_removeSubscriber(const char* sid, int sidlen);
 
-const char *
-upnpevents_renewSubscription(const char * sid, int sidlen, int timeout);
+const char*
+upnpevents_renewSubscription(const char* sid, int sidlen, int timeout);
 
-void upnpevents_selectfds(fd_set *readset, fd_set *writeset, int * max_fd);
-void upnpevents_processfds(fd_set *readset, fd_set *writeset);
+void upnpevents_selectfds(fd_set* readset, fd_set* writeset, int* max_fd);
+void upnpevents_processfds(fd_set* readset, fd_set* writeset);
 
 #ifdef USE_MINIUPNPDCTL
 void write_events_details(int s);

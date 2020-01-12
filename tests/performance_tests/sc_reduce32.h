@@ -44,7 +44,7 @@ class test_sc_reduce32
 	bool test()
 	{
 		crypto::hash reduced = m_hash;
-		sc_reduce32((unsigned char *)reduced.data);
+		sc_reduce32((unsigned char*)reduced.data);
 		return true;
 	}
 

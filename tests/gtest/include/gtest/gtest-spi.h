@@ -64,11 +64,11 @@ class GTEST_API_ ScopedFakeTestPartResultReporter
 	// by Google Test.  The 'result' parameter specifies where to report the
 	// results. This reporter will only catch failures generated in the current
 	// thread. DEPRECATED
-	explicit ScopedFakeTestPartResultReporter(TestPartResultArray *result);
+	explicit ScopedFakeTestPartResultReporter(TestPartResultArray* result);
 
 	// Same as above, but you can choose the interception scope of this object.
 	ScopedFakeTestPartResultReporter(InterceptMode intercept_mode,
-									 TestPartResultArray *result);
+		TestPartResultArray* result);
 
 	// The d'tor restores the previous test part result reporter.
 	virtual ~ScopedFakeTestPartResultReporter();
@@ -78,14 +78,14 @@ class GTEST_API_ ScopedFakeTestPartResultReporter
 	//
 	// This method is from the TestPartResultReporterInterface
 	// interface.
-	virtual void ReportTestPartResult(const TestPartResult &result);
+	virtual void ReportTestPartResult(const TestPartResult& result);
 
   private:
 	void Init();
 
 	const InterceptMode intercept_mode_;
-	TestPartResultReporterInterface *old_reporter_;
-	TestPartResultArray *const result_;
+	TestPartResultReporterInterface* old_reporter_;
+	TestPartResultArray* const result_;
 
 	GTEST_DISALLOW_COPY_AND_ASSIGN_(ScopedFakeTestPartResultReporter);
 };
@@ -102,13 +102,13 @@ class GTEST_API_ SingleFailureChecker
 {
   public:
 	// The constructor remembers the arguments.
-	SingleFailureChecker(const TestPartResultArray *results,
-						 TestPartResult::Type type,
-						 const string &substr);
+	SingleFailureChecker(const TestPartResultArray* results,
+		TestPartResult::Type type,
+		const string& substr);
 	~SingleFailureChecker();
 
   private:
-	const TestPartResultArray *const results_;
+	const TestPartResultArray* const results_;
 	const TestPartResult::Type type_;
 	const string substr_;
 

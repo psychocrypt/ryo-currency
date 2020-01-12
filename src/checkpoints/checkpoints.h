@@ -81,7 +81,7 @@ class checkpoints
      *         AND the existing checkpoint hash does not match the new one,
      *         otherwise returns true
      */
-	bool add_checkpoint(uint64_t height, const std::string &hash_str);
+	bool add_checkpoint(uint64_t height, const std::string& hash_str);
 
 	/**
      * @brief checks if there is a checkpoint in the future
@@ -111,12 +111,12 @@ class checkpoints
      *         true if the passed parameters match the stored checkpoint,
      *         false otherwise
      */
-	bool check_block(uint64_t height, const crypto::hash &h, bool &is_a_checkpoint) const;
+	bool check_block(uint64_t height, const crypto::hash& h, bool& is_a_checkpoint) const;
 
 	/**
      * @overload
      */
-	bool check_block(uint64_t height, const crypto::hash &h) const;
+	bool check_block(uint64_t height, const crypto::hash& h) const;
 
 	/**
      * @brief checks if alternate chain blocks should be kept for a given height
@@ -146,7 +146,7 @@ class checkpoints
      *
      * @return a const reference to the checkpoints container
      */
-	const std::map<uint64_t, crypto::hash> &get_points() const;
+	const std::map<uint64_t, crypto::hash>& get_points() const;
 
 	/**
      * @brief checks if our checkpoints container conflicts with another
@@ -158,7 +158,7 @@ class checkpoints
      *
      * @return false if any conflict is found, otherwise true
      */
-	bool check_for_conflicts(const checkpoints &other) const;
+	bool check_for_conflicts(const checkpoints& other) const;
 
 	/**
      * @brief loads the default main chain checkpoints
@@ -180,7 +180,7 @@ class checkpoints
      *
      * @return true if loading successful and no conflicts
      */
-	bool load_new_checkpoints(const std::string &json_hashfile_fullpath, network_type nettype = MAINNET, bool dns = true);
+	bool load_new_checkpoints(const std::string& json_hashfile_fullpath, network_type nettype = MAINNET, bool dns = true);
 
 	/**
      * @brief load new checkpoints from json
@@ -189,7 +189,7 @@ class checkpoints
      *
      * @return true if loading successful and no conflicts
      */
-	bool load_checkpoints_from_json(const std::string &json_hashfile_fullpath);
+	bool load_checkpoints_from_json(const std::string& json_hashfile_fullpath);
 
 	/**
      * @brief load new checkpoints from DNS
@@ -203,4 +203,4 @@ class checkpoints
   private:
 	std::map<uint64_t, crypto::hash> m_points; //!< the checkpoints container
 };
-}
+} // namespace cryptonote

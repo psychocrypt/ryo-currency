@@ -38,19 +38,19 @@ namespace epee
 	try                 \
 	{
 
-#define STD_TRY_CATCH(where_, ret_val)                               \
-	}                                                                \
-	catch(const std::exception &e)                                   \
-	{                                                                \
-		GULPS_CAT_MAJOR("epee_msc_lang"); \
+#define STD_TRY_CATCH(where_, ret_val)                            \
+	}                                                             \
+	catch(const std::exception& e)                                \
+	{                                                             \
+		GULPS_CAT_MAJOR("epee_msc_lang");                         \
 		GULPSF_ERROR("EXCEPTION: {}, mes: {}", where_, e.what()); \
-		return ret_val;                                              \
-	}                                                                \
-	catch(...)                                                       \
-	{                                                                \
-		GULPS_CAT_MAJOR("epee_msc_lang"); \
-		GULPSF_ERROR("EXCEPTION: {}", where_);                          \
-		return ret_val;                                              \
+		return ret_val;                                           \
+	}                                                             \
+	catch(...)                                                    \
+	{                                                             \
+		GULPS_CAT_MAJOR("epee_msc_lang");                         \
+		GULPSF_ERROR("EXCEPTION: {}", where_);                    \
+		return ret_val;                                           \
 	}
 
 #define AUTO_VAL_INIT(v) boost::value_initialized<decltype(v)>()
@@ -84,14 +84,14 @@ template <class _Ty>
 struct less_as_pod
 	: public std::binary_function<_Ty, _Ty, bool>
 { // functor for operator<
-	bool operator()(const _Ty &_Left, const _Ty &_Right) const
+	bool operator()(const _Ty& _Left, const _Ty& _Right) const
 	{ // apply operator< to operands
 		return memcmp(&_Left, &_Right, sizeof(_Left)) < 0;
 	}
 };
 
 template <class _Ty>
-bool is_less_as_pod(const _Ty &_Left, const _Ty &_Right)
+bool is_less_as_pod(const _Ty& _Left, const _Ty& _Right)
 { // apply operator< to operands
 	return memcmp(&_Left, &_Right, sizeof(_Left)) < 0;
 }
@@ -106,7 +106,7 @@ inline bool sleep_no_w(long ms)
 }
 
 template <class type_vec_type>
-type_vec_type median(std::vector<type_vec_type> &v)
+type_vec_type median(std::vector<type_vec_type>& v)
 {
 	if(v.empty())
 		return boost::value_initialized<type_vec_type>();
@@ -141,7 +141,8 @@ template <class t_scope_leave_handler>
 struct call_befor_die : public call_befor_die_base
 {
 	t_scope_leave_handler m_func;
-	call_befor_die(t_scope_leave_handler f) : m_func(f)
+	call_befor_die(t_scope_leave_handler f) :
+		m_func(f)
 	{
 	}
 	~call_befor_die()
@@ -156,5 +157,5 @@ auto_scope_leave_caller create_scope_leave_handler(t_scope_leave_handler f)
 	auto_scope_leave_caller slc(new call_befor_die<t_scope_leave_handler>(f));
 	return slc;
 }
-}
-}
+} // namespace misc_utils
+} // namespace epee

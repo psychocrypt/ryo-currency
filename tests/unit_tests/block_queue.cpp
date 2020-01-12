@@ -32,13 +32,13 @@
 #include "gtest/gtest.h"
 #include <boost/uuid/uuid.hpp>
 
-static const boost::uuids::uuid &uuid1()
+static const boost::uuids::uuid& uuid1()
 {
 	static const boost::uuids::uuid uuid = crypto::rand<boost::uuids::uuid>();
 	return uuid;
 }
 
-static const boost::uuids::uuid &uuid2()
+static const boost::uuids::uuid& uuid2()
 {
 	static const boost::uuids::uuid uuid = crypto::rand<boost::uuids::uuid>();
 	return uuid;

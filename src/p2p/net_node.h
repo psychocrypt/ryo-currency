@@ -72,7 +72,10 @@ namespace nodetool
 template <class base_type>
 struct p2p_connection_context_t : base_type //t_payload_net_handler::connection_context //public net_utils::connection_context_base
 {
-	p2p_connection_context_t() : peer_id(0), support_flags(0), m_in_timedsync(false) {}
+	p2p_connection_context_t() :
+		peer_id(0),
+		support_flags(0),
+		m_in_timedsync(false) {}
 
 	peerid_type peer_id;
 	uint32_t support_flags;
@@ -103,40 +106,40 @@ class node_server : public epee::levin::levin_commands_handler<p2p_connection_co
   public:
 	typedef t_payload_net_handler payload_net_handler;
 
-	node_server(t_payload_net_handler &payload_handler)
-		: m_payload_handler(payload_handler),
-		  m_current_number_of_out_peers(0),
-		  m_current_number_of_in_peers(0),
-		  m_allow_local_ip(false),
-		  m_hide_my_port(false),
-		  m_no_igd(false),
-		  m_offline(false),
-		  is_closing(false),
-		  m_net_server(epee::net_utils::e_connection_type_P2P) // this is a P2P connection of the main p2p node server, because this is class node_server<>
+	node_server(t_payload_net_handler& payload_handler) :
+		m_payload_handler(payload_handler),
+		m_current_number_of_out_peers(0),
+		m_current_number_of_in_peers(0),
+		m_allow_local_ip(false),
+		m_hide_my_port(false),
+		m_no_igd(false),
+		m_offline(false),
+		is_closing(false),
+		m_net_server(epee::net_utils::e_connection_type_P2P) // this is a P2P connection of the main p2p node server, because this is class node_server<>
 	{
 	}
 	virtual ~node_server()
 	{
 	}
 
-	static void init_options(boost::program_options::options_description &desc);
+	static void init_options(boost::program_options::options_description& desc);
 
 	bool run();
-	bool init(const boost::program_options::variables_map &vm);
+	bool init(const boost::program_options::variables_map& vm);
 	bool deinit();
 	bool send_stop_signal();
 	uint32_t get_this_peer_port() { return m_listening_port; }
-	t_payload_net_handler &get_payload_object();
+	t_payload_net_handler& get_payload_object();
 
 	template <class Archive, class t_version_type>
-	void serialize(Archive &a, const t_version_type ver)
+	void serialize(Archive& a, const t_version_type ver)
 	{
-		a &m_peerlist;
+		a& m_peerlist;
 		if(ver == 0)
 		{
 			// from v1, we do not store the peer id anymore
 			peerid_type peer_id = AUTO_VAL_INIT(peer_id);
-			a &peer_id;
+			a& peer_id;
 		}
 	}
 	// debug functions
@@ -145,11 +148,11 @@ class node_server : public epee::levin::levin_commands_handler<p2p_connection_co
 	virtual uint64_t get_connections_count();
 	size_t get_outgoing_connections_count();
 	size_t get_incoming_connections_count();
-	peerlist_manager &get_peerlist_manager() { return m_peerlist; }
+	peerlist_manager& get_peerlist_manager() { return m_peerlist; }
 	void delete_out_connections(size_t count);
 	void delete_in_connections(size_t count);
-	virtual bool block_host(const epee::net_utils::network_address &adress, time_t seconds = P2P_IP_BLOCKTIME);
-	virtual bool unblock_host(const epee::net_utils::network_address &address);
+	virtual bool block_host(const epee::net_utils::network_address& adress, time_t seconds = P2P_IP_BLOCKTIME);
+	virtual bool unblock_host(const epee::net_utils::network_address& address);
 	virtual std::map<std::string, time_t> get_blocked_hosts()
 	{
 		CRITICAL_REGION_LOCAL(m_blocked_hosts_lock);
@@ -159,13 +162,13 @@ class node_server : public epee::levin::levin_commands_handler<p2p_connection_co
   private:
 	const std::vector<std::string> m_seed_nodes_list =
 		{"seed1.ryo-currency.com",
-		 "seed2.ryo-currency.com",
-		 "seed3.ryo-currency.com",
-		 "seed1.ryo-currency.org",
-		 "seed2.ryo-currency.org",
-		 "seed3.ryo-currency.org",
-		 "testnet-seed.ryo-currency.com",
-		 "testnet-seed.ryo-currency.org"};
+			"seed2.ryo-currency.com",
+			"seed3.ryo-currency.com",
+			"seed1.ryo-currency.org",
+			"seed2.ryo-currency.org",
+			"seed3.ryo-currency.org",
+			"testnet-seed.ryo-currency.com",
+			"testnet-seed.ryo-currency.org"};
 
 	bool islimitup = false;
 	bool islimitdown = false;
@@ -185,7 +188,7 @@ class node_server : public epee::levin::levin_commands_handler<p2p_connection_co
 	HANDLE_INVOKE_T2(COMMAND_REQUEST_PEER_ID, &node_server::handle_get_peer_id)
 #endif
 	HANDLE_INVOKE_T2(COMMAND_REQUEST_SUPPORT_FLAGS, &node_server::handle_get_support_flags)
-	CHAIN_INVOKE_MAP_TO_OBJ_FORCE_CONTEXT(m_payload_handler, typename t_payload_net_handler::connection_context &)
+	CHAIN_INVOKE_MAP_TO_OBJ_FORCE_CONTEXT(m_payload_handler, typename t_payload_net_handler::connection_context&)
 	END_INVOKE_MAP2()
 
 	enum PeerType
@@ -196,90 +199,90 @@ class node_server : public epee::levin::levin_commands_handler<p2p_connection_co
 	};
 
 	//----------------- commands handlers ----------------------------------------------
-	int handle_handshake(int command, typename COMMAND_HANDSHAKE::request &arg, typename COMMAND_HANDSHAKE::response &rsp, p2p_connection_context &context);
-	int handle_timed_sync(int command, typename COMMAND_TIMED_SYNC::request &arg, typename COMMAND_TIMED_SYNC::response &rsp, p2p_connection_context &context);
-	int handle_ping(int command, COMMAND_PING::request &arg, COMMAND_PING::response &rsp, p2p_connection_context &context);
+	int handle_handshake(int command, typename COMMAND_HANDSHAKE::request& arg, typename COMMAND_HANDSHAKE::response& rsp, p2p_connection_context& context);
+	int handle_timed_sync(int command, typename COMMAND_TIMED_SYNC::request& arg, typename COMMAND_TIMED_SYNC::response& rsp, p2p_connection_context& context);
+	int handle_ping(int command, COMMAND_PING::request& arg, COMMAND_PING::response& rsp, p2p_connection_context& context);
 #ifdef ALLOW_DEBUG_COMMANDS
-	int handle_get_stat_info(int command, typename COMMAND_REQUEST_STAT_INFO::request &arg, typename COMMAND_REQUEST_STAT_INFO::response &rsp, p2p_connection_context &context);
-	int handle_get_network_state(int command, COMMAND_REQUEST_NETWORK_STATE::request &arg, COMMAND_REQUEST_NETWORK_STATE::response &rsp, p2p_connection_context &context);
-	int handle_get_peer_id(int command, COMMAND_REQUEST_PEER_ID::request &arg, COMMAND_REQUEST_PEER_ID::response &rsp, p2p_connection_context &context);
+	int handle_get_stat_info(int command, typename COMMAND_REQUEST_STAT_INFO::request& arg, typename COMMAND_REQUEST_STAT_INFO::response& rsp, p2p_connection_context& context);
+	int handle_get_network_state(int command, COMMAND_REQUEST_NETWORK_STATE::request& arg, COMMAND_REQUEST_NETWORK_STATE::response& rsp, p2p_connection_context& context);
+	int handle_get_peer_id(int command, COMMAND_REQUEST_PEER_ID::request& arg, COMMAND_REQUEST_PEER_ID::response& rsp, p2p_connection_context& context);
 #endif
-	int handle_get_support_flags(int command, COMMAND_REQUEST_SUPPORT_FLAGS::request &arg, COMMAND_REQUEST_SUPPORT_FLAGS::response &rsp, p2p_connection_context &context);
+	int handle_get_support_flags(int command, COMMAND_REQUEST_SUPPORT_FLAGS::request& arg, COMMAND_REQUEST_SUPPORT_FLAGS::response& rsp, p2p_connection_context& context);
 	bool init_config();
 	bool make_default_peer_id();
 	bool make_default_config();
 	bool store_config();
-	bool check_trust(const proof_of_trust &tr);
+	bool check_trust(const proof_of_trust& tr);
 
 	//----------------- levin_commands_handler -------------------------------------------------------------
-	virtual void on_connection_new(p2p_connection_context &context);
-	virtual void on_connection_close(p2p_connection_context &context);
-	virtual void callback(p2p_connection_context &context);
+	virtual void on_connection_new(p2p_connection_context& context);
+	virtual void on_connection_close(p2p_connection_context& context);
+	virtual void callback(p2p_connection_context& context);
 	//----------------- i_p2p_endpoint -------------------------------------------------------------
-	virtual bool relay_notify_to_list(int command, const std::string &data_buff, const std::list<boost::uuids::uuid> &connections);
-	virtual bool relay_notify_to_all(int command, const std::string &data_buff, const epee::net_utils::connection_context_base &context);
-	virtual bool invoke_command_to_peer(int command, const std::string &req_buff, std::string &resp_buff, const epee::net_utils::connection_context_base &context);
-	virtual bool invoke_notify_to_peer(int command, const std::string &req_buff, const epee::net_utils::connection_context_base &context);
-	virtual bool drop_connection(const epee::net_utils::connection_context_base &context);
-	virtual void request_callback(const epee::net_utils::connection_context_base &context);
-	virtual void for_each_connection(std::function<bool(typename t_payload_net_handler::connection_context &, peerid_type, uint32_t)> f);
-	virtual bool for_connection(const boost::uuids::uuid &, std::function<bool(typename t_payload_net_handler::connection_context &, peerid_type, uint32_t)> f);
-	virtual bool add_host_fail(const epee::net_utils::network_address &address);
+	virtual bool relay_notify_to_list(int command, const std::string& data_buff, const std::list<boost::uuids::uuid>& connections);
+	virtual bool relay_notify_to_all(int command, const std::string& data_buff, const epee::net_utils::connection_context_base& context);
+	virtual bool invoke_command_to_peer(int command, const std::string& req_buff, std::string& resp_buff, const epee::net_utils::connection_context_base& context);
+	virtual bool invoke_notify_to_peer(int command, const std::string& req_buff, const epee::net_utils::connection_context_base& context);
+	virtual bool drop_connection(const epee::net_utils::connection_context_base& context);
+	virtual void request_callback(const epee::net_utils::connection_context_base& context);
+	virtual void for_each_connection(std::function<bool(typename t_payload_net_handler::connection_context&, peerid_type, uint32_t)> f);
+	virtual bool for_connection(const boost::uuids::uuid&, std::function<bool(typename t_payload_net_handler::connection_context&, peerid_type, uint32_t)> f);
+	virtual bool add_host_fail(const epee::net_utils::network_address& address);
 	//----------------- i_connection_filter  --------------------------------------------------------
-	virtual bool is_remote_host_allowed(const epee::net_utils::network_address &address);
+	virtual bool is_remote_host_allowed(const epee::net_utils::network_address& address);
 	//-----------------------------------------------------------------------------------------------
-	bool parse_peer_from_string(epee::net_utils::network_address &pe, const std::string &node_addr, uint16_t default_port = 0);
+	bool parse_peer_from_string(epee::net_utils::network_address& pe, const std::string& node_addr, uint16_t default_port = 0);
 	bool handle_command_line(
-		const boost::program_options::variables_map &vm);
+		const boost::program_options::variables_map& vm);
 	bool idle_worker();
-	bool handle_remote_peerlist(const std::list<peerlist_entry> &peerlist, time_t local_time, const epee::net_utils::connection_context_base &context);
-	bool get_local_node_data(basic_node_data &node_data);
+	bool handle_remote_peerlist(const std::list<peerlist_entry>& peerlist, time_t local_time, const epee::net_utils::connection_context_base& context);
+	bool get_local_node_data(basic_node_data& node_data);
 	//bool get_local_handshake_data(handshake_data& hshd);
 
-	bool merge_peerlist_with_local(const std::list<peerlist_entry> &bs);
-	bool fix_time_delta(std::list<peerlist_entry> &local_peerlist, time_t local_time, int64_t &delta);
+	bool merge_peerlist_with_local(const std::list<peerlist_entry>& bs);
+	bool fix_time_delta(std::list<peerlist_entry>& local_peerlist, time_t local_time, int64_t& delta);
 
 	bool connections_maker();
 	bool peer_sync_idle_maker();
-	bool do_handshake_with_peer(peerid_type &pi, p2p_connection_context &context, bool just_take_peerlist = false);
-	bool do_peer_timed_sync(const epee::net_utils::connection_context_base &context, peerid_type peer_id);
+	bool do_handshake_with_peer(peerid_type& pi, p2p_connection_context& context, bool just_take_peerlist = false);
+	bool do_peer_timed_sync(const epee::net_utils::connection_context_base& context, peerid_type peer_id);
 
-	bool make_new_connection_from_anchor_peerlist(const std::vector<anchor_peerlist_entry> &anchor_peerlist);
+	bool make_new_connection_from_anchor_peerlist(const std::vector<anchor_peerlist_entry>& anchor_peerlist);
 	bool make_new_connection_from_peerlist(bool use_white_list);
-	bool try_to_connect_and_handshake_with_new_peer(const epee::net_utils::network_address &na, bool just_take_peerlist = false, uint64_t last_seen_stamp = 0, PeerType peer_type = white, uint64_t first_seen_stamp = 0);
+	bool try_to_connect_and_handshake_with_new_peer(const epee::net_utils::network_address& na, bool just_take_peerlist = false, uint64_t last_seen_stamp = 0, PeerType peer_type = white, uint64_t first_seen_stamp = 0);
 	size_t get_random_index_with_fixed_probability(size_t max_index);
-	bool is_peer_used(const peerlist_entry &peer);
-	bool is_peer_used(const anchor_peerlist_entry &peer);
-	bool is_addr_connected(const epee::net_utils::network_address &peer);
+	bool is_peer_used(const peerlist_entry& peer);
+	bool is_peer_used(const anchor_peerlist_entry& peer);
+	bool is_addr_connected(const epee::net_utils::network_address& peer);
 	void add_upnp_port_mapping(uint32_t port);
 	void delete_upnp_port_mapping(uint32_t port);
 	template <class t_callback>
-	bool try_ping(basic_node_data &node_data, p2p_connection_context &context, const t_callback &cb);
-	bool try_get_support_flags(const p2p_connection_context &context, std::function<void(p2p_connection_context &, const uint32_t &)> f);
+	bool try_ping(basic_node_data& node_data, p2p_connection_context& context, const t_callback& cb);
+	bool try_get_support_flags(const p2p_connection_context& context, std::function<void(p2p_connection_context&, const uint32_t&)> f);
 	bool make_expected_connections_count(PeerType peer_type, size_t expected_connections);
-	void cache_connect_fail_info(const epee::net_utils::network_address &addr);
-	bool is_addr_recently_failed(const epee::net_utils::network_address &addr);
-	bool is_priority_node(const epee::net_utils::network_address &na);
+	void cache_connect_fail_info(const epee::net_utils::network_address& addr);
+	bool is_addr_recently_failed(const epee::net_utils::network_address& addr);
+	bool is_priority_node(const epee::net_utils::network_address& na);
 	std::set<std::string> get_seed_nodes(cryptonote::network_type nettype) const;
 	bool connect_to_seed();
 
 	template <class Container>
-	bool connect_to_peerlist(const Container &peers);
+	bool connect_to_peerlist(const Container& peers);
 
 	template <class Container>
-	bool parse_peers_and_add_to_container(const boost::program_options::variables_map &vm, const command_line::arg_descriptor<std::vector<std::string>> &arg, Container &container);
+	bool parse_peers_and_add_to_container(const boost::program_options::variables_map& vm, const command_line::arg_descriptor<std::vector<std::string>>& arg, Container& container);
 
-	bool set_max_out_peers(const boost::program_options::variables_map &vm, int64_t max);
-	bool set_max_in_peers(const boost::program_options::variables_map &vm, int64_t max);
-	bool set_tos_flag(const boost::program_options::variables_map &vm, int limit);
+	bool set_max_out_peers(const boost::program_options::variables_map& vm, int64_t max);
+	bool set_max_in_peers(const boost::program_options::variables_map& vm, int64_t max);
+	bool set_tos_flag(const boost::program_options::variables_map& vm, int limit);
 
-	bool set_rate_up_limit(const boost::program_options::variables_map &vm, int64_t limit);
-	bool set_rate_down_limit(const boost::program_options::variables_map &vm, int64_t limit);
-	bool set_rate_limit(const boost::program_options::variables_map &vm, int64_t limit);
+	bool set_rate_up_limit(const boost::program_options::variables_map& vm, int64_t limit);
+	bool set_rate_down_limit(const boost::program_options::variables_map& vm, int64_t limit);
+	bool set_rate_limit(const boost::program_options::variables_map& vm, int64_t limit);
 
-	bool has_too_many_connections(const epee::net_utils::network_address &address);
+	bool has_too_many_connections(const epee::net_utils::network_address& address);
 
-	bool check_connection_and_handshake_with_peer(const epee::net_utils::network_address &na, uint64_t last_seen_stamp);
+	bool check_connection_and_handshake_with_peer(const epee::net_utils::network_address& na, uint64_t last_seen_stamp);
 	bool gray_peerlist_housekeeping();
 
 	void kill()
@@ -331,7 +334,7 @@ class node_server : public epee::levin::levin_commands_handler<p2p_connection_co
 	//critical_section m_connections_lock;
 	//connections_indexed_container m_connections;
 
-	t_payload_net_handler &m_payload_handler;
+	t_payload_net_handler& m_payload_handler;
 	peerlist_manager m_peerlist;
 
 	epee::math_helper::once_a_time_seconds<P2P_DEFAULT_HANDSHAKE_INTERVAL> m_peer_handshake_idle_maker_interval;
@@ -386,6 +389,6 @@ extern const command_line::arg_descriptor<int> arg_tos_flag;
 extern const command_line::arg_descriptor<int64_t> arg_limit_rate_up;
 extern const command_line::arg_descriptor<int64_t> arg_limit_rate_down;
 extern const command_line::arg_descriptor<int64_t> arg_limit_rate;
-}
+} // namespace nodetool
 
 POP_WARNINGS

@@ -54,7 +54,8 @@ struct msgreply_entry;
  * Delegation Point.
  * For a domain name, the NS rrset, and the A and AAAA records for those.
  */
-struct delegpt {
+struct delegpt
+{
 	/** the domain name of the delegation point. */
 	uint8_t* name;
 	/** length of the delegation point name */
@@ -90,7 +91,8 @@ struct delegpt {
 /**
  * Nameservers for a delegation point.
  */
-struct delegpt_ns {
+struct delegpt_ns
+{
 	/** next in list */
 	struct delegpt_ns* next;
 	/** name of nameserver */
@@ -126,7 +128,8 @@ struct delegpt_ns {
 /**
  * Address of target nameserver in delegation point.
  */
-struct delegpt_addr {
+struct delegpt_addr
+{
 	/** next delegation point in results */
 	struct delegpt_addr* next_result;
 	/** next delegation point in usable list */
@@ -175,7 +178,7 @@ struct delegpt* delegpt_copy(struct delegpt* dp, struct regional* regional);
  * @param name: name to use.
  * @return false on error.
  */
-int delegpt_set_name(struct delegpt* dp, struct regional* regional, 
+int delegpt_set_name(struct delegpt* dp, struct regional* regional,
 	uint8_t* name);
 
 /**
@@ -186,7 +189,7 @@ int delegpt_set_name(struct delegpt* dp, struct regional* regional,
  * @param lame: name is lame, disprefer it.
  * @return false on error.
  */
-int delegpt_add_ns(struct delegpt* dp, struct regional* regional, 
+int delegpt_add_ns(struct delegpt* dp, struct regional* regional,
 	uint8_t* name, uint8_t lame);
 
 /**
@@ -213,8 +216,8 @@ int delegpt_rrset_add_ns(struct delegpt* dp, struct regional* regional,
  * @param lame: address is lame.
  * @return false on error.
  */
-int delegpt_add_target(struct delegpt* dp, struct regional* regional, 
-	uint8_t* name, size_t namelen, struct sockaddr_storage* addr, 
+int delegpt_add_target(struct delegpt* dp, struct regional* regional,
+	uint8_t* name, size_t namelen, struct sockaddr_storage* addr,
 	socklen_t addrlen, uint8_t bogus, uint8_t lame);
 
 /**
@@ -225,7 +228,7 @@ int delegpt_add_target(struct delegpt* dp, struct regional* regional,
  * @param lame: rrset is lame, disprefer it.
  * @return 0 on alloc error.
  */
-int delegpt_add_rrset_A(struct delegpt* dp, struct regional* regional, 
+int delegpt_add_rrset_A(struct delegpt* dp, struct regional* regional,
 	struct ub_packed_rrset_key* rrset, uint8_t lame);
 
 /**
@@ -236,7 +239,7 @@ int delegpt_add_rrset_A(struct delegpt* dp, struct regional* regional,
  * @param lame: rrset is lame, disprefer it.
  * @return 0 on alloc error.
  */
-int delegpt_add_rrset_AAAA(struct delegpt* dp, struct regional* regional, 
+int delegpt_add_rrset_AAAA(struct delegpt* dp, struct regional* regional,
 	struct ub_packed_rrset_key* rrset, uint8_t lame);
 
 /**
@@ -248,7 +251,7 @@ int delegpt_add_rrset_AAAA(struct delegpt* dp, struct regional* regional,
  * @param lame: rrset is lame, disprefer it.
  * @return 0 on alloc error.
  */
-int delegpt_add_rrset(struct delegpt* dp, struct regional* regional, 
+int delegpt_add_rrset(struct delegpt* dp, struct regional* regional,
 	struct ub_packed_rrset_key* rrset, uint8_t lame);
 
 /**
@@ -261,7 +264,7 @@ int delegpt_add_rrset(struct delegpt* dp, struct regional* regional,
  * @param lame: if address is lame.
  * @return false on error.
  */
-int delegpt_add_addr(struct delegpt* dp, struct regional* regional, 
+int delegpt_add_addr(struct delegpt* dp, struct regional* regional,
 	struct sockaddr_storage* addr, socklen_t addrlen,
 	uint8_t bogus, uint8_t lame);
 
@@ -272,7 +275,7 @@ int delegpt_add_addr(struct delegpt* dp, struct regional* regional,
  * @param namelen: length of name.
  * @return the ns structure or NULL if not found.
  */
-struct delegpt_ns* delegpt_find_ns(struct delegpt* dp, uint8_t* name, 
+struct delegpt_ns* delegpt_find_ns(struct delegpt* dp, uint8_t* name,
 	size_t namelen);
 
 /** 
@@ -282,7 +285,7 @@ struct delegpt_ns* delegpt_find_ns(struct delegpt* dp, uint8_t* name,
  * @param addrlen: length of addr
  * @return the addr structure or NULL if not found.
  */
-struct delegpt_addr* delegpt_find_addr(struct delegpt* dp, 
+struct delegpt_addr* delegpt_find_addr(struct delegpt* dp,
 	struct sockaddr_storage* addr, socklen_t addrlen);
 
 /**
@@ -296,7 +299,7 @@ void delegpt_log(enum verbosity_value v, struct delegpt* dp);
 void delegpt_count_ns(struct delegpt* dp, size_t* numns, size_t* missing);
 
 /** count addresses, and number in result and available lists, for logging */
-void delegpt_count_addr(struct delegpt* dp, size_t* numaddr, size_t* numres, 
+void delegpt_count_addr(struct delegpt* dp, size_t* numaddr, size_t* numres,
 	size_t* numavail);
 
 /**
@@ -333,7 +336,7 @@ size_t delegpt_count_targets(struct delegpt* dp);
  * @return new delegation point or NULL on alloc error, or if the
  *         message was not appropriate.
  */
-struct delegpt* delegpt_from_message(struct dns_msg* msg, 
+struct delegpt* delegpt_from_message(struct dns_msg* msg,
 	struct regional* regional);
 
 /**

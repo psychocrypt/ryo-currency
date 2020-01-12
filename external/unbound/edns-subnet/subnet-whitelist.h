@@ -50,7 +50,8 @@ struct regional;
 /**
  * ecs_whitelist structure
  */
-struct ecs_whitelist {
+struct ecs_whitelist
+{
 	/** regional for allocation */
 	struct regional* region;
 	/** 

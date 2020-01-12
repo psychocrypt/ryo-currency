@@ -86,16 +86,16 @@ class IWallet
 {
   public:
 	virtual ~IWallet() = 0;
-	virtual void addObserver(IWalletObserver *observer) = 0;
-	virtual void removeObserver(IWalletObserver *observer) = 0;
+	virtual void addObserver(IWalletObserver* observer) = 0;
+	virtual void removeObserver(IWalletObserver* observer) = 0;
 
-	virtual void initAndGenerate(const std::string &password) = 0;
-	virtual void initAndLoad(std::istream &source, const std::string &password) = 0;
+	virtual void initAndGenerate(const std::string& password) = 0;
+	virtual void initAndLoad(std::istream& source, const std::string& password) = 0;
 	virtual void shutdown() = 0;
 
-	virtual void save(std::ostream &destination, bool saveDetailed = true, bool saveCache = true) = 0;
+	virtual void save(std::ostream& destination, bool saveDetailed = true, bool saveCache = true) = 0;
 
-	virtual std::error_code changePassword(const std::string &oldPassword, const std::string &newPassword) = 0;
+	virtual std::error_code changePassword(const std::string& oldPassword, const std::string& newPassword) = 0;
 
 	virtual std::string getAddress() = 0;
 
@@ -107,11 +107,11 @@ class IWallet
 
 	virtual TransactionId findTransactionByTransferId(TransferId transferId) = 0;
 
-	virtual bool getTransaction(TransactionId transactionId, Transaction &transaction) = 0;
-	virtual bool getTransfer(TransferId transferId, Transfer &transfer) = 0;
+	virtual bool getTransaction(TransactionId transactionId, Transaction& transaction) = 0;
+	virtual bool getTransfer(TransferId transferId, Transfer& transfer) = 0;
 
-	virtual TransactionId sendTransaction(const Transfer &transfer, uint64_t fee, const std::string &extra = "", uint64_t mixIn = 0, uint64_t unlockTimestamp = 0) = 0;
-	virtual TransactionId sendTransaction(const std::vector<Transfer> &transfers, uint64_t fee, const std::string &extra = "", uint64_t mixIn = 0, uint64_t unlockTimestamp = 0) = 0;
+	virtual TransactionId sendTransaction(const Transfer& transfer, uint64_t fee, const std::string& extra = "", uint64_t mixIn = 0, uint64_t unlockTimestamp = 0) = 0;
+	virtual TransactionId sendTransaction(const std::vector<Transfer>& transfers, uint64_t fee, const std::string& extra = "", uint64_t mixIn = 0, uint64_t unlockTimestamp = 0) = 0;
 	virtual std::error_code cancelTransaction(size_t transferId) = 0;
 };
-}
+} // namespace CryptoNote

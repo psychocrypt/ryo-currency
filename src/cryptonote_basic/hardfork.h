@@ -54,7 +54,8 @@ class BlockchainDB;
 class HardFork
 {
   public:
-	typedef enum {
+	typedef enum
+	{
 		LikelyForked,
 		UpdateNeeded,
 		Ready,
@@ -75,7 +76,7 @@ class HardFork
      * @param window_size the size of the window in blocks to consider for version voting
      * @param default_threshold_percent the size of the majority in percents
      */
-	HardFork(cryptonote::BlockchainDB &db, uint8_t original_version = 1, uint64_t original_version_till_height = DEFAULT_ORIGINAL_VERSION_TILL_HEIGHT, time_t forked_time = DEFAULT_FORKED_TIME, time_t update_time = DEFAULT_UPDATE_TIME, uint64_t window_size = DEFAULT_WINDOW_SIZE, uint8_t default_threshold_percent = DEFAULT_THRESHOLD_PERCENT);
+	HardFork(cryptonote::BlockchainDB& db, uint8_t original_version = 1, uint64_t original_version_till_height = DEFAULT_ORIGINAL_VERSION_TILL_HEIGHT, time_t forked_time = DEFAULT_FORKED_TIME, time_t update_time = DEFAULT_UPDATE_TIME, uint64_t window_size = DEFAULT_WINDOW_SIZE, uint8_t default_threshold_percent = DEFAULT_THRESHOLD_PERCENT);
 
 	/**
      * @brief add a new hardfork height
@@ -126,7 +127,7 @@ class HardFork
      * block being invalid, double spending, etc) would cause the
      * hardfork object to reorganize.
      */
-	bool check(const cryptonote::block &block) const;
+	bool check(const cryptonote::block& block) const;
 
 	/**
      * @brief same as check, but for a particular height, rather than the top
@@ -140,7 +141,7 @@ class HardFork
      * @param block the new block
      * @param height which height to check for
      */
-	bool check_for_height(const cryptonote::block &block, uint64_t height) const;
+	bool check_for_height(const cryptonote::block& block, uint64_t height) const;
 
 	/**
      * @brief add a new block
@@ -149,7 +150,7 @@ class HardFork
      *
      * @param block the new block
      */
-	bool add(const cryptonote::block &block, uint64_t height);
+	bool add(const cryptonote::block& block, uint64_t height);
 
 	/**
      * @brief called when the blockchain is reorganized
@@ -230,7 +231,7 @@ class HardFork
      * @param threshold number of votes needed to switch to next version
      * @param earliest_height earliest height at which the version can take effect
      */
-	bool get_voting_info(uint8_t version, uint32_t &window, uint32_t &votes, uint32_t &threshold, uint64_t &earliest_height, uint8_t &voting) const;
+	bool get_voting_info(uint8_t version, uint32_t& window, uint32_t& votes, uint32_t& threshold, uint64_t& earliest_height, uint8_t& voting) const;
 
 	/**
      * @brief returns the size of the voting window in blocks
@@ -249,7 +250,7 @@ class HardFork
 	bool rescan_from_chain_height(uint64_t height);
 
   private:
-	BlockchainDB &db;
+	BlockchainDB& db;
 
 	time_t forked_time;
 	time_t update_time;
@@ -265,7 +266,11 @@ class HardFork
 		uint8_t threshold;
 		uint64_t height;
 		time_t time;
-		Params(uint8_t version, uint64_t height, uint8_t threshold, time_t time) : version(version), threshold(threshold), height(height), time(time) {}
+		Params(uint8_t version, uint64_t height, uint8_t threshold, time_t time) :
+			version(version),
+			threshold(threshold),
+			height(height),
+			time(time) {}
 	};
 	std::vector<Params> heights;
 

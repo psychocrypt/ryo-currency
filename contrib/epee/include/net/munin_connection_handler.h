@@ -63,14 +63,14 @@ struct munin_service;
 
 struct munin_service_data_provider
 {
-	virtual bool update_service_data(munin_service *pservice, std::string &paramters_text) = 0;
+	virtual bool update_service_data(munin_service* pservice, std::string& paramters_text) = 0;
 };
 
 struct munin_service
 {
 	std::string m_service_name;
 	std::string m_service_config_string;
-	munin_service_data_provider *m_pdata_provider;
+	munin_service_data_provider* m_pdata_provider;
 };
 
 struct node_server_config
@@ -81,9 +81,9 @@ struct node_server_config
 
 struct fake_send_handler : public i_service_endpoint
 {
-	virtual bool do_send(const void *ptr, size_t cb)
+	virtual bool do_send(const void* ptr, size_t cb)
 	{
-		m_cache += std::string((const char *)ptr, cb);
+		m_cache += std::string((const char*)ptr, cb);
 		return true;
 	}
 
@@ -96,15 +96,16 @@ struct fake_send_handler : public i_service_endpoint
 /************************************************************************/
 class munin_node_server_connection_handler
 {
-  GULPS_CAT_MAJOR("epee_mun_conn");
+	GULPS_CAT_MAJOR("epee_mun_conn");
 
   public:
 	typedef node_server_config config_type;
 	typedef connection_context_base connection_context;
 
-	munin_node_server_connection_handler(i_service_endpoint *psnd_hndlr, config_type &config, const connection_context_base &context) : m_psnd_hndlr(psnd_hndlr),
-																																		m_machine_state(http_state_retriving_comand_line),
-																																		m_config(config)
+	munin_node_server_connection_handler(i_service_endpoint* psnd_hndlr, config_type& config, const connection_context_base& context) :
+		m_psnd_hndlr(psnd_hndlr),
+		m_machine_state(http_state_retriving_comand_line),
+		m_config(config)
 	{
 		init();
 	}
@@ -138,10 +139,10 @@ class munin_node_server_connection_handler
 	{
 	}
 
-	virtual bool handle_recv(const void *ptr, size_t cb)
+	virtual bool handle_recv(const void* ptr, size_t cb)
 	{
 
-		const char *pbuff = (const char *)ptr;
+		const char* pbuff = (const char*)ptr;
 		std::string recvd_buff(pbuff, cb);
 		GULPS_PRINT_L3("munin_recv: \n{}", recvd_buff);
 
@@ -171,7 +172,7 @@ class munin_node_server_connection_handler
 				stop_handling = true;
 				return false;
 			default:
-				GULPS_LOG_ERROR("Error in munin state machine! Unknown state=" , m_machine_state);
+				GULPS_LOG_ERROR("Error in munin state machine! Unknown state=", m_machine_state);
 				stop_handling = true;
 				m_machine_state = http_state_error;
 				return false;
@@ -190,7 +191,7 @@ class munin_node_server_connection_handler
 		m_host_name = hostname;
 		return true;
 	}
-	bool handle_command(const std::string &command)
+	bool handle_command(const std::string& command)
 	{
 		// list, nodes, config, fetch, version or quit
 		STATIC_REGEXP_EXPR_1(rexp_match_command_line, "^((list)|(nodes)|(config)|(fetch)|(version)|(quit))(\\s+(\\S+))?", boost::regex::icase | boost::regex::normal);
@@ -257,18 +258,18 @@ class munin_node_server_connection_handler
 		send_hook(m_host_name + "\n.\n");
 		return true;
 	}
-	bool handle_config_command(const std::string &service_name)
+	bool handle_config_command(const std::string& service_name)
 	{
-		munin_service *psrv = get_service_by_name(service_name);
+		munin_service* psrv = get_service_by_name(service_name);
 		if(!psrv)
 			return send_hook(std::string() + "Unknown service\n");
 
 		return send_hook(psrv->m_service_config_string + ".\n");
 	}
 
-	bool handle_fetch_command(const std::string &service_name)
+	bool handle_fetch_command(const std::string& service_name)
 	{
-		munin_service *psrv = get_service_by_name(service_name);
+		munin_service* psrv = get_service_by_name(service_name);
 		if(!psrv)
 			return send_hook(std::string() + "Unknown service\n");
 
@@ -287,7 +288,7 @@ class munin_node_server_connection_handler
 		return false;
 	}
 
-	bool send_hook(const std::string &buff)
+	bool send_hook(const std::string& buff)
 	{
 		GULPS_PRINT_L3("munin_send: \n{}", buff);
 
@@ -297,7 +298,7 @@ class munin_node_server_connection_handler
 			return false;
 	}
 
-	munin_service *get_service_by_name(const std::string &srv_name)
+	munin_service* get_service_by_name(const std::string& srv_name)
 	{
 		std::list<munin_service>::iterator it = m_config.m_services.begin();
 		for(; it != m_config.m_services.end(); it++)
@@ -316,13 +317,13 @@ class munin_node_server_connection_handler
 		http_state_error
 	};
 
-	config_type &m_config;
+	config_type& m_config;
 	machine_state m_machine_state;
 	std::string m_cache;
 	std::string m_host_name;
 
   protected:
-	i_service_endpoint *m_psnd_hndlr;
+	i_service_endpoint* m_psnd_hndlr;
 };
 
 inline bool test_self()
@@ -368,7 +369,7 @@ inline bool test_self()
 */
 	return true;
 }
-}
-}
-}
+} // namespace munin
+} // namespace net_utils
+} // namespace epee
 #endif //!_MUNIN_CONNECTION_HANDLER_H_

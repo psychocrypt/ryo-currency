@@ -82,8 +82,10 @@ struct t_internals
 	std::vector<std::unique_ptr<t_rpc>> rpcs;
 
 	t_internals(
-		boost::program_options::variables_map const &vm)
-		: core{vm}, protocol{vm, core, command_line::get_arg(vm, cryptonote::arg_offline)}, p2p{vm, protocol}
+		boost::program_options::variables_map const& vm) :
+		core{vm},
+		protocol{vm, core, command_line::get_arg(vm, cryptonote::arg_offline)},
+		p2p{vm, protocol}
 	{
 		// Handle circular dependencies
 		protocol.set_p2p_endpoint(p2p.get());
@@ -104,7 +106,7 @@ struct t_internals
 	}
 };
 
-void t_daemon::init_options(boost::program_options::options_description &option_spec)
+void t_daemon::init_options(boost::program_options::options_description& option_spec)
 {
 	t_core::init_options(option_spec);
 	t_p2p::init_options(option_spec);
@@ -112,8 +114,8 @@ void t_daemon::init_options(boost::program_options::options_description &option_
 }
 
 t_daemon::t_daemon(
-	boost::program_options::variables_map const &vm)
-	: mp_internals{new t_internals{vm}}
+	boost::program_options::variables_map const& vm) :
+	mp_internals{new t_internals{vm}}
 {
 	zmq_rpc_bind_port = command_line::get_arg(vm, daemon_args::arg_zmq_rpc_bind_port);
 	zmq_rpc_bind_address = command_line::get_arg(vm, daemon_args::arg_zmq_rpc_bind_ip);
@@ -122,7 +124,7 @@ t_daemon::t_daemon(
 t_daemon::~t_daemon() = default;
 
 // MSVC is brain-dead and can't default this...
-t_daemon::t_daemon(t_daemon &&other)
+t_daemon::t_daemon(t_daemon&& other)
 {
 	if(this != &other)
 	{
@@ -132,7 +134,7 @@ t_daemon::t_daemon(t_daemon &&other)
 }
 
 // or this
-t_daemon &t_daemon::operator=(t_daemon &&other)
+t_daemon& t_daemon::operator=(t_daemon&& other)
 {
 	if(this != &other)
 	{
@@ -155,7 +157,7 @@ bool t_daemon::run(bool interactive)
 		if(!mp_internals->core.run())
 			return false;
 
-		for(auto &rpc : mp_internals->rpcs)
+		for(auto& rpc : mp_internals->rpcs)
 			rpc->run();
 
 		std::unique_ptr<daemonize::t_command_server> rpc_commands;
@@ -176,7 +178,7 @@ bool t_daemon::run(bool interactive)
 			if(rpc_commands)
 				rpc_commands->stop_handling();
 
-			for(auto &rpc : mp_internals->rpcs)
+			for(auto& rpc : mp_internals->rpcs)
 				rpc->stop();
 
 			return false;
@@ -194,13 +196,13 @@ bool t_daemon::run(bool interactive)
 
 		zmq_server.stop();
 
-		for(auto &rpc : mp_internals->rpcs)
+		for(auto& rpc : mp_internals->rpcs)
 			rpc->stop();
 		mp_internals->core.get().get_miner().stop();
 		GULPS_GLOBAL_PRINT("Node stopped.");
 		return true;
 	}
-	catch(std::exception const &ex)
+	catch(std::exception const& ex)
 	{
 		GULPSF_ERROR("Uncaught exception! {}", ex.what());
 		return false;
@@ -220,7 +222,7 @@ void t_daemon::stop()
 	}
 	mp_internals->core.get().get_miner().stop();
 	mp_internals->p2p.stop();
-	for(auto &rpc : mp_internals->rpcs)
+	for(auto& rpc : mp_internals->rpcs)
 		rpc->stop();
 
 	mp_internals.reset(nullptr); // Ensure resources are cleaned up before we return

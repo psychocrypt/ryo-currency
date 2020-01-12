@@ -75,8 +75,6 @@
 
 #include "common/gulps.hpp"
 
-
-
 // ################################################################################################
 // ################################################################################################
 // the "header part". Not separeted out for .hpp because point of this modification is
@@ -95,7 +93,7 @@ namespace net_utils
 class connection_basic_pimpl
 {
   public:
-	connection_basic_pimpl(const std::string &name);
+	connection_basic_pimpl(const std::string& name);
 
 	static int m_default_tos;
 
@@ -105,8 +103,8 @@ class connection_basic_pimpl
 	void _packet(size_t packet_size, int phase, int q_len); // execute a sleep ; phase is not really used now(?) could be used for different kinds of sleep e.g. direct/queue write
 };
 
-} // namespace
-} // namespace
+} // namespace net_utils
+} // namespace epee
 
 // ################################################################################################
 // ################################################################################################
@@ -125,14 +123,15 @@ namespace net_utils
 
 network_throttle::~network_throttle() {}
 
-network_throttle::packet_info::packet_info()
-	: m_size(0)
+network_throttle::packet_info::packet_info() :
+	m_size(0)
 {
 }
 
-network_throttle::network_throttle(const std::string &nameshort, const std::string &name, int window_size)
-	: m_window_size((window_size == -1) ? 10 : window_size),
-	  m_history(m_window_size), m_nameshort(nameshort)
+network_throttle::network_throttle(const std::string& nameshort, const std::string& name, int window_size) :
+	m_window_size((window_size == -1) ? 10 : window_size),
+	m_history(m_window_size),
+	m_nameshort(nameshort)
 {
 	set_name(name);
 	m_network_add_cost = 128;
@@ -143,7 +142,7 @@ network_throttle::network_throttle(const std::string &nameshort, const std::stri
 	m_target_speed = 16 * 1024; // other defaults are probably defined in the command-line parsing code when this class is used e.g. as main global throttle
 }
 
-void network_throttle::set_name(const std::string &name)
+void network_throttle::set_name(const std::string& name)
 {
 	m_name = name;
 }
@@ -212,10 +211,10 @@ void network_throttle::_handle_trafic_exact(size_t packet_size, size_t orginal_s
 	std::string history_str = oss.str();
 
 	GULPSF_LOG_L2("Throttle {}: packet of ~{}b  (from {} b) Speed AVG={:>4}[w={}] {:>4}[w={}]  /  Limit={} KiB/sec {}", m_name, packet_size,
-					   orginal_size,
-					   ((long int)(cts.average / 1024)), cts.window,
-					   ((long int)(cts2.average / 1024)), cts2.window,
-					  ((long int)(m_target_speed / 1024)), history_str);
+		orginal_size,
+		((long int)(cts.average / 1024)), cts.window,
+		((long int)(cts2.average / 1024)), cts2.window,
+		((long int)(m_target_speed / 1024)), history_str);
 }
 
 void network_throttle::handle_trafic_tcp(size_t packet_size)
@@ -231,7 +230,7 @@ network_time_seconds network_throttle::get_sleep_time_after_tick(size_t packet_s
 	return get_sleep_time(packet_size);
 }
 
-void network_throttle::logger_handle_net(const std::string &filename, double time, size_t size)
+void network_throttle::logger_handle_net(const std::string& filename, double time, size_t size)
 {
 	static boost::mutex mutex;
 
@@ -258,10 +257,10 @@ network_time_seconds network_throttle::get_sleep_time(size_t packet_size) const
 }
 
 // MAIN LOGIC:
-void network_throttle::calculate_times(size_t packet_size, calculate_times_struct &cts, bool dbg, double force_window) const
+void network_throttle::calculate_times(size_t packet_size, calculate_times_struct& cts, bool dbg, double force_window) const
 {
 	const double the_window_size = std::max((double)m_window_size,
-											((force_window > 0) ? force_window : m_window_size));
+		((force_window > 0) ? force_window : m_window_size));
 
 	if(!m_any_packet_yet)
 	{
@@ -316,19 +315,19 @@ void network_throttle::calculate_times(size_t packet_size, calculate_times_struc
 		oss << "]" << std::ends;
 		std::string history_str = oss.str();
 		GULPSF_LOG_L2("{} dbg {}: speed is A={:>8} vs Max={:>8}  so sleep: D={:>8} sec E={:>8} (Enow={:>8}) M={:>8} W={:>8} R={:>8} Wgood {:>8} History: {:>8} m_last_sample_time={:>8}",
-			   (cts.delay > 0 ? "SLEEP" : ""),
-			   m_name,
-			   cts.average,
-			   M,
-			   cts.delay,
-			   E,
-			   Enow,
-			   M,
-			   cts.window,
-			   cts.recomendetDataSize,
-			   Wgood,
-			   history_str,
-			   m_last_sample_time);
+			(cts.delay > 0 ? "SLEEP" : ""),
+			m_name,
+			cts.average,
+			M,
+			cts.delay,
+			E,
+			Enow,
+			M,
+			cts.window,
+			cts.recomendetDataSize,
+			Wgood,
+			history_str,
+			m_last_sample_time);
 	}
 }
 
@@ -386,5 +385,5 @@ double network_throttle::get_current_speed() const
 	return bytes_transferred / ((m_history.size() - 1) * m_slot_size);
 }
 
-} // namespace
-} // namespace
+} // namespace net_utils
+} // namespace epee

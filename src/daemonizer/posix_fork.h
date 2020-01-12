@@ -50,7 +50,7 @@
 namespace posix
 {
 
-void fork(const std::string &pidfile);
+void fork(const std::string& pidfile);
 }
 
 #endif

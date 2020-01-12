@@ -20,16 +20,16 @@ namespace jsonrpc2
 
 GULPS_CAT_MAJOR("epee_jsrpc_proto");
 
-inline std::string &make_error_resp_json(int64_t code, const std::string &message,
-										 std::string &response_data,
-										 const epee::serialization::storage_entry &id = nullptr)
+inline std::string& make_error_resp_json(int64_t code, const std::string& message,
+	std::string& response_data,
+	const epee::serialization::storage_entry& id = nullptr)
 {
 	epee::json_rpc::error_response rsp;
 	rsp.id = id;
 	rsp.jsonrpc = "2.0";
 	rsp.error.code = code;
 	rsp.error.message = message;
-	epee::serialization::store_t_to_json(static_cast<epee::json_rpc::error_response &>(rsp), response_data, 0, false);
+	epee::serialization::store_t_to_json(static_cast<epee::json_rpc::error_response&>(rsp), response_data, 0, false);
 	response_data += "\n";
 	return response_data;
 }
@@ -40,9 +40,9 @@ struct i_jsonrpc2_server_handler
 	virtual ~i_jsonrpc2_server_handler()
 	{
 	}
-	virtual bool handle_rpc_request(const std::string &req_data,
-									std::string &resp_data,
-									t_connection_context &conn_context) = 0;
+	virtual bool handle_rpc_request(const std::string& req_data,
+		std::string& resp_data,
+		t_connection_context& conn_context) = 0;
 	virtual bool init_server_thread()
 	{
 		return true;
@@ -56,7 +56,7 @@ struct i_jsonrpc2_server_handler
 template <class t_connection_context>
 struct jsonrpc2_server_config
 {
-	i_jsonrpc2_server_handler<t_connection_context> *m_phandler;
+	i_jsonrpc2_server_handler<t_connection_context>* m_phandler;
 	critical_section m_lock;
 };
 
@@ -67,13 +67,13 @@ class jsonrpc2_connection_handler
 	typedef t_connection_context connection_context;
 	typedef jsonrpc2_server_config<t_connection_context> config_type;
 
-	jsonrpc2_connection_handler(i_service_endpoint *psnd_hndlr,
-								config_type &config,
-								t_connection_context &conn_context)
-		: m_psnd_hndlr(psnd_hndlr),
-		  m_config(config),
-		  m_conn_context(conn_context),
-		  m_is_stop_handling(false)
+	jsonrpc2_connection_handler(i_service_endpoint* psnd_hndlr,
+		config_type& config,
+		t_connection_context& conn_context) :
+		m_psnd_hndlr(psnd_hndlr),
+		m_config(config),
+		m_conn_context(conn_context),
+		m_is_stop_handling(false)
 	{
 	}
 	virtual ~jsonrpc2_connection_handler()
@@ -99,17 +99,17 @@ class jsonrpc2_connection_handler
 	{
 		return true;
 	}
-	virtual bool handle_recv(const void *ptr, size_t cb)
+	virtual bool handle_recv(const void* ptr, size_t cb)
 	{
-		std::string buf((const char *)ptr, cb);
-		GULPSF_PRINT("JSONRPC2_RECV: {}\r\n{}", ptr , buf);
+		std::string buf((const char*)ptr, cb);
+		GULPSF_PRINT("JSONRPC2_RECV: {}\r\n{}", ptr, buf);
 
 		bool res = handle_buff_in(buf);
 		return res;
 	}
 
   private:
-	bool handle_buff_in(std::string &buf)
+	bool handle_buff_in(std::string& buf)
 	{
 		if(m_cache.size())
 			m_cache += buf;
@@ -149,7 +149,7 @@ class jsonrpc2_connection_handler
 		m_cache.erase(0, pos);
 		return handle_request_and_send_response(request_data);
 	}
-	bool handle_request_and_send_response(const std::string &request_data)
+	bool handle_request_and_send_response(const std::string& request_data)
 	{
 		GULPS_CHECK_AND_ASSERT_MES(m_config.m_phandler, false, "m_config.m_phandler is NULL!!!!");
 		std::string response_data;
@@ -158,10 +158,10 @@ class jsonrpc2_connection_handler
 		bool rpc_result = m_config.m_phandler->handle_rpc_request(request_data, response_data, m_conn_context);
 		GULPSF_LOG_L3("JSONRPC2_RESPONSE: << \r\n{}", response_data);
 
-		m_psnd_hndlr->do_send((void *)response_data.data(), response_data.size());
+		m_psnd_hndlr->do_send((void*)response_data.data(), response_data.size());
 		return rpc_result;
 	}
-	std::string::size_type match_end_of_request(const std::string &buf)
+	std::string::size_type match_end_of_request(const std::string& buf)
 	{
 		std::string::size_type res = buf.find("\n");
 		if(std::string::npos != res)
@@ -172,16 +172,16 @@ class jsonrpc2_connection_handler
 	}
 
   protected:
-	i_service_endpoint *m_psnd_hndlr;
+	i_service_endpoint* m_psnd_hndlr;
 
   private:
-	config_type &m_config;
-	t_connection_context &m_conn_context;
+	config_type& m_config;
+	t_connection_context& m_conn_context;
 	std::string m_cache;
 	bool m_is_stop_handling;
 };
-}
-}
-}
+} // namespace jsonrpc2
+} // namespace net_utils
+} // namespace epee
 
 #endif /* JSONRPC_PROTOCOL_HANDLER_H */

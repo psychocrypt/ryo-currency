@@ -57,7 +57,8 @@ struct sldns_buffer;
  * the tree can be unlocked again.  This means you have to release the lock
  * on a trust anchor and look it up again to delete it.
  */
-struct val_anchors {
+struct val_anchors
+{
 	/** lock on trees */
 	lock_basic_type lock;
 	/**
@@ -76,7 +77,8 @@ struct val_anchors {
 /**
  * Trust anchor key
  */
-struct ta_key {
+struct ta_key
+{
 	/** next in list */
 	struct ta_key* next;
 	/** rdata, in wireformat of the key RR. starts with rdlength. */
@@ -91,7 +93,8 @@ struct ta_key {
  * A trust anchor in the trust anchor store.
  * Unique by name, class.
  */
-struct trust_anchor {
+struct trust_anchor
+{
 	/** rbtree node, key is this structure */
 	rbnode_type node;
 	/** lock on the entire anchor and its keys; for autotrust changes */
@@ -174,7 +177,7 @@ struct trust_anchor* anchors_lookup(struct val_anchors* anchors,
  * @param dclass: class of trust anchor
  * @return NULL if not found. The anchor is locked.
  */
-struct trust_anchor* anchor_find(struct val_anchors* anchors, 
+struct trust_anchor* anchor_find(struct val_anchors* anchors,
 	uint8_t* name, int namelabs, size_t namelen, uint16_t dclass);
 
 /**
@@ -184,7 +187,7 @@ struct trust_anchor* anchor_find(struct val_anchors* anchors,
  * @param str: string.
  * @return NULL on error.
  */
-struct trust_anchor* anchor_store_str(struct val_anchors* anchors, 
+struct trust_anchor* anchor_store_str(struct val_anchors* anchors,
 	struct sldns_buffer* buffer, const char* str);
 
 /**

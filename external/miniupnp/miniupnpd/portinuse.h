@@ -14,10 +14,9 @@
  * on a given interface.
  * returns: 0 not in use, > 0 in use
  *         -1 in case of error */
-int
-port_in_use(const char *if_name,
-            unsigned port, int proto,
-            const char *iaddr, unsigned iport);
+int port_in_use(const char* if_name,
+	unsigned port, int proto,
+	const char* iaddr, unsigned iport);
 #endif /* CHECK_PORTINUSE */
 
 #endif

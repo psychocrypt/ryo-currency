@@ -54,7 +54,8 @@
  * None of the data inside the slabhash may be altered.
  * Therefore, no locks are needed to access the structure.
  */
-struct slabhash {
+struct slabhash
+{
 	/** the size of the array - must be power of 2 */
 	size_t size;
 	/** size bitmask - uses high bits. */
@@ -79,9 +80,9 @@ struct slabhash {
  * @param arg: user argument that is passed to user function calls.
  * @return: new hash table or NULL on malloc failure.
  */
-struct slabhash* slabhash_create(size_t numtables, size_t start_size, 
-	size_t maxmem, lruhash_sizefunc_type sizefunc, 
-	lruhash_compfunc_type compfunc, lruhash_delkeyfunc_type delkeyfunc, 
+struct slabhash* slabhash_create(size_t numtables, size_t start_size,
+	size_t maxmem, lruhash_sizefunc_type sizefunc,
+	lruhash_compfunc_type compfunc, lruhash_delkeyfunc_type delkeyfunc,
 	lruhash_deldatafunc_type deldatafunc, void* arg);
 
 /**
@@ -109,7 +110,7 @@ void slabhash_clear(struct slabhash* table);
  * @param data: the data.
  * @param cb_override: if not NULL overrides the cb_arg for deletefunc.
  */
-void slabhash_insert(struct slabhash* table, hashvalue_type hash, 
+void slabhash_insert(struct slabhash* table, hashvalue_type hash,
 	struct lruhash_entry* entry, void* data, void* cb_override);
 
 /**
@@ -125,7 +126,7 @@ void slabhash_insert(struct slabhash* table, hashvalue_type hash,
  * @return: pointer to the entry or NULL. The entry is locked.
  *    The user must unlock the entry when done.
  */
-struct lruhash_entry* slabhash_lookup(struct slabhash* table, 
+struct lruhash_entry* slabhash_lookup(struct slabhash* table,
 	hashvalue_type hash, void* key, int wr);
 
 /**
@@ -182,7 +183,7 @@ void slabhash_setmarkdel(struct slabhash* table, lruhash_markdelfunc_type md);
  * @param arg: user argument to function.
  */
 void slabhash_traverse(struct slabhash* table, int wr,
-        void (*func)(struct lruhash_entry*, void*), void* arg);
+	void (*func)(struct lruhash_entry*, void*), void* arg);
 
 /*
  * Count entries in slabhash.
@@ -193,14 +194,16 @@ size_t count_slabhash_entries(struct slabhash* table);
 
 /* --- test representation --- */
 /** test structure contains test key */
-struct slabhash_testkey {
+struct slabhash_testkey
+{
 	/** the key id */
 	int id;
 	/** the entry */
 	struct lruhash_entry entry;
 };
 /** test structure contains test data */
-struct slabhash_testdata {
+struct slabhash_testdata
+{
 	/** data value */
 	int data;
 };

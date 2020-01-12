@@ -47,13 +47,14 @@ class portable_binary_oarchive_exception : public boost::archive::archive_except
 	{
 		invalid_flags
 	} m_exception_code;
-	portable_binary_oarchive_exception(exception_code c = invalid_flags) : boost::archive::archive_exception(boost::archive::archive_exception::other_exception),
-																		   m_exception_code(c)
+	portable_binary_oarchive_exception(exception_code c = invalid_flags) :
+		boost::archive::archive_exception(boost::archive::archive_exception::other_exception),
+		m_exception_code(c)
 	{
 	}
-	virtual const char *what() const throw()
+	virtual const char* what() const throw()
 	{
-		const char *msg = "programmer error";
+		const char* msg = "programmer error";
 		switch(m_exception_code)
 		{
 		case invalid_flags:
@@ -108,37 +109,37 @@ class portable_binary_oarchive : public boost::archive::basic_binary_oprimitive<
 
 	// default fall through for any types not specified here
 	template <class T>
-	void save(const T &t)
+	void save(const T& t)
 	{
 		save_impl(t, sizeof(T));
 	}
-	void save(const std::string &t)
+	void save(const std::string& t)
 	{
 		this->primitive_base_t::save(t);
 	}
 #ifndef BOOST_NO_STD_WSTRING
-	void save(const std::wstring &t)
+	void save(const std::wstring& t)
 	{
 		this->primitive_base_t::save(t);
 	}
 #endif
-	void save(const float &t)
+	void save(const float& t)
 	{
 		this->primitive_base_t::save(t);
 		// floats not supported
 		//BOOST_STATIC_ASSERT(false);
 	}
-	void save(const double &t)
+	void save(const double& t)
 	{
 		this->primitive_base_t::save(t);
 		// doubles not supported
 		//BOOST_STATIC_ASSERT(false);
 	}
-	void save(const char &t)
+	void save(const char& t)
 	{
 		this->primitive_base_t::save(t);
 	}
-	void save(const unsigned char &t)
+	void save(const unsigned char& t)
 	{
 		this->primitive_base_t::save(t);
 	}
@@ -149,47 +150,48 @@ class portable_binary_oarchive : public boost::archive::basic_binary_oprimitive<
 		detail_common_oarchive;
 #if BOOST_VERSION > 105800
 	template <class T>
-	void save_override(T &t)
+	void save_override(T& t)
 	{
 		this->detail_common_oarchive::save_override(t);
 	}
 	// explicitly convert to char * to avoid compile ambiguities
-	void save_override(const boost::archive::class_name_type &t)
+	void save_override(const boost::archive::class_name_type& t)
 	{
 		const std::string s(t);
 		*this << s;
 	}
 	// binary files don't include the optional information
 	void save_override(
-		const boost::archive::class_id_optional_type & /* t */
-		)
+		const boost::archive::class_id_optional_type& /* t */
+	)
 	{
 	}
 #else
 	template <class T>
-	void save_override(T &t, int)
+	void save_override(T& t, int)
 	{
 		this->detail_common_oarchive::save_override(t, 0);
 	}
 	// explicitly convert to char * to avoid compile ambiguities
-	void save_override(const boost::archive::class_name_type &t, int)
+	void save_override(const boost::archive::class_name_type& t, int)
 	{
 		const std::string s(t);
 		*this << s;
 	}
 	// binary files don't include the optional information
 	void save_override(
-		const boost::archive::class_id_optional_type & /* t */, int) {}
+		const boost::archive::class_id_optional_type& /* t */, int) {}
 #endif
 
 	void init(unsigned int flags);
 
   public:
-	portable_binary_oarchive(std::ostream &os, unsigned flags = 0) : primitive_base_t(
-																		 *os.rdbuf(),
-																		 0 != (flags & boost::archive::no_codecvt)),
-																	 archive_base_t(flags),
-																	 m_flags(flags & (endian_big | endian_little))
+	portable_binary_oarchive(std::ostream& os, unsigned flags = 0) :
+		primitive_base_t(
+			*os.rdbuf(),
+			0 != (flags & boost::archive::no_codecvt)),
+		archive_base_t(flags),
+		m_flags(flags & (endian_big | endian_little))
 	{
 		init(flags);
 	}
@@ -197,17 +199,18 @@ class portable_binary_oarchive : public boost::archive::basic_binary_oprimitive<
 	portable_binary_oarchive(
 		std::basic_streambuf<
 			std::ostream::char_type,
-			std::ostream::traits_type> &bsb,
-		unsigned int flags) : primitive_base_t(bsb,
-											   0 != (flags & boost::archive::no_codecvt)),
-							  archive_base_t(flags),
-							  m_flags(0)
+			std::ostream::traits_type>& bsb,
+		unsigned int flags) :
+		primitive_base_t(bsb,
+			0 != (flags & boost::archive::no_codecvt)),
+		archive_base_t(flags),
+		m_flags(0)
 	{
 		init(flags);
 	}
 };
-}
-}
+} // namespace archive
+} // namespace boost
 
 // required by export in boost version > 1.34
 #ifdef BOOST_SERIALIZATION_REGISTER_ARCHIVE
@@ -267,7 +270,7 @@ portable_binary_oarchive::save_impl(
 		ll = -l;
 	else
 		ll = l;
-	char *cptr = reinterpret_cast<char *>(&ll);
+	char* cptr = reinterpret_cast<char*>(&ll);
 #if BOOST_ENDIAN_BIG_BYTE
 	cptr += (sizeof(boost::intmax_t) - size);
 	if(m_flags & endian_little)
@@ -305,8 +308,8 @@ portable_binary_oarchive::init(unsigned int flags)
 	}
 	save(static_cast<unsigned char>(m_flags >> CHAR_BIT));
 }
-}
-}
+} // namespace archive
+} // namespace boost
 
 namespace boost
 {

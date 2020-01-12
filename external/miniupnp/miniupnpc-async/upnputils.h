@@ -13,15 +13,12 @@
  * [ipv6]:port or ipv4:port
  * return the number of characters used (as snprintf)
  */
-int
-sockaddr_to_string(const struct sockaddr * addr, char * str, size_t size);
+int sockaddr_to_string(const struct sockaddr* addr, char* str, size_t size);
 
 /**
  * set the file description as non blocking
  * return 0 in case of failure, 1 in case of success
  */
-int
-set_non_blocking(int fd);
+int set_non_blocking(int fd);
 
 #endif
-

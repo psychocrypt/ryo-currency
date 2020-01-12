@@ -47,7 +47,7 @@
  * Get the dns64 function block.
  * @return: function block with function pointers to dns64 methods.
  */
-struct module_func_block *dns64_get_funcblock(void);
+struct module_func_block* dns64_get_funcblock(void);
 
 /** dns64 init */
 int dns64_init(struct module_env* env, int id);
@@ -57,10 +57,10 @@ void dns64_deinit(struct module_env* env, int id);
 
 /** dns64 operate on a query */
 void dns64_operate(struct module_qstate* qstate, enum module_ev event, int id,
-		struct outbound_entry* outbound);
+	struct outbound_entry* outbound);
 
 void dns64_inform_super(struct module_qstate* qstate, int id,
-    struct module_qstate* super);
+	struct module_qstate* super);
 
 /** dns64 cleanup query state */
 void dns64_clear(struct module_qstate* qstate, int id);

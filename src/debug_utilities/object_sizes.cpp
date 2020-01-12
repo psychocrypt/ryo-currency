@@ -61,24 +61,23 @@
 
 #include "common/gulps.hpp"
 
-
-
 class size_logger
 {
   public:
 	~size_logger()
 	{
 		GULPS_CAT_MAJOR("obj_sizes");
-		for(const auto &i : types)
-			GULPSF_PRINT("{}\t{}",i.first, i.second);
+		for(const auto& i : types)
+			GULPSF_PRINT("{}\t{}", i.first, i.second);
 	}
-	void add(const char *type, size_t size) { types.insert(std::make_pair(size, type)); }
+	void add(const char* type, size_t size) { types.insert(std::make_pair(size, type)); }
+
   private:
 	std::multimap<size_t, const std::string> types;
 };
 #define SL(type) sl.add(#type, sizeof(type))
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	size_logger sl;
 

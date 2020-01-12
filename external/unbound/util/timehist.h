@@ -48,7 +48,8 @@
 /**
  * Bucket of time history information
  */
-struct th_buck {
+struct th_buck
+{
 	/** lower bound */
 	struct timeval lower;
 	/** upper bound */
@@ -60,7 +61,8 @@ struct th_buck {
 /**
  * Keep histogram of time values.
  */
-struct timehist {
+struct timehist
+{
 	/** number of buckets */
 	size_t num;
 	/** bucket array */

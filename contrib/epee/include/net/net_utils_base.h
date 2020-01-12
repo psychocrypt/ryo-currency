@@ -52,13 +52,13 @@ class ipv4_network_address
 	uint16_t m_port;
 
   public:
-	constexpr ipv4_network_address(uint32_t ip, uint16_t port) noexcept
-		: m_ip(ip),
-		  m_port(port) {}
+	constexpr ipv4_network_address(uint32_t ip, uint16_t port) noexcept :
+		m_ip(ip),
+		m_port(port) {}
 
-	bool equal(const ipv4_network_address &other) const noexcept;
-	bool less(const ipv4_network_address &other) const noexcept;
-	constexpr bool is_same_host(const ipv4_network_address &other) const noexcept
+	bool equal(const ipv4_network_address& other) const noexcept;
+	bool less(const ipv4_network_address& other) const noexcept;
+	constexpr bool is_same_host(const ipv4_network_address& other) const noexcept
 	{
 		return ip() == other.ip();
 	}
@@ -78,27 +78,27 @@ class ipv4_network_address
 	END_KV_SERIALIZE_MAP()
 };
 
-inline bool operator==(const ipv4_network_address &lhs, const ipv4_network_address &rhs) noexcept
+inline bool operator==(const ipv4_network_address& lhs, const ipv4_network_address& rhs) noexcept
 {
 	return lhs.equal(rhs);
 }
-inline bool operator!=(const ipv4_network_address &lhs, const ipv4_network_address &rhs) noexcept
+inline bool operator!=(const ipv4_network_address& lhs, const ipv4_network_address& rhs) noexcept
 {
 	return !lhs.equal(rhs);
 }
-inline bool operator<(const ipv4_network_address &lhs, const ipv4_network_address &rhs) noexcept
+inline bool operator<(const ipv4_network_address& lhs, const ipv4_network_address& rhs) noexcept
 {
 	return lhs.less(rhs);
 }
-inline bool operator<=(const ipv4_network_address &lhs, const ipv4_network_address &rhs) noexcept
+inline bool operator<=(const ipv4_network_address& lhs, const ipv4_network_address& rhs) noexcept
 {
 	return !rhs.less(lhs);
 }
-inline bool operator>(const ipv4_network_address &lhs, const ipv4_network_address &rhs) noexcept
+inline bool operator>(const ipv4_network_address& lhs, const ipv4_network_address& rhs) noexcept
 {
 	return rhs.less(lhs);
 }
-inline bool operator>=(const ipv4_network_address &lhs, const ipv4_network_address &rhs) noexcept
+inline bool operator>=(const ipv4_network_address& lhs, const ipv4_network_address& rhs) noexcept
 {
 	return !lhs.less(rhs);
 }
@@ -109,9 +109,9 @@ class network_address
 	{
 		virtual ~interface(){};
 
-		virtual bool equal(const interface &) const = 0;
-		virtual bool less(const interface &) const = 0;
-		virtual bool is_same_host(const interface &) const = 0;
+		virtual bool equal(const interface&) const = 0;
+		virtual bool less(const interface&) const = 0;
+		virtual bool is_same_host(const interface&) const = 0;
 
 		virtual std::string str() const = 0;
 		virtual std::string host_str() const = 0;
@@ -125,26 +125,27 @@ class network_address
 	{
 		T value;
 
-		implementation(const T &src) : value(src) {}
+		implementation(const T& src) :
+			value(src) {}
 		~implementation() = default;
 
 		// Type-checks for cast are done in cpp
-		static const T &cast(const interface &src) noexcept
+		static const T& cast(const interface& src) noexcept
 		{
-			return static_cast<const implementation<T> &>(src).value;
+			return static_cast<const implementation<T>&>(src).value;
 		}
 
-		virtual bool equal(const interface &other) const override
+		virtual bool equal(const interface& other) const override
 		{
 			return value.equal(cast(other));
 		}
 
-		virtual bool less(const interface &other) const override
+		virtual bool less(const interface& other) const override
 		{
 			return value.less(cast(other));
 		}
 
-		virtual bool is_same_host(const interface &other) const override
+		virtual bool is_same_host(const interface& other) const override
 		{
 			return value.is_same_host(cast(other));
 		}
@@ -159,30 +160,30 @@ class network_address
 	std::shared_ptr<interface> self = nullptr;
 
 	template <typename Type>
-	Type &as_mutable() const
+	Type& as_mutable() const
 	{
 		// types `implmentation<Type>` and `implementation<const Type>` are unique
 		using Type_ = typename std::remove_const<Type>::type;
-		network_address::interface *const self_ = self.get(); // avoid clang warning in typeid
+		network_address::interface* const self_ = self.get(); // avoid clang warning in typeid
 		if(!self_ || typeid(implementation<Type_>) != typeid(*self_))
 			throw std::bad_cast{};
-		return static_cast<implementation<Type_> *>(self_)->value;
+		return static_cast<implementation<Type_>*>(self_)->value;
 	}
 
   public:
 	template <typename T>
-	network_address(const T &src)
-		: self(std::make_shared<implementation<T>>(src)) {}
-	bool equal(const network_address &other) const;
-	bool less(const network_address &other) const;
-	bool is_same_host(const network_address &other) const;
+	network_address(const T& src) :
+		self(std::make_shared<implementation<T>>(src)) {}
+	bool equal(const network_address& other) const;
+	bool less(const network_address& other) const;
+	bool is_same_host(const network_address& other) const;
 	std::string str() const { return self ? self->str() : "<none>"; }
 	std::string host_str() const { return self ? self->host_str() : "<none>"; }
 	bool is_loopback() const { return self ? self->is_loopback() : false; }
 	bool is_local() const { return self ? self->is_local() : false; }
 	uint8_t get_type_id() const { return self ? self->get_type_id() : 0; }
 	template <typename Type>
-	const Type &as() const { return as_mutable<const Type>(); }
+	const Type& as() const { return as_mutable<const Type>(); }
 
 	BEGIN_KV_SERIALIZE_MAP(network_address)
 	uint8_t type = is_store ? this_ref.get_type_id() : 0;
@@ -194,8 +195,8 @@ class network_address
 	{
 		if(!is_store)
 		{
-			const_cast<network_address &>(this_ref) = ipv4_network_address{0, 0};
-			auto &addr = this_ref.template as_mutable<ipv4_network_address>();
+			const_cast<network_address&>(this_ref) = ipv4_network_address{0, 0};
+			auto& addr = this_ref.template as_mutable<ipv4_network_address>();
 			if(epee::serialization::selector<is_store>::serialize(addr, stg, hparent_section, "addr"))
 				GULPSF_LOG_L1("Found as addr: {}", this_ref.str());
 			else if(epee::serialization::selector<is_store>::serialize(addr, stg, hparent_section, "template as<ipv4_network_address>()"))
@@ -210,7 +211,7 @@ class network_address
 		}
 		else
 		{
-			auto &addr = this_ref.template as_mutable<ipv4_network_address>();
+			auto& addr = this_ref.template as_mutable<ipv4_network_address>();
 			if(!epee::serialization::selector<is_store>::serialize(addr, stg, hparent_section, "addr"))
 				return false;
 		}
@@ -223,32 +224,32 @@ class network_address
 	END_KV_SERIALIZE_MAP()
 };
 
-inline bool operator==(const network_address &lhs, const network_address &rhs)
+inline bool operator==(const network_address& lhs, const network_address& rhs)
 {
 	return lhs.equal(rhs);
 }
-inline bool operator!=(const network_address &lhs, const network_address &rhs)
+inline bool operator!=(const network_address& lhs, const network_address& rhs)
 {
 	return !lhs.equal(rhs);
 }
-inline bool operator<(const network_address &lhs, const network_address &rhs)
+inline bool operator<(const network_address& lhs, const network_address& rhs)
 {
 	return lhs.less(rhs);
 }
-inline bool operator<=(const network_address &lhs, const network_address &rhs)
+inline bool operator<=(const network_address& lhs, const network_address& rhs)
 {
 	return !rhs.less(lhs);
 }
-inline bool operator>(const network_address &lhs, const network_address &rhs)
+inline bool operator>(const network_address& lhs, const network_address& rhs)
 {
 	return rhs.less(lhs);
 }
-inline bool operator>=(const network_address &lhs, const network_address &rhs)
+inline bool operator>=(const network_address& lhs, const network_address& rhs)
 {
 	return !lhs.less(rhs);
 }
 
-bool create_network_address(network_address &address, const std::string &string, uint16_t default_port = 0);
+bool create_network_address(network_address& address, const std::string& string, uint16_t default_port = 0);
 
 /************************************************************************/
 /*                                                                      */
@@ -267,35 +268,37 @@ struct connection_context_base
 	double m_current_speed_up;
 
 	connection_context_base(boost::uuids::uuid connection_id,
-							const network_address &remote_address, bool is_income,
-							time_t last_recv = 0, time_t last_send = 0,
-							uint64_t recv_cnt = 0, uint64_t send_cnt = 0) : m_connection_id(connection_id),
-																			m_remote_address(remote_address),
-																			m_is_income(is_income),
-																			m_started(time(NULL)),
-																			m_last_recv(last_recv),
-																			m_last_send(last_send),
-																			m_recv_cnt(recv_cnt),
-																			m_send_cnt(send_cnt),
-																			m_current_speed_down(0),
-																			m_current_speed_up(0)
+		const network_address& remote_address, bool is_income,
+		time_t last_recv = 0, time_t last_send = 0,
+		uint64_t recv_cnt = 0, uint64_t send_cnt = 0) :
+		m_connection_id(connection_id),
+		m_remote_address(remote_address),
+		m_is_income(is_income),
+		m_started(time(NULL)),
+		m_last_recv(last_recv),
+		m_last_send(last_send),
+		m_recv_cnt(recv_cnt),
+		m_send_cnt(send_cnt),
+		m_current_speed_down(0),
+		m_current_speed_up(0)
 	{
 	}
 
-	connection_context_base() : m_connection_id(),
-								m_remote_address(ipv4_network_address{0, 0}),
-								m_is_income(false),
-								m_started(time(NULL)),
-								m_last_recv(0),
-								m_last_send(0),
-								m_recv_cnt(0),
-								m_send_cnt(0),
-								m_current_speed_down(0),
-								m_current_speed_up(0)
+	connection_context_base() :
+		m_connection_id(),
+		m_remote_address(ipv4_network_address{0, 0}),
+		m_is_income(false),
+		m_started(time(NULL)),
+		m_last_recv(0),
+		m_last_send(0),
+		m_recv_cnt(0),
+		m_send_cnt(0),
+		m_current_speed_down(0),
+		m_current_speed_up(0)
 	{
 	}
 
-	connection_context_base &operator=(const connection_context_base &a)
+	connection_context_base& operator=(const connection_context_base& a)
 	{
 		set_details(a.m_connection_id, a.m_remote_address, a.m_is_income);
 		return *this;
@@ -304,7 +307,7 @@ struct connection_context_base
   private:
 	template <class t_protocol_handler>
 	friend class connection;
-	void set_details(boost::uuids::uuid connection_id, const network_address &remote_address, bool is_income)
+	void set_details(boost::uuids::uuid connection_id, const network_address& remote_address, bool is_income)
 	{
 		this->~connection_context_base();
 		new(this) connection_context_base(connection_id, remote_address, is_income);
@@ -316,11 +319,11 @@ struct connection_context_base
 /************************************************************************/
 struct i_service_endpoint
 {
-	virtual bool do_send(const void *ptr, size_t cb) = 0;
+	virtual bool do_send(const void* ptr, size_t cb) = 0;
 	virtual bool close() = 0;
 	virtual bool call_run_once_service_io() = 0;
 	virtual bool request_callback() = 0;
-	virtual boost::asio::io_service &get_io_service() = 0;
+	virtual boost::asio::io_service& get_io_service() = 0;
 	//protect from deletion connection object(with protocol instance) during external call "invoke"
 	virtual bool add_ref() = 0;
 	virtual bool release() = 0;
@@ -331,17 +334,17 @@ struct i_service_endpoint
 
 //some helpers
 
-std::string print_connection_context(const connection_context_base &ctx);
-std::string print_connection_context_short(const connection_context_base &ctx);
+std::string print_connection_context(const connection_context_base& ctx);
+std::string print_connection_context_short(const connection_context_base& ctx);
 
-inline std::ostream &operator<<(std::ostream &os, const connection_context_base &ct)
+inline std::ostream& operator<<(std::ostream& os, const connection_context_base& ct)
 {
 	os << "[" << epee::net_utils::print_connection_context_short(ct).c_str() << "] ";
 	return os;
 }
 
-}
-}
+} // namespace net_utils
+} // namespace epee
 
 #if BOOST_VERSION >= 107000
 #define GET_IO_SERVICE(s) ((boost::asio::io_context&)(s).get_executor().context())

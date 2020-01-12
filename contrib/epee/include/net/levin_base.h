@@ -75,12 +75,12 @@ struct bucket_head2
 template <class t_connection_context = net_utils::connection_context_base>
 struct levin_commands_handler
 {
-	virtual int invoke(int command, const std::string &in_buff, std::string &buff_out, t_connection_context &context) = 0;
-	virtual int notify(int command, const std::string &in_buff, t_connection_context &context) = 0;
-	virtual void callback(t_connection_context &context){};
+	virtual int invoke(int command, const std::string& in_buff, std::string& buff_out, t_connection_context& context) = 0;
+	virtual int notify(int command, const std::string& in_buff, t_connection_context& context) = 0;
+	virtual void callback(t_connection_context& context){};
 
-	virtual void on_connection_new(t_connection_context &context){};
-	virtual void on_connection_close(t_connection_context &context){};
+	virtual void on_connection_new(t_connection_context& context){};
+	virtual void on_connection_close(t_connection_context& context){};
 
 	virtual ~levin_commands_handler() {}
 };
@@ -97,7 +97,7 @@ struct levin_commands_handler
 #define DESCRIBE_RET_CODE(code) \
 	case code:                  \
 		return #code;
-inline const char *get_err_descr(int err)
+inline const char* get_err_descr(int err)
 {
 	switch(err)
 	{
@@ -113,7 +113,7 @@ inline const char *get_err_descr(int err)
 		return "unknown code";
 	}
 }
-}
-}
+} // namespace levin
+} // namespace epee
 
 #endif //_LEVIN_BASE_H_

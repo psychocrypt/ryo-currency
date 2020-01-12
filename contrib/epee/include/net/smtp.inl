@@ -34,13 +34,13 @@ namespace smtp
 {
 
 //////////////////////////////////////////////////////////////////////////
-inline char *convert_hex(unsigned char *in, int len)
+inline char* convert_hex(unsigned char* in, int len)
 {
 	static char hex[] = "0123456789abcdef";
-	char *out;
+	char* out;
 	int i;
 
-	out = (char *)malloc(len * 2 + 1);
+	out = (char*)malloc(len * 2 + 1);
 	if(out == NULL)
 		return NULL;
 
@@ -56,10 +56,10 @@ inline char *convert_hex(unsigned char *in, int len)
 }
 
 //////////////////////////////////////////////////////////////////////////
-inline char *hash_md5(const char *sec_key, const char *data, int len)
+inline char* hash_md5(const char* sec_key, const char* data, int len)
 {
 	char key[65], digest[24];
-	char *hash_hex;
+	char* hash_hex;
 
 	int sec_len, i;
 
@@ -78,8 +78,8 @@ inline char *hash_md5(const char *sec_key, const char *data, int len)
 		memcpy(key, sec_key, 64);
 	}
 
-	md5::hmac_md5((const unsigned char *)data, len, (const unsigned char *)key, 64, (unsigned char *)digest);
-	hash_hex = convert_hex((unsigned char *)digest, 16);
+	md5::hmac_md5((const unsigned char*)data, len, (const unsigned char*)key, 64, (unsigned char*)digest);
+	hash_hex = convert_hex((unsigned char*)digest, 16);
 
 	return hash_hex;
 }
@@ -150,12 +150,12 @@ inline void CSMTPClient::SetErrorText(LPCSTR szErrorText, DWORD dwErrorCode)
 	if(szErrorText && strlen(szErrorText))
 	{
 		m_pErrorText = (LPBYTE)malloc(strlen(szErrorText) + 1);
-		strcpy((char *)m_pErrorText, szErrorText);
+		strcpy((char*)m_pErrorText, szErrorText);
 
 		if(lpMsgBuf)
 		{
-			strcat((char *)m_pErrorText, " ");
-			strcpy((char *)m_pErrorText, (char *)lpMsgBuf);
+			strcat((char*)m_pErrorText, " ");
+			strcpy((char*)m_pErrorText, (char*)lpMsgBuf);
 
 			LocalFree(lpMsgBuf);
 		}
@@ -168,9 +168,9 @@ inline void CSMTPClient::SetErrorText(PBYTE szErrorText, DWORD dwErrorCode)
 }
 
 //////////////////////////////////////////////////////////////////////////
-inline char *CSMTPClient::GetLastErrorText()
+inline char* CSMTPClient::GetLastErrorText()
 {
-	return (char *)m_pErrorText;
+	return (char*)m_pErrorText;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -184,7 +184,7 @@ inline DWORD CSMTPClient::ReceiveData(SOCKET hSocket, PBYTE pReceiveBuffer, DWOR
 		int iLength = 0;
 
 		iLength = recv(hSocket, (LPSTR)pReceiveBuffer + iReceived, dwReceiveBufferSize - iReceived,
-					   NO_FLAGS);
+			NO_FLAGS);
 
 		if(iLength != 0 && iLength != SOCKET_ERROR)
 			iReceived += iLength;
@@ -211,7 +211,7 @@ inline /////////////////////////////////////////////////////////////////////////
 		while(iLength != SOCKET_ERROR && dwSendBufferSize - iSended > 0)
 		{
 			iLength = send(hSocket, (LPSTR)pSendBuffer + iSended, dwSendBufferSize - iSended,
-						   NO_FLAGS);
+				NO_FLAGS);
 
 			if(iLength != 0 && iLength != SOCKET_ERROR)
 				iSended += iLength;
@@ -245,15 +245,15 @@ inline unsigned short CSMTPClient::GetResponseCode(LPBYTE pBuffer, DWORD dwBuffe
 //////////////////////////////////////////////////////////////////////////
 inline void CSMTPClient::ParseESMTPExtensions(LPBYTE pBuffer, DWORD dwBufferSize)
 {
-	const char *szSubstring = strstr((const char *)pBuffer, "250-AUTH ");
+	const char* szSubstring = strstr((const char*)pBuffer, "250-AUTH ");
 	if(!szSubstring)
 	{
-		szSubstring = strstr((const char *)pBuffer, "250 AUTH ");
+		szSubstring = strstr((const char*)pBuffer, "250 AUTH ");
 	}
 
 	if(szSubstring)
 	{
-		const char *szSubstringEnd = strstr((const char *)szSubstring, "\r\n");
+		const char* szSubstringEnd = strstr((const char*)szSubstring, "\r\n");
 		if(szSubstringEnd)
 		{
 			szSubstring += 9;
@@ -334,8 +334,8 @@ inline BOOL CSMTPClient::ServerConnect(LPCSTR szServerAddress, const unsigned sh
 
 			// EHLO / HELO
 			BYTE szHelloBuffer[256];
-			sprintf((char *)szHelloBuffer, "%s %s\r\n", (char *)SMTP_COMMAND_EHLO, (char *)szServerAddress);
-			if(SendData(m_hSocket, (PBYTE)szHelloBuffer, strlen((const char *)szHelloBuffer)) == 0)
+			sprintf((char*)szHelloBuffer, "%s %s\r\n", (char*)SMTP_COMMAND_EHLO, (char*)szServerAddress);
+			if(SendData(m_hSocket, (PBYTE)szHelloBuffer, strlen((const char*)szHelloBuffer)) == 0)
 			{
 				SetErrorText("SendData error.", WSAGetLastError());
 				free(pReceiveBuffer);
@@ -352,8 +352,8 @@ inline BOOL CSMTPClient::ServerConnect(LPCSTR szServerAddress, const unsigned sh
 				{
 					SetErrorText(pReceiveBuffer);
 
-					sprintf((char *)szHelloBuffer, "%s %s\r\n", (char *)SMTP_COMMAND_HELO, (char *)szServerAddress);
-					if(SendData(m_hSocket, (PBYTE)szHelloBuffer, strlen((const char *)szHelloBuffer)) == 0)
+					sprintf((char*)szHelloBuffer, "%s %s\r\n", (char*)SMTP_COMMAND_HELO, (char*)szServerAddress);
+					if(SendData(m_hSocket, (PBYTE)szHelloBuffer, strlen((const char*)szHelloBuffer)) == 0)
 					{
 						SetErrorText("SendData error.", WSAGetLastError());
 						free(pReceiveBuffer);
@@ -448,7 +448,7 @@ inline SOCKET CSMTPClient::_connectServerSocket(LPCSTR szServerAddress, const un
 			sockAddr.sin_addr = *((LPIN_ADDR)*lpHostEnt->h_addr_list);
 
 			nConnect = connect(hServerSocket, (PSOCKADDR)&sockAddr,
-							   sizeof(sockAddr));
+				sizeof(sockAddr));
 
 			if(nConnect != 0)
 			{
@@ -564,8 +564,8 @@ inline BOOL CSMTPClient::ServerLoginMethodPlain(LPCSTR szUsername, LPCSTR szPass
 	BOOL bSuccess = FALSE;
 
 	BYTE szCommandBuffer[256];
-	sprintf((char *)szCommandBuffer, "%s %s\r\n", (char *)SMTP_COMMAND_AUTH, (char *)SMTP_COMMAND_AUTH_PLAIN);
-	if(SendData(m_hSocket, (PBYTE)szCommandBuffer, strlen((const char *)szCommandBuffer)) == 0)
+	sprintf((char*)szCommandBuffer, "%s %s\r\n", (char*)SMTP_COMMAND_AUTH, (char*)SMTP_COMMAND_AUTH_PLAIN);
+	if(SendData(m_hSocket, (PBYTE)szCommandBuffer, strlen((const char*)szCommandBuffer)) == 0)
 	{
 		SetErrorText("SendData error.", WSAGetLastError());
 		return FALSE;
@@ -598,7 +598,7 @@ inline BOOL CSMTPClient::ServerLoginMethodPlain(LPCSTR szUsername, LPCSTR szPass
 
 		// Encode.
 		DWORD dwLoginBuffer = strlen(szUsername) + strlen(szPassword) + 3;
-		char *pLoginBuffer = (char *)malloc(dwLoginBuffer);
+		char* pLoginBuffer = (char*)malloc(dwLoginBuffer);
 		if(pLoginBuffer)
 		{
 			ZeroMemory(pLoginBuffer, dwLoginBuffer);
@@ -612,13 +612,13 @@ inline BOOL CSMTPClient::ServerLoginMethodPlain(LPCSTR szUsername, LPCSTR szPass
 			if(szLoginBufferEncoded && strlen(szLoginBufferEncoded) > 0)
 			{
 				DWORD dwSendBufferSize = strlen(szLoginBufferEncoded) + 4;
-				char *pSendBuffer = (char *)malloc(dwSendBufferSize);
+				char* pSendBuffer = (char*)malloc(dwSendBufferSize);
 				if(pSendBuffer)
 				{
 					strcpy(pSendBuffer, szLoginBufferEncoded);
 					strcat(pSendBuffer, "\r\n");
 
-					if(SendData(m_hSocket, (PBYTE)pSendBuffer, strlen((const char *)pSendBuffer)) == 0)
+					if(SendData(m_hSocket, (PBYTE)pSendBuffer, strlen((const char*)pSendBuffer)) == 0)
 					{
 						SetErrorText("SendData error.", WSAGetLastError());
 						free(pSendBuffer);
@@ -669,8 +669,8 @@ inline BOOL CSMTPClient::ServerLoginMethodLogin(LPCSTR szUsername, LPCSTR szPass
 	BOOL bSuccess = FALSE;
 
 	BYTE szCommandBuffer[256];
-	sprintf((char *)szCommandBuffer, "%s %s\r\n", (char *)SMTP_COMMAND_AUTH, (char *)SMTP_COMMAND_AUTH_LOGIN);
-	if(SendData(m_hSocket, (PBYTE)szCommandBuffer, strlen((const char *)szCommandBuffer)) == 0)
+	sprintf((char*)szCommandBuffer, "%s %s\r\n", (char*)SMTP_COMMAND_AUTH, (char*)SMTP_COMMAND_AUTH_LOGIN);
+	if(SendData(m_hSocket, (PBYTE)szCommandBuffer, strlen((const char*)szCommandBuffer)) == 0)
 	{
 		SetErrorText("SendData error.", WSAGetLastError());
 		return FALSE;
@@ -706,13 +706,13 @@ inline BOOL CSMTPClient::ServerLoginMethodLogin(LPCSTR szUsername, LPCSTR szPass
 						coder.Encode((const PBYTE)szUsername, strlen(szUsername));
 						LPCSTR szUsernameEncoded = coder.EncodedMessage();
 
-						char *szLoginUsernameBuffer = (char *)malloc(strlen(szUsernameEncoded) + 4);
+						char* szLoginUsernameBuffer = (char*)malloc(strlen(szUsernameEncoded) + 4);
 						if(szLoginUsernameBuffer)
 						{
 							strcpy(szLoginUsernameBuffer, szUsernameEncoded);
 							strcat(szLoginUsernameBuffer, "\r\n");
 
-							if(SendData(m_hSocket, (PBYTE)szLoginUsernameBuffer, strlen((const char *)szLoginUsernameBuffer)) == 0)
+							if(SendData(m_hSocket, (PBYTE)szLoginUsernameBuffer, strlen((const char*)szLoginUsernameBuffer)) == 0)
 							{
 								SetErrorText("SendData error.", WSAGetLastError());
 								free(pReceiveBuffer);
@@ -752,13 +752,13 @@ inline BOOL CSMTPClient::ServerLoginMethodLogin(LPCSTR szUsername, LPCSTR szPass
 										coder.Encode((const PBYTE)szPassword, strlen(szPassword));
 										LPCSTR szPasswordEncoded = coder.EncodedMessage();
 
-										char *szLoginPasswordBuffer = (char *)malloc(strlen(szPasswordEncoded) + 4);
+										char* szLoginPasswordBuffer = (char*)malloc(strlen(szPasswordEncoded) + 4);
 										if(szLoginPasswordBuffer)
 										{
 											strcpy(szLoginPasswordBuffer, szPasswordEncoded);
 											strcat(szLoginPasswordBuffer, "\r\n");
 
-											if(SendData(m_hSocket, (PBYTE)szLoginPasswordBuffer, strlen((const char *)szLoginPasswordBuffer)) == 0)
+											if(SendData(m_hSocket, (PBYTE)szLoginPasswordBuffer, strlen((const char*)szLoginPasswordBuffer)) == 0)
 											{
 												SetErrorText("SendData error.", WSAGetLastError());
 												free(pReceiveBuffer);
@@ -836,8 +836,8 @@ inline BOOL CSMTPClient::ServerLoginMethodCramMD5(LPCSTR szUsername, LPCSTR szPa
 	BOOL bSuccess = FALSE;
 
 	BYTE szCommandBuffer[256];
-	sprintf((char *)szCommandBuffer, "%s %s\r\n", (char *)SMTP_COMMAND_AUTH, (char *)SMTP_COMMAND_AUTH_CRAM_MD5);
-	if(SendData(m_hSocket, (PBYTE)szCommandBuffer, strlen((const char *)szCommandBuffer)) == 0)
+	sprintf((char*)szCommandBuffer, "%s %s\r\n", (char*)SMTP_COMMAND_AUTH, (char*)SMTP_COMMAND_AUTH_CRAM_MD5);
+	if(SendData(m_hSocket, (PBYTE)szCommandBuffer, strlen((const char*)szCommandBuffer)) == 0)
 	{
 		SetErrorText("SendData error.", WSAGetLastError());
 		return FALSE;
@@ -869,14 +869,14 @@ inline BOOL CSMTPClient::ServerLoginMethodCramMD5(LPCSTR szUsername, LPCSTR szPa
 				LPCSTR szResponse = coder.DecodedMessage();
 				if(szResponse && strlen(szResponse) > 0)
 				{
-					char *auth_hex = hash_md5(szPassword, szResponse, strlen(szResponse));
+					char* auth_hex = hash_md5(szPassword, szResponse, strlen(szResponse));
 					if(!auth_hex)
 					{
 						free(pReceiveBuffer);
 						return FALSE;
 					}
 
-					char *szCommand = (char *)malloc(strlen(szUsername) + strlen(auth_hex) + 5);
+					char* szCommand = (char*)malloc(strlen(szUsername) + strlen(auth_hex) + 5);
 					if(szCommand)
 					{
 						sprintf(szCommand, "%s %s", szUsername, auth_hex);
@@ -894,14 +894,14 @@ inline BOOL CSMTPClient::ServerLoginMethodCramMD5(LPCSTR szUsername, LPCSTR szPa
 							return FALSE;
 						}
 
-						char *szAuthCommand = (char *)malloc(strlen(szAuthEncoded) + 4);
+						char* szAuthCommand = (char*)malloc(strlen(szAuthEncoded) + 4);
 						if(szAuthCommand)
 						{
 							strcpy(szAuthCommand, szAuthEncoded);
 							strcat(szAuthCommand, "\r\n");
 
 							// Send auth data
-							if(SendData(m_hSocket, (PBYTE)szAuthCommand, strlen((const char *)szAuthCommand)) == 0)
+							if(SendData(m_hSocket, (PBYTE)szAuthCommand, strlen((const char*)szAuthCommand)) == 0)
 							{
 								SetErrorText("SendData error.", WSAGetLastError());
 								free(szAuthCommand);
@@ -983,7 +983,7 @@ inline BOOL CSMTPClient::SendMessage(LPCSTR szFromAddress, LPCSTR szFromName, LP
 		return NULL;
 	}
 
-	char *szHeaderBuffer = (char *)malloc(1024 * 16);
+	char* szHeaderBuffer = (char*)malloc(1024 * 16);
 	if(szHeaderBuffer)
 	{
 		// get the current date and time
@@ -1049,8 +1049,8 @@ inline BOOL CSMTPClient::SendMessage(LPCSTR szFromAddress, LPCSTR szFromName, LP
 	}
 
 	BYTE szCommandBuffer[256];
-	sprintf((char *)szCommandBuffer, "MAIL FROM:<%s> SIZE=%u\r\n", (char *)szFromAddress, strlen(szHeaderBuffer) + dwBodySize + 2);
-	if(SendData(m_hSocket, (PBYTE)szCommandBuffer, strlen((const char *)szCommandBuffer)) == 0)
+	sprintf((char*)szCommandBuffer, "MAIL FROM:<%s> SIZE=%u\r\n", (char*)szFromAddress, strlen(szHeaderBuffer) + dwBodySize + 2);
+	if(SendData(m_hSocket, (PBYTE)szCommandBuffer, strlen((const char*)szCommandBuffer)) == 0)
 	{
 		SetErrorText("SendData error.", WSAGetLastError());
 		free(szHeaderBuffer);
@@ -1084,7 +1084,7 @@ inline BOOL CSMTPClient::SendMessage(LPCSTR szFromAddress, LPCSTR szFromName, LP
 		}
 
 		// Post "RCTP TO:"
-		char *szCurrentAddr = (char *)malloc(strlen(szToAddresses) + 1);
+		char* szCurrentAddr = (char*)malloc(strlen(szToAddresses) + 1);
 		if(!szCurrentAddr)
 		{
 			SetErrorText("malloc error.", GetLastError());
@@ -1093,14 +1093,14 @@ inline BOOL CSMTPClient::SendMessage(LPCSTR szFromAddress, LPCSTR szFromName, LP
 			return FALSE;
 		}
 
-		const char *szToOffset = szToAddresses;
-		char *szZap = NULL;
+		const char* szToOffset = szToAddresses;
+		char* szZap = NULL;
 
 		BOOL bRCPTAccepted = FALSE;
 		do
 		{
 			strcpy(szCurrentAddr, szToOffset);
-			char *szExtractedAdress = szCurrentAddr;
+			char* szExtractedAdress = szCurrentAddr;
 			szZap = strchr(szCurrentAddr, ',');
 
 			if(szZap)
@@ -1109,8 +1109,8 @@ inline BOOL CSMTPClient::SendMessage(LPCSTR szFromAddress, LPCSTR szFromName, LP
 				szToOffset = szZap + 1;
 			}
 
-			char *pSkobka1 = strchr(szCurrentAddr, '<');
-			char *pSkobka2 = strchr(szCurrentAddr, '>');
+			char* pSkobka1 = strchr(szCurrentAddr, '<');
+			char* pSkobka2 = strchr(szCurrentAddr, '>');
 
 			if(pSkobka1 && pSkobka2 && pSkobka2 > pSkobka1)
 			{
@@ -1120,8 +1120,8 @@ inline BOOL CSMTPClient::SendMessage(LPCSTR szFromAddress, LPCSTR szFromName, LP
 
 			if(szExtractedAdress && strlen(szExtractedAdress) > 0)
 			{
-				sprintf((char *)szCommandBuffer, "RCPT TO:<%s>\r\n", (char *)szExtractedAdress);
-				if(SendData(m_hSocket, (PBYTE)szCommandBuffer, strlen((const char *)szCommandBuffer)) == 0)
+				sprintf((char*)szCommandBuffer, "RCPT TO:<%s>\r\n", (char*)szExtractedAdress);
+				if(SendData(m_hSocket, (PBYTE)szCommandBuffer, strlen((const char*)szCommandBuffer)) == 0)
 				{
 					SetErrorText("SendData error.", WSAGetLastError());
 					free(szCurrentAddr);
@@ -1158,8 +1158,8 @@ inline BOOL CSMTPClient::SendMessage(LPCSTR szFromAddress, LPCSTR szFromName, LP
 
 		if(bRCPTAccepted)
 		{
-			sprintf((char *)szCommandBuffer, "DATA\r\n");
-			if(SendData(m_hSocket, (PBYTE)szCommandBuffer, strlen((const char *)szCommandBuffer)) == 0)
+			sprintf((char*)szCommandBuffer, "DATA\r\n");
+			if(SendData(m_hSocket, (PBYTE)szCommandBuffer, strlen((const char*)szCommandBuffer)) == 0)
 			{
 				SetErrorText("SendData error.", WSAGetLastError());
 				free(pReceiveBuffer);
@@ -1190,7 +1190,7 @@ inline BOOL CSMTPClient::SendMessage(LPCSTR szFromAddress, LPCSTR szFromName, LP
 			}
 
 			// Send message data (header + body + .)
-			if(SendData(m_hSocket, (PBYTE)szHeaderBuffer, strlen((const char *)szHeaderBuffer)) == 0)
+			if(SendData(m_hSocket, (PBYTE)szHeaderBuffer, strlen((const char*)szHeaderBuffer)) == 0)
 			{
 				SetErrorText("SendData error.", WSAGetLastError());
 				free(pReceiveBuffer);
@@ -1262,11 +1262,11 @@ inline BOOL CSMTPClient::SendMessage(LPCSTR szFromAddress, LPCSTR szFromName, LP
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-inline Base64Coder::Base64Coder()
-	: m_pDBuffer(NULL),
-	  m_pEBuffer(NULL),
-	  m_nDBufLen(0),
-	  m_nEBufLen(0)
+inline Base64Coder::Base64Coder() :
+	m_pDBuffer(NULL),
+	m_pEBuffer(NULL),
+	m_nDBufLen(0),
+	m_nEBufLen(0)
 {
 }
 
@@ -1374,7 +1374,7 @@ inline void Base64Coder::Encode(const PBYTE pBuffer, DWORD nBufLen)
 inline void Base64Coder::Encode(LPCSTR szMessage)
 {
 	if(szMessage != NULL)
-		Base64Coder::Encode((const PBYTE)szMessage, strlen((const char *)szMessage));
+		Base64Coder::Encode((const PBYTE)szMessage, strlen((const char*)szMessage));
 }
 
 inline void Base64Coder::Decode(const PBYTE pBuffer, DWORD dwBufLen)
@@ -1431,10 +1431,10 @@ inline void Base64Coder::Decode(const PBYTE pBuffer, DWORD dwBufLen)
 inline void Base64Coder::Decode(LPCSTR szMessage)
 {
 	if(szMessage != NULL)
-		Base64Coder::Decode((const PBYTE)szMessage, strlen((const char *)szMessage));
+		Base64Coder::Decode((const PBYTE)szMessage, strlen((const char*)szMessage));
 }
 
-inline DWORD Base64Coder::_DecodeToBuffer(const TempBucket &Decode, PBYTE pBuffer)
+inline DWORD Base64Coder::_DecodeToBuffer(const TempBucket& Decode, PBYTE pBuffer)
 {
 	TempBucket Data;
 	DWORD nCount = 0;
@@ -1451,7 +1451,7 @@ inline DWORD Base64Coder::_DecodeToBuffer(const TempBucket &Decode, PBYTE pBuffe
 	return nCount;
 }
 
-inline void Base64Coder::_EncodeToBuffer(const TempBucket &Decode, PBYTE pBuffer)
+inline void Base64Coder::_EncodeToBuffer(const TempBucket& Decode, PBYTE pBuffer)
 {
 	TempBucket Data;
 
@@ -1469,7 +1469,7 @@ inline void Base64Coder::_EncodeToBuffer(const TempBucket &Decode, PBYTE pBuffer
 	}
 }
 
-inline void Base64Coder::_DecodeRaw(TempBucket &Data, const TempBucket &Decode)
+inline void Base64Coder::_DecodeRaw(TempBucket& Data, const TempBucket& Decode)
 {
 	BYTE nTemp;
 
@@ -1496,7 +1496,7 @@ inline void Base64Coder::_DecodeRaw(TempBucket &Data, const TempBucket &Decode)
 	Data.nData[2] |= nTemp;
 }
 
-inline void Base64Coder::_EncodeRaw(TempBucket &Data, const TempBucket &Decode)
+inline void Base64Coder::_EncodeRaw(TempBucket& Data, const TempBucket& Decode)
 {
 	BYTE nTemp;
 
@@ -1560,6 +1560,6 @@ inline void Base64Coder::_Init()
 
 	is_init() = TRUE;
 }
-}
-}
-}
+} // namespace smtp
+} // namespace net_utils
+} // namespace epee

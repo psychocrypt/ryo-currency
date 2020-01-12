@@ -41,7 +41,7 @@ namespace munin
 {
 typedef boosted_tcp_server<munin_node_server_connection_handler> munin_node_server;
 //typedef cp_server_impl<munin_node_server_connection_handler> munin_node_cp_server;
-}
-}
-}
+} // namespace munin
+} // namespace net_utils
+} // namespace epee
 #endif //!_MUNIN_NODE_SERVER_H_

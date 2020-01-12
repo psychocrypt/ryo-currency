@@ -61,17 +61,17 @@ static_assert(sizeof(size_t) <= sizeof(boost::uuids::uuid), "boost::uuids::uuid 
 template <>
 struct hash<boost::uuids::uuid>
 {
-	std::size_t operator()(const boost::uuids::uuid &_v) const
+	std::size_t operator()(const boost::uuids::uuid& _v) const
 	{
-		return reinterpret_cast<const std::size_t &>(_v);
+		return reinterpret_cast<const std::size_t&>(_v);
 	}
 };
-}
+} // namespace std
 
 namespace cryptonote
 {
 
-void block_queue::add_blocks(uint64_t height, std::list<cryptonote::block_complete_entry> bcel, const boost::uuids::uuid &connection_id, float rate, size_t size)
+void block_queue::add_blocks(uint64_t height, std::list<cryptonote::block_complete_entry> bcel, const boost::uuids::uuid& connection_id, float rate, size_t size)
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	std::list<crypto::hash> hashes;
@@ -81,14 +81,14 @@ void block_queue::add_blocks(uint64_t height, std::list<cryptonote::block_comple
 		set_span_hashes(height, connection_id, hashes);
 }
 
-void block_queue::add_blocks(uint64_t height, uint64_t nblocks, const boost::uuids::uuid &connection_id, boost::posix_time::ptime time)
+void block_queue::add_blocks(uint64_t height, uint64_t nblocks, const boost::uuids::uuid& connection_id, boost::posix_time::ptime time)
 {
 	GULPS_CHECK_AND_ASSERT_THROW_MES(nblocks > 0, "Empty span");
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	blocks.insert(span(height, nblocks, connection_id, time));
 }
 
-void block_queue::flush_spans(const boost::uuids::uuid &connection_id, bool all)
+void block_queue::flush_spans(const boost::uuids::uuid& connection_id, bool all)
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	block_map::iterator i = blocks.begin();
@@ -102,7 +102,7 @@ void block_queue::flush_spans(const boost::uuids::uuid &connection_id, bool all)
 	}
 }
 
-void block_queue::flush_stale_spans(const std::set<boost::uuids::uuid> &live_connections)
+void block_queue::flush_stale_spans(const std::set<boost::uuids::uuid>& live_connections)
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	block_map::iterator i = blocks.begin();
@@ -118,7 +118,7 @@ void block_queue::flush_stale_spans(const std::set<boost::uuids::uuid> &live_con
 	}
 }
 
-bool block_queue::remove_span(uint64_t start_block_height, std::list<crypto::hash> *hashes)
+bool block_queue::remove_span(uint64_t start_block_height, std::list<crypto::hash>* hashes)
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	for(block_map::iterator i = blocks.begin(); i != blocks.end(); ++i)
@@ -134,7 +134,7 @@ bool block_queue::remove_span(uint64_t start_block_height, std::list<crypto::has
 	return false;
 }
 
-void block_queue::remove_spans(const boost::uuids::uuid &connection_id, uint64_t start_block_height)
+void block_queue::remove_spans(const boost::uuids::uuid& connection_id, uint64_t start_block_height)
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	for(block_map::iterator i = blocks.begin(); i != blocks.end();)
@@ -151,7 +151,7 @@ uint64_t block_queue::get_max_block_height() const
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	uint64_t height = 0;
-	for(const auto &span : blocks)
+	for(const auto& span : blocks)
 	{
 		const uint64_t h = span.start_block_height + span.nblocks - 1;
 		if(h > height)
@@ -163,9 +163,9 @@ uint64_t block_queue::get_max_block_height() const
 void block_queue::print() const
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
-	GULPSF_LOG_L1("Block queue has {} spans", blocks.size() );
-	for(const auto &span : blocks)
-		GULPSF_LOG_L1("  {} - {} ({}) - {} {} ({} kB/s)", span.start_block_height, (span.start_block_height + span.nblocks - 1), span.nblocks, (is_blockchain_placeholder(span) ? "blockchain" : span.blocks.empty() ? "scheduled" : "filled    ") , boost::uuids::to_string(span.connection_id), ((unsigned)(span.rate * 10 / 1024.f)) / 10.f);
+	GULPSF_LOG_L1("Block queue has {} spans", blocks.size());
+	for(const auto& span : blocks)
+		GULPSF_LOG_L1("  {} - {} ({}) - {} {} ({} kB/s)", span.start_block_height, (span.start_block_height + span.nblocks - 1), span.nblocks, (is_blockchain_placeholder(span) ? "blockchain" : span.blocks.empty() ? "scheduled" : "filled    "), boost::uuids::to_string(span.connection_id), ((unsigned)(span.rate * 10 / 1024.f)) / 10.f);
 }
 
 std::string block_queue::get_overview() const
@@ -181,25 +181,25 @@ std::string block_queue::get_overview() const
 	return s;
 }
 
-bool block_queue::requested(const crypto::hash &hash) const
+bool block_queue::requested(const crypto::hash& hash) const
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
-	for(const auto &span : blocks)
+	for(const auto& span : blocks)
 	{
-		for(const auto &h : span.hashes)
+		for(const auto& h : span.hashes)
 			if(h == hash)
 				return true;
 	}
 	return false;
 }
 
-std::pair<uint64_t, uint64_t> block_queue::reserve_span(uint64_t first_block_height, uint64_t last_block_height, uint64_t max_blocks, const boost::uuids::uuid &connection_id, const std::list<crypto::hash> &block_hashes, boost::posix_time::ptime time)
+std::pair<uint64_t, uint64_t> block_queue::reserve_span(uint64_t first_block_height, uint64_t last_block_height, uint64_t max_blocks, const boost::uuids::uuid& connection_id, const std::list<crypto::hash>& block_hashes, boost::posix_time::ptime time)
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 
 	if(last_block_height < first_block_height || max_blocks == 0)
 	{
-		GULPSF_LOG_L1("reserve_span: early out: first_block_height {}, last_block_height {}, max_blocks {}", first_block_height , last_block_height , max_blocks);
+		GULPSF_LOG_L1("reserve_span: early out: first_block_height {}, last_block_height {}, max_blocks {}", first_block_height, last_block_height, max_blocks);
 		return std::make_pair(0, 0);
 	}
 
@@ -220,13 +220,13 @@ std::pair<uint64_t, uint64_t> block_queue::reserve_span(uint64_t first_block_hei
 	}
 	if(span_length == 0)
 		return std::make_pair(0, 0);
-	GULPSF_LOG_L1("Reserving span {} - {} for {}", span_start_height , (span_start_height + span_length - 1) , boost::uuids::to_string(connection_id));
+	GULPSF_LOG_L1("Reserving span {} - {} for {}", span_start_height, (span_start_height + span_length - 1), boost::uuids::to_string(connection_id));
 	add_blocks(span_start_height, span_length, connection_id, time);
 	set_span_hashes(span_start_height, connection_id, hashes);
 	return std::make_pair(span_start_height, span_length);
 }
 
-bool block_queue::is_blockchain_placeholder(const span &span) const
+bool block_queue::is_blockchain_placeholder(const span& span) const
 {
 	return span.connection_id == boost::uuids::nil_uuid();
 }
@@ -246,12 +246,12 @@ std::pair<uint64_t, uint64_t> block_queue::get_start_gap_span() const
 	uint64_t first_span_height = i->start_block_height;
 	if(first_span_height <= current_height + 1)
 		return std::make_pair(0, 0);
-	GULPSF_LOG_L1("Found gap at start of spans: last blockchain block height {}, first span's block height {}", current_height , first_span_height);
+	GULPSF_LOG_L1("Found gap at start of spans: last blockchain block height {}, first span's block height {}", current_height, first_span_height);
 	print();
 	return std::make_pair(current_height + 1, first_span_height - current_height - 1);
 }
 
-std::pair<uint64_t, uint64_t> block_queue::get_next_span_if_scheduled(std::list<crypto::hash> &hashes, boost::uuids::uuid &connection_id, boost::posix_time::ptime &time) const
+std::pair<uint64_t, uint64_t> block_queue::get_next_span_if_scheduled(std::list<crypto::hash>& hashes, boost::uuids::uuid& connection_id, boost::posix_time::ptime& time) const
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	if(blocks.empty())
@@ -269,7 +269,7 @@ std::pair<uint64_t, uint64_t> block_queue::get_next_span_if_scheduled(std::list<
 	return std::make_pair(i->start_block_height, i->nblocks);
 }
 
-void block_queue::set_span_hashes(uint64_t start_height, const boost::uuids::uuid &connection_id, std::list<crypto::hash> hashes)
+void block_queue::set_span_hashes(uint64_t start_height, const boost::uuids::uuid& connection_id, std::list<crypto::hash> hashes)
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	for(block_map::iterator i = blocks.begin(); i != blocks.end(); ++i)
@@ -285,7 +285,7 @@ void block_queue::set_span_hashes(uint64_t start_height, const boost::uuids::uui
 	}
 }
 
-bool block_queue::get_next_span(uint64_t &height, std::list<cryptonote::block_complete_entry> &bcel, boost::uuids::uuid &connection_id, bool filled) const
+bool block_queue::get_next_span(uint64_t& height, std::list<cryptonote::block_complete_entry>& bcel, boost::uuids::uuid& connection_id, bool filled) const
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	if(blocks.empty())
@@ -306,7 +306,7 @@ bool block_queue::get_next_span(uint64_t &height, std::list<cryptonote::block_co
 	return false;
 }
 
-bool block_queue::has_next_span(const boost::uuids::uuid &connection_id, bool &filled) const
+bool block_queue::has_next_span(const boost::uuids::uuid& connection_id, bool& filled) const
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	if(blocks.empty())
@@ -326,7 +326,7 @@ size_t block_queue::get_data_size() const
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	size_t size = 0;
-	for(const auto &span : blocks)
+	for(const auto& span : blocks)
 		size += span.size;
 	return size;
 }
@@ -353,18 +353,18 @@ size_t block_queue::get_num_filled_spans() const
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	size_t size = 0;
-	for(const auto &span : blocks)
+	for(const auto& span : blocks)
 		if(!span.blocks.empty())
 			++size;
 	return size;
 }
 
-crypto::hash block_queue::get_last_known_hash(const boost::uuids::uuid &connection_id) const
+crypto::hash block_queue::get_last_known_hash(const boost::uuids::uuid& connection_id) const
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	crypto::hash hash = crypto::null_hash;
 	uint64_t highest_height = 0;
-	for(const auto &span : blocks)
+	for(const auto& span : blocks)
 	{
 		if(span.connection_id != connection_id)
 			continue;
@@ -378,9 +378,9 @@ crypto::hash block_queue::get_last_known_hash(const boost::uuids::uuid &connecti
 	return hash;
 }
 
-bool block_queue::has_spans(const boost::uuids::uuid &connection_id) const
+bool block_queue::has_spans(const boost::uuids::uuid& connection_id) const
 {
-	for(const auto &span : blocks)
+	for(const auto& span : blocks)
 	{
 		if(span.connection_id == connection_id)
 			return true;
@@ -388,11 +388,11 @@ bool block_queue::has_spans(const boost::uuids::uuid &connection_id) const
 	return false;
 }
 
-float block_queue::get_speed(const boost::uuids::uuid &connection_id) const
+float block_queue::get_speed(const boost::uuids::uuid& connection_id) const
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	std::unordered_map<boost::uuids::uuid, float> speeds;
-	for(const auto &span : blocks)
+	for(const auto& span : blocks)
 	{
 		if(span.blocks.empty())
 			continue;
@@ -406,7 +406,7 @@ float block_queue::get_speed(const boost::uuids::uuid &connection_id) const
 			i->second = (i->second + span.rate) / 2;
 	}
 	float conn_rate = -1, best_rate = 0;
-	for(const auto &i : speeds)
+	for(const auto& i : speeds)
 	{
 		if(i.first == connection_id)
 			conn_rate = i.second;
@@ -420,11 +420,11 @@ float block_queue::get_speed(const boost::uuids::uuid &connection_id) const
 		return 1.0f; // everything dead ? Can't happen, but let's trap anyway
 
 	const float speed = conn_rate / best_rate;
-	GULPSF_LOG_L2(" Relative speed for {}: {} ({}/{})", boost::uuids::to_string(connection_id) , speed , conn_rate , best_rate);
+	GULPSF_LOG_L2(" Relative speed for {}: {} ({}/{})", boost::uuids::to_string(connection_id), speed, conn_rate, best_rate);
 	return speed;
 }
 
-bool block_queue::foreach(std::function<bool(const span &)> f, bool include_blockchain_placeholder) const
+bool block_queue::foreach(std::function<bool(const span&)> f, bool include_blockchain_placeholder) const
 {
 	boost::unique_lock<boost::recursive_mutex> lock(mutex);
 	block_map::const_iterator i = blocks.begin();
@@ -435,4 +435,4 @@ bool block_queue::foreach(std::function<bool(const span &)> f, bool include_bloc
 			return false;
 	return true;
 }
-}
+} // namespace cryptonote

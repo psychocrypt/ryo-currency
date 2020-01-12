@@ -50,14 +50,14 @@
 #include "crypto/crypto.h"
 #include "include_base_utils.h"
 #include "warnings.h"
-extern "C" {
+extern "C"
+{
 #include "crypto/keccak.h"
 }
 #include "cryptonote_basic_impl.h"
 #include "cryptonote_format_utils.h"
 
 #include "common/gulps.hpp"
-
 
 GULPS_CAT_MAJOR("crybas_account");
 
@@ -69,12 +69,12 @@ namespace cryptonote
 {
 
 //-----------------------------------------------------------------
-hw::device &account_keys::get_device() const
+hw::device& account_keys::get_device() const
 {
 	return *m_device;
 }
 //-----------------------------------------------------------------
-void account_keys::set_device(hw::device &hwdev)
+void account_keys::set_device(hw::device& hwdev)
 {
 	m_device = &hwdev;
 	GULPS_CAT_LOG_L1("device", "account_keys::set_device device type: ", typeid(hwdev).name());
@@ -105,13 +105,13 @@ crypto::secret_key_16 account_base::generate()
 	return m_keys.m_short_seed;
 }
 
-void account_base::recover_legacy(const crypto::secret_key &recovery_seed)
+void account_base::recover_legacy(const crypto::secret_key& recovery_seed)
 {
 	crypto::secret_key first = generate_legacy_keys(m_keys.m_account_address.m_spend_public_key, m_keys.m_spend_secret_key, recovery_seed, true);
 
 	// rng for generating second set of keys is hash of first rng.  means only one set of electrum-style words needed for recovery
 	crypto::secret_key second;
-	keccak((uint8_t *)&m_keys.m_spend_secret_key, sizeof(crypto::secret_key), (uint8_t *)&second, sizeof(crypto::secret_key));
+	keccak((uint8_t*)&m_keys.m_spend_secret_key, sizeof(crypto::secret_key), (uint8_t*)&second, sizeof(crypto::secret_key));
 
 	generate_legacy_keys(m_keys.m_account_address.m_view_public_key, m_keys.m_view_secret_key, second, true);
 	m_creation_timestamp = EARLIEST_TIMESTAMP;
@@ -121,8 +121,8 @@ bool account_base::has_25word_seed() const
 {
 	using namespace crypto;
 	secret_key second;
-	keccak((uint8_t *)&m_keys.m_spend_secret_key, sizeof(secret_key), (uint8_t *)&second, sizeof(secret_key));
-	sc_reduce32((uint8_t *)unwrap(second).data);
+	keccak((uint8_t*)&m_keys.m_spend_secret_key, sizeof(secret_key), (uint8_t*)&second, sizeof(secret_key));
+	sc_reduce32((uint8_t*)unwrap(second).data);
 	return second == m_keys.m_view_secret_key;
 }
 
@@ -147,7 +147,7 @@ bool account_base::has_14word_seed() const
 	}
 }
 //-----------------------------------------------------------------
-void account_base::create_from_keys(const cryptonote::account_public_address &address, const crypto::secret_key &spendkey, const crypto::secret_key &viewkey)
+void account_base::create_from_keys(const cryptonote::account_public_address& address, const crypto::secret_key& spendkey, const crypto::secret_key& viewkey)
 {
 	m_keys.m_account_address = address;
 	m_keys.m_spend_secret_key = spendkey;
@@ -156,10 +156,10 @@ void account_base::create_from_keys(const cryptonote::account_public_address &ad
 }
 
 //-----------------------------------------------------------------
-void account_base::create_from_device(const std::string &device_name)
+void account_base::create_from_device(const std::string& device_name)
 {
 
-	hw::device &hwdev = hw::get_device(device_name);
+	hw::device& hwdev = hw::get_device(device_name);
 	m_keys.set_device(hwdev);
 	hwdev.set_name(device_name);
 	GULPS_CAT_LOG_L1("ledger", "device type: ", typeid(hwdev).name());
@@ -171,14 +171,14 @@ void account_base::create_from_device(const std::string &device_name)
 }
 
 //-----------------------------------------------------------------
-void account_base::create_from_viewkey(const cryptonote::account_public_address &address, const crypto::secret_key &viewkey)
+void account_base::create_from_viewkey(const cryptonote::account_public_address& address, const crypto::secret_key& viewkey)
 {
 	crypto::secret_key fake;
 	fake.scrub();
 	create_from_keys(address, fake, viewkey);
 }
 //-----------------------------------------------------------------
-bool account_base::make_multisig(const crypto::secret_key &view_secret_key, const crypto::secret_key &spend_secret_key, const crypto::public_key &spend_public_key, const std::vector<crypto::secret_key> &multisig_keys)
+bool account_base::make_multisig(const crypto::secret_key& view_secret_key, const crypto::secret_key& spend_secret_key, const crypto::public_key& spend_public_key, const std::vector<crypto::secret_key>& multisig_keys)
 {
 	m_creation_timestamp = EARLIEST_TIMESTAMP;
 	m_keys.m_account_address.m_spend_public_key = spend_public_key;
@@ -188,12 +188,12 @@ bool account_base::make_multisig(const crypto::secret_key &view_secret_key, cons
 	return crypto::secret_key_to_public_key(view_secret_key, m_keys.m_account_address.m_view_public_key);
 }
 //-----------------------------------------------------------------
-void account_base::finalize_multisig(const crypto::public_key &spend_public_key)
+void account_base::finalize_multisig(const crypto::public_key& spend_public_key)
 {
 	m_keys.m_account_address.m_spend_public_key = spend_public_key;
 }
 //-----------------------------------------------------------------
-const account_keys &account_base::get_keys() const
+const account_keys& account_base::get_keys() const
 {
 	return m_keys;
 }
@@ -213,7 +213,7 @@ std::string account_base::get_public_address_str(network_type nettype) const
 	}
 }
 //-----------------------------------------------------------------
-std::string account_base::get_public_integrated_address_str(const crypto::hash8 &payment_id, network_type nettype) const
+std::string account_base::get_public_integrated_address_str(const crypto::hash8& payment_id, network_type nettype) const
 {
 	switch(nettype)
 	{
@@ -228,4 +228,4 @@ std::string account_base::get_public_integrated_address_str(const crypto::hash8 
 	}
 }
 //-----------------------------------------------------------------
-}
+} // namespace cryptonote

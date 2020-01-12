@@ -115,12 +115,12 @@ static void MD5_memset(POINTER output, int value, unsigned int len)
 	unsigned int i;
 
 	for(i = 0; i < len; i++)
-		((char *)output)[i] = (char)value;
+		((char*)output)[i] = (char)value;
 }
 
 static void MD5Transform(UINT4 state[4], unsigned char block[64]);
 
-static unsigned char *PADDING()
+static unsigned char* PADDING()
 {
 	static unsigned char local_PADDING[64] = {
 		0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -180,7 +180,7 @@ static unsigned char *PADDING()
 /* MD5 initialization. Begins an MD5 operation, writing a new context.
 	*/
 
-static void MD5Init(MD5_CTX *context)
+static void MD5Init(MD5_CTX* context)
 {
 	context->count[0] = context->count[1] = 0;
 
@@ -197,7 +197,7 @@ static void MD5Init(MD5_CTX *context)
 	operation, processing another message block, and updating the context. 
 	*/
 
-static void MD5Update(MD5_CTX *context, const unsigned char *input, unsigned int inputLen)
+static void MD5Update(MD5_CTX* context, const unsigned char* input, unsigned int inputLen)
 {
 	unsigned int i, index, partLen;
 
@@ -220,7 +220,7 @@ static void MD5Update(MD5_CTX *context, const unsigned char *input, unsigned int
 		MD5Transform(context->state, context->buffer);
 
 		for(i = partLen; i + 63 < inputLen; i += 64)
-			MD5Transform(context->state, (unsigned char *)&input[i]);
+			MD5Transform(context->state, (unsigned char*)&input[i]);
 
 		index = 0;
 	}
@@ -236,7 +236,7 @@ static void MD5Update(MD5_CTX *context, const unsigned char *input, unsigned int
 
 	*/
 
-static void Encode(unsigned char *output, UINT4 *input, unsigned int len)
+static void Encode(unsigned char* output, UINT4* input, unsigned int len)
 {
 	unsigned int i, j;
 
@@ -254,7 +254,7 @@ static void Encode(unsigned char *output, UINT4 *input, unsigned int len)
 
 	*/
 
-static void Decode(UINT4 *output, unsigned char *input, unsigned int len)
+static void Decode(UINT4* output, unsigned char* input, unsigned int len)
 {
 	unsigned int i, j;
 
@@ -267,7 +267,7 @@ static void Decode(UINT4 *output, unsigned char *input, unsigned int len)
 
 	*/
 
-static void MD5Final(unsigned char digest[16], MD5_CTX *context)
+static void MD5Final(unsigned char digest[16], MD5_CTX* context)
 {
 	unsigned char bits[8];
 	unsigned int index, padLen;
@@ -389,9 +389,9 @@ static void MD5Transform(UINT4 state[4], unsigned char block[64])
 /* Note: Replace "for loop" with standard memcpy if possible.
 
 	*/
-inline void hmac_md5_init(HMAC_MD5_CTX *hmac,
-						  const unsigned char *key,
-						  int key_len)
+inline void hmac_md5_init(HMAC_MD5_CTX* hmac,
+	const unsigned char* key,
+	int key_len)
 {
 	unsigned char k_ipad[65]; /* inner padding -
 									 * key XORd with ipad
@@ -461,9 +461,9 @@ inline void hmac_md5_init(HMAC_MD5_CTX *hmac,
 	* buffer fields.  So all we have to do is save the state field; we
 	* can zero the others when we reload it.  Which is why the decision
 	* was made to pad the key out to 64 bytes in the first place. */
-inline void hmac_md5_precalc(HMAC_MD5_STATE *state,
-							 const unsigned char *key,
-							 int key_len)
+inline void hmac_md5_precalc(HMAC_MD5_STATE* state,
+	const unsigned char* key,
+	int key_len)
 {
 	HMAC_MD5_CTX hmac;
 	unsigned lupe;
@@ -477,8 +477,8 @@ inline void hmac_md5_precalc(HMAC_MD5_STATE *state,
 	MD5_memset((POINTER)&hmac, 0, sizeof(hmac));
 }
 
-inline void hmac_md5_import(HMAC_MD5_CTX *hmac,
-							HMAC_MD5_STATE *state)
+inline void hmac_md5_import(HMAC_MD5_CTX* hmac,
+	HMAC_MD5_STATE* state)
 {
 	unsigned lupe;
 	MD5_memset((POINTER)hmac, 0, sizeof(HMAC_MD5_CTX));
@@ -494,14 +494,14 @@ inline void hmac_md5_import(HMAC_MD5_CTX *hmac,
 }
 
 inline void hmac_md5_final(unsigned char digest[HMAC_MD5_SIZE],
-						   HMAC_MD5_CTX *hmac)
+	HMAC_MD5_CTX* hmac)
 {
 	MD5Final(digest, &hmac->ictx);		/* Finalize inner md5 */
 	MD5Update(&hmac->octx, digest, 16); /* Update outer ctx */
 	MD5Final(digest, &hmac->octx);		/* Finalize outer md5 */
 }
 
-void hmac_md5(const unsigned char *text, int text_len, const unsigned char *key, int key_len, unsigned char *digest)
+void hmac_md5(const unsigned char* text, int text_len, const unsigned char* key, int key_len, unsigned char* digest)
 {
 	MD5_CTX context;
 
@@ -570,4 +570,4 @@ void hmac_md5(const unsigned char *text, int text_len, const unsigned char *key,
 											 * hash */
 	MD5Final(digest, &context);		 /* finish up 2nd pass */
 }
-}
+} // namespace md5

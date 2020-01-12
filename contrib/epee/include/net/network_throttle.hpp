@@ -118,9 +118,9 @@ class network_throttle_manager
 	friend class connection_basic_pimpl; // ditto
 
   public:
-	static i_network_throttle &get_global_throttle_in();	///< singleton ; for friend class ; caller MUST use proper locks! like m_lock_get_global_throttle_in
-	static i_network_throttle &get_global_throttle_inreq(); ///< ditto ; use lock ... use m_lock_get_global_throttle_inreq obviously
-	static i_network_throttle &get_global_throttle_out();   ///< ditto ; use lock ... use m_lock_get_global_throttle_out obviously
+	static i_network_throttle& get_global_throttle_in();	///< singleton ; for friend class ; caller MUST use proper locks! like m_lock_get_global_throttle_in
+	static i_network_throttle& get_global_throttle_inreq(); ///< ditto ; use lock ... use m_lock_get_global_throttle_inreq obviously
+	static i_network_throttle& get_global_throttle_out();   ///< ditto ; use lock ... use m_lock_get_global_throttle_out obviously
 };
 
 /***
@@ -129,7 +129,7 @@ class network_throttle_manager
 class i_network_throttle
 {
   public:
-	virtual void set_name(const std::string &name) = 0;
+	virtual void set_name(const std::string& name) = 0;
 	virtual void set_target_speed(network_speed_kbps target) = 0;
 	virtual network_speed_kbps get_target_speed() = 0;
 
@@ -139,7 +139,7 @@ class i_network_throttle
 
 	// time calculations:
 
-	virtual void calculate_times(size_t packet_size, calculate_times_struct &cts, bool dbg, double force_window) const = 0; // assuming sending new package (or 0), calculate:
+	virtual void calculate_times(size_t packet_size, calculate_times_struct& cts, bool dbg, double force_window) const = 0; // assuming sending new package (or 0), calculate:
 	// Average, Window, Delay, Recommended data size ; also gets dbg=debug flag, and forced widnow size if >0 or -1 for not forcing window size
 
 	// Average speed, Window size, recommended Delay to sleep now, Recommended size of data to send now
@@ -150,7 +150,7 @@ class i_network_throttle
 	virtual size_t get_recommended_size_of_planned_transport() const = 0; // what should be the recommended limit of data size that we can transport over current network_throttle in near future
 
 	virtual double get_time_seconds() const = 0; // a timer
-	virtual void logger_handle_net(const std::string &filename, double time, size_t size) = 0;
+	virtual void logger_handle_net(const std::string& filename, double time, size_t size) = 0;
 };
 
 // ... more in the -advanced.h file

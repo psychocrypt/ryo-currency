@@ -67,10 +67,12 @@
 #if defined(EXPORT_ALL_SYMBOLS)
 #define fptr_ok(x) /* nothing, dll-exe memory layout on win disables it */
 #else
-#define fptr_ok(x) \
-	do { if(!(x)) \
-		fatal_exit("%s:%d: %s: pointer whitelist %s failed", \
-		__FILE__, __LINE__, __func__, #x); \
+#define fptr_ok(x)                                               \
+	do                                                           \
+	{                                                            \
+		if(!(x))                                                 \
+			fatal_exit("%s:%d: %s: pointer whitelist %s failed", \
+				__FILE__, __LINE__, __func__, #x);               \
 	} while(0);
 #endif
 
@@ -80,7 +82,7 @@
  * @param fptr: function pointer to check.
  * @return false if not in whitelist.
  */
-int fptr_whitelist_comm_point(comm_point_callback_type *fptr);
+int fptr_whitelist_comm_point(comm_point_callback_type* fptr);
 
 /**
  * Check function pointer whitelist for raw comm_point callback values.
@@ -88,7 +90,7 @@ int fptr_whitelist_comm_point(comm_point_callback_type *fptr);
  * @param fptr: function pointer to check.
  * @return false if not in whitelist.
  */
-int fptr_whitelist_comm_point_raw(comm_point_callback_type *fptr);
+int fptr_whitelist_comm_point_raw(comm_point_callback_type* fptr);
 
 /**
  * Check function pointer whitelist for comm_timer callback values.
@@ -129,7 +131,7 @@ int fptr_whitelist_stop_accept(void (*fptr)(void*));
  * @param fptr: function pointer to check.
  * @return false if not in whitelist.
  */
-int fptr_whitelist_event(void (*fptr)(int, short, void *));
+int fptr_whitelist_event(void (*fptr)(int, short, void*));
 
 /**
  * Check function pointer whitelist for pending udp callback values.
@@ -137,7 +139,7 @@ int fptr_whitelist_event(void (*fptr)(int, short, void *));
  * @param fptr: function pointer to check.
  * @return false if not in whitelist.
  */
-int fptr_whitelist_pending_udp(comm_point_callback_type *fptr);
+int fptr_whitelist_pending_udp(comm_point_callback_type* fptr);
 
 /**
  * Check function pointer whitelist for pending tcp callback values.
@@ -145,7 +147,7 @@ int fptr_whitelist_pending_udp(comm_point_callback_type *fptr);
  * @param fptr: function pointer to check.
  * @return false if not in whitelist.
  */
-int fptr_whitelist_pending_tcp(comm_point_callback_type *fptr);
+int fptr_whitelist_pending_tcp(comm_point_callback_type* fptr);
 
 /**
  * Check function pointer whitelist for serviced query callback values.
@@ -153,7 +155,7 @@ int fptr_whitelist_pending_tcp(comm_point_callback_type *fptr);
  * @param fptr: function pointer to check.
  * @return false if not in whitelist.
  */
-int fptr_whitelist_serviced_query(comm_point_callback_type *fptr);
+int fptr_whitelist_serviced_query(comm_point_callback_type* fptr);
 
 /**
  * Check function pointer whitelist for rbtree cmp callback values.
@@ -161,7 +163,7 @@ int fptr_whitelist_serviced_query(comm_point_callback_type *fptr);
  * @param fptr: function pointer to check.
  * @return false if not in whitelist.
  */
-int fptr_whitelist_rbtree_cmp(int (*fptr) (const void *, const void *));
+int fptr_whitelist_rbtree_cmp(int (*fptr)(const void*, const void*));
 
 /**
  * Check function pointer whitelist for lruhash sizefunc callback values.
@@ -230,7 +232,7 @@ int fptr_whitelist_modenv_detach_subs(void (*fptr)(
  * @return false if not in whitelist.
  */
 int fptr_whitelist_modenv_attach_sub(int (*fptr)(
-	struct module_qstate* qstate, struct query_info* qinfo, 
+	struct module_qstate* qstate, struct query_info* qinfo,
 	uint16_t qflags, int prime, int valrec, struct module_qstate** newq));
 
 /**
@@ -257,7 +259,7 @@ int fptr_whitelist_modenv_kill_sub(void (*fptr)(struct module_qstate* newq));
  * @return false if not in whitelist.
  */
 int fptr_whitelist_modenv_detect_cycle(int (*fptr)(
-	struct module_qstate* qstate, struct query_info* qinfo, 
+	struct module_qstate* qstate, struct query_info* qinfo,
 	uint16_t flags, int prime, int valrec));
 
 /**
@@ -282,7 +284,7 @@ int fptr_whitelist_mod_deinit(void (*fptr)(struct module_env* env, int id));
  * @param fptr: function pointer to check.
  * @return false if not in whitelist.
  */
-int fptr_whitelist_mod_operate(void (*fptr)(struct module_qstate* qstate, 
+int fptr_whitelist_mod_operate(void (*fptr)(struct module_qstate* qstate,
 	enum module_ev event, int id, struct outbound_entry* outbound));
 
 /**
@@ -300,7 +302,7 @@ int fptr_whitelist_mod_inform_super(void (*fptr)(
  * @param fptr: function pointer to check.
  * @return false if not in whitelist.
  */
-int fptr_whitelist_mod_clear(void (*fptr)(struct module_qstate* qstate, 
+int fptr_whitelist_mod_clear(void (*fptr)(struct module_qstate* qstate,
 	int id));
 
 /**
@@ -340,7 +342,7 @@ int fptr_whitelist_mesh_cb(mesh_cb_func_type fptr);
  * @param fptr: function pointer to check.
  * @return false if not in whitelist.
  */
-int fptr_whitelist_print_func(void (*fptr)(char*,void*));
+int fptr_whitelist_print_func(void (*fptr)(char*, void*));
 
 /**
  * Check function pointer whitelist for inplace_cb_reply,

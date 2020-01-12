@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
 
 		if(command_line::get_arg(vm, command_line::arg_help))
 		{
-			GULPSF_PRINT("Ryo '{}' ({})\n", RYO_RELEASE_NAME , RYO_VERSION_FULL );
+			GULPSF_PRINT("Ryo '{}' ({})\n", RYO_RELEASE_NAME, RYO_VERSION_FULL);
 			GULPSF_PRINT("\nUsage: {} [options|settings] [daemon_command...]\n\n", std::string{argv[0]});
 			GULPS_PRINT(visible_options);
 			return 0;
@@ -164,7 +164,7 @@ int main(int argc, char* argv[])
 		// Ryo Version
 		if(command_line::get_arg(vm, command_line::arg_version))
 		{
-			GULPSF_PRINT("Ryo '{}' ({})\n", RYO_RELEASE_NAME , RYO_VERSION_FULL );
+			GULPSF_PRINT("Ryo '{}' ({})\n", RYO_RELEASE_NAME, RYO_VERSION_FULL);
 			return 0;
 		}
 
@@ -184,7 +184,7 @@ int main(int argc, char* argv[])
 			{
 				po::store(po::parse_config_file<char>(config_path.string<std::string>().c_str(), core_settings), vm);
 			}
-			catch(const std::exception &e)
+			catch(const std::exception& e)
 			{
 				// log system isn't initialized yet
 				GULPSF_ERROR("Error parsing config file: {}", e.what());
@@ -360,7 +360,7 @@ int main(int argc, char* argv[])
 
 		return daemonizer::daemonize(argc, argv, daemonize::t_executor{}, vm) ? 0 : 1;
 	}
-	catch(std::exception const &ex)
+	catch(std::exception const& ex)
 	{
 		GULPSF_LOG_ERROR("Exception in main! {}", ex.what());
 	}

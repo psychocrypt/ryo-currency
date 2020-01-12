@@ -34,8 +34,6 @@
 
 #include "common/gulps.hpp"
 
-
-
 namespace epee
 {
 
@@ -43,24 +41,25 @@ template <class t_child_class, class t_connection_context = epee::net_utils::con
 class http_server_impl_base : public net_utils::http::i_http_server_handler<t_connection_context>
 {
 	GULPS_CAT_MAJOR("epee_http_serv");
+
   public:
-	http_server_impl_base()
-		: m_net_server(epee::net_utils::e_connection_type_RPC)
+	http_server_impl_base() :
+		m_net_server(epee::net_utils::e_connection_type_RPC)
 	{
 	}
 
-	explicit http_server_impl_base(boost::asio::io_service &external_io_service)
-		: m_net_server(external_io_service)
+	explicit http_server_impl_base(boost::asio::io_service& external_io_service) :
+		m_net_server(external_io_service)
 	{
 	}
 
-	bool init(std::function<void(size_t, uint8_t *)> rng, const std::string &bind_port = "0", const std::string &bind_ip = "0.0.0.0",
-			  std::vector<std::string> access_control_origins = std::vector<std::string>(),
-			  boost::optional<net_utils::http::login> user = boost::none)
+	bool init(std::function<void(size_t, uint8_t*)> rng, const std::string& bind_port = "0", const std::string& bind_ip = "0.0.0.0",
+		std::vector<std::string> access_control_origins = std::vector<std::string>(),
+		boost::optional<net_utils::http::login> user = boost::none)
 	{
 
 		//set self as callback handler
-		m_net_server.get_config_object().m_phandler = static_cast<t_child_class *>(this);
+		m_net_server.get_config_object().m_phandler = static_cast<t_child_class*>(this);
 		m_net_server.get_config_object().rng = std::move(rng);
 
 		//here set folder for hosting reqests
@@ -72,7 +71,7 @@ class http_server_impl_base : public net_utils::http::i_http_server_handler<t_co
 
 		m_net_server.get_config_object().m_user = std::move(user);
 
-		GULPSF_GLOBAL_PRINT("Binding on {}:{}", bind_ip , bind_port);
+		GULPSF_GLOBAL_PRINT("Binding on {}:{}", bind_ip, bind_port);
 		bool res = m_net_server.init_server(bind_port, bind_ip);
 		if(!res)
 		{
@@ -85,7 +84,7 @@ class http_server_impl_base : public net_utils::http::i_http_server_handler<t_co
 	bool run(size_t threads_count, bool wait = true)
 	{
 		//go to loop
-		GULPSF_INFO("Run net_service loop( {} threads)...", threads_count );
+		GULPSF_INFO("Run net_service loop( {} threads)...", threads_count);
 		if(!m_net_server.run_server(threads_count, wait))
 		{
 			GULPS_LOG_ERROR("Failed to run net tcp server!");
@@ -125,4 +124,4 @@ class http_server_impl_base : public net_utils::http::i_http_server_handler<t_co
   protected:
 	net_utils::boosted_tcp_server<net_utils::http::http_custom_handler<t_connection_context>> m_net_server;
 };
-}
+} // namespace epee

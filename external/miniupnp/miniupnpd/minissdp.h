@@ -9,50 +9,41 @@
 
 #include "miniupnpdtypes.h"
 
-int
-OpenAndConfSSDPReceiveSocket(int ipv6);
+int OpenAndConfSSDPReceiveSocket(int ipv6);
 
-int
-OpenAndConfSSDPNotifySockets(int * sockets);
+int OpenAndConfSSDPNotifySockets(int* sockets);
 
 #ifdef ENABLE_HTTPS
-void
-SendSSDPNotifies2(int * sockets,
-                  unsigned short http_port,
-                  unsigned short https_port,
-                  unsigned int lifetime);
+void SendSSDPNotifies2(int* sockets,
+	unsigned short http_port,
+	unsigned short https_port,
+	unsigned int lifetime);
 #else
-void
-SendSSDPNotifies2(int * sockets,
-                  unsigned short http_port,
-                  unsigned int lifetime);
+void SendSSDPNotifies2(int* sockets,
+	unsigned short http_port,
+	unsigned int lifetime);
 #endif
 
 void
 #ifdef ENABLE_HTTPS
 ProcessSSDPRequest(int s,
-                   unsigned short http_port, unsigned short https_port);
+	unsigned short http_port, unsigned short https_port);
 #else
 ProcessSSDPRequest(int s, unsigned short http_port);
 #endif
 
 #ifdef ENABLE_HTTPS
-void
-ProcessSSDPData(int s, const char *bufr, int n,
-                const struct sockaddr * sendername, int source_if,
-                unsigned short http_port, unsigned short https_port);
+void ProcessSSDPData(int s, const char* bufr, int n,
+	const struct sockaddr* sendername, int source_if,
+	unsigned short http_port, unsigned short https_port);
 #else
-void
-ProcessSSDPData(int s, const char *bufr, int n,
-                const struct sockaddr * sendername, int source_if,
-                unsigned short http_port);
+void ProcessSSDPData(int s, const char* bufr, int n,
+	const struct sockaddr* sendername, int source_if,
+	unsigned short http_port);
 #endif
 
-int
-SendSSDPGoodbye(int * sockets, int n);
+int SendSSDPGoodbye(int* sockets, int n);
 
-int
-SubmitServicesToMiniSSDPD(const char * host, unsigned short port);
+int SubmitServicesToMiniSSDPD(const char* host, unsigned short port);
 
 #endif
-

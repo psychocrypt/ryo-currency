@@ -34,4 +34,3 @@
 #define ENABLE_RELEASE_LOGGING
 #include "log_opt_defs.h"
 #include "common/gulps.hpp"
-

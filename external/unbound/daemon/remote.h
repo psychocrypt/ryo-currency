@@ -62,13 +62,19 @@ struct daemon_remote;
 /**
  * a busy control command connection, SSL state
  */
-struct rc_state {
+struct rc_state
+{
 	/** the next item in list */
 	struct rc_state* next;
 	/** the commpoint */
 	struct comm_point* c;
 	/** in the handshake part */
-	enum { rc_none, rc_hs_read, rc_hs_write } shake_state;
+	enum
+	{
+		rc_none,
+		rc_hs_read,
+		rc_hs_write
+	} shake_state;
 #ifdef HAVE_SSL
 	/** the ssl state */
 	SSL* ssl;
@@ -84,7 +90,8 @@ struct rc_state {
  * the control port.  The other threads do not, but are called on the
  * command channel(pipe) from the first thread.
  */
-struct daemon_remote {
+struct daemon_remote
+{
 	/** the worker for this remote control */
 	struct worker* worker;
 	/** commpoints for accepting remote control connections */
@@ -138,7 +145,7 @@ struct listen_port* daemon_remote_open_ports(struct config_file* cfg);
  * @param worker: worker with communication base. and links to command channels.
  * @return false on error.
  */
-int daemon_remote_open_accept(struct daemon_remote* rc, 
+int daemon_remote_open_accept(struct daemon_remote* rc,
 	struct listen_port* ports, struct worker* worker);
 
 /**
@@ -175,7 +182,7 @@ int ssl_print_text(SSL* ssl, const char* text);
  * @return success or false on a network failure.
  */
 int ssl_printf(SSL* ssl, const char* format, ...)
-        ATTR_FORMAT(printf, 2, 3);
+	ATTR_FORMAT(printf, 2, 3);
 
 /**
  * Read until \n is encountered

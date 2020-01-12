@@ -42,45 +42,45 @@ GULPS_CAT_MAJOR("epee_kv_ser");
 
 //-------------------------------------------------------------------------------------------------------------------
 template <class t_type, class t_storage>
-static bool serialize_t_val(const t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+static bool serialize_t_val(const t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	return stg.set_value(pname, d, hparent_section);
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class t_type, class t_storage>
-static bool unserialize_t_val(t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+static bool unserialize_t_val(t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	return stg.get_value(pname, d, hparent_section);
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class t_type, class t_storage>
-static bool serialize_t_val_as_blob(const t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+static bool serialize_t_val_as_blob(const t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
-	std::string blob((const char *)&d, sizeof(d));
+	std::string blob((const char*)&d, sizeof(d));
 	return stg.set_value(pname, blob, hparent_section);
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class t_type, class t_storage>
-static bool unserialize_t_val_as_blob(t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+static bool unserialize_t_val_as_blob(t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	std::string blob;
 	if(!stg.get_value(pname, blob, hparent_section))
 		return false;
-	GULPS_CHECK_AND_ASSERT_MES(blob.size() == sizeof(d), false, "unserialize_t_val_as_blob: size of " , typeid(t_type).name() , " = " , sizeof(t_type) , ", but stored blod size = " , blob.size() , ", value name = " , pname);
-	d = *(const t_type *)blob.data();
+	GULPS_CHECK_AND_ASSERT_MES(blob.size() == sizeof(d), false, "unserialize_t_val_as_blob: size of ", typeid(t_type).name(), " = ", sizeof(t_type), ", but stored blod size = ", blob.size(), ", value name = ", pname);
+	d = *(const t_type*)blob.data();
 	return true;
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class serializible_type, class t_storage>
-static bool serialize_t_obj(const serializible_type &obj, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+static bool serialize_t_obj(const serializible_type& obj, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	typename t_storage::hsection hchild_section = stg.open_section(pname, hparent_section, true);
-	GULPS_CHECK_AND_ASSERT_MES(hchild_section, false, "serialize_t_obj: failed to open/create section " , pname);
+	GULPS_CHECK_AND_ASSERT_MES(hchild_section, false, "serialize_t_obj: failed to open/create section ", pname);
 	return obj.store(stg, hchild_section);
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class serializible_type, class t_storage>
-static bool unserialize_t_obj(serializible_type &obj, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+static bool unserialize_t_obj(serializible_type& obj, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	typename t_storage::hsection hchild_section = stg.open_section(pname, hparent_section, false);
 	if(!hchild_section)
@@ -89,7 +89,7 @@ static bool unserialize_t_obj(serializible_type &obj, t_storage &stg, typename t
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class serializible_type, class t_storage>
-static bool serialize_t_obj(enableable<serializible_type> &obj, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+static bool serialize_t_obj(enableable<serializible_type>& obj, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	if(!obj.enabled)
 		return true;
@@ -97,7 +97,7 @@ static bool serialize_t_obj(enableable<serializible_type> &obj, t_storage &stg, 
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class serializible_type, class t_storage>
-static bool unserialize_t_obj(enableable<serializible_type> &obj, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+static bool unserialize_t_obj(enableable<serializible_type>& obj, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	obj.enabled = false;
 	typename t_storage::hsection hchild_section = stg.open_section(pname, hparent_section, false);
@@ -108,7 +108,7 @@ static bool unserialize_t_obj(enableable<serializible_type> &obj, t_storage &stg
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class stl_container, class t_storage>
-static bool serialize_stl_container_t_val(const stl_container &container, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+static bool serialize_stl_container_t_val(const stl_container& container, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	if(!container.size())
 		return true;
@@ -123,7 +123,7 @@ static bool serialize_stl_container_t_val(const stl_container &container, t_stor
 }
 //--------------------------------------------------------------------------------------------------------------------
 template <class stl_container, class t_storage>
-static bool unserialize_stl_container_t_val(stl_container &container, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+static bool unserialize_stl_container_t_val(stl_container& container, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	container.clear();
 	typename stl_container::value_type exchange_val;
@@ -136,14 +136,14 @@ static bool unserialize_stl_container_t_val(stl_container &container, t_storage 
 	return true;
 } //--------------------------------------------------------------------------------------------------------------------
 template <class stl_container, class t_storage>
-static bool serialize_stl_container_pod_val_as_blob(const stl_container &container, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+static bool serialize_stl_container_pod_val_as_blob(const stl_container& container, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	if(!container.size())
 		return true;
 	std::string mb;
 	mb.resize(sizeof(typename stl_container::value_type) * container.size());
-	typename stl_container::value_type *p_elem = (typename stl_container::value_type *)mb.data();
-	for(const typename stl_container::value_type &v : container)
+	typename stl_container::value_type* p_elem = (typename stl_container::value_type*)mb.data();
+	for(const typename stl_container::value_type& v : container)
 	{
 		*p_elem = v;
 		p_elem++;
@@ -152,7 +152,7 @@ static bool serialize_stl_container_pod_val_as_blob(const stl_container &contain
 }
 //--------------------------------------------------------------------------------------------------------------------
 template <class stl_container, class t_storage>
-static bool unserialize_stl_container_pod_val_as_blob(stl_container &container, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+static bool unserialize_stl_container_pod_val_as_blob(stl_container& container, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	container.clear();
 	std::string buff;
@@ -160,10 +160,10 @@ static bool unserialize_stl_container_pod_val_as_blob(stl_container &container, 
 	if(res)
 	{
 		size_t loaded_size = buff.size();
-		typename stl_container::value_type *pelem = (typename stl_container::value_type *)buff.data();
+		typename stl_container::value_type* pelem = (typename stl_container::value_type*)buff.data();
 		GULPS_CHECK_AND_ASSERT_MES(!(loaded_size % sizeof(typename stl_container::value_type)),
-							 false,
-							 "size in blob " , loaded_size , " not have not zero modulo for sizeof(value_type) = " , sizeof(typename stl_container::value_type));
+			false,
+			"size in blob ", loaded_size, " not have not zero modulo for sizeof(value_type) = ", sizeof(typename stl_container::value_type));
 		size_t count = (loaded_size / sizeof(typename stl_container::value_type));
 		for(size_t i = 0; i < count; i++)
 			container.insert(container.end(), *(pelem++));
@@ -172,7 +172,7 @@ static bool unserialize_stl_container_pod_val_as_blob(stl_container &container, 
 }
 //--------------------------------------------------------------------------------------------------------------------
 template <class stl_container, class t_storage>
-static bool serialize_stl_container_t_obj(const stl_container &container, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+static bool serialize_stl_container_t_obj(const stl_container& container, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	bool res = false;
 	if(!container.size())
@@ -180,7 +180,7 @@ static bool serialize_stl_container_t_obj(const stl_container &container, t_stor
 	typename stl_container::const_iterator it = container.begin();
 	typename t_storage::hsection hchild_section = nullptr;
 	typename t_storage::harray hsec_array = stg.insert_first_section(pname, hchild_section, hparent_section);
-	GULPS_CHECK_AND_ASSERT_MES(hsec_array && hchild_section, false, "failed to insert first section with section name " , pname);
+	GULPS_CHECK_AND_ASSERT_MES(hsec_array && hchild_section, false, "failed to insert first section with section name ", pname);
 	res = it->store(stg, hchild_section);
 	it++;
 	for(; it != container.end(); it++)
@@ -192,7 +192,7 @@ static bool serialize_stl_container_t_obj(const stl_container &container, t_stor
 }
 //--------------------------------------------------------------------------------------------------------------------
 template <class stl_container, class t_storage>
-static bool unserialize_stl_container_t_obj(stl_container &container, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+static bool unserialize_stl_container_t_obj(stl_container& container, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	bool res = false;
 	container.clear();
@@ -219,61 +219,61 @@ template <>
 struct kv_serialization_overloads_impl_is_base_serializable_types<true>
 {
 	template <class t_type, class t_storage>
-	static bool kv_serialize(const t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_serialize(const t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return stg.set_value(pname, d, hparent_section);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_unserialize(t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_unserialize(t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return stg.get_value(pname, d, hparent_section);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_serialize(const std::vector<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_serialize(const std::vector<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return serialize_stl_container_t_val(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_unserialize(std::vector<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_unserialize(std::vector<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return unserialize_stl_container_t_val(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_serialize(const std::deque<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_serialize(const std::deque<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return serialize_stl_container_t_val(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_unserialize(std::deque<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_unserialize(std::deque<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return unserialize_stl_container_t_val(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_serialize(const std::list<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_serialize(const std::list<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return serialize_stl_container_t_val(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_unserialize(std::list<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_unserialize(std::list<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return unserialize_stl_container_t_val(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_serialize(const std::set<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_serialize(const std::set<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return serialize_stl_container_t_val(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_unserialize(std::set<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_unserialize(std::set<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return unserialize_stl_container_t_val(d, stg, hparent_section, pname);
 	}
@@ -283,62 +283,62 @@ template <>
 struct kv_serialization_overloads_impl_is_base_serializable_types<false>
 {
 	template <class t_type, class t_storage>
-	static bool kv_serialize(const t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_serialize(const t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return serialize_t_obj(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_unserialize(t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_unserialize(t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return unserialize_t_obj(d, stg, hparent_section, pname);
 	}
 
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_serialize(const std::vector<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_serialize(const std::vector<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return serialize_stl_container_t_obj(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_unserialize(std::vector<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_unserialize(std::vector<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return unserialize_stl_container_t_obj(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_serialize(const std::deque<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_serialize(const std::deque<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return serialize_stl_container_t_obj(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_unserialize(std::deque<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_unserialize(std::deque<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return unserialize_stl_container_t_obj(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_serialize(const std::list<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_serialize(const std::list<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return serialize_stl_container_t_obj(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_unserialize(std::list<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_unserialize(std::list<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return unserialize_stl_container_t_obj(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_serialize(const std::set<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_serialize(const std::set<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return serialize_stl_container_t_obj(d, stg, hparent_section, pname);
 	}
 	//-------------------------------------------------------------------------------------------------------------------
 	template <class t_type, class t_storage>
-	static bool kv_unserialize(std::set<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool kv_unserialize(std::set<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return unserialize_stl_container_t_obj(d, stg, hparent_section, pname);
 	}
@@ -354,19 +354,19 @@ template <>
 struct selector<true>
 {
 	template <class t_type, class t_storage>
-	static bool serialize(const t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool serialize(const t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return kv_serialize(d, stg, hparent_section, pname);
 	}
 
 	template <class t_type, class t_storage>
-	static bool serialize_stl_container_pod_val_as_blob(const t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool serialize_stl_container_pod_val_as_blob(const t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return epee::serialization::serialize_stl_container_pod_val_as_blob(d, stg, hparent_section, pname);
 	}
 
 	template <class t_type, class t_storage>
-	static bool serialize_t_val_as_blob(const t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool serialize_t_val_as_blob(const t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return epee::serialization::serialize_t_val_as_blob(d, stg, hparent_section, pname);
 	}
@@ -375,81 +375,81 @@ template <>
 struct selector<false>
 {
 	template <class t_type, class t_storage>
-	static bool serialize(t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool serialize(t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return kv_unserialize(d, stg, hparent_section, pname);
 	}
 	template <class t_type, class t_storage>
-	static bool serialize_stl_container_pod_val_as_blob(t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool serialize_stl_container_pod_val_as_blob(t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return epee::serialization::unserialize_stl_container_pod_val_as_blob(d, stg, hparent_section, pname);
 	}
 
 	template <class t_type, class t_storage>
-	static bool serialize_t_val_as_blob(t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+	static bool serialize_t_val_as_blob(t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 	{
 		return epee::serialization::unserialize_t_val_as_blob(d, stg, hparent_section, pname);
 	}
 };
 
 template <class t_type, class t_storage>
-bool kv_serialize(const t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+bool kv_serialize(const t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	return kv_serialization_overloads_impl_is_base_serializable_types<boost::mpl::contains<base_serializable_types<t_storage>, typename std::remove_const<t_type>::type>::value>::kv_serialize(d, stg, hparent_section, pname);
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class t_type, class t_storage>
-bool kv_unserialize(t_type &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+bool kv_unserialize(t_type& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	return kv_serialization_overloads_impl_is_base_serializable_types<boost::mpl::contains<base_serializable_types<t_storage>, typename std::remove_const<t_type>::type>::value>::kv_unserialize(d, stg, hparent_section, pname);
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class t_type, class t_storage>
-bool kv_serialize(const std::vector<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+bool kv_serialize(const std::vector<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	return kv_serialization_overloads_impl_is_base_serializable_types<boost::mpl::contains<base_serializable_types<t_storage>, typename std::remove_const<t_type>::type>::value>::kv_serialize(d, stg, hparent_section, pname);
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class t_type, class t_storage>
-bool kv_unserialize(std::vector<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+bool kv_unserialize(std::vector<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	return kv_serialization_overloads_impl_is_base_serializable_types<boost::mpl::contains<base_serializable_types<t_storage>, typename std::remove_const<t_type>::type>::value>::kv_unserialize(d, stg, hparent_section, pname);
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class t_type, class t_storage>
-bool kv_serialize(const std::deque<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+bool kv_serialize(const std::deque<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	return kv_serialization_overloads_impl_is_base_serializable_types<boost::mpl::contains<base_serializable_types<t_storage>, typename std::remove_const<t_type>::type>::value>::kv_serialize(d, stg, hparent_section, pname);
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class t_type, class t_storage>
-bool kv_unserialize(std::deque<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+bool kv_unserialize(std::deque<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	return kv_serialization_overloads_impl_is_base_serializable_types<boost::mpl::contains<base_serializable_types<t_storage>, typename std::remove_const<t_type>::type>::value>::kv_unserialize(d, stg, hparent_section, pname);
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class t_type, class t_storage>
-bool kv_serialize(const std::list<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+bool kv_serialize(const std::list<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	return kv_serialization_overloads_impl_is_base_serializable_types<boost::mpl::contains<base_serializable_types<t_storage>, typename std::remove_const<t_type>::type>::value>::kv_serialize(d, stg, hparent_section, pname);
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class t_type, class t_storage>
-bool kv_unserialize(std::list<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+bool kv_unserialize(std::list<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	return kv_serialization_overloads_impl_is_base_serializable_types<boost::mpl::contains<base_serializable_types<t_storage>, typename std::remove_const<t_type>::type>::value>::kv_unserialize(d, stg, hparent_section, pname);
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class t_type, class t_storage>
-bool kv_serialize(const std::set<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+bool kv_serialize(const std::set<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	return kv_serialization_overloads_impl_is_base_serializable_types<boost::mpl::contains<base_serializable_types<t_storage>, typename std::remove_const<t_type>::type>::value>::kv_serialize(d, stg, hparent_section, pname);
 }
 //-------------------------------------------------------------------------------------------------------------------
 template <class t_type, class t_storage>
-bool kv_unserialize(std::set<t_type> &d, t_storage &stg, typename t_storage::hsection hparent_section, const char *pname)
+bool kv_unserialize(std::set<t_type>& d, t_storage& stg, typename t_storage::hsection hparent_section, const char* pname)
 {
 	return kv_serialization_overloads_impl_is_base_serializable_types<boost::mpl::contains<base_serializable_types<t_storage>, typename std::remove_const<t_type>::type>::value>::kv_unserialize(d, stg, hparent_section, pname);
 }
-}
-}
+} // namespace serialization
+} // namespace epee

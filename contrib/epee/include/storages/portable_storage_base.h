@@ -74,42 +74,43 @@ struct section;
 template <class t_entry_type>
 struct array_entry_t
 {
-	array_entry_t() : m_it(m_array.end()) {}
+	array_entry_t() :
+		m_it(m_array.end()) {}
 
-	const t_entry_type *get_first_val() const
+	const t_entry_type* get_first_val() const
 	{
 		m_it = m_array.begin();
 		return get_next_val();
 	}
 
-	t_entry_type *get_first_val()
+	t_entry_type* get_first_val()
 	{
 		m_it = m_array.begin();
 		return get_next_val();
 	}
 
-	const t_entry_type *get_next_val() const
+	const t_entry_type* get_next_val() const
 	{
 		if(m_it == m_array.end())
 			return nullptr;
 		return &(*(m_it++));
 	}
 
-	t_entry_type *get_next_val()
+	t_entry_type* get_next_val()
 	{
 		if(m_it == m_array.end())
 			return nullptr;
-		return (t_entry_type *)&(*(m_it++)); //fuckoff
+		return (t_entry_type*)&(*(m_it++)); //fuckoff
 	}
 
-	t_entry_type &insert_first_val(const t_entry_type &v)
+	t_entry_type& insert_first_val(const t_entry_type& v)
 	{
 		m_array.clear();
 		m_it = m_array.end();
 		return insert_next_value(v);
 	}
 
-	t_entry_type &insert_next_value(const t_entry_type &v)
+	t_entry_type& insert_next_value(const t_entry_type& v)
 	{
 		m_array.push_back(v);
 		return m_array.back();
@@ -148,7 +149,7 @@ struct section
 };
 
 //handle-like aliases
-typedef section *hsection;
-typedef array_entry *harray;
-}
-}
+typedef section* hsection;
+typedef array_entry* harray;
+} // namespace serialization
+} // namespace epee

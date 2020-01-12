@@ -19,31 +19,32 @@
 #include <sldns/rrdef.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-struct sldns_struct_lookup_table;
+	struct sldns_struct_lookup_table;
 
 /** buffer to read an RR, cannot be larger than 64K because of packet size */
 #define LDNS_RR_BUF_SIZE 65535 /* bytes */
-#define LDNS_DEFAULT_TTL	3600
+#define LDNS_DEFAULT_TTL 3600
 
-/*
+	/*
  * To convert class and type to string see
  * sldns_get_rr_class_by_name(str)
  * sldns_get_rr_type_by_name(str)
  * from rrdef.h
  */
 
-/**
+	/**
  * Convert text string into dname wireformat, mallocless, with user buffer.
  * @param str: the text string with the domain name.
  * @param buf: the result buffer, suggested size LDNS_MAX_DOMAINLEN+1
  * @param len: length of the buffer on input, length of the result on output.
  * @return 0 on success, otherwise an error.
  */
-int sldns_str2wire_dname_buf(const char* str, uint8_t* buf, size_t* len);
+	int sldns_str2wire_dname_buf(const char* str, uint8_t* buf, size_t* len);
 
-/**
+	/**
  * Same as sldns_str2wire_dname_buf, but concatenates origin if the domain
  * name is relative (does not end in '.').
  * @param str: the text string with the domain name.
@@ -53,18 +54,18 @@ int sldns_str2wire_dname_buf(const char* str, uint8_t* buf, size_t* len);
  * @param origin_len: length of origin.
  * @return 0 on success, otherwise an error.
  */
-int sldns_str2wire_dname_buf_origin(const char* str, uint8_t* buf, size_t* len,
-	uint8_t* origin, size_t origin_len);
+	int sldns_str2wire_dname_buf_origin(const char* str, uint8_t* buf, size_t* len,
+		uint8_t* origin, size_t origin_len);
 
-/**
+	/**
  * Convert text string into dname wireformat
  * @param str: the text string with the domain name.
  * @param len: returned length of wireformat.
  * @return wireformat dname (malloced) or NULL on failure.
  */
-uint8_t* sldns_str2wire_dname(const char* str, size_t* len);
+	uint8_t* sldns_str2wire_dname(const char* str, size_t* len);
 
-/**
+	/**
  * Convert text RR to wireformat, with user buffer.
  * @param str: the RR data in text presentation format.
  * @param rr: the buffer where the result is stored into.  This buffer has
@@ -83,11 +84,11 @@ uint8_t* sldns_str2wire_dname(const char* str, size_t* len);
  * @param prev_len: length of prev.
  * @return 0 on success, an error on failure.
  */
-int sldns_str2wire_rr_buf(const char* str, uint8_t* rr, size_t* len,
-	size_t* dname_len, uint32_t default_ttl, uint8_t* origin,
-	size_t origin_len, uint8_t* prev, size_t prev_len);
+	int sldns_str2wire_rr_buf(const char* str, uint8_t* rr, size_t* len,
+		size_t* dname_len, uint32_t default_ttl, uint8_t* origin,
+		size_t origin_len, uint8_t* prev, size_t prev_len);
 
-/**
+	/**
  * Same as sldns_str2wire_rr_buf, but there is no rdata, it returns an RR
  * with zero rdata and no ttl.  It has name, type, class.
  * You can access those with the sldns_wirerr_get_type and class functions.
@@ -103,38 +104,38 @@ int sldns_str2wire_rr_buf(const char* str, uint8_t* rr, size_t* len,
  * @param prev_len: length of prev.
  * @return 0 on success, an error on failure.
  */
-int sldns_str2wire_rr_question_buf(const char* str, uint8_t* rr, size_t* len,
-	size_t* dname_len, uint8_t* origin, size_t origin_len, uint8_t* prev,
-	size_t prev_len);
+	int sldns_str2wire_rr_question_buf(const char* str, uint8_t* rr, size_t* len,
+		size_t* dname_len, uint8_t* origin, size_t origin_len, uint8_t* prev,
+		size_t prev_len);
 
-/**
+	/**
  * Get the type of the RR.
  * @param rr: the RR in wire format.
  * @param len: rr length.
  * @param dname_len: dname length to skip.
  * @return type in host byteorder
  */
-uint16_t sldns_wirerr_get_type(uint8_t* rr, size_t len, size_t dname_len);
+	uint16_t sldns_wirerr_get_type(uint8_t* rr, size_t len, size_t dname_len);
 
-/**
+	/**
  * Get the class of the RR.
  * @param rr: the RR in wire format.
  * @param len: rr length.
  * @param dname_len: dname length to skip.
  * @return class in host byteorder
  */
-uint16_t sldns_wirerr_get_class(uint8_t* rr, size_t len, size_t dname_len);
+	uint16_t sldns_wirerr_get_class(uint8_t* rr, size_t len, size_t dname_len);
 
-/**
+	/**
  * Get the ttl of the RR.
  * @param rr: the RR in wire format.
  * @param len: rr length.
  * @param dname_len: dname length to skip.
  * @return ttl in host byteorder
  */
-uint32_t sldns_wirerr_get_ttl(uint8_t* rr, size_t len, size_t dname_len);
+	uint32_t sldns_wirerr_get_ttl(uint8_t* rr, size_t len, size_t dname_len);
 
-/**
+	/**
  * Get the rdata length of the RR.
  * @param rr: the RR in wire format.
  * @param len: rr length.
@@ -144,25 +145,25 @@ uint32_t sldns_wirerr_get_ttl(uint8_t* rr, size_t len, size_t dname_len);
  * 	So, that it is safe to read the data length returned
  * 	from this function from the rdata pointer of sldns_wirerr_get_rdata.
  */
-uint16_t sldns_wirerr_get_rdatalen(uint8_t* rr, size_t len, size_t dname_len);
+	uint16_t sldns_wirerr_get_rdatalen(uint8_t* rr, size_t len, size_t dname_len);
 
-/**
+	/**
  * Get the rdata pointer of the RR.
  * @param rr: the RR in wire format.
  * @param len: rr length.
  * @param dname_len: dname length to skip.
  * @return rdata pointer
  */
-uint8_t* sldns_wirerr_get_rdata(uint8_t* rr, size_t len, size_t dname_len);
+	uint8_t* sldns_wirerr_get_rdata(uint8_t* rr, size_t len, size_t dname_len);
 
-/**
+	/**
  * Get the rdata pointer of the RR. prefixed with rdata length.
  * @param rr: the RR in wire format.
  * @param len: rr length.
  * @param dname_len: dname length to skip.
  * @return pointer to rdatalength, followed by the rdata.
  */
-uint8_t* sldns_wirerr_get_rdatawl(uint8_t* rr, size_t len, size_t dname_len);
+	uint8_t* sldns_wirerr_get_rdatawl(uint8_t* rr, size_t len, size_t dname_len);
 
 /**
  * Parse result codes
@@ -170,7 +171,7 @@ uint8_t* sldns_wirerr_get_rdatawl(uint8_t* rr, size_t len, size_t dname_len);
 #define LDNS_WIREPARSE_MASK 0x0fff
 #define LDNS_WIREPARSE_SHIFT 12
 #define LDNS_WIREPARSE_ERROR(e) ((e)&LDNS_WIREPARSE_MASK)
-#define LDNS_WIREPARSE_OFFSET(e) (((e)&~LDNS_WIREPARSE_MASK)>>LDNS_WIREPARSE_SHIFT)
+#define LDNS_WIREPARSE_OFFSET(e) (((e) & ~LDNS_WIREPARSE_MASK) >> LDNS_WIREPARSE_SHIFT)
 /* use lookuptable to get error string, sldns_wireparse_errors */
 #define LDNS_WIREPARSE_ERR_OK 0
 #define LDNS_WIREPARSE_ERR_GENERAL 342
@@ -205,33 +206,34 @@ uint8_t* sldns_wirerr_get_rdatawl(uint8_t* rr, size_t len, size_t dname_len);
 #define LDNS_WIREPARSE_ERR_INCLUDE 371
 #define LDNS_WIREPARSE_ERR_PARENTHESIS 372
 
-/**
+	/**
  * Get reference to a constant string for the (parse) error.
  * @param e: error return value
  * @return string.
  */
-const char* sldns_get_errorstr_parse(int e);
+	const char* sldns_get_errorstr_parse(int e);
 
-/**
+	/**
  * wire parse state for parsing files
  */
-struct sldns_file_parse_state {
-	/** the origin domain name, if len!=0. uncompressed wireformat */
-	uint8_t origin[LDNS_MAX_DOMAINLEN+1];
-	/** length of origin domain name, in bytes. 0 if not set. */
-	size_t origin_len;
-	/** the previous domain name, if len!=0. uncompressed wireformat*/
-	uint8_t prev_rr[LDNS_MAX_DOMAINLEN+1];
-	/** length of the previous domain name, in bytes. 0 if not set. */
-	size_t prev_rr_len;
-	/** default TTL, this is used if the text does not specify a TTL,
+	struct sldns_file_parse_state
+	{
+		/** the origin domain name, if len!=0. uncompressed wireformat */
+		uint8_t origin[LDNS_MAX_DOMAINLEN + 1];
+		/** length of origin domain name, in bytes. 0 if not set. */
+		size_t origin_len;
+		/** the previous domain name, if len!=0. uncompressed wireformat*/
+		uint8_t prev_rr[LDNS_MAX_DOMAINLEN + 1];
+		/** length of the previous domain name, in bytes. 0 if not set. */
+		size_t prev_rr_len;
+		/** default TTL, this is used if the text does not specify a TTL,
 	 * host byteorder */
-	uint32_t default_ttl;
-	/** line number information */
-	int lineno;
-};
+		uint32_t default_ttl;
+		/** line number information */
+		int lineno;
+	};
 
-/**
+	/**
  * Read one RR from zonefile with buffer for the data.
  * @param in: file that is read from (one RR, multiple lines if it spans them).
  * @param rr: this is malloced by the user and the result is stored here,
@@ -251,10 +253,10 @@ struct sldns_file_parse_state {
  * 	you should initialize it at 1 at the start of the file.
  * @return 0 on success, error on failure.
  */
-int sldns_fp2wire_rr_buf(FILE* in, uint8_t* rr, size_t* len, size_t* dname_len,
-	struct sldns_file_parse_state* parse_state);
+	int sldns_fp2wire_rr_buf(FILE* in, uint8_t* rr, size_t* len, size_t* dname_len,
+		struct sldns_file_parse_state* parse_state);
 
-/**
+	/**
  * Convert one rdf in rdata to wireformat and parse from string.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
@@ -262,82 +264,82 @@ int sldns_fp2wire_rr_buf(FILE* in, uint8_t* rr, size_t* len, size_t* dname_len,
  * @param rdftype: the type of the rdf.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_rdf_buf(const char* str, uint8_t* rd, size_t* len,
-	sldns_rdf_type rdftype);
+	int sldns_str2wire_rdf_buf(const char* str, uint8_t* rd, size_t* len,
+		sldns_rdf_type rdftype);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_INT8 from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_int8_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_int8_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_INT16 from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_int16_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_int16_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_INT32 from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_int32_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_int32_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_A from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_a_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_a_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_AAAA from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_aaaa_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_aaaa_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_STR from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_str_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_str_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_APL from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_apl_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_apl_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_B64 from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_b64_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_b64_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_B32_EXT from string to wireformat.
  * And also LDNS_RDF_TYPE_NSEC3_NEXT_OWNER.
  * @param str: the text to convert for this rdata element.
@@ -345,221 +347,221 @@ int sldns_str2wire_b64_buf(const char* str, uint8_t* rd, size_t* len);
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_b32_ext_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_b32_ext_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_HEX from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_hex_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_hex_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_NSEC from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_nsec_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_nsec_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_TYPE from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_type_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_type_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_CLASS from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_class_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_class_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_CERT_ALG from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_cert_alg_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_cert_alg_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_ALG from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_alg_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_alg_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_TIME from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_time_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_time_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_PERIOD from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_period_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_period_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_TSIGTIME from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_tsigtime_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_tsigtime_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_TSIGERROR from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_tsigerror_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_tsigerror_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_LOC from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_loc_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_loc_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_WKS from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_wks_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_wks_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_NSAP from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_nsap_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_nsap_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_ATMA from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_atma_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_atma_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_IPSECKEY from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_ipseckey_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_ipseckey_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_NSEC3_SALT from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_nsec3_salt_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_nsec3_salt_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_ILNP64 from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_ilnp64_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_ilnp64_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_EUI48 from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_eui48_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_eui48_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_EUI64 from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_eui64_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_eui64_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_TAG from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_tag_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_tag_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_LONG_STR from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_long_str_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_long_str_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_HIP from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_hip_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_hip_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Convert rdf of type LDNS_RDF_TYPE_INT16_DATA from string to wireformat.
  * @param str: the text to convert for this rdata element.
  * @param rd: rdata buffer for the wireformat.
  * @param len: length of rd buffer on input, used length on output.
  * @return 0 on success, error on failure.
  */
-int sldns_str2wire_int16_data_buf(const char* str, uint8_t* rd, size_t* len);
+	int sldns_str2wire_int16_data_buf(const char* str, uint8_t* rd, size_t* len);
 
-/**
+	/**
  * Strip whitespace from the start and the end of line.
  * @param line: modified with 0 to shorten it.
  * @return new start with spaces skipped.
  */
-char * sldns_strip_ws(char *line);
+	char* sldns_strip_ws(char* line);
 #ifdef __cplusplus
 }
 #endif

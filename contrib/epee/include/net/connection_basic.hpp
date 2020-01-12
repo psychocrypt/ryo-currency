@@ -101,16 +101,16 @@ class connection_basic
 	/// Socket for the connection.
 	boost::asio::ip::tcp::socket socket_;
 
-	std::atomic<long> &m_ref_sock_count; // reference to external counter of existing sockets that we will ++/--
+	std::atomic<long>& m_ref_sock_count; // reference to external counter of existing sockets that we will ++/--
   public:
 	// first counter is the ++/-- count of current sockets, the other socket_number is only-increasing ++ number generator
-	connection_basic(boost::asio::io_service &io_service, std::atomic<long> &ref_sock_count, std::atomic<long> &sock_number);
+	connection_basic(boost::asio::io_service& io_service, std::atomic<long>& ref_sock_count, std::atomic<long>& sock_number);
 
 	virtual ~connection_basic() noexcept(false);
 
 	// various handlers to be called from connection class:
-	void do_send_handler_write(const void *ptr, size_t cb);
-	void do_send_handler_write_from_queue(const boost::system::error_code &e, size_t cb, int q_len); // from handle_write, sending next part
+	void do_send_handler_write(const void* ptr, size_t cb);
+	void do_send_handler_write_from_queue(const boost::system::error_code& e, size_t cb, int q_len); // from handle_write, sending next part
 
 	void logger_handle_net_write(size_t size); // network data written
 	void logger_handle_net_read(size_t size);  // network data read
@@ -134,7 +134,7 @@ class connection_basic
 	static double get_sleep_time(size_t cb);
 };
 
-} // nameserver
-} // nameserver
+} // namespace net_utils
+} // namespace epee
 
 #endif

@@ -42,7 +42,6 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #include <algorithm>
 #include <cstdio>
 
@@ -50,14 +49,13 @@
 #include "cryptonote_basic/cryptonote_basic.h"
 #include "hardfork.h"
 
-
 #include "common/gulps.hpp"
 
 GULPS_CAT_MAJOR("crybas_hfork");
 
 using namespace cryptonote;
 
-static uint8_t get_block_vote(const cryptonote::block &b)
+static uint8_t get_block_vote(const cryptonote::block& b)
 {
 	// Pre-hardfork blocks have a minor version hardcoded to 0.
 	// For the purposes of voting, we consider 0 to refer to
@@ -68,18 +66,19 @@ static uint8_t get_block_vote(const cryptonote::block &b)
 	return b.minor_version;
 }
 
-static uint8_t get_block_version(const cryptonote::block &b)
+static uint8_t get_block_version(const cryptonote::block& b)
 {
 	return b.major_version;
 }
 
-HardFork::HardFork(cryptonote::BlockchainDB &db, uint8_t original_version, uint64_t original_version_till_height, time_t forked_time, time_t update_time, uint64_t window_size, uint8_t default_threshold_percent) : db(db),
-																																																					 original_version(original_version),
-																																																					 original_version_till_height(original_version_till_height),
-																																																					 forked_time(forked_time),
-																																																					 update_time(update_time),
-																																																					 window_size(window_size),
-																																																					 default_threshold_percent(default_threshold_percent)
+HardFork::HardFork(cryptonote::BlockchainDB& db, uint8_t original_version, uint64_t original_version_till_height, time_t forked_time, time_t update_time, uint64_t window_size, uint8_t default_threshold_percent) :
+	db(db),
+	original_version(original_version),
+	original_version_till_height(original_version_till_height),
+	forked_time(forked_time),
+	update_time(update_time),
+	window_size(window_size),
+	default_threshold_percent(default_threshold_percent)
 {
 	if(window_size == 0)
 		throw "window_size needs to be strictly positive";
@@ -130,7 +129,7 @@ bool HardFork::do_check(uint8_t block_version, uint8_t voting_version) const
 	return block_version == heights[current_fork_index].version && voting_version >= heights[current_fork_index].version;
 }
 
-bool HardFork::check(const cryptonote::block &block) const
+bool HardFork::check(const cryptonote::block& block) const
 {
 	CRITICAL_REGION_LOCAL(lock);
 	return do_check(::get_block_version(block), ::get_block_vote(block));
@@ -142,7 +141,7 @@ bool HardFork::do_check_for_height(uint8_t block_version, uint8_t voting_version
 	return block_version == heights[fork_index].version && voting_version >= heights[fork_index].version;
 }
 
-bool HardFork::check_for_height(const cryptonote::block &block, uint64_t height) const
+bool HardFork::check_for_height(const cryptonote::block& block, uint64_t height) const
 {
 	CRITICAL_REGION_LOCAL(lock);
 	return do_check_for_height(::get_block_version(block), ::get_block_vote(block), height);
@@ -179,7 +178,7 @@ bool HardFork::add(uint8_t block_version, uint8_t voting_version, uint64_t heigh
 	return true;
 }
 
-bool HardFork::add(const cryptonote::block &block, uint64_t height)
+bool HardFork::add(const cryptonote::block& block, uint64_t height)
 {
 	return add(::get_block_version(block), ::get_block_vote(block), height);
 }
@@ -237,7 +236,7 @@ uint8_t HardFork::get_block_version(uint64_t height) const
 	if(height <= original_version_till_height)
 		return original_version;
 
-	const cryptonote::block &block = db.get_block_from_height(height);
+	const cryptonote::block& block = db.get_block_from_height(height);
 	return ::get_block_version(block);
 }
 
@@ -440,7 +439,7 @@ uint8_t HardFork::get_next_version() const
 	return original_version;
 }
 
-bool HardFork::get_voting_info(uint8_t version, uint32_t &window, uint32_t &votes, uint32_t &threshold, uint64_t &earliest_height, uint8_t &voting) const
+bool HardFork::get_voting_info(uint8_t version, uint32_t& window, uint32_t& votes, uint32_t& threshold, uint64_t& earliest_height, uint8_t& voting) const
 {
 	CRITICAL_REGION_LOCAL(lock);
 

@@ -51,39 +51,37 @@
 
 #include "common/gulps.hpp"
 
-
-
 namespace daemonize
 {
 std::string const t_executor::NAME = "Ryo Daemon";
 
 void t_executor::init_options(
-	boost::program_options::options_description &configurable_options)
+	boost::program_options::options_description& configurable_options)
 {
 	t_daemon::init_options(configurable_options);
 }
 
-std::string const &t_executor::name()
+std::string const& t_executor::name()
 {
 	return NAME;
 }
 
 t_daemon t_executor::create_daemon(
-	boost::program_options::variables_map const &vm)
+	boost::program_options::variables_map const& vm)
 {
 	GULPS_PRINT("Ryo '{} ({}) Daemonised", RYO_RELEASE_NAME, RYO_VERSION_FULL);
 	return t_daemon{vm};
 }
 
 bool t_executor::run_non_interactive(
-	boost::program_options::variables_map const &vm)
+	boost::program_options::variables_map const& vm)
 {
 	return t_daemon{vm}.run(false);
 }
 
 bool t_executor::run_interactive(
-	boost::program_options::variables_map const &vm)
+	boost::program_options::variables_map const& vm)
 {
 	return t_daemon{vm}.run(true);
 }
-}
+} // namespace daemonize

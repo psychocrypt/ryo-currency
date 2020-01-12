@@ -39,38 +39,38 @@ class wipeable_string
 {
   public:
 	wipeable_string() {}
-	wipeable_string(const wipeable_string &other);
-	wipeable_string(wipeable_string &&other);
-	wipeable_string(const std::string &other);
-	wipeable_string(std::string &&other);
-	wipeable_string(const char *s);
+	wipeable_string(const wipeable_string& other);
+	wipeable_string(wipeable_string&& other);
+	wipeable_string(const std::string& other);
+	wipeable_string(std::string&& other);
+	wipeable_string(const char* s);
 	~wipeable_string();
 	void wipe();
 	void push_back(char c);
 	void pop_back();
-	const char *data() const noexcept { return buffer.data(); }
+	const char* data() const noexcept { return buffer.data(); }
 	size_t size() const noexcept { return buffer.size(); }
 	bool empty() const noexcept { return buffer.empty(); }
 	void resize(size_t sz);
 	void reserve(size_t sz);
 	void clear();
-	wipeable_string &operator+=(const std::string &oth)
+	wipeable_string& operator+=(const std::string& oth)
 	{
 		std::copy(oth.begin(), oth.end(), std::back_inserter(buffer));
 		return *this;
 	}
-	wipeable_string &operator+=(const char *oth)
+	wipeable_string& operator+=(const char* oth)
 	{
 		std::copy(oth, oth + strlen(oth), std::back_inserter(buffer));
 		return *this;
 	}
-	bool operator==(const wipeable_string &other) const noexcept { return buffer == other.buffer; }
-	bool operator!=(const wipeable_string &other) const noexcept { return buffer != other.buffer; }
-	wipeable_string &operator=(wipeable_string &&other);
-	wipeable_string &operator=(const wipeable_string &other);
+	bool operator==(const wipeable_string& other) const noexcept { return buffer == other.buffer; }
+	bool operator!=(const wipeable_string& other) const noexcept { return buffer != other.buffer; }
+	wipeable_string& operator=(wipeable_string&& other);
+	wipeable_string& operator=(const wipeable_string& other);
 
   private:
 	void grow(size_t sz, size_t reserved = 0);
 	std::vector<char> buffer;
 };
-}
+} // namespace epee

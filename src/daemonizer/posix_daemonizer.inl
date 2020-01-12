@@ -65,10 +65,10 @@ const command_line::arg_descriptor<std::string> arg_pidfile = {
 	"pidfile", "File path to write the daemon's PID to (optional, requires --detach)"};
 const command_line::arg_descriptor<bool> arg_non_interactive = {
 	"non-interactive", "Run non-interactive"};
-}
+} // namespace
 
 inline void init_options(
-	boost::program_options::options_description &hidden_options, boost::program_options::options_description &normal_options)
+	boost::program_options::options_description& hidden_options, boost::program_options::options_description& normal_options)
 {
 	command_line::add_arg(normal_options, arg_detach);
 	command_line::add_arg(normal_options, arg_pidfile);
@@ -81,16 +81,16 @@ inline boost::filesystem::path get_default_data_dir()
 }
 
 inline boost::filesystem::path get_relative_path_base(
-	boost::program_options::variables_map const &vm)
+	boost::program_options::variables_map const& vm)
 {
 	return boost::filesystem::current_path();
 }
 
 template <typename T_executor>
 inline bool daemonize(
-	int argc, char* argv[], T_executor &&executor // universal ref
+	int argc, char* argv[], T_executor&& executor // universal ref
 	,
-	boost::program_options::variables_map const &vm)
+	boost::program_options::variables_map const& vm)
 {
 
 	if(command_line::has_arg(vm, arg_detach))
@@ -115,4 +115,4 @@ inline bool daemonize(
 		return executor.run_interactive(vm);
 	}
 }
-}
+} // namespace daemonizer

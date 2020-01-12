@@ -12,29 +12,30 @@
 #include <stdio.h>
 
 #ifdef _WIN32
-# include <windows.h>
+#include <windows.h>
 #else
-# include <sys/param.h>  // for FreeBSD version
-# include <sys/types.h>  // for ssize_t
+#include <sys/param.h> // for FreeBSD version
+#include <sys/types.h> // for ssize_t
 #endif
 
 #ifndef _MSC_VER
 struct stat;
 #endif
 
-namespace test {
+namespace test
+{
 
 #ifndef _MSC_VER
 // Size type for read and write.
 typedef size_t size_t;
 typedef ssize_t ssize_t;
-int open(const char *path, int oflag, int mode);
-int fstat(int fd, struct stat *buf);
+int open(const char* path, int oflag, int mode);
+int fstat(int fd, struct stat* buf);
 #else
 typedef unsigned size_t;
 typedef int ssize_t;
 errno_t sopen_s(
-    int* pfh, const char *filename, int oflag, int shflag, int pmode);
+	int* pfh, const char* filename, int oflag, int shflag, int pmode);
 #endif
 
 #ifndef _WIN32
@@ -48,22 +49,22 @@ int close(int fildes);
 int dup(int fildes);
 int dup2(int fildes, int fildes2);
 
-FILE *fdopen(int fildes, const char *mode);
+FILE* fdopen(int fildes, const char* mode);
 
-ssize_t read(int fildes, void *buf, size_t nbyte);
-ssize_t write(int fildes, const void *buf, size_t nbyte);
+ssize_t read(int fildes, void* buf, size_t nbyte);
+ssize_t write(int fildes, const void* buf, size_t nbyte);
 
 #ifndef _WIN32
 int pipe(int fildes[2]);
 #else
-int pipe(int *pfds, unsigned psize, int textmode);
+int pipe(int* pfds, unsigned psize, int textmode);
 #endif
 
-FILE *fopen(const char *filename, const char *mode);
-int fclose(FILE *stream);
-int (fileno)(FILE *stream);
-}  // namespace test
+FILE* fopen(const char* filename, const char* mode);
+int fclose(FILE* stream);
+int(fileno)(FILE* stream);
+} // namespace test
 
 #define FMT_SYSTEM(call) test::call
 
-#endif  // FMT_POSIX_TEST_H
+#endif // FMT_POSIX_TEST_H

@@ -50,7 +50,8 @@ struct regional;
 /**
  * Iterator donotqueryaddresses structure
  */
-struct iter_donotq {
+struct iter_donotq
+{
 	/** regional for allocation */
 	struct regional* region;
 	/** 

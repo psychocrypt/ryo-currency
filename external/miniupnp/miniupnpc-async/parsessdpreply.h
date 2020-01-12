@@ -23,10 +23,8 @@
  *    - location/locationsize : "location:" field of the SSDP reply packet
  *    - st/stsize : "st:" field of the SSDP reply packet.
  * The strings are NOT null terminated */
-void
-parseMSEARCHReply(const char * reply, int size,
-                  const char * * location, int * locationsize,
-			      const char * * st, int * stsize);
+void parseMSEARCHReply(const char* reply, int size,
+	const char** location, int* locationsize,
+	const char** st, int* stsize);
 
 #endif
-

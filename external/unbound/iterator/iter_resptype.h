@@ -49,12 +49,13 @@ struct delegpt;
 /**
  * The response type is used to interpret the response.
  */
-enum response_type {
+enum response_type
+{
 	/** 
 	 * 'untyped' means that the type of this response hasn't been 
 	 * assigned. 
 	 */
-	RESPONSE_TYPE_UNTYPED   = 0,
+	RESPONSE_TYPE_UNTYPED = 0,
 
 	/** 
 	 * 'answer' means that the response terminates the resolution 
@@ -102,7 +103,7 @@ enum response_type {
  * @param request: the request that generated the response.
  * @return the response type (CNAME or ANSWER).
  */
-enum response_type response_type_from_cache(struct dns_msg* msg, 
+enum response_type response_type_from_cache(struct dns_msg* msg,
 	struct query_info* request);
 
 /**
@@ -121,7 +122,7 @@ enum response_type response_type_from_cache(struct dns_msg* msg,
  *          when the response was returned.
  * @return the response type (CNAME or ANSWER).
  */
-enum response_type response_type_from_server(int rdset, 
+enum response_type response_type_from_server(int rdset,
 	struct dns_msg* msg, struct query_info* request, struct delegpt* dp);
 
 #endif /* ITERATOR_ITER_RESPTYPE_H */

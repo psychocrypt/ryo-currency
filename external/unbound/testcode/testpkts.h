@@ -27,7 +27,7 @@ struct sldns_file_parse_state;
  *
  */
 
- /*
+/*
 	The data file format is as follows:
 	
 	; comment.
@@ -143,10 +143,16 @@ ENTRY_END
 */
 
 /** Type of transport, since some entries match based on UDP or TCP of query */
-enum transport_type {transport_any = 0, transport_udp, transport_tcp };
+enum transport_type
+{
+	transport_any = 0,
+	transport_udp,
+	transport_tcp
+};
 
 /** struct to keep a linked list of reply packets for a query */
-struct reply_packet {
+struct reply_packet
+{
 	/** next in list of reply packets, for TCP multiple pkts on wire */
 	struct reply_packet* next;
 	/** the reply pkt */
@@ -158,20 +164,21 @@ struct reply_packet {
 	/** or reply pkt in hex if not parsable */
 	struct sldns_buffer* reply_from_hex;
 	/** seconds to sleep before giving packet */
-	unsigned int packet_sleep; 
+	unsigned int packet_sleep;
 };
 
 /** data structure to keep the canned queries in.
    format is the 'matching query' and the 'canned answer' */
-struct entry {
+struct entry
+{
 	/* match */
 	/* How to match an incoming query with this canned reply */
 	/** match query opcode with answer opcode */
-	uint8_t match_opcode; 
+	uint8_t match_opcode;
 	/** match qtype with answer qtype */
-	uint8_t match_qtype;  
+	uint8_t match_qtype;
 	/** match qname with answer qname */
-	uint8_t match_qname;  
+	uint8_t match_qname;
 	/** match rcode with answer rcode */
 	uint8_t match_rcode;
 	/** match question section */
@@ -179,9 +186,9 @@ struct entry {
 	/** match answer section */
 	uint8_t match_answer;
 	/** match qname as subdomain of answer qname */
-	uint8_t match_subdomain;  
+	uint8_t match_subdomain;
 	/** match SOA serial number, from auth section */
-	uint8_t match_serial; 
+	uint8_t match_serial;
 	/** match all of the packet */
 	uint8_t match_all;
 	/** match ttls in the packet */
@@ -193,23 +200,23 @@ struct entry {
 	/** match edns data field given in hex */
 	uint8_t match_ednsdata_raw;
 	/** match query serial with this value. */
-	uint32_t ixfr_soa_serial; 
+	uint32_t ixfr_soa_serial;
 	/** match on UDP/TCP */
-	enum transport_type match_transport; 
+	enum transport_type match_transport;
 
 	/** pre canned reply */
-	struct reply_packet *reply_list;
+	struct reply_packet* reply_list;
 
 	/** how to adjust the reply packet */
 	/** copy over the ID from the query into the answer */
-	uint8_t copy_id; 
+	uint8_t copy_id;
 	/** copy the query nametypeclass from query into the answer */
 	uint8_t copy_query;
 	/** copy ednsdata to reply, assume it is clientsubnet and
 	 * adjust scopemask to match sourcemask */
 	uint8_t copy_ednsdata_assume_clientsubnet;
 	/** in seconds */
-	unsigned int sleeptime; 
+	unsigned int sleeptime;
 
 	/** some number that names this entry, line number in file or so */
 	int lineno;
@@ -240,7 +247,7 @@ void delete_entry(struct entry* list);
  * @param skip_whitespace: skip leftside whitespace.
  * @return: The entry read (malloced) or NULL if no entry could be read.
  */
-struct entry* read_entry(FILE* in, const char* name, 
+struct entry* read_entry(FILE* in, const char* name,
 	struct sldns_file_parse_state* pstate, int skip_whitespace);
 
 /**
@@ -282,8 +289,8 @@ void adjust_packet(struct entry* match, uint8_t** answer_pkt,
  * @param userdata: userarg to give to sendfunc.
  * @param verbose_out: if not NULL, verbose messages are printed there.
  */
-void handle_query(uint8_t* inbuf, ssize_t inlen, struct entry* entries, 
-	int* count, enum transport_type transport, 
+void handle_query(uint8_t* inbuf, ssize_t inlen, struct entry* entries,
+	int* count, enum transport_type transport,
 	void (*sendfunc)(uint8_t*, size_t, void*), void* userdata,
 	FILE* verbose_out);
 

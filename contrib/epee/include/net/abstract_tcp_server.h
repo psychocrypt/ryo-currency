@@ -38,8 +38,6 @@
 
 #include "common/gulps.hpp"
 
-
-
 namespace epee
 {
 namespace net_utils
@@ -50,15 +48,17 @@ namespace net_utils
 class soket_sender : public i_service_endpoint
 {
   public:
-	soket_sender(SOCKET sock) : m_sock(sock) {}
+	soket_sender(SOCKET sock) :
+		m_sock(sock) {}
+
   private:
-	virtual bool handle_send(const void *ptr, size_t cb)
+	virtual bool handle_send(const void* ptr, size_t cb)
 	{
-		if(cb != send(m_sock, (char *)ptr, (int)cb, 0))
+		if(cb != send(m_sock, (char*)ptr, (int)cb, 0))
 		{
 			int sock_err = WSAGetLastError();
 			GULPS_CAT_MAJOR("epee_tcp_srv");
-			GULPSF_LOG_ERROR("soket_sender: Failed to send {} bytes, Error={}", cb , sock_err);
+			GULPSF_LOG_ERROR("soket_sender: Failed to send {} bytes, Error={}", cb, sock_err);
 			return false;
 		}
 		return true;
@@ -74,6 +74,7 @@ template <class THandler>
 class abstract_tcp_server
 {
 	GULPS_CAT_MAJOR("epee_tcp_srv");
+
   public:
 	abstract_tcp_server();
 
@@ -82,11 +83,11 @@ class abstract_tcp_server
 	bool run_server();
 	bool send_stop_signal();
 
-	typename THandler::config_type &get_config_object() { return m_config; }
+	typename THandler::config_type& get_config_object() { return m_config; }
 
   private:
 	bool invoke_connection(SOCKET hnew_sock, long ip_from, int post_from);
-	static unsigned __stdcall ConnectionHandlerProc(void *lpParameter);
+	static unsigned __stdcall ConnectionHandlerProc(void* lpParameter);
 
 	class thread_context;
 	typedef std::list<thread_context> connections_container;
@@ -96,7 +97,7 @@ class abstract_tcp_server
 	{
 		HANDLE m_htread;
 		SOCKET m_socket;
-		abstract_tcp_server *powner;
+		abstract_tcp_server* powner;
 		connection_context m_context;
 		typename connections_iterator m_self_it;
 	};
@@ -112,13 +113,13 @@ class abstract_tcp_server
 };
 
 template <class THandler>
-unsigned __stdcall abstract_tcp_server<THandler>::ConnectionHandlerProc(void *lpParameter)
+unsigned __stdcall abstract_tcp_server<THandler>::ConnectionHandlerProc(void* lpParameter)
 {
 
-	thread_context *pthread_context = (thread_context *)lpParameter;
+	thread_context* pthread_context = (thread_context*)lpParameter;
 	if(!pthread_context)
 		return 0;
-	abstract_tcp_server<THandler> *pthis = pthread_context->powner;
+	abstract_tcp_server<THandler>* pthis = pthread_context->powner;
 
 	::InterlockedIncrement(&pthis->m_threads_count);
 
@@ -134,17 +135,17 @@ unsigned __stdcall abstract_tcp_server<THandler>::ConnectionHandlerProc(void *lp
 
 	char buff[1000] = {0};
 	std::string ansver;
-	while((res = recv(pthread_context->m_socket, (char *)buff, 1000, 0)) > 0)
+	while((res = recv(pthread_context->m_socket, (char*)buff, 1000, 0)) > 0)
 	{
-		GULPSF_LOG_L3("Data in, {} bytes", res );
+		GULPSF_LOG_L3("Data in, {} bytes", res);
 		if(!srv.handle_recv(buff, res))
 			break;
 	}
 	shutdown(pthread_context->m_socket, SD_BOTH);
 	closesocket(pthread_context->m_socket);
 
-	abstract_tcp_server *powner = pthread_context->powner;
-	GULPSF_LOG_L2("Handler thread with socket={} STOPPED", pthread_context->m_socket );
+	abstract_tcp_server* powner = pthread_context->powner;
+	GULPSF_LOG_L2("Handler thread with socket={} STOPPED", pthread_context->m_socket);
 	powner->m_connections_lock.lock();
 	::CloseHandle(pthread_context->m_htread);
 	pthread_context->powner->m_connections.erase(pthread_context->m_self_it);
@@ -155,9 +156,12 @@ unsigned __stdcall abstract_tcp_server<THandler>::ConnectionHandlerProc(void *lp
 }
 //----------------------------------------------------------------------------------------
 template <class THandler>
-abstract_tcp_server<THandler>::abstract_tcp_server() : m_listen_socket(INVALID_SOCKET),
-													   m_initialized(false),
-													   m_stop_server(0), m_port(0), m_threads_count(0)
+abstract_tcp_server<THandler>::abstract_tcp_server() :
+	m_listen_socket(INVALID_SOCKET),
+	m_initialized(false),
+	m_stop_server(0),
+	m_port(0),
+	m_threads_count(0)
 {
 }
 
@@ -170,7 +174,7 @@ bool abstract_tcp_server<THandler>::init_server(int port_no)
 	int err = ::WSAStartup(MAKEWORD(2, 2), &wsad);
 	if(err != 0 || LOBYTE(wsad.wVersion) != 2 || HIBYTE(wsad.wVersion) != 2)
 	{
-		GULPSF_LOG_ERROR("Could not find a usable WinSock DLL, err = {} \"{}\"", err , socket_errors::get_socket_error_text(err) );
+		GULPSF_LOG_ERROR("Could not find a usable WinSock DLL, err = {} \"{}\"", err, socket_errors::get_socket_error_text(err));
 		return false;
 	}
 
@@ -180,19 +184,19 @@ bool abstract_tcp_server<THandler>::init_server(int port_no)
 	if(INVALID_SOCKET == m_listen_socket)
 	{
 		err = ::WSAGetLastError();
-		GULPSF_LOG_ERROR("Failed to create socket, err = {} \"{}\"", err , socket_errors::get_socket_error_text(err) );
+		GULPSF_LOG_ERROR("Failed to create socket, err = {} \"{}\"", err, socket_errors::get_socket_error_text(err));
 		return false;
 	}
 
 	int opt = 1;
-	setsockopt(m_listen_socket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char *>(&opt), sizeof(int));
+	setsockopt(m_listen_socket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&opt), sizeof(int));
 
 	sockaddr_in adr = {0};
 	adr.sin_family = AF_INET;
 	adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	adr.sin_port = (u_short)htons(port_no);
 
-	err = bind(m_listen_socket, (const sockaddr *)&adr, sizeof(adr));
+	err = bind(m_listen_socket, (const sockaddr*)&adr, sizeof(adr));
 	if(SOCKET_ERROR == err)
 	{
 		err = ::WSAGetLastError();
@@ -220,7 +224,7 @@ bool abstract_tcp_server<THandler>::deinit_server()
 		if(SOCKET_ERROR == res)
 		{
 			int err = ::WSAGetLastError();
-			GULPSF_LOG_ERROR("Failed to closesocket(), err = {} \"{}\"", err , socket_errors::get_socket_error_text(err) );
+			GULPSF_LOG_ERROR("Failed to closesocket(), err = {} \"{}\"", err, socket_errors::get_socket_error_text(err));
 		}
 		m_listen_socket = INVALID_SOCKET;
 	}
@@ -229,7 +233,7 @@ bool abstract_tcp_server<THandler>::deinit_server()
 	if(SOCKET_ERROR == res)
 	{
 		int err = ::WSAGetLastError();
-		GULPSF_LOG_ERROR("Failed to WSACleanup(), err = {} \"{}\"", err , socket_errors::get_socket_error_text(err) );
+		GULPSF_LOG_ERROR("Failed to WSACleanup(), err = {} \"{}\"", err, socket_errors::get_socket_error_text(err));
 	}
 	m_initialized = false;
 
@@ -250,11 +254,11 @@ bool abstract_tcp_server<THandler>::run_server()
 	if(SOCKET_ERROR == err)
 	{
 		err = ::WSAGetLastError();
-		GULPSF_LOG_ERROR("Failed to listen, err = {} \"{}\"", err , socket_errors::get_socket_error_text(err) );
+		GULPSF_LOG_ERROR("Failed to listen, err = {} \"{}\"", err, socket_errors::get_socket_error_text(err));
 		return false;
 	}
 
-	GULPSF_LOG_L2("Listening port {}....", m_port );
+	GULPSF_LOG_L2("Listening port {}....", m_port);
 
 	while(!m_stop_server)
 	{
@@ -268,7 +272,7 @@ bool abstract_tcp_server<THandler>::run_server()
 		int select_res = select(0, &read_fs, NULL, NULL, &tv);
 		if(!select_res)
 			continue;
-		SOCKET new_sock = WSAAccept(m_listen_socket, (sockaddr *)&adr_from, &adr_len, NULL, NULL);
+		SOCKET new_sock = WSAAccept(m_listen_socket, (sockaddr*)&adr_from, &adr_len, NULL, NULL);
 		GULPSF_LOG_L2("Accepted connection on socket={}", new_sock);
 		invoke_connection(new_sock, adr_from.sin_addr.s_addr, adr_from.sin_port);
 	}
@@ -285,13 +289,13 @@ bool abstract_tcp_server<THandler>::run_server()
 		::Sleep(ABSTR_TCP_SRV_WAIT_COUNT_INTERVAL);
 		wait_count++;
 	}
-	GULPSF_PRINT("abstract_tcp_server exit with wait count={}(max={})", wait_count * ABSTR_TCP_SRV_WAIT_COUNT_INTERVAL , ABSTR_TCP_SRV_WAIT_COUNT_MAX );
+	GULPSF_PRINT("abstract_tcp_server exit with wait count={}(max={})", wait_count * ABSTR_TCP_SRV_WAIT_COUNT_INTERVAL, ABSTR_TCP_SRV_WAIT_COUNT_MAX);
 
 	return true;
 }
 //----------------------------------------------------------------------------------------
 template <class THandler>
-bool abstract_tcp_server<THandler>::invoke_connection(SOCKET hnew_sock, const network_address &remote_address)
+bool abstract_tcp_server<THandler>::invoke_connection(SOCKET hnew_sock, const network_address& remote_address)
 {
 	m_connections_lock.lock();
 	m_connections.push_back(thread_context());
@@ -308,6 +312,6 @@ bool abstract_tcp_server<THandler>::invoke_connection(SOCKET hnew_sock, const ne
 
 //----------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------
-}
-}
+} // namespace net_utils
+} // namespace epee
 #endif //_ABSTRACT_TCP_SERVER_H_

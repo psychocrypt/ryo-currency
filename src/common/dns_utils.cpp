@@ -59,14 +59,14 @@ namespace bf = boost::filesystem;
 
 GULPS_CAT_MAJOR("dns_utils");
 
-static const char *DEFAULT_DNS_PUBLIC_ADDR[] =
-{
-	"194.150.168.168",    // CCC (Germany)
-	"80.67.169.40",       // FDN (France)
-	"89.233.43.71",       // http://censurfridns.dk (Denmark)
-	"109.69.8.51",        // punCAT (Spain)
-	"77.109.148.137",     // Xiala.net (Switzerland)
-	"193.58.251.251",     // SkyDNS (Russia)
+static const char* DEFAULT_DNS_PUBLIC_ADDR[] =
+	{
+		"194.150.168.168", // CCC (Germany)
+		"80.67.169.40",	// FDN (France)
+		"89.233.43.71",	// http://censurfridns.dk (Denmark)
+		"109.69.8.51",	 // punCAT (Spain)
+		"77.109.148.137",  // Xiala.net (Switzerland)
+		"193.58.251.251",  // SkyDNS (Russia)
 };
 
 static boost::mutex instance_lock;
@@ -117,12 +117,12 @@ get_builtin_cert(void)
 static const char* const*
 get_builtin_ds(void)
 {
-	static const char * const ds[] =
-	{
-		". IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5\n",
-		". IN DS 20326 8 2 E06D44B80B8F1D39A95C0B0D7C65D08458E880409BBC683457104237C7F8EC8D\n",
-		nullptr // mark the last entry
-	};
+	static const char* const ds[] =
+		{
+			". IN DS 19036 8 2 49AAC11D7B6F6446702E54A1607371607A1A41855200FD2CE1CDDE32F24E8FB5\n",
+			". IN DS 20326 8 2 E06D44B80B8F1D39A95C0B0D7C65D08458E880409BBC683457104237C7F8EC8D\n",
+			nullptr // mark the last entry
+		};
 	return ds;
 }
 
@@ -136,7 +136,7 @@ namespace tools
 {
 
 // fuck it, I'm tired of dealing with getnameinfo()/inet_ntop/etc
-std::string ipv4_to_string(const char *src, size_t len)
+std::string ipv4_to_string(const char* src, size_t len)
 {
 	assert(len >= 4);
 
@@ -156,7 +156,7 @@ std::string ipv4_to_string(const char *src, size_t len)
 
 // this obviously will need to change, but is here to reflect the above
 // stop-gap measure and to make the tests pass at least...
-std::string ipv6_to_string(const char *src, size_t len)
+std::string ipv6_to_string(const char* src, size_t len)
 {
 	assert(len >= 8);
 
@@ -178,56 +178,60 @@ std::string ipv6_to_string(const char *src, size_t len)
 	return ss.str();
 }
 
-std::string txt_to_string(const char *src, size_t len)
+std::string txt_to_string(const char* src, size_t len)
 {
 	return std::string(src + 1, len - 1);
 }
 
 // custom smart pointer.
 // TODO: see if std::auto_ptr and the like support custom destructors
-template <typename type, void (*freefunc)(type *)>
+template <typename type, void (*freefunc)(type*)>
 class scoped_ptr
 {
   public:
-	scoped_ptr() : ptr(nullptr)
+	scoped_ptr() :
+		ptr(nullptr)
 	{
 	}
-	scoped_ptr(type *p) : ptr(p)
+	scoped_ptr(type* p) :
+		ptr(p)
 	{
 	}
 	~scoped_ptr()
 	{
 		freefunc(ptr);
 	}
-	operator type *() { return ptr; }
-	type **operator&() { return &ptr; }
-	type *operator->() { return ptr; }
-	operator const type *() const { return &ptr; }
+	operator type*() { return ptr; }
+	type** operator&() { return &ptr; }
+	type* operator->() { return ptr; }
+	operator const type*() const { return &ptr; }
 
   private:
-	type *ptr;
+	type* ptr;
 };
 
 typedef class scoped_ptr<ub_result, ub_resolve_free> ub_result_ptr;
 
 struct DNSResolverData
 {
-	ub_ctx *m_ub_context;
+	ub_ctx* m_ub_context;
 };
 
 // work around for bug https://www.nlnetlabs.nl/bugs-script/show_bug.cgi?id=515 needed for it to compile on e.g. Debian 7
 class string_copy
 {
   public:
-	string_copy(const char *s) : str(strdup(s)) {}
+	string_copy(const char* s) :
+		str(strdup(s)) {}
 	~string_copy() { free(str); }
-	operator char *() { return str; }
+	operator char*() { return str; }
 
   public:
-	char *str;
+	char* str;
 };
 
-DNSResolver::DNSResolver() : m_data(new DNSResolverData())
+DNSResolver::DNSResolver() :
+	m_data(new DNSResolverData())
 {
 	int use_dns_public = 0;
 	std::vector<std::string> dns_public_addr;
@@ -250,7 +254,7 @@ DNSResolver::DNSResolver() : m_data(new DNSResolverData())
 
 	if(use_dns_public)
 	{
-		for(const auto &ip : dns_public_addr)
+		for(const auto& ip : dns_public_addr)
 			ub_ctx_set_fwd(m_data->m_ub_context, string_copy(ip.c_str()));
 		ub_ctx_set_option(m_data->m_ub_context, string_copy("do-udp:"), string_copy("no"));
 		ub_ctx_set_option(m_data->m_ub_context, string_copy("do-tcp:"), string_copy("yes"));
@@ -262,8 +266,8 @@ DNSResolver::DNSResolver() : m_data(new DNSResolverData())
 		ub_ctx_hosts(m_data->m_ub_context, NULL);
 	}
 
-	const char * const *ds = ::get_builtin_ds();
-	while (*ds)
+	const char* const* ds = ::get_builtin_ds();
+	while(*ds)
 	{
 		GULPSF_INFO("adding trust anchor: {}", *ds);
 		ub_ctx_add_ta(m_data->m_ub_context, string_copy(*ds++));
@@ -282,7 +286,7 @@ DNSResolver::~DNSResolver()
 	}
 }
 
-std::vector<std::string> DNSResolver::get_record(const std::string &url, int record_type, std::string (*reader)(const char *, size_t), bool &dnssec_available, bool &dnssec_valid)
+std::vector<std::string> DNSResolver::get_record(const std::string& url, int record_type, std::string (*reader)(const char*, size_t), bool& dnssec_available, bool& dnssec_valid)
 {
 	std::vector<std::string> addresses;
 	dnssec_available = false;
@@ -313,22 +317,22 @@ std::vector<std::string> DNSResolver::get_record(const std::string &url, int rec
 	return addresses;
 }
 
-std::vector<std::string> DNSResolver::get_ipv4(const std::string &url, bool &dnssec_available, bool &dnssec_valid)
+std::vector<std::string> DNSResolver::get_ipv4(const std::string& url, bool& dnssec_available, bool& dnssec_valid)
 {
 	return get_record(url, DNS_TYPE_A, ipv4_to_string, dnssec_available, dnssec_valid);
 }
 
-std::vector<std::string> DNSResolver::get_ipv6(const std::string &url, bool &dnssec_available, bool &dnssec_valid)
+std::vector<std::string> DNSResolver::get_ipv6(const std::string& url, bool& dnssec_available, bool& dnssec_valid)
 {
 	return get_record(url, DNS_TYPE_AAAA, ipv6_to_string, dnssec_available, dnssec_valid);
 }
 
-std::vector<std::string> DNSResolver::get_txt_record(const std::string &url, bool &dnssec_available, bool &dnssec_valid)
+std::vector<std::string> DNSResolver::get_txt_record(const std::string& url, bool& dnssec_available, bool& dnssec_valid)
 {
 	return get_record(url, DNS_TYPE_TXT, txt_to_string, dnssec_available, dnssec_valid);
 }
 
-std::string DNSResolver::get_dns_format_from_oa_address(const std::string &oa_addr)
+std::string DNSResolver::get_dns_format_from_oa_address(const std::string& oa_addr)
 {
 	std::string addr(oa_addr);
 	auto first_at = addr.find("@");
@@ -341,7 +345,7 @@ std::string DNSResolver::get_dns_format_from_oa_address(const std::string &oa_ad
 	return addr;
 }
 
-DNSResolver &DNSResolver::instance()
+DNSResolver& DNSResolver::instance()
 {
 	boost::lock_guard<boost::mutex> lock(instance_lock);
 
@@ -354,7 +358,7 @@ DNSResolver DNSResolver::create()
 	return DNSResolver();
 }
 
-bool DNSResolver::check_address_syntax(const char *addr) const
+bool DNSResolver::check_address_syntax(const char* addr) const
 {
 	// if string doesn't contain a dot, we won't consider it a url for now.
 	if(strchr(addr, '.') == NULL)
@@ -369,15 +373,15 @@ namespace dns_utils
 
 namespace
 {
-bool dns_records_match(const std::vector<std::string> &a, const std::vector<std::string> &b)
+bool dns_records_match(const std::vector<std::string>& a, const std::vector<std::string>& b)
 {
 	if(a.size() != b.size())
 		return false;
 
-	for(const auto &record_in_a : a)
+	for(const auto& record_in_a : a)
 	{
 		bool ok = false;
-		for(const auto &record_in_b : b)
+		for(const auto& record_in_b : b)
 		{
 			if(record_in_a == record_in_b)
 			{
@@ -391,9 +395,9 @@ bool dns_records_match(const std::vector<std::string> &a, const std::vector<std:
 
 	return true;
 }
-}
+} // namespace
 
-bool load_txt_records_from_dns(std::vector<std::string> &good_records, const std::vector<std::string> &dns_urls)
+bool load_txt_records_from_dns(std::vector<std::string>& good_records, const std::vector<std::string>& dns_urls)
 {
 	// Prevent infinite recursion when distributing
 	if(dns_urls.empty())
@@ -422,7 +426,7 @@ bool load_txt_records_from_dns(std::vector<std::string> &good_records, const std
 	size_t cur_index = first_index;
 	do
 	{
-		const std::string &url = dns_urls[cur_index];
+		const std::string& url = dns_urls[cur_index];
 		if(!avail[cur_index])
 		{
 			records[cur_index].clear();
@@ -443,7 +447,7 @@ bool load_txt_records_from_dns(std::vector<std::string> &good_records, const std
 
 	size_t num_valid_records = 0;
 
-	for(const auto &record_set : records)
+	for(const auto& record_set : records)
 	{
 		if(record_set.size() != 0)
 		{
@@ -485,7 +489,7 @@ bool load_txt_records_from_dns(std::vector<std::string> &good_records, const std
 	return true;
 }
 
-std::vector<std::string> parse_dns_public(const char *s)
+std::vector<std::string> parse_dns_public(const char* s)
 {
 	unsigned ip0, ip1, ip2, ip3;
 	char c;
@@ -494,7 +498,7 @@ std::vector<std::string> parse_dns_public(const char *s)
 	{
 		for(size_t i = 0; i < sizeof(DEFAULT_DNS_PUBLIC_ADDR) / sizeof(DEFAULT_DNS_PUBLIC_ADDR[0]); ++i)
 			dns_public_addr.push_back(DEFAULT_DNS_PUBLIC_ADDR[i]);
-			GULPSF_LOG_L0("Using default public DNS server(s):{}  (TCP)", boost::join(dns_public_addr, ", "));
+		GULPSF_LOG_L0("Using default public DNS server(s):{}  (TCP)", boost::join(dns_public_addr, ", "));
 	}
 	else if(sscanf(s, "tcp://%u.%u.%u.%u%c", &ip0, &ip1, &ip2, &ip3, &c) == 4)
 	{
@@ -514,6 +518,6 @@ std::vector<std::string> parse_dns_public(const char *s)
 	return dns_public_addr;
 }
 
-} // namespace tools::dns_utils
+} // namespace dns_utils
 
 } // namespace tools

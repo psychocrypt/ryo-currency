@@ -110,7 +110,7 @@ FilePath FilePath::GetCurrentDir()
 	return FilePath(_getcwd(cwd, sizeof(cwd)) == NULL ? "" : cwd);
 #else
 	char cwd[GTEST_PATH_MAX_ + 1] = {'\0'};
-	char *result = getcwd(cwd, sizeof(cwd));
+	char* result = getcwd(cwd, sizeof(cwd));
 #if GTEST_OS_NACL
 	// getcwd will likely fail in NaCl due to the sandbox, so return something
 	// reasonable. The user may have provided a shim implementation for getcwd,
@@ -125,7 +125,7 @@ FilePath FilePath::GetCurrentDir()
 // Example: FilePath("dir/file.exe").RemoveExtension("EXE") returns
 // FilePath("dir/file"). If a case-insensitive extension is not
 // found, returns a copy of the original FilePath.
-FilePath FilePath::RemoveExtension(const char *extension) const
+FilePath FilePath::RemoveExtension(const char* extension) const
 {
 	const std::string dot_extension = std::string(".") + extension;
 	if(String::EndsWithCaseInsensitive(pathname_, dot_extension))
@@ -139,14 +139,14 @@ FilePath FilePath::RemoveExtension(const char *extension) const
 // Returns a pointer to the last occurrence of a valid path separator in
 // the FilePath. On Windows, for example, both '/' and '\' are valid path
 // separators. Returns NULL if no path separator was found.
-const char *FilePath::FindLastPathSeparator() const
+const char* FilePath::FindLastPathSeparator() const
 {
-	const char *const last_sep = strrchr(c_str(), kPathSeparator);
+	const char* const last_sep = strrchr(c_str(), kPathSeparator);
 #if GTEST_HAS_ALT_PATH_SEP_
-	const char *const last_alt_sep = strrchr(c_str(), kAlternatePathSeparator);
+	const char* const last_alt_sep = strrchr(c_str(), kAlternatePathSeparator);
 	// Comparing two pointers of which only one is NULL is undefined.
 	if(last_alt_sep != NULL &&
-	   (last_sep == NULL || last_alt_sep > last_sep))
+		(last_sep == NULL || last_alt_sep > last_sep))
 	{
 		return last_alt_sep;
 	}
@@ -162,7 +162,7 @@ const char *FilePath::FindLastPathSeparator() const
 // On Windows platform, '\' is the path separator, otherwise it is '/'.
 FilePath FilePath::RemoveDirectoryName() const
 {
-	const char *const last_sep = FindLastPathSeparator();
+	const char* const last_sep = FindLastPathSeparator();
 	return last_sep ? FilePath(last_sep + 1) : *this;
 }
 
@@ -174,7 +174,7 @@ FilePath FilePath::RemoveDirectoryName() const
 // On Windows platform, '\' is the path separator, otherwise it is '/'.
 FilePath FilePath::RemoveFileName() const
 {
-	const char *const last_sep = FindLastPathSeparator();
+	const char* const last_sep = FindLastPathSeparator();
 	std::string dir;
 	if(last_sep)
 	{
@@ -193,10 +193,10 @@ FilePath FilePath::RemoveFileName() const
 // extension = "xml", returns "dir/test.xml". If number is greater
 // than zero (e.g., 12), returns "dir/test_12.xml".
 // On Windows platform, uses \ as the separator rather than /.
-FilePath FilePath::MakeFileName(const FilePath &directory,
-								const FilePath &base_name,
-								int number,
-								const char *extension)
+FilePath FilePath::MakeFileName(const FilePath& directory,
+	const FilePath& base_name,
+	int number,
+	const char* extension)
 {
 	std::string file;
 	if(number == 0)
@@ -212,8 +212,8 @@ FilePath FilePath::MakeFileName(const FilePath &directory,
 
 // Given directory = "dir", relative_path = "test.xml", returns "dir/test.xml".
 // On Windows, uses \ as the separator rather than /.
-FilePath FilePath::ConcatPaths(const FilePath &directory,
-							   const FilePath &relative_path)
+FilePath FilePath::ConcatPaths(const FilePath& directory,
+	const FilePath& relative_path)
 {
 	if(directory.IsEmpty())
 		return relative_path;
@@ -244,9 +244,9 @@ bool FilePath::DirectoryExists() const
 #if GTEST_OS_WINDOWS
 	// Don't strip off trailing separator if path is a root directory on
 	// Windows (like "C:\\").
-	const FilePath &path(IsRootDirectory() ? *this : RemoveTrailingPathSeparator());
+	const FilePath& path(IsRootDirectory() ? *this : RemoveTrailingPathSeparator());
 #else
-	const FilePath &path(*this);
+	const FilePath& path(*this);
 #endif
 
 #if GTEST_OS_WINDOWS_MOBILE
@@ -254,7 +254,7 @@ bool FilePath::DirectoryExists() const
 	const DWORD attributes = GetFileAttributes(unicode);
 	delete[] unicode;
 	if((attributes != kInvalidFileAttributes) &&
-	   (attributes & FILE_ATTRIBUTE_DIRECTORY))
+		(attributes & FILE_ATTRIBUTE_DIRECTORY))
 	{
 		result = true;
 	}
@@ -284,11 +284,11 @@ bool FilePath::IsRootDirectory() const
 // Returns true if pathname describes an absolute path.
 bool FilePath::IsAbsolutePath() const
 {
-	const char *const name = pathname_.c_str();
+	const char* const name = pathname_.c_str();
 #if GTEST_OS_WINDOWS
 	return pathname_.length() >= 3 &&
 		   ((name[0] >= 'a' && name[0] <= 'z') ||
-			(name[0] >= 'A' && name[0] <= 'Z')) &&
+			   (name[0] >= 'A' && name[0] <= 'Z')) &&
 		   name[1] == ':' &&
 		   IsPathSeparator(name[2]);
 #else
@@ -304,9 +304,9 @@ bool FilePath::IsAbsolutePath() const
 // Examples: 'dir/foo_test.xml' or 'dir/foo_test_1.xml'.
 // There could be a race condition if two or more processes are calling this
 // function at the same time -- they could both pick the same filename.
-FilePath FilePath::GenerateUniqueFileName(const FilePath &directory,
-										  const FilePath &base_name,
-										  const char *extension)
+FilePath FilePath::GenerateUniqueFileName(const FilePath& directory,
+	const FilePath& base_name,
+	const char* extension)
 {
 	FilePath full_pathname;
 	int number = 0;
@@ -390,9 +390,9 @@ void FilePath::Normalize()
 		pathname_ = "";
 		return;
 	}
-	const char *src = pathname_.c_str();
-	char *const dest = new char[pathname_.length() + 1];
-	char *dest_ptr = dest;
+	const char* src = pathname_.c_str();
+	char* const dest = new char[pathname_.length() + 1];
+	char* dest_ptr = dest;
 	memset(dest_ptr, 0, pathname_.length() + 1);
 
 	while(*src != '\0')

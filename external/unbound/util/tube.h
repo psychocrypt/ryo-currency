@@ -60,7 +60,8 @@ typedef void tube_callback_type(struct tube*, uint8_t*, size_t, int, void*);
 /**
  * A pipe
  */
-struct tube {
+struct tube
+{
 #ifndef USE_WINSOCK
 	/** pipe end to read from */
 	int sr;
@@ -90,7 +91,7 @@ struct tube {
 	/** last in list */
 	struct tube_res_list* res_last;
 
-#else /* USE_WINSOCK */
+#else  /* USE_WINSOCK */
 	/** listen callback */
 	tube_callback_type* listen_cb;
 	/** listen callback user arg */
@@ -112,7 +113,8 @@ struct tube {
 /**
  * List of results (arbitrary command serializations) to write back
  */
-struct tube_res_list {
+struct tube_res_list
+{
 	/** next in list */
 	struct tube_res_list* next;
 	/** serialized buffer to write */
@@ -150,7 +152,7 @@ void tube_delete(struct tube* tube);
  *              unknown.
  *      return 1 if all OK.
  */
-int tube_write_msg(struct tube* tube, uint8_t* buf, uint32_t len, 
+int tube_write_msg(struct tube* tube, uint8_t* buf, uint32_t len,
 	int nonblock);
 
 /**
@@ -170,7 +172,7 @@ int tube_write_msg(struct tube* tube, uint8_t* buf, uint32_t len,
  *              unknown. On EOF 0 is returned.
  *      return 1 if all OK.
  */
-int tube_read_msg(struct tube* tube, uint8_t** buf, uint32_t* len, 
+int tube_read_msg(struct tube* tube, uint8_t** buf, uint32_t* len,
 	int nonblock);
 
 /**
@@ -245,7 +247,6 @@ int tube_setup_bg_write(struct tube* tube, struct comm_base* base);
  */
 void tube_remove_bg_write(struct tube* tube);
 
-
 /**
  * Append data item to background list of writes.
  * Mallocs a list entry behind the scenes.
@@ -259,11 +260,11 @@ void tube_remove_bg_write(struct tube* tube);
 int tube_queue_item(struct tube* tube, uint8_t* msg, size_t len);
 
 /** for fptr wlist, callback function */
-int tube_handle_listen(struct comm_point* c, void* arg, int error, 
+int tube_handle_listen(struct comm_point* c, void* arg, int error,
 	struct comm_reply* reply_info);
 
 /** for fptr wlist, callback function */
-int tube_handle_write(struct comm_point* c, void* arg, int error, 
+int tube_handle_write(struct comm_point* c, void* arg, int error,
 	struct comm_reply* reply_info);
 
 /** for fptr wlist, winsock signal event callback function */

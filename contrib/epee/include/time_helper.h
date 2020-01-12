@@ -39,7 +39,7 @@ namespace misc_utils
 
 #ifdef __ATLTIME_H__
 
-inline bool get_time_t_from_ole_date(DATE src, time_t &res)
+inline bool get_time_t_from_ole_date(DATE src, time_t& res)
 {
 	SYSTEMTIME st = {0};
 	if(TRUE != ::VariantTimeToSystemTime(src, &st))
@@ -49,11 +49,11 @@ inline bool get_time_t_from_ole_date(DATE src, time_t &res)
 	return true;
 }
 #endif
-inline std::string get_time_str(const time_t &time_)
+inline std::string get_time_str(const time_t& time_)
 {
 
 	char tmpbuf[200] = {0};
-	tm *pt = NULL;
+	tm* pt = NULL;
 	PRAGMA_WARNING_PUSH
 	PRAGMA_WARNING_DISABLE_VS(4996)
 	pt = localtime(&time_);
@@ -70,11 +70,11 @@ inline std::string get_time_str(const time_t &time_)
 	return tmpbuf;
 }
 
-inline std::string get_time_str_v2(const time_t &time_)
+inline std::string get_time_str_v2(const time_t& time_)
 {
 
 	char tmpbuf[200] = {0};
-	tm *pt = NULL;
+	tm* pt = NULL;
 	PRAGMA_WARNING_PUSH
 	PRAGMA_WARNING_DISABLE_VS(4996)
 	pt = localtime(&time_);
@@ -91,15 +91,15 @@ inline std::string get_time_str_v2(const time_t &time_)
 	return tmpbuf;
 }
 
-inline std::string get_time_str_v3(const boost::posix_time::ptime &time_)
+inline std::string get_time_str_v3(const boost::posix_time::ptime& time_)
 {
 	return boost::posix_time::to_simple_string(time_);
 }
 
-inline std::string get_internet_time_str(const time_t &time_)
+inline std::string get_internet_time_str(const time_t& time_)
 {
 	char tmpbuf[200] = {0};
-	tm *pt = NULL;
+	tm* pt = NULL;
 	PRAGMA_WARNING_PUSH
 	PRAGMA_WARNING_DISABLE_VS(4996)
 	pt = gmtime(&time_);
@@ -108,7 +108,7 @@ inline std::string get_internet_time_str(const time_t &time_)
 	return tmpbuf;
 }
 
-inline std::string get_time_interval_string(const time_t &time_)
+inline std::string get_time_interval_string(const time_t& time_)
 {
 	std::string res;
 	time_t tail = time_;
@@ -127,7 +127,7 @@ inline std::string get_time_interval_string(const time_t &time_)
 }
 
 #ifdef __SQLEXT
-inline bool odbc_time_to_oledb_taime(const SQL_TIMESTAMP_STRUCT &odbc_timestamp, DATE &oledb_date)
+inline bool odbc_time_to_oledb_taime(const SQL_TIMESTAMP_STRUCT& odbc_timestamp, DATE& oledb_date)
 {
 
 	SYSTEMTIME st = {0};
@@ -145,5 +145,5 @@ inline bool odbc_time_to_oledb_taime(const SQL_TIMESTAMP_STRUCT &odbc_timestamp,
 }
 
 #endif
-}
-}
+} // namespace misc_utils
+} // namespace epee

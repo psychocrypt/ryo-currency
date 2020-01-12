@@ -69,7 +69,8 @@ typedef struct ub_packed_rrset_key alloc_special_type;
  * Structure that provides allocation. Use one per thread.
  * The one on top has a NULL super pointer.
  */
-struct alloc_cache {
+struct alloc_cache
+{
 	/** lock, only used for the super. */
 	lock_quick_type lock;
 	/** global allocator above this one. NULL for none (malloc/free) */
@@ -177,40 +178,40 @@ void alloc_set_id_cleanup(struct alloc_cache* alloc, void (*cleanup)(void*),
 	void* arg);
 
 #ifdef UNBOUND_ALLOC_LITE
-#  include <sldns/ldns.h>
-#  include <sldns/packet.h>
-#  ifdef HAVE_OPENSSL_SSL_H
-#    include <openssl/ssl.h>
-#  endif
-#  define malloc(s) unbound_stat_malloc_lite(s, __FILE__, __LINE__, __func__)
-#  define calloc(n,s) unbound_stat_calloc_lite(n, s, __FILE__, __LINE__, __func__)
-#  define free(p) unbound_stat_free_lite(p, __FILE__, __LINE__, __func__)
-#  define realloc(p,s) unbound_stat_realloc_lite(p, s, __FILE__, __LINE__, __func__)
-void *unbound_stat_malloc_lite(size_t size, const char* file, int line,
+#include <sldns/ldns.h>
+#include <sldns/packet.h>
+#ifdef HAVE_OPENSSL_SSL_H
+#include <openssl/ssl.h>
+#endif
+#define malloc(s) unbound_stat_malloc_lite(s, __FILE__, __LINE__, __func__)
+#define calloc(n, s) unbound_stat_calloc_lite(n, s, __FILE__, __LINE__, __func__)
+#define free(p) unbound_stat_free_lite(p, __FILE__, __LINE__, __func__)
+#define realloc(p, s) unbound_stat_realloc_lite(p, s, __FILE__, __LINE__, __func__)
+void* unbound_stat_malloc_lite(size_t size, const char* file, int line,
 	const char* func);
-void *unbound_stat_calloc_lite(size_t nmemb, size_t size, const char* file,
+void* unbound_stat_calloc_lite(size_t nmemb, size_t size, const char* file,
 	int line, const char* func);
-void unbound_stat_free_lite(void *ptr, const char* file, int line,
+void unbound_stat_free_lite(void* ptr, const char* file, int line,
 	const char* func);
-void *unbound_stat_realloc_lite(void *ptr, size_t size, const char* file,
+void* unbound_stat_realloc_lite(void* ptr, size_t size, const char* file,
 	int line, const char* func);
-#  ifdef strdup
-#    undef strdup
-#  endif
-#  define strdup(s) unbound_strdup_lite(s, __FILE__, __LINE__, __func__)
-char* unbound_strdup_lite(const char* s, const char* file, int line, 
+#ifdef strdup
+#undef strdup
+#endif
+#define strdup(s) unbound_strdup_lite(s, __FILE__, __LINE__, __func__)
+char* unbound_strdup_lite(const char* s, const char* file, int line,
 	const char* func);
 char* unbound_lite_wrapstr(char* s);
-#  define sldns_rr2str(rr) unbound_lite_wrapstr(sldns_rr2str(rr))
-#  define sldns_rdf2str(rdf) unbound_lite_wrapstr(sldns_rdf2str(rdf))
-#  define sldns_rr_type2str(t) unbound_lite_wrapstr(sldns_rr_type2str(t))
-#  define sldns_rr_class2str(c) unbound_lite_wrapstr(sldns_rr_class2str(c))
-#  define sldns_rr_list2str(r) unbound_lite_wrapstr(sldns_rr_list2str(r))
-#  define sldns_pkt2str(p) unbound_lite_wrapstr(sldns_pkt2str(p))
-#  define sldns_pkt_rcode2str(r) unbound_lite_wrapstr(sldns_pkt_rcode2str(r))
-#  define sldns_pkt2wire(a, r, s) unbound_lite_pkt2wire(a, r, s)
-sldns_status unbound_lite_pkt2wire(uint8_t **dest, const sldns_pkt *p, size_t *size);
-#  define i2d_DSA_SIG(d, s) unbound_lite_i2d_DSA_SIG(d, s)
+#define sldns_rr2str(rr) unbound_lite_wrapstr(sldns_rr2str(rr))
+#define sldns_rdf2str(rdf) unbound_lite_wrapstr(sldns_rdf2str(rdf))
+#define sldns_rr_type2str(t) unbound_lite_wrapstr(sldns_rr_type2str(t))
+#define sldns_rr_class2str(c) unbound_lite_wrapstr(sldns_rr_class2str(c))
+#define sldns_rr_list2str(r) unbound_lite_wrapstr(sldns_rr_list2str(r))
+#define sldns_pkt2str(p) unbound_lite_wrapstr(sldns_pkt2str(p))
+#define sldns_pkt_rcode2str(r) unbound_lite_wrapstr(sldns_pkt_rcode2str(r))
+#define sldns_pkt2wire(a, r, s) unbound_lite_pkt2wire(a, r, s)
+sldns_status unbound_lite_pkt2wire(uint8_t** dest, const sldns_pkt* p, size_t* size);
+#define i2d_DSA_SIG(d, s) unbound_lite_i2d_DSA_SIG(d, s)
 int unbound_lite_i2d_DSA_SIG(DSA_SIG* dsasig, unsigned char** sig);
 #endif /* UNBOUND_ALLOC_LITE */
 

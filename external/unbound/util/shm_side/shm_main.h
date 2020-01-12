@@ -50,7 +50,8 @@ struct worker;
 /**
  * The SHM info.
  */
-struct shm_main_info {
+struct shm_main_info
+{
 	/** stats_info array, shared memory segment.
 	 * [0] is totals, [1..thread_num] are per-thread stats */
 	struct ub_stats_info* ptr_arr;
@@ -63,6 +64,6 @@ struct shm_main_info {
 
 int shm_main_init(struct daemon* daemon);
 void shm_main_shutdown(struct daemon* daemon);
-void shm_main_run(struct worker *worker);
+void shm_main_run(struct worker* worker);
 
 #endif /* UTIL_SHM_SIDE_MAIN_H */

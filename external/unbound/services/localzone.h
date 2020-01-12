@@ -61,7 +61,8 @@ struct config_strlist;
  * This type determines processing for queries that did not match
  * local-data directly.
  */
-enum localzone_type {
+enum localzone_type
+{
 	/** unset type, used for unset tag_action elements */
 	local_zone_unset = 0,
 	/** drop query */
@@ -83,9 +84,9 @@ enum localzone_type {
 	local_zone_inform,
 	/** log client address, and block (drop) */
 	local_zone_inform_deny,
-	/** resolve normally, even when there is local data */	
+	/** resolve normally, even when there is local data */
 	local_zone_always_transparent,
-	/** answer with error, even when there is local data */	
+	/** answer with error, even when there is local data */
 	local_zone_always_refuse,
 	/** answer with nxdomain, even when there is local data */
 	local_zone_always_nxdomain,
@@ -96,7 +97,8 @@ enum localzone_type {
 /**
  * Authoritative local zones storage, shared.
  */
-struct local_zones {
+struct local_zones
+{
 	/** lock on the localzone tree */
 	lock_rw_type lock;
 	/** rbtree of struct local_zone */
@@ -106,7 +108,8 @@ struct local_zones {
 /**
  * Local zone. A locally served authoritative zone.
  */
-struct local_zone {
+struct local_zone
+{
 	/** rbtree node, key is name and class */
 	rbnode_type node;
 	/** parent zone, if any. */
@@ -151,7 +154,8 @@ struct local_zone {
 /**
  * Local data. One domain name, and the RRs to go with it.
  */
-struct local_data {
+struct local_data
+{
 	/** rbtree node, key is name only */
 	rbnode_type node;
 	/** domain name */
@@ -168,7 +172,8 @@ struct local_data {
 /**
  * A local data RRset
  */
-struct local_rrset {
+struct local_rrset
+{
 	/** next in list */
 	struct local_rrset* next;
 	/** RRset data item */
@@ -178,7 +183,8 @@ struct local_rrset {
 /**
  * Local zone override information
  */
-struct local_zone_override {
+struct local_zone_override
+{
 	/** node in addrtree */
 	struct addr_tree_node node;
 	/** override for local zone type */
@@ -244,7 +250,7 @@ void local_zone_delete(struct local_zone* z);
  * local-zone's tags.
  * @return closest local_zone or NULL if no covering zone is found.
  */
-struct local_zone* local_zones_tags_lookup(struct local_zones* zones, 
+struct local_zone* local_zones_tags_lookup(struct local_zones* zones,
 	uint8_t* name, size_t len, int labs, uint16_t dclass, uint16_t dtype,
 	uint8_t* taglist, size_t taglen, int ignoretags);
 
@@ -260,7 +266,7 @@ struct local_zone* local_zones_tags_lookup(struct local_zones* zones,
  *   pass 0 to just plain find a zone for a name.
  * @return closest local_zone or NULL if no covering zone is found.
  */
-struct local_zone* local_zones_lookup(struct local_zones* zones, 
+struct local_zone* local_zones_lookup(struct local_zones* zones,
 	uint8_t* name, size_t len, int labs, uint16_t dclass, uint16_t dtype);
 
 /**
@@ -335,7 +341,7 @@ const char* local_zone_type2str(enum localzone_type t);
  * @param dclass: class to lookup.
  * @return the exact local_zone or NULL.
  */
-struct local_zone* local_zones_find(struct local_zones* zones, 
+struct local_zone* local_zones_find(struct local_zones* zones,
 	uint8_t* name, size_t len, int labs, uint16_t dclass);
 
 /**
@@ -350,8 +356,8 @@ struct local_zone* local_zones_find(struct local_zones* zones,
  * @param tp: type.
  * @return local_zone or NULL on error, caller must printout memory error.
  */
-struct local_zone* local_zones_add_zone(struct local_zones* zones, 
-	uint8_t* name, size_t len, int labs, uint16_t dclass, 
+struct local_zone* local_zones_add_zone(struct local_zones* zones,
+	uint8_t* name, size_t len, int labs, uint16_t dclass,
 	enum localzone_type tp);
 
 /**
@@ -381,9 +387,8 @@ int local_zones_add_RR(struct local_zones* zones, const char* rr);
  * @param labs: labelcount of name.
  * @param dclass: class to remove.
  */
-void local_zones_del_data(struct local_zones* zones, 
+void local_zones_del_data(struct local_zones* zones,
 	uint8_t* name, size_t len, int labs, uint16_t dclass);
-
 
 /** 
  * Form wireformat from text format domain name. 
@@ -480,22 +485,23 @@ int rrset_insert_rr(struct regional* region, struct packed_rrset_data* pd,
   * access-control-tags, which can be shared for both response ip actions and
   * local zones.
   */
-enum respip_action {
+enum respip_action
+{
 	/** no respip action */
 	respip_none = local_zone_unset,
 	/** don't answer */
 	respip_deny = local_zone_deny,
 	/** redirect as per provided data */
 	respip_redirect = local_zone_redirect,
-        /** log query source and answer query */
+	/** log query source and answer query */
 	respip_inform = local_zone_inform,
-        /** log query source and don't answer query */
+	/** log query source and don't answer query */
 	respip_inform_deny = local_zone_inform_deny,
-        /** resolve normally, even when there is response-ip data */
+	/** resolve normally, even when there is response-ip data */
 	respip_always_transparent = local_zone_always_transparent,
-        /** answer with 'refused' response */
+	/** answer with 'refused' response */
 	respip_always_refuse = local_zone_always_refuse,
-        /** answer with 'no such domain' response */
+	/** answer with 'no such domain' response */
 	respip_always_nxdomain = local_zone_always_nxdomain,
 
 	/* The rest of the values are only possible as

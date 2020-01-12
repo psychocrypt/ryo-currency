@@ -70,11 +70,11 @@ inline __m128 _mm_set1_ps_epi32(uint32_t x)
 	return _mm_castsi128_ps(_mm_set1_epi32(x));
 }
 
-inline __m256 fma_break(const __m256& x) 
-{ 
-	// Break the dependency chain by setitng the exp to ?????01 
-	__m256 xx = _mm256_and_ps(_mm256_set1_ps_epi32(0xFEFFFFFF), x); 
-	return _mm256_or_ps(_mm256_set1_ps_epi32(0x00800000), xx); 
+inline __m256 fma_break(const __m256& x)
+{
+	// Break the dependency chain by setitng the exp to ?????01
+	__m256 xx = _mm256_and_ps(_mm256_set1_ps_epi32(0xFEFFFFFF), x);
+	return _mm256_or_ps(_mm256_set1_ps_epi32(0x00800000), xx);
 }
 
 // 14
@@ -121,8 +121,8 @@ inline void round_compute(const __m256& n0, const __m256& n1, const __m256& n2, 
 
 // 112×4 = 448
 template <bool add>
-inline __m256i double_comupte(const __m256& n0, const __m256& n1, const __m256& n2, const __m256& n3, 
-							  float lcnt, float hcnt, const __m256& rnd_c, __m256& sum)
+inline __m256i double_comupte(const __m256& n0, const __m256& n1, const __m256& n2, const __m256& n3,
+	float lcnt, float hcnt, const __m256& rnd_c, __m256& sum)
 {
 	__m256 c = _mm256_insertf128_ps(_mm256_castps128_ps256(_mm_set1_ps(lcnt)), _mm_set1_ps(hcnt), 1);
 	__m256 r = _mm256_setzero_ps();
@@ -146,8 +146,8 @@ inline __m256i double_comupte(const __m256& n0, const __m256& n1, const __m256& 
 }
 
 template <size_t rot>
-inline void double_comupte_wrap(const __m256& n0, const __m256& n1, const __m256& n2, const __m256& n3, 
-								float lcnt, float hcnt, const __m256& rnd_c, __m256& sum, __m256i& out)
+inline void double_comupte_wrap(const __m256& n0, const __m256& n1, const __m256& n2, const __m256& n3,
+	float lcnt, float hcnt, const __m256& rnd_c, __m256& sum, __m256i& out)
 {
 	__m256i r = double_comupte<rot % 2 != 0>(n0, n1, n2, n3, lcnt, hcnt, rnd_c, sum);
 	if(rot != 0)

@@ -53,12 +53,16 @@ namespace cryptonote
 {
 struct subaddress_index
 {
-	subaddress_index(uint32_t maj, uint32_t min) { major = maj; minor = min; }
-  
+	subaddress_index(uint32_t maj, uint32_t min)
+	{
+		major = maj;
+		minor = min;
+	}
+
 	uint32_t major;
 	uint32_t minor;
-	bool operator==(const subaddress_index &rhs) const { return !memcmp(this, &rhs, sizeof(subaddress_index)); }
-	bool operator!=(const subaddress_index &rhs) const { return !(*this == rhs); }
+	bool operator==(const subaddress_index& rhs) const { return !memcmp(this, &rhs, sizeof(subaddress_index)); }
+	bool operator!=(const subaddress_index& rhs) const { return !(*this == rhs); }
 	bool is_zero() const { return major == 0 && minor == 0; }
 
 	BEGIN_SERIALIZE_OBJECT()
@@ -71,22 +75,22 @@ struct subaddress_index
 	KV_SERIALIZE(minor)
 	END_KV_SERIALIZE_MAP()
 };
-}
+} // namespace cryptonote
 
 namespace cryptonote
 {
-inline std::ostream &operator<<(std::ostream &out, const cryptonote::subaddress_index &subaddr_index)
+inline std::ostream& operator<<(std::ostream& out, const cryptonote::subaddress_index& subaddr_index)
 {
 	return out << subaddr_index.major << '/' << subaddr_index.minor;
 }
-}
+} // namespace cryptonote
 
 namespace std
 {
 template <>
 struct hash<cryptonote::subaddress_index>
 {
-	size_t operator()(const cryptonote::subaddress_index &index) const
+	size_t operator()(const cryptonote::subaddress_index& index) const
 	{
 		size_t res;
 		if(sizeof(size_t) == 8)
@@ -103,7 +107,7 @@ struct hash<cryptonote::subaddress_index>
 		return res;
 	}
 };
-}
+} // namespace std
 
 BOOST_CLASS_VERSION(cryptonote::subaddress_index, 0)
 
@@ -112,10 +116,10 @@ namespace boost
 namespace serialization
 {
 template <class Archive>
-inline void serialize(Archive &a, cryptonote::subaddress_index &x, const boost::serialization::version_type ver)
+inline void serialize(Archive& a, cryptonote::subaddress_index& x, const boost::serialization::version_type ver)
 {
-	a &x.major;
-	a &x.minor;
+	a& x.major;
+	a& x.minor;
 }
-}
-}
+} // namespace serialization
+} // namespace boost

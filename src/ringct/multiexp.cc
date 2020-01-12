@@ -46,7 +46,8 @@
 
 #include "common/perf_timer.h"
 #include "common/gulps.hpp"
-extern "C" {
+extern "C"
+{
 #include "crypto/crypto-ops.h"
 }
 #include "multiexp.h"
@@ -88,8 +89,8 @@ extern "C" {
 
 namespace rct
 {
-	GULPS_CAT_MAJOR("multiexp");
-static inline bool operator<(const rct::key &k0, const rct::key &k1)
+GULPS_CAT_MAJOR("multiexp");
+static inline bool operator<(const rct::key& k0, const rct::key& k1)
 {
 	for(int n = 31; n >= 0; --n)
 	{
@@ -101,7 +102,7 @@ static inline bool operator<(const rct::key &k0, const rct::key &k1)
 	return false;
 }
 
-static inline rct::key div2(const rct::key &k)
+static inline rct::key div2(const rct::key& k)
 {
 	rct::key res;
 	int carry = 0;
@@ -122,21 +123,21 @@ static inline rct::key pow2(size_t n)
 	return res;
 }
 
-static inline int test(const rct::key &k, size_t n)
+static inline int test(const rct::key& k, size_t n)
 {
 	if(n >= 256)
 		return 0;
 	return k[n >> 3] & (1 << (n & 7));
 }
 
-static inline void add(ge_p3 &p3, const ge_cached &other)
+static inline void add(ge_p3& p3, const ge_cached& other)
 {
 	ge_p1p1 p1;
 	ge_add(&p1, &p3, &other);
 	ge_p1p1_to_p3(&p3, &p1);
 }
 
-static inline void add(ge_p3 &p3, const ge_p3 &other)
+static inline void add(ge_p3& p3, const ge_p3& other)
 {
 	ge_cached cached;
 	ge_p3_to_cached(&cached, &other);
@@ -337,10 +338,10 @@ rct::key bos_coster_heap_conv_robust(std::vector<MultiexpData> data)
 	return res;
 }
 
-static rct::key get_exponent(const rct::key &base, size_t idx)
+static rct::key get_exponent(const rct::key& base, size_t idx)
 {
 	static const std::string salt("bulletproof");
-	std::string hashed = std::string((const char *)base.bytes, sizeof(base)) + salt + tools::get_varint_data(idx);
+	std::string hashed = std::string((const char*)base.bytes, sizeof(base)) + salt + tools::get_varint_data(idx);
 	const rct::key e = rct::hashToPoint(rct::hash2rct(crypto::cn_fast_hash(hashed.data(), hashed.size())));
 	GULPS_CHECK_AND_ASSERT_THROW_MES(!(e == rct::identity()), "Exponent is point at infinity");
 	return e;
@@ -363,18 +364,18 @@ multiexp_cache::multiexp_cache()
 	s_cache.init_cache(data, STRAUS_SIZE_LIMIT);
 	p_cache.init_cache(data, 0, false);
 
-	GULPSF_INFO("Hi/Gi cache size: {} kB", (sizeof(Hi_cache) + sizeof(Gi_cache)) / 1024 );
-	GULPSF_INFO("Hi_p3/Gi_p3 cache size: {} kB", (sizeof(Hi_p3_cache) + sizeof(Gi_p3_cache)) / 1024 );
-	GULPSF_INFO("Straus cache size: {} kB", sizeof(straus_cache) / 1024 );
-	GULPSF_INFO("Pippenger cache size: {} kB", sizeof(pippenger_cache) / 1024 );
+	GULPSF_INFO("Hi/Gi cache size: {} kB", (sizeof(Hi_cache) + sizeof(Gi_cache)) / 1024);
+	GULPSF_INFO("Hi_p3/Gi_p3 cache size: {} kB", (sizeof(Hi_p3_cache) + sizeof(Gi_p3_cache)) / 1024);
+	GULPSF_INFO("Straus cache size: {} kB", sizeof(straus_cache) / 1024);
+	GULPSF_INFO("Pippenger cache size: {} kB", sizeof(pippenger_cache) / 1024);
 	size_t cache_size = (sizeof(Hi_cache) + sizeof(Hi_p3_cache)) * 2 + sizeof(straus_cache) + sizeof(pippenger_cache);
-	GULPSF_INFO("Total cache size: {}kB", cache_size / 1024 );
+	GULPSF_INFO("Total cache size: {}kB", cache_size / 1024);
 }
 
-void straus_cache::init_cache(const std::vector<MultiexpData> &data, size_t N)
+void straus_cache::init_cache(const std::vector<MultiexpData>& data, size_t N)
 {
 	MULTIEXP_PERF(PERF_TIMER_START_UNIT(multiples, 1000000));
-	if (N == 0)
+	if(N == 0)
 		N = data.size();
 	GULPS_CHECK_AND_ASSERT_THROW_MES(N <= data.size(), "Bad cache base data");
 	ge_p1p1 p1;
@@ -384,15 +385,15 @@ void straus_cache::init_cache(const std::vector<MultiexpData> &data, size_t N)
 	if(cache == nullptr || alloc_size < N)
 	{
 		alloc_size = std::max<size_t>(N, 64);
-		cache = make_aligned_array<ge_cached_pad>(4096, ((1<<STRAUS_C)-1) * alloc_size);
+		cache = make_aligned_array<ge_cached_pad>(4096, ((1 << STRAUS_C) - 1) * alloc_size);
 	}
 
-	for (size_t j=0;j<N;++j)
+	for(size_t j = 0; j < N; ++j)
 	{
 		ge_p3_to_cached(st_offset(j, 1), &data[j].point);
-		for (size_t i=2;i<1<<STRAUS_C;++i)
+		for(size_t i = 2; i < 1 << STRAUS_C; ++i)
 		{
-			ge_add(&p1, &data[j].point, st_offset(j, i-1));
+			ge_add(&p1, &data[j].point, st_offset(j, i - 1));
 			ge_p1p1_to_p3(&p3, &p1);
 			ge_p3_to_cached(st_offset(j, i), &p3);
 		}
@@ -400,7 +401,7 @@ void straus_cache::init_cache(const std::vector<MultiexpData> &data, size_t N)
 	MULTIEXP_PERF(PERF_TIMER_STOP(multiples));
 }
 
-rct::key straus_cache::straus(const std::vector<MultiexpData> &data, size_t STEP) const
+rct::key straus_cache::straus(const std::vector<MultiexpData>& data, size_t STEP) const
 {
 	GULPS_CHECK_AND_ASSERT_THROW_MES(cache != nullptr, "null cache");
 	GULPS_CHECK_AND_ASSERT_THROW_MES(cache == NULL || size >= data.size(), "Cache is too small");
@@ -429,7 +430,7 @@ rct::key straus_cache::straus(const std::vector<MultiexpData> &data, size_t STEP
 		unsigned char bytes33[33];
 		memcpy(bytes33, data[j].scalar.bytes, 32);
 		bytes33[32] = 0;
-		const unsigned char *bytes = bytes33;
+		const unsigned char* bytes = bytes33;
 		static_assert(STRAUS_C == 4, "optimized version needs STRAUS_C == 4");
 		unsigned int i;
 		for(i = 0; i < 256; i += 8, bytes++)
@@ -504,7 +505,7 @@ rct::key straus_cache::straus(const std::vector<MultiexpData> &data, size_t STEP
 	return res;
 }
 
-void pippenger_cache::init_cache(const std::vector<MultiexpData> &data, size_t N, bool over_alloc)
+void pippenger_cache::init_cache(const std::vector<MultiexpData>& data, size_t N, bool over_alloc)
 {
 	MULTIEXP_PERF(PERF_TIMER_START_UNIT(pippenger_init_cache, 1000000));
 	if(N == 0)
@@ -515,7 +516,7 @@ void pippenger_cache::init_cache(const std::vector<MultiexpData> &data, size_t N
 	if(cache == nullptr || alloc_size < N)
 	{
 		if(over_alloc)
-			alloc_size = 2*N;
+			alloc_size = 2 * N;
 		else
 			alloc_size = N;
 
@@ -528,7 +529,7 @@ void pippenger_cache::init_cache(const std::vector<MultiexpData> &data, size_t N
 	MULTIEXP_PERF(PERF_TIMER_STOP(pippenger_init_cache));
 }
 
-rct::key pippenger_cache::pippenger(const std::vector<MultiexpData> &data, aligned_ptr<ge_p3[]>& buckets, size_t c) const
+rct::key pippenger_cache::pippenger(const std::vector<MultiexpData>& data, aligned_ptr<ge_p3[]>& buckets, size_t c) const
 {
 	GULPS_CHECK_AND_ASSERT_THROW_MES(cache != nullptr, "null cache");
 	GULPS_CHECK_AND_ASSERT_THROW_MES(size >= data.size(), "Cache is too small");
@@ -609,12 +610,12 @@ rct::key pippenger_cache::pippenger(const std::vector<MultiexpData> &data, align
 }
 
 /* Given two scalar arrays, construct a vector commitment */
-rct::key bp_cache::vector_exponent(const rct::keyV &a, const rct::keyV &b)
+rct::key bp_cache::vector_exponent(const rct::keyV& a, const rct::keyV& b)
 {
 	GULPS_CHECK_AND_ASSERT_THROW_MES(a.size() == b.size(), "Incompatible sizes of a and b");
 	GULPS_CHECK_AND_ASSERT_THROW_MES(a.size() <= maxN * maxM, "Incompatible sizes of a and maxN");
 
-	clear_pad(a.size()*2);
+	clear_pad(a.size() * 2);
 	for(size_t i = 0; i < a.size(); ++i)
 	{
 		me_pad.emplace_back(a[i], multiexp_cache::Gi_p3(i));
@@ -625,14 +626,14 @@ rct::key bp_cache::vector_exponent(const rct::keyV &a, const rct::keyV &b)
 }
 
 /* Compute a custom vector-scalar commitment */
-rct::key bp_cache::vector_exponent_custom(const rct::keyV &A, const rct::keyV &B, const rct::keyV &a, const rct::keyV &b)
+rct::key bp_cache::vector_exponent_custom(const rct::keyV& A, const rct::keyV& B, const rct::keyV& a, const rct::keyV& b)
 {
 	GULPS_CHECK_AND_ASSERT_THROW_MES(A.size() == B.size(), "Incompatible sizes of A and B");
 	GULPS_CHECK_AND_ASSERT_THROW_MES(a.size() == b.size(), "Incompatible sizes of a and b");
 	GULPS_CHECK_AND_ASSERT_THROW_MES(a.size() == A.size(), "Incompatible sizes of a and A");
 	GULPS_CHECK_AND_ASSERT_THROW_MES(a.size() <= maxN * maxM, "Incompatible sizes of a and maxN");
 
-	clear_pad(a.size()*2);
+	clear_pad(a.size() * 2);
 	for(size_t i = 0; i < a.size(); ++i)
 	{
 		me_pad.emplace_back(a[i], A[i]);
@@ -641,4 +642,4 @@ rct::key bp_cache::vector_exponent_custom(const rct::keyV &A, const rct::keyV &B
 
 	return multiexp();
 }
-}
+} // namespace rct

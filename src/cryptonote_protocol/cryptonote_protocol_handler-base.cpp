@@ -46,7 +46,6 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #include <atomic>
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
@@ -109,7 +108,7 @@ class cryptonote_protocol_handler_base_pimpl
   public:
 };
 
-} // namespace
+} // namespace cryptonote
 
 // ################################################################################################
 // ################################################################################################
@@ -144,7 +143,7 @@ cryptonote_protocol_handler_base::~cryptonote_protocol_handler_base()
 {
 }
 
-void cryptonote_protocol_handler_base::handler_request_blocks_history(std::list<crypto::hash> &ids)
+void cryptonote_protocol_handler_base::handler_request_blocks_history(std::list<crypto::hash>& ids)
 {
 }
 
@@ -177,7 +176,7 @@ void cryptonote_protocol_handler_base::handler_response_blocks_now(size_t packet
 			//delay += rand2*0.1;
 			long int ms = (long int)(delay * 1000);
 			GULPSF_LOG_L1("Sleeping for {} ms before packet_size=", ms, packet_size); // XXX debug sleep
-			boost::this_thread::sleep(boost::posix_time::milliseconds(ms));			   // TODO randomize sleeps
+			boost::this_thread::sleep(boost::posix_time::milliseconds(ms));			  // TODO randomize sleeps
 		}
 	} while(delay > 0);
 
@@ -190,4 +189,4 @@ void cryptonote_protocol_handler_base::handler_response_blocks_now(size_t packet
 	}
 }
 
-} // namespace
+} // namespace cryptonote

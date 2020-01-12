@@ -52,10 +52,11 @@ struct val_env;
 struct sldns_buffer;
 
 /** Autotrust anchor states */
-typedef enum {
-	AUTR_STATE_START   = 0,
+typedef enum
+{
+	AUTR_STATE_START = 0,
 	AUTR_STATE_ADDPEND = 1,
-	AUTR_STATE_VALID   = 2,
+	AUTR_STATE_VALID = 2,
 	AUTR_STATE_MISSING = 3,
 	AUTR_STATE_REVOKED = 4,
 	AUTR_STATE_REMOVED = 5
@@ -64,7 +65,8 @@ typedef enum {
 /** 
  * Autotrust metadata for one trust anchor key.
  */
-struct autr_ta {
+struct autr_ta
+{
 	/** next key */
 	struct autr_ta* next;
 	/** the RR */
@@ -87,7 +89,8 @@ struct autr_ta {
  * Autotrust metadata for a trust point.
  * This is part of the struct trust_anchor data.
  */
-struct autr_point_data {
+struct autr_point_data
+{
 	/** file to store the trust point in. chrootdir already applied. */
 	char* file;
 	/** rbtree node for probe sort, key is struct trust_anchor */
@@ -124,7 +127,8 @@ struct autr_point_data {
 /** 
  * Autotrust global metadata.
  */
-struct autr_global_data {
+struct autr_global_data
+{
 	/** rbtree of autotrust anchors sorted by next probe time.
 	 * When time is equal, sorted by anchor class, name. */
 	rbtree_type probe;
@@ -205,7 +209,7 @@ int autr_process_prime(struct module_env* env, struct val_env* ve,
 void autr_debug_print(struct val_anchors* anchors);
 
 /** callback for query answer to 5011 probe */
-void probe_answer_cb(void* arg, int rcode, struct sldns_buffer* buf, 
+void probe_answer_cb(void* arg, int rcode, struct sldns_buffer* buf,
 	enum sec_status sec, char* errinf);
 
 #endif /* VALIDATOR_AUTOTRUST_H */

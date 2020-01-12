@@ -55,13 +55,13 @@ namespace rpc
 class RpcHandler
 {
   public:
-	virtual std::string handle(const std::string &request) = 0;
+	virtual std::string handle(const std::string& request) = 0;
 
 	RpcHandler() {}
 
 	virtual ~RpcHandler() {}
 };
 
-} // rpc
+} // namespace rpc
 
-} // cryptonote
+} // namespace cryptonote

@@ -74,26 +74,26 @@ struct outbound_entry* libworker_send_query(struct query_info* qinfo,
 
 /** process incoming replies from the network */
 int libworker_handle_reply(struct comm_point* c, void* arg, int error,
-        struct comm_reply* reply_info);
+	struct comm_reply* reply_info);
 
 /** process incoming serviced query replies from the network */
 int libworker_handle_service_reply(struct comm_point* c, void* arg, int error,
-        struct comm_reply* reply_info);
+	struct comm_reply* reply_info);
 
 /** handle control command coming into server */
 void libworker_handle_control_cmd(struct tube* tube, uint8_t* msg, size_t len,
 	int err, void* arg);
 
 /** mesh callback with fg results */
-void libworker_fg_done_cb(void* arg, int rcode, sldns_buffer* buf, 
+void libworker_fg_done_cb(void* arg, int rcode, sldns_buffer* buf,
 	enum sec_status s, char* why_bogus);
 
 /** mesh callback with bg results */
-void libworker_bg_done_cb(void* arg, int rcode, sldns_buffer* buf, 
+void libworker_bg_done_cb(void* arg, int rcode, sldns_buffer* buf,
 	enum sec_status s, char* why_bogus);
 
 /** mesh callback with event results */
-void libworker_event_done_cb(void* arg, int rcode, struct sldns_buffer* buf, 
+void libworker_event_done_cb(void* arg, int rcode, struct sldns_buffer* buf,
 	enum sec_status s, char* why_bogus);
 
 /**
@@ -141,11 +141,11 @@ int worker_handle_request(struct comm_point* c, void* arg, int error,
 	struct comm_reply* repinfo);
 
 /** process incoming replies from the network */
-int worker_handle_reply(struct comm_point* c, void* arg, int error, 
+int worker_handle_reply(struct comm_point* c, void* arg, int error,
 	struct comm_reply* reply_info);
 
 /** process incoming serviced query replies from the network */
-int worker_handle_service_reply(struct comm_point* c, void* arg, int error, 
+int worker_handle_service_reply(struct comm_point* c, void* arg, int error,
 	struct comm_reply* reply_info);
 
 /** cleanup the cache to remove all rrset IDs from it, arg is worker */
@@ -170,6 +170,6 @@ int remote_accept_callback(struct comm_point*, void*, int, struct comm_reply*);
 int remote_control_callback(struct comm_point*, void*, int, struct comm_reply*);
 
 /** routine to printout option values over SSL */
-void  remote_get_opt_ssl(char* line, void* arg);
+void remote_get_opt_ssl(char* line, void* arg);
 
 #endif /* LIBUNBOUND_WORKER_H */

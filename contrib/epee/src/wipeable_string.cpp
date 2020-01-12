@@ -34,24 +34,25 @@
 namespace epee
 {
 
-wipeable_string::wipeable_string(const wipeable_string &other) : buffer(other.buffer)
+wipeable_string::wipeable_string(const wipeable_string& other) :
+	buffer(other.buffer)
 {
 }
 
-wipeable_string::wipeable_string(wipeable_string &&other)
+wipeable_string::wipeable_string(wipeable_string&& other)
 {
 	if(&other == this)
 		return;
 	buffer = std::move(other.buffer);
 }
 
-wipeable_string::wipeable_string(const std::string &other)
+wipeable_string::wipeable_string(const std::string& other)
 {
 	grow(other.size());
 	memcpy(buffer.data(), other.c_str(), size());
 }
 
-wipeable_string::wipeable_string(std::string &&other)
+wipeable_string::wipeable_string(std::string&& other)
 {
 	grow(other.size());
 	memcpy(buffer.data(), other.c_str(), size());
@@ -62,7 +63,7 @@ wipeable_string::wipeable_string(std::string &&other)
 	}
 }
 
-wipeable_string::wipeable_string(const char *s)
+wipeable_string::wipeable_string(const char* s)
 {
 	grow(strlen(s));
 	memcpy(buffer.data(), s, size());
@@ -128,17 +129,17 @@ void wipeable_string::clear()
 	resize(0);
 }
 
-wipeable_string &wipeable_string::operator=(wipeable_string &&other)
+wipeable_string& wipeable_string::operator=(wipeable_string&& other)
 {
 	if(&other != this)
 		buffer = std::move(other.buffer);
 	return *this;
 }
 
-wipeable_string &wipeable_string::operator=(const wipeable_string &other)
+wipeable_string& wipeable_string::operator=(const wipeable_string& other)
 {
 	if(&other != this)
 		buffer = other.buffer;
 	return *this;
 }
-}
+} // namespace epee

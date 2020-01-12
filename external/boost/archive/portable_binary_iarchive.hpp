@@ -48,13 +48,14 @@ class portable_binary_iarchive_exception : public boost::archive::archive_except
 	{
 		incompatible_integer_size
 	} m_exception_code;
-	portable_binary_iarchive_exception(exception_code c = incompatible_integer_size) : boost::archive::archive_exception(boost::archive::archive_exception::other_exception),
-																					   m_exception_code(c)
+	portable_binary_iarchive_exception(exception_code c = incompatible_integer_size) :
+		boost::archive::archive_exception(boost::archive::archive_exception::other_exception),
+		m_exception_code(c)
 	{
 	}
-	virtual const char *what() const throw()
+	virtual const char* what() const throw()
 	{
-		const char *msg = "programmer error";
+		const char* msg = "programmer error";
 		switch(m_exception_code)
 		{
 		case incompatible_integer_size:
@@ -100,11 +101,11 @@ class portable_binary_iarchive : public boost::archive::basic_binary_iprimitive<
   protected:
 #endif
 	unsigned int m_flags;
-	void load_impl(boost::intmax_t &l, char maxsize);
+	void load_impl(boost::intmax_t& l, char maxsize);
 
 	// default fall through for any types not specified here
 	template <class T>
-	void load(T &t)
+	void load(T& t)
 	{
 		boost::intmax_t l;
 		load_impl(l, sizeof(T));
@@ -112,54 +113,54 @@ class portable_binary_iarchive : public boost::archive::basic_binary_iprimitive<
 		//t = static_cast< T >(l);
 		t = T(l);
 	}
-	void load(boost::serialization::item_version_type &t)
+	void load(boost::serialization::item_version_type& t)
 	{
 		boost::intmax_t l;
 		load_impl(l, sizeof(boost::serialization::item_version_type));
 		// use cast to avoid compile time warning
 		t = boost::serialization::item_version_type(l);
 	}
-	void load(boost::archive::version_type &t)
+	void load(boost::archive::version_type& t)
 	{
 		boost::intmax_t l;
 		load_impl(l, sizeof(boost::archive::version_type));
 		// use cast to avoid compile time warning
 		t = boost::archive::version_type(l);
 	}
-	void load(boost::archive::class_id_type &t)
+	void load(boost::archive::class_id_type& t)
 	{
 		boost::intmax_t l;
 		load_impl(l, sizeof(boost::archive::class_id_type));
 		// use cast to avoid compile time warning
 		t = boost::archive::class_id_type(static_cast<int>(l));
 	}
-	void load(std::string &t)
+	void load(std::string& t)
 	{
 		this->primitive_base_t::load(t);
 	}
 #ifndef BOOST_NO_STD_WSTRING
-	void load(std::wstring &t)
+	void load(std::wstring& t)
 	{
 		this->primitive_base_t::load(t);
 	}
 #endif
-	void load(float &t)
+	void load(float& t)
 	{
 		this->primitive_base_t::load(t);
 		// floats not supported
 		//BOOST_STATIC_ASSERT(false);
 	}
-	void load(double &t)
+	void load(double& t)
 	{
 		this->primitive_base_t::load(t);
 		// doubles not supported
 		//BOOST_STATIC_ASSERT(false);
 	}
-	void load(char &t)
+	void load(char& t)
 	{
 		this->primitive_base_t::load(t);
 	}
-	void load(unsigned char &t)
+	void load(unsigned char& t)
 	{
 		this->primitive_base_t::load(t);
 	}
@@ -167,32 +168,33 @@ class portable_binary_iarchive : public boost::archive::basic_binary_iprimitive<
 		detail_common_iarchive;
 #if BOOST_VERSION > 105800
 	template <class T>
-	void load_override(T &t)
+	void load_override(T& t)
 	{
 		this->detail_common_iarchive::load_override(t);
 	}
-	void load_override(boost::archive::class_name_type &t);
+	void load_override(boost::archive::class_name_type& t);
 	// binary files don't include the optional information
-	void load_override(boost::archive::class_id_optional_type &) {}
+	void load_override(boost::archive::class_id_optional_type&) {}
 #else
 	template <class T>
-	void load_override(T &t, int)
+	void load_override(T& t, int)
 	{
 		this->detail_common_iarchive::load_override(t, 0);
 	}
-	void load_override(boost::archive::class_name_type &t, int);
+	void load_override(boost::archive::class_name_type& t, int);
 	// binary files don't include the optional information
-	void load_override(boost::archive::class_id_optional_type &, int) {}
+	void load_override(boost::archive::class_id_optional_type&, int) {}
 #endif
 
 	void init(unsigned int flags);
 
   public:
-	portable_binary_iarchive(std::istream &is, unsigned flags = 0) : primitive_base_t(
-																		 *is.rdbuf(),
-																		 0 != (flags & boost::archive::no_codecvt)),
-																	 archive_base_t(flags),
-																	 m_flags(0)
+	portable_binary_iarchive(std::istream& is, unsigned flags = 0) :
+		primitive_base_t(
+			*is.rdbuf(),
+			0 != (flags & boost::archive::no_codecvt)),
+		archive_base_t(flags),
+		m_flags(0)
 	{
 		init(flags);
 	}
@@ -200,17 +202,18 @@ class portable_binary_iarchive : public boost::archive::basic_binary_iprimitive<
 	portable_binary_iarchive(
 		std::basic_streambuf<
 			std::istream::char_type,
-			std::istream::traits_type> &bsb,
-		unsigned int flags) : primitive_base_t(bsb,
-											   0 != (flags & boost::archive::no_codecvt)),
-							  archive_base_t(flags),
-							  m_flags(0)
+			std::istream::traits_type>& bsb,
+		unsigned int flags) :
+		primitive_base_t(bsb,
+			0 != (flags & boost::archive::no_codecvt)),
+		archive_base_t(flags),
+		m_flags(0)
 	{
 		init(flags);
 	}
 };
-}
-}
+} // namespace archive
+} // namespace boost
 
 // required by export in boost version > 1.34
 #ifdef BOOST_SERIALIZATION_REGISTER_ARCHIVE
@@ -243,7 +246,7 @@ namespace archive
 {
 
 inline void
-portable_binary_iarchive::load_impl(boost::intmax_t &l, char maxsize)
+portable_binary_iarchive::load_impl(boost::intmax_t& l, char maxsize)
 {
 	signed char size;
 	l = 0;
@@ -262,7 +265,7 @@ portable_binary_iarchive::load_impl(boost::intmax_t &l, char maxsize)
 		boost::serialization::throw_exception(
 			portable_binary_iarchive_exception());
 
-	char *cptr = reinterpret_cast<char *>(&l);
+	char* cptr = reinterpret_cast<char*>(&l);
 #if BOOST_ENDIAN_BIG_BYTE
 	cptr += (sizeof(boost::intmax_t) - size);
 #endif
@@ -282,7 +285,7 @@ portable_binary_iarchive::load_impl(boost::intmax_t &l, char maxsize)
 #if BOOST_VERSION > 105800
 inline void
 portable_binary_iarchive::load_override(
-	boost::archive::class_name_type &t)
+	boost::archive::class_name_type& t)
 {
 	std::string cn;
 	cn.reserve(BOOST_SERIALIZATION_MAX_KEY_SIZE);
@@ -298,7 +301,7 @@ portable_binary_iarchive::load_override(
 #else
 inline void
 portable_binary_iarchive::load_override(
-	boost::archive::class_name_type &t, int)
+	boost::archive::class_name_type& t, int)
 {
 	std::string cn;
 	cn.reserve(BOOST_SERIALIZATION_MAX_KEY_SIZE);
@@ -330,8 +333,8 @@ portable_binary_iarchive::init(unsigned int flags)
 		boost::archive::library_version_type input_library_version;
 		*this >> input_library_version;
 
-// ignore archive version checking
-/*
+		// ignore archive version checking
+		/*
         // extra little .t is to get around borland quirk
         if(boost::archive::BOOST_ARCHIVE_VERSION() < input_library_version)
             boost::serialization::throw_exception(
@@ -355,8 +358,8 @@ portable_binary_iarchive::init(unsigned int flags)
 	load(x);
 	m_flags = x << CHAR_BIT;
 }
-}
-}
+} // namespace archive
+} // namespace boost
 
 namespace boost
 {

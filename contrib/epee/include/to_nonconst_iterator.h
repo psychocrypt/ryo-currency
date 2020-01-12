@@ -31,7 +31,7 @@ namespace epee
 {
 
 template <class Type>
-typename Type::iterator to_nonsonst_iterator(Type &obj, typename Type::const_iterator it)
+typename Type::iterator to_nonsonst_iterator(Type& obj, typename Type::const_iterator it)
 {
 	typename Type::difference_type dist = std::distance(static_cast<typename Type::const_iterator>(obj.begin()), it);
 	typename Type::iterator res_it = obj.begin() + dist;

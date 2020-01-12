@@ -88,7 +88,7 @@ class test_aggregated_bulletproof
 		}
 		else
 		{
-			for(const rct::Bulletproof &proof : proofs)
+			for(const rct::Bulletproof& proof : proofs)
 				if(!rct::bulletproof_VERIFY(proof))
 					return false;
 			return true;

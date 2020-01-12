@@ -55,7 +55,7 @@ namespace ledger
 
 //undef RYO_DEFAULT_LOG_CATEGORY
 
-void buffer_to_str(char *to_buff, size_t to_len, const char *buff, size_t len)
+void buffer_to_str(char* to_buff, size_t to_len, const char* buff, size_t len)
 {
 	CHECK_AND_ASSERT_THROW_MES(to_len > (len * 2), "destination buffer too short. At least" << (len * 2 + 1) << " bytes required");
 	for(size_t i = 0; i < len; i++)
@@ -64,7 +64,7 @@ void buffer_to_str(char *to_buff, size_t to_len, const char *buff, size_t len)
 	}
 }
 
-void log_hexbuffer(std::string msg, const char *buff, size_t len)
+void log_hexbuffer(std::string msg, const char* buff, size_t len)
 {
 	char logstr[1025];
 	buffer_to_str(logstr, sizeof(logstr), buff, len);
@@ -80,7 +80,7 @@ void log_message(std::string msg, std::string info)
 extern crypto::secret_key dbg_viewkey;
 extern crypto::secret_key dbg_spendkey;
 
-void decrypt(char *buf, size_t len)
+void decrypt(char* buf, size_t len)
 {
 #ifdef IODUMMYCRYPT_HWDEVICE
 	size_t i;
@@ -117,14 +117,14 @@ void decrypt(char *buf, size_t len)
 #endif
 }
 
-crypto::key_derivation decrypt(const crypto::key_derivation &derivation)
+crypto::key_derivation decrypt(const crypto::key_derivation& derivation)
 {
 	crypto::key_derivation x = derivation;
 	decrypt(x.data, 32);
 	return x;
 }
 
-cryptonote::account_keys decrypt(const cryptonote::account_keys &keys)
+cryptonote::account_keys decrypt(const cryptonote::account_keys& keys)
 {
 	cryptonote::account_keys x = keys;
 	decrypt(x.m_view_secret_key.data, 32);
@@ -132,28 +132,28 @@ cryptonote::account_keys decrypt(const cryptonote::account_keys &keys)
 	return x;
 }
 
-crypto::secret_key decrypt(const crypto::secret_key &sec)
+crypto::secret_key decrypt(const crypto::secret_key& sec)
 {
 	crypto::secret_key x = sec;
 	decrypt(x.data, 32);
 	return x;
 }
 
-rct::key decrypt(const rct::key &sec)
+rct::key decrypt(const rct::key& sec)
 {
 	rct::key x = sec;
-	decrypt((char *)x.bytes, 32);
+	decrypt((char*)x.bytes, 32);
 	return x;
 }
 
-crypto::ec_scalar decrypt(const crypto::ec_scalar &res)
+crypto::ec_scalar decrypt(const crypto::ec_scalar& res)
 {
 	crypto::ec_scalar x = res;
-	decrypt((char *)x.data, 32);
+	decrypt((char*)x.data, 32);
 	return x;
 }
 
-rct::keyV decrypt(const rct::keyV &keys)
+rct::keyV decrypt(const rct::keyV& keys)
 {
 	rct::keyV x;
 	for(unsigned int j = 0; j < keys.size(); j++)
@@ -163,7 +163,7 @@ rct::keyV decrypt(const rct::keyV &keys)
 	return x;
 }
 
-static void check(std::string msg, std::string info, const char *h, const char *d, int len, bool crypted)
+static void check(std::string msg, std::string info, const char* h, const char* d, int len, bool crypted)
 {
 	char dd[32];
 	char logstr[128];
@@ -188,16 +188,16 @@ static void check(std::string msg, std::string info, const char *h, const char *
 	}
 }
 
-void check32(std::string msg, std::string info, const char *h, const char *d, bool crypted)
+void check32(std::string msg, std::string info, const char* h, const char* d, bool crypted)
 {
 	check(msg, info, h, d, 32, crypted);
 }
 
-void check8(std::string msg, std::string info, const char *h, const char *d, bool crypted)
+void check8(std::string msg, std::string info, const char* h, const char* d, bool crypted)
 {
 	check(msg, info, h, d, 8, crypted);
 }
 #endif
-}
+} // namespace ledger
 #endif //WITH_DEVICE_LEDGER
-}
+} // namespace hw

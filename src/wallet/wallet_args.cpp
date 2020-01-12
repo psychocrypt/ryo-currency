@@ -82,7 +82,7 @@ command_line::arg_descriptor<std::string> arg_wallet_file()
 	return {"wallet-file", wallet_args::tr("Use wallet <arg>"), ""};
 }
 
-const char *tr(const char *str)
+const char* tr(const char* str)
 {
 	return i18n_translate(str, "wallet_args");
 }
@@ -90,13 +90,13 @@ const char *tr(const char *str)
 gulps_log_level log_scr, log_dsk;
 
 boost::optional<boost::program_options::variables_map> main(
-	int argc, char **argv,
-	const char *const usage,
-	const char *const notice,
+	int argc, char** argv,
+	const char* const usage,
+	const char* const notice,
 	boost::program_options::options_description desc_params,
-	const boost::program_options::positional_options_description &positional_options,
-	const char *default_log_name,
-	int &error_code,
+	const boost::program_options::positional_options_description& positional_options,
+	const char* default_log_name,
+	int& error_code,
 	bool log_to_console)
 
 {
@@ -147,7 +147,7 @@ boost::optional<boost::program_options::variables_map> main(
 			GULPS_PRINT_OK("Ryo '", RYO_RELEASE_NAME, "' (", RYO_VERSION_FULL, ")\n\n");
 			GULPS_PRINT_OK(wallet_args::tr("This is the command line ryo wallet. It needs to connect to a ryo daemon to work correctly."), "\n\n");
 			GULPS_PRINT_OK(wallet_args::tr("Usage:"), "\n  ", usage);
-			GULPS_PRINT_OK(desc_all,"\n");
+			GULPS_PRINT_OK(desc_all, "\n");
 			error_code = 0;
 			return false;
 		}
@@ -213,22 +213,22 @@ boost::optional<boost::program_options::variables_map> main(
 	{
 		std::unique_ptr<gulps::gulps_output> out(new gulps::gulps_print_output(gulps::COLOR_WHITE, gulps::TIMESTAMP_ONLY));
 		out->add_filter([](const gulps::message& msg, bool printed, bool logged) -> bool {
-				if(msg.out != gulps::OUT_LOG_0 && msg.out != gulps::OUT_USER_0)
-					return false;
-				if(printed)
-					return false;
-				return log_scr.match_msg(msg);
-				});
+			if(msg.out != gulps::OUT_LOG_0 && msg.out != gulps::OUT_USER_0)
+				return false;
+			if(printed)
+				return false;
+			return log_scr.match_msg(msg);
+		});
 		gulps::inst().add_output(std::move(out));
 	}
 
 	if(log_dsk.is_active())
 	{
 		file_out->add_filter([](const gulps::message& msg, bool printed, bool logged) -> bool {
-				if(msg.out != gulps::OUT_LOG_0 && msg.out != gulps::OUT_USER_0)
-					return false;
-				return log_dsk.match_msg(msg);
-				});
+			if(msg.out != gulps::OUT_LOG_0 && msg.out != gulps::OUT_USER_0)
+				return false;
+			return log_dsk.match_msg(msg);
+		});
 		gulps::inst().add_output(std::move(file_out));
 	}
 
@@ -244,4 +244,4 @@ boost::optional<boost::program_options::variables_map> main(
 	error_code = 0;
 	return {std::move(vm)};
 }
-}
+} // namespace wallet_args

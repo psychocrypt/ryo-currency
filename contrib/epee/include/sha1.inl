@@ -41,14 +41,14 @@ namespace
 { // local
 // Rotate an integer value to left.
 inline const unsigned int rol(const unsigned int value,
-							  const unsigned int steps)
+	const unsigned int steps)
 {
 	return ((value << steps) | (value >> (32 - steps)));
 }
 
 // Sets the first 16 integers in the buffert to zero.
 // Used for clearing the W buffert.
-inline void clearWBuffert(unsigned int *buffert)
+inline void clearWBuffert(unsigned int* buffert)
 {
 	for(int pos = 16; --pos >= 0;)
 	{
@@ -56,7 +56,7 @@ inline void clearWBuffert(unsigned int *buffert)
 	}
 }
 
-inline void innerHash(unsigned int *result, unsigned int *w)
+inline void innerHash(unsigned int* result, unsigned int* w)
 {
 	unsigned int a = result[0];
 	unsigned int b = result[1];
@@ -115,14 +115,14 @@ inline void innerHash(unsigned int *result, unsigned int *w)
 }
 } // namespace
 
-inline void calc(const void *src, const int bytelength, unsigned char *hash)
+inline void calc(const void* src, const int bytelength, unsigned char* hash)
 {
 	// Init the result array.
 	unsigned int result[5] = {0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476,
-							  0xc3d2e1f0};
+		0xc3d2e1f0};
 
 	// Cast the void src pointer to be the byte array we can work with.
-	const unsigned char *sarray = (const unsigned char *)src;
+	const unsigned char* sarray = (const unsigned char*)src;
 
 	// The reusable round buffer
 	unsigned int w[80];
@@ -168,7 +168,7 @@ inline void calc(const void *src, const int bytelength, unsigned char *hash)
 		hash[hashByte] = (result[hashByte >> 2] >> (((3 - hashByte) & 0x3) << 3)) & 0xff;
 	}
 }
-inline void toHexString(const unsigned char *hash, char *hexstring)
+inline void toHexString(const unsigned char* hash, char* hexstring)
 {
 	const char hexDigits[] = {"0123456789abcdef"};
 

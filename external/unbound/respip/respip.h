@@ -42,7 +42,8 @@ struct respip_addr_info;
  * structure.
  * respip_set is supposed to refer to the response-ip set for the global view.
  */
-struct respip_client_info {
+struct respip_client_info
+{
 	uint8_t* taglist;
 	size_t taglen;
 	uint8_t* tag_actions;
@@ -58,7 +59,8 @@ struct respip_client_info {
  * Note: this structure currently only define a few members, but exists
  * as a separate struct mainly for the convenience of custom extensions.
  */
-struct respip_action_info {
+struct respip_action_info
+{
 	enum respip_action action;
 	struct respip_addr_info* addrinfo; /* set only for inform variants */
 };
@@ -153,7 +155,7 @@ int respip_merge_cname(struct reply_info* base_rep,
  */
 int respip_rewrite_reply(const struct query_info* qinfo,
 	const struct respip_client_info* cinfo,
-	const struct reply_info *rep, struct reply_info** new_repp,
+	const struct reply_info* rep, struct reply_info** new_repp,
 	struct respip_action_info* actinfo,
 	struct ub_packed_rrset_key** alias_rrset,
 	int search_only, struct regional* region);
@@ -227,4 +229,4 @@ void respip_inform_print(struct respip_addr_info* respip_addr, uint8_t* qname,
 	uint16_t qtype, uint16_t qclass, struct local_rrset* local_alias,
 	struct comm_reply* repinfo);
 
-#endif	/* RESPIP_RESPIP_H */
+#endif /* RESPIP_RESPIP_H */

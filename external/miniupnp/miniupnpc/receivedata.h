@@ -14,8 +14,7 @@
  * Returns the number of bytes read if successful, zero if no bytes were
  * read or if we timed out. Returns negative if there was an error. */
 int receivedata(SOCKET socket,
-                char * data, int length,
-                int timeout, unsigned int * scope_id);
+	char* data, int length,
+	int timeout, unsigned int* scope_id);
 
 #endif
-

@@ -41,11 +41,11 @@ namespace serialization
 {
 struct throwable_buffer_reader
 {
-	throwable_buffer_reader(const void *ptr, size_t sz);
-	void read(void *target, size_t count);
-	void read_sec_name(std::string &sce_name);
+	throwable_buffer_reader(const void* ptr, size_t sz);
+	void read(void* target, size_t count);
+	void read_sec_name(std::string& sce_name);
 	template <class t_pod_type>
-	void read(t_pod_type &pod_val);
+	void read(t_pod_type& pod_val);
 	template <class t_type>
 	t_type read();
 	template <class type_name>
@@ -55,18 +55,19 @@ struct throwable_buffer_reader
 	template <class t_type>
 	storage_entry read_se();
 	storage_entry load_storage_entry();
-	void read(section &sec);
-	void read(std::string &str);
-	void read(array_entry &ae);
+	void read(section& sec);
+	void read(std::string& str);
+	void read(array_entry& ae);
 
   private:
 	struct recursuion_limitation_guard
 	{
-		size_t &m_counter_ref;
-		recursuion_limitation_guard(size_t &counter) : m_counter_ref(counter)
+		size_t& m_counter_ref;
+		recursuion_limitation_guard(size_t& counter) :
+			m_counter_ref(counter)
 		{
 			++m_counter_ref;
-		GULPS_CHECK_AND_ASSERT_THROW_MES(m_counter_ref < EPEE_PORTABLE_STORAGE_RECURSION_LIMIT_INTERNAL, "Wrong blob data in portable storage: recursion limitation (", EPEE_PORTABLE_STORAGE_RECURSION_LIMIT_INTERNAL, ") exceeded");
+			GULPS_CHECK_AND_ASSERT_THROW_MES(m_counter_ref < EPEE_PORTABLE_STORAGE_RECURSION_LIMIT_INTERNAL, "Wrong blob data in portable storage: recursion limitation (", EPEE_PORTABLE_STORAGE_RECURSION_LIMIT_INTERNAL, ") exceeded");
 		}
 		~recursuion_limitation_guard() noexcept(false)
 		{
@@ -76,22 +77,22 @@ struct throwable_buffer_reader
 	};
 #define RECURSION_LIMITATION() recursuion_limitation_guard rl(m_recursion_count)
 
-	const uint8_t *m_ptr;
+	const uint8_t* m_ptr;
 	size_t m_count;
 	size_t m_recursion_count;
 };
 
-inline throwable_buffer_reader::throwable_buffer_reader(const void *ptr, size_t sz)
+inline throwable_buffer_reader::throwable_buffer_reader(const void* ptr, size_t sz)
 {
 	if(!ptr)
 		throw std::runtime_error("throwable_buffer_reader: ptr==nullptr");
 	if(!sz)
 		throw std::runtime_error("throwable_buffer_reader: sz==0");
-	m_ptr = (uint8_t *)ptr;
+	m_ptr = (uint8_t*)ptr;
 	m_count = sz;
 	m_recursion_count = 0;
 }
-inline void throwable_buffer_reader::read(void *target, size_t count)
+inline void throwable_buffer_reader::read(void* target, size_t count)
 {
 	RECURSION_LIMITATION();
 	GULPS_CHECK_AND_ASSERT_THROW_MES(m_count >= count, " attempt to read ", count, " bytes from buffer with ", m_count, " bytes remained");
@@ -99,17 +100,17 @@ inline void throwable_buffer_reader::read(void *target, size_t count)
 	m_ptr += count;
 	m_count -= count;
 }
-inline void throwable_buffer_reader::read_sec_name(std::string &sce_name)
+inline void throwable_buffer_reader::read_sec_name(std::string& sce_name)
 {
 	RECURSION_LIMITATION();
 	uint8_t name_len = 0;
 	read(name_len);
 	sce_name.resize(name_len);
-	read((void *)sce_name.data(), name_len);
+	read((void*)sce_name.data(), name_len);
 }
 
 template <class t_pod_type>
-void throwable_buffer_reader::read(t_pod_type &pod_val)
+void throwable_buffer_reader::read(t_pod_type& pod_val)
 {
 	RECURSION_LIMITATION();
 	static_assert(std::is_pod<t_pod_type>::value, "POD type expected");
@@ -180,7 +181,7 @@ inline size_t throwable_buffer_reader::read_varint()
 	RECURSION_LIMITATION();
 	GULPS_CHECK_AND_ASSERT_THROW_MES(m_count >= 1, "empty buff, expected place for varint");
 	size_t v = 0;
-	uint8_t size_mask = (*(uint8_t *)m_ptr) & PORTABLE_RAW_SIZE_MARK_MASK;
+	uint8_t size_mask = (*(uint8_t*)m_ptr) & PORTABLE_RAW_SIZE_MARK_MASK;
 	switch(size_mask)
 	{
 	case PORTABLE_RAW_SIZE_MARK_BYTE:
@@ -224,7 +225,7 @@ inline storage_entry throwable_buffer_reader::read_se<section>()
 	RECURSION_LIMITATION();
 	section s; //use extra variable due to vs bug, line "storage_entry se(section()); " can't be compiled in visual studio
 	storage_entry se(s);
-	section &section_entry = boost::get<section>(se);
+	section& section_entry = boost::get<section>(se);
 	read(section_entry);
 	return se;
 }
@@ -279,7 +280,7 @@ inline storage_entry throwable_buffer_reader::load_storage_entry()
 		GULPS_CHECK_AND_ASSERT_THROW_MES(false, "unknown entry_type code = ", ent_type);
 	}
 }
-inline void throwable_buffer_reader::read(section &sec)
+inline void throwable_buffer_reader::read(section& sec)
 {
 	RECURSION_LIMITATION();
 	sec.m_entries.clear();
@@ -292,22 +293,22 @@ inline void throwable_buffer_reader::read(section &sec)
 		sec.m_entries.insert(std::make_pair(sec_name, load_storage_entry()));
 	}
 }
-inline void throwable_buffer_reader::read(std::string &str)
+inline void throwable_buffer_reader::read(std::string& str)
 {
 	RECURSION_LIMITATION();
 	size_t len = read_varint();
 	GULPS_CHECK_AND_ASSERT_THROW_MES(len < MAX_STRING_LEN_POSSIBLE, "to big string len value in storage: ", len);
 	GULPS_CHECK_AND_ASSERT_THROW_MES(m_count >= len, "string len count value ", len, " goes out of remain storage len ", m_count);
 	//do this manually to avoid double memory write in huge strings (first time at resize, second at read)
-	str.assign((const char *)m_ptr, len);
+	str.assign((const char*)m_ptr, len);
 	m_ptr += len;
 	m_count -= len;
 }
 
-inline void throwable_buffer_reader::read(array_entry &ae)
+inline void throwable_buffer_reader::read(array_entry& ae)
 {
 	RECURSION_LIMITATION();
 	GULPS_CHECK_AND_ASSERT_THROW_MES(false, "Reading array entry is not supported");
 }
-}
-}
+} // namespace serialization
+} // namespace epee

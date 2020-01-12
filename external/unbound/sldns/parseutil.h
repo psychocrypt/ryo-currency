@@ -24,9 +24,10 @@ struct tm;
  *  and vice versa. The lookup tables themselves are defined wherever needed,
  *  for instance in host2str.c
  */
-struct sldns_struct_lookup_table {
-        int id;
-        const char *name;
+struct sldns_struct_lookup_table
+{
+	int id;
+	const char* name;
 };
 typedef struct sldns_struct_lookup_table sldns_lookup_table;
 
@@ -36,15 +37,15 @@ typedef struct sldns_struct_lookup_table sldns_lookup_table;
  * \param[in] name what to search for
  * \return the item found
  */
-sldns_lookup_table *sldns_lookup_by_name(sldns_lookup_table table[],
-                                       const char *name);
+sldns_lookup_table* sldns_lookup_by_name(sldns_lookup_table table[],
+	const char* name);
 /**
  * Looks up the table entry by id, returns NULL if not found.
  * \param[in] table the lookup table to search in
  * \param[in] id what to search for
  * \return the item found
  */
-sldns_lookup_table *sldns_lookup_by_id(sldns_lookup_table table[], int id);
+sldns_lookup_table* sldns_lookup_by_id(sldns_lookup_table table[], int id);
 
 /**
  * Convert TM to seconds since epoch (midnight, January 1st, 1970).
@@ -52,7 +53,7 @@ sldns_lookup_table *sldns_lookup_by_id(sldns_lookup_table table[], int id);
  * \param[in] tm a struct tm* with the date
  * \return the seconds since epoch
  */
-time_t sldns_mktime_from_utc(const struct tm *tm);
+time_t sldns_mktime_from_utc(const struct tm* tm);
 
 /**
  * The function interprets time as the number of seconds since epoch
@@ -68,7 +69,7 @@ time_t sldns_mktime_from_utc(const struct tm *tm);
  * \param[out] result the struct with the broken-out time information
  * \return result on success or NULL on error
  */
-struct tm * sldns_serial_arithmetics_gmtime_r(int32_t time, time_t now, struct tm *result);
+struct tm* sldns_serial_arithmetics_gmtime_r(int32_t time, time_t now, struct tm* result);
 
 /**
  * converts a ttl value (like 5d2h) to a long.
@@ -76,7 +77,7 @@ struct tm * sldns_serial_arithmetics_gmtime_r(int32_t time, time_t now, struct t
  * \param[out] endptr points to the last char in case of error
  * \return the convert duration value
  */
-uint32_t sldns_str2period(const char *nptr, const char **endptr);
+uint32_t sldns_str2period(const char* nptr, const char** endptr);
 
 /**
  * Returns the int value of the given (hex) digit
@@ -90,15 +91,15 @@ int sldns_hexdigit_to_int(char ch);
  */
 size_t sldns_b64_ntop_calculate_size(size_t srcsize);
 
-int sldns_b64_ntop(uint8_t const *src, size_t srclength,
-	char *target, size_t targsize);
+int sldns_b64_ntop(uint8_t const* src, size_t srclength,
+	char* target, size_t targsize);
 
 /**
  * calculates the size needed to store the result of sldns_b64_pton
  */
 size_t sldns_b64_pton_calculate_size(size_t srcsize);
 
-int sldns_b64_pton(char const *src, uint8_t *target, size_t targsize);
+int sldns_b64_pton(char const* src, uint8_t* target, size_t targsize);
 
 /**
  * calculates the size needed to store the result of b32_ntop
@@ -135,7 +136,7 @@ int sldns_b32_pton_extended_hex(const char* src_text, size_t src_text_length,
  *
  * @return 0 on error
  */
-int sldns_parse_escape(uint8_t *ch_p, const char** str_p);
+int sldns_parse_escape(uint8_t* ch_p, const char** str_p);
 
 /** 
  * Parse one character, with escape codes,
@@ -143,6 +144,6 @@ int sldns_parse_escape(uint8_t *ch_p, const char** str_p);
  * @param str_p: the string. moved along for characters read.
  * @return 0 on error
  */
-int sldns_parse_char(uint8_t *ch_p, const char** str_p);
+int sldns_parse_char(uint8_t* ch_p, const char** str_p);
 
 #endif /* LDNS_PARSEUTIL_H */

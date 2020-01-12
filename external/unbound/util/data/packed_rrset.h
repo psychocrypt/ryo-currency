@@ -71,7 +71,8 @@ typedef uint64_t rrset_id_type;
 /**
  * The identifying information for an RRset.
  */
-struct packed_rrset_key {
+struct packed_rrset_key
+{
 	/**
 	 * The domain name. If not null (for id=0) it is allocated, and
 	 * contains the wireformat domain name.
@@ -104,7 +105,8 @@ struct packed_rrset_key {
  * deleted, although the data can be. The id can be set to 0 to store and the
  * structure can be recycled with a new id.
  */
-struct ub_packed_rrset_key {
+struct ub_packed_rrset_key
+{
 	/** 
 	 * entry into hashtable. Note the lock is never destroyed,
 	 *  even when this key is retired to the cache. 
@@ -137,7 +139,8 @@ struct ub_packed_rrset_key {
  * Added trust_none for a sane initial value, smaller than anything else.
  * Added validated and ultimate trust for keys and rrsig validated content.
  */
-enum rrset_trust {
+enum rrset_trust
+{
 	/** initial value for trust */
 	rrset_trust_none = 0,
 	/** Additional information from non-authoritative answers */
@@ -173,7 +176,8 @@ enum rrset_trust {
  * Security status from validation for data.
  * The order is significant; more secure, more proven later.
  */
-enum sec_status {
+enum sec_status
+{
 	/** UNCHECKED means that object has yet to be validated. */
 	sec_status_unchecked = 0,
 	/** BOGUS means that the object (RRset or message) failed to validate
@@ -228,7 +232,8 @@ enum sec_status {
  *	and rr_data starts with the rdlength.
  *	the ttl value to send changes due to time.
  */
-struct packed_rrset_data {
+struct packed_rrset_data
+{
 	/** TTL (in seconds like time()) of the rrset.
 	 * Same for all RRs see rfc2181(5.2).  */
 	time_t ttl;
@@ -237,13 +242,13 @@ struct packed_rrset_data {
 	/** number of rrsigs, if 0 no rrsigs */
 	size_t rrsig_count;
 	/** the trustworthiness of the rrset data */
-	enum rrset_trust trust; 
+	enum rrset_trust trust;
 	/** security status of the rrset data */
 	enum sec_status security;
 	/** length of every rr's rdata, rr_len[i] is size of rr_data[i]. */
 	size_t* rr_len;
 	/** ttl of every rr. rr_ttl[i] ttl of rr i. */
-	time_t *rr_ttl;
+	time_t* rr_ttl;
 	/** 
 	 * Array of pointers to every rr's rdata. 
 	 * The rr_data[i] rdata is stored in uncompressed wireformat. 
@@ -259,7 +264,8 @@ struct packed_rrset_data {
  * Split into key and data structures to simplify implementation of
  * caching schemes.
  */
-struct packed_rrset {
+struct packed_rrset
+{
 	/** domain name, type and class */
 	struct packed_rrset_key* k;
 	/** ttl, count and rdatas (and rrsig) */
@@ -269,7 +275,8 @@ struct packed_rrset {
 /**
  * list of packed rrsets
  */
-struct packed_rrset_list {
+struct packed_rrset_list
+{
 	/** next in list */
 	struct packed_rrset_list* next;
 	/** rrset key and data */
@@ -372,7 +379,7 @@ void packed_rrset_ttl_add(struct packed_rrset_data* data, time_t add);
  *	rdata was not a valid dname, not a CNAME, ...).
  * @param dname_len: length of dname is returned.
  */
-void get_cname_target(struct ub_packed_rrset_key* rrset, uint8_t** dname, 
+void get_cname_target(struct ub_packed_rrset_key* rrset, uint8_t** dname,
 	size_t* dname_len);
 
 /**
@@ -395,7 +402,7 @@ const char* sec_status_to_string(enum sec_status s);
  * @param str: string of message.
  * @param rrset: structure with name, type and class.
  */
-void log_rrset_key(enum verbosity_value v, const char* str, 
+void log_rrset_key(enum verbosity_value v, const char* str,
 	struct ub_packed_rrset_key* rrset);
 
 /**
@@ -428,7 +435,7 @@ void log_packed_rrset(enum verbosity_value v, const char* str,
  * @return new region-alloced rrset key or NULL on alloc failure.
  */
 struct ub_packed_rrset_key* packed_rrset_copy_region(
-	struct ub_packed_rrset_key* key, struct regional* region, 
+	struct ub_packed_rrset_key* key, struct regional* region,
 	time_t now);
 
 /** 
@@ -439,7 +446,7 @@ struct ub_packed_rrset_key* packed_rrset_copy_region(
  * @return new region-alloced rrset key or NULL on alloc failure.
  */
 struct ub_packed_rrset_key* packed_rrset_copy_alloc(
-	struct ub_packed_rrset_key* key, struct alloc_cache* alloc, 
+	struct ub_packed_rrset_key* key, struct alloc_cache* alloc,
 	time_t now);
 
 #endif /* UTIL_DATA_PACKED_RRSET_H */

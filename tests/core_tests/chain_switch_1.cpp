@@ -43,7 +43,7 @@ gen_chain_switch_1::gen_chain_switch_1()
 }
 
 //-----------------------------------------------------------------------------------------------------
-bool gen_chain_switch_1::generate(std::vector<test_event_entry> &events) const
+bool gen_chain_switch_1::generate(std::vector<test_event_entry>& events) const
 {
 	uint64_t ts_start = 1338224400;
 	/*
@@ -118,7 +118,7 @@ bool gen_chain_switch_1::generate(std::vector<test_event_entry> &events) const
 }
 
 //-----------------------------------------------------------------------------------------------------
-bool gen_chain_switch_1::check_split_not_switched(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events)
+bool gen_chain_switch_1::check_split_not_switched(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events)
 {
 	DEFINE_TESTS_ERROR_CONTEXT("gen_chain_switch_1::check_split_not_switched");
 
@@ -161,7 +161,7 @@ bool gen_chain_switch_1::check_split_not_switched(cryptonote::core &c, size_t ev
 }
 
 //-----------------------------------------------------------------------------------------------------
-bool gen_chain_switch_1::check_split_switched(cryptonote::core &c, size_t ev_index, const std::vector<test_event_entry> &events)
+bool gen_chain_switch_1::check_split_switched(cryptonote::core& c, size_t ev_index, const std::vector<test_event_entry>& events)
 {
 	DEFINE_TESTS_ERROR_CONTEXT("gen_chain_switch_1::check_split_switched");
 

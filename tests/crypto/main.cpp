@@ -61,74 +61,74 @@ using namespace std;
 using namespace crypto;
 typedef crypto::hash chash;
 
-bool operator!=(const ec_scalar &a, const ec_scalar &b)
+bool operator!=(const ec_scalar& a, const ec_scalar& b)
 {
 	return 0 != memcmp(&a, &b, sizeof(ec_scalar));
 }
 
-bool operator!=(const ec_point &a, const ec_point &b)
+bool operator!=(const ec_point& a, const ec_point& b)
 {
 	return 0 != memcmp(&a, &b, sizeof(ec_point));
 }
 
-bool operator!=(const key_derivation &a, const key_derivation &b)
+bool operator!=(const key_derivation& a, const key_derivation& b)
 {
 	return 0 != memcmp(&a, &b, sizeof(key_derivation));
 }
 
-template<typename T>
+template <typename T>
 inline std::string get_strval(const T& val)
 {
 	return epee::string_tools::pod_to_hex(val);
 }
 
-template<>
+template <>
 inline std::string get_strval<long unsigned int>(const long unsigned int& val)
 {
 	return std::to_string(val);
 }
 
-template<>
+template <>
 inline std::string get_strval<unsigned int>(const unsigned int& val)
 {
 	return std::to_string(val);
 }
 
-template<>
+template <>
 inline std::string get_strval<bool>(const bool& val)
 {
 	return val ? "true" : "false";
 }
 
-template<>
+template <>
 inline std::string get_strval<string>(const string& val)
 {
 	return val;
 }
 
-template<>
+template <>
 inline std::string get_strval<secret_key>(const secret_key& val)
 {
 	return epee::string_tools::pod_to_hex(val.data);
 }
 
-template<>
+template <>
 inline std::string get_strval<public_key>(const public_key& val)
 {
 	return epee::string_tools::pod_to_hex(val.data);
 }
 
-template<>
+template <>
 inline std::string get_strval<vector<char>>(const vector<char>& val)
 {
 	return epee::to_hex::string(epee::to_byte_span(epee::to_span(val)));
 }
 
-template<>
+template <>
 inline std::string get_strval<vector<public_key>>(const vector<public_key>& val)
 {
 	std::string ret;
-	ret.reserve(val.size()*33);
+	ret.reserve(val.size() * 33);
 
 	for(const public_key& s : val)
 	{
@@ -140,11 +140,11 @@ inline std::string get_strval<vector<public_key>>(const vector<public_key>& val)
 	return ret;
 }
 
-template<>
+template <>
 inline std::string get_strval<vector<signature>>(const vector<signature>& val)
 {
 	std::string ret;
-	ret.reserve(val.size()*64);
+	ret.reserve(val.size() * 64);
 
 	for(const signature& s : val)
 		ret += epee::string_tools::pod_to_hex(s);
@@ -153,7 +153,7 @@ inline std::string get_strval<vector<signature>>(const vector<signature>& val)
 }
 
 bool error = false;
-template<typename T>
+template <typename T>
 inline bool report_result(const std::string& cmd, size_t test_id, const T& actual, const T& expected, size_t sub_test = 0)
 {
 	if(actual != expected)
@@ -173,19 +173,19 @@ inline bool report_result(const std::string& cmd, size_t test_id, const T& actua
 template <typename T>
 struct has_iterator
 {
-    template <typename U>
-    static char test(typename U::iterator* x);
- 
-    template <typename U>
-    static long test(U* x);
- 
-    static const bool value = sizeof(test<T>(0)) == 1;
+	template <typename U>
+	static char test(typename U::iterator* x);
+
+	template <typename U>
+	static long test(U* x);
+
+	static const bool value = sizeof(test<T>(0)) == 1;
 };
 
 inline void print_result() {}
 
-template <typename T, typename... TT> 
-inline void print_result(T &res, TT &... resres)
+template <typename T, typename... TT>
+inline void print_result(T& res, TT&... resres)
 {
 	cout << get_strval(res);
 	if(sizeof...(TT) > 0)
@@ -195,9 +195,9 @@ inline void print_result(T &res, TT &... resres)
 	print_result(resres...);
 }
 
-DISABLE_GCC_WARNING(maybe-uninitialized)
+DISABLE_GCC_WARNING(maybe - uninitialized)
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	fstream input;
 	string cmd;
@@ -426,11 +426,11 @@ int main(int argc, char *argv[])
 		}
 		else if(cmd == "generate_ring_signature")
 		{
-			// this test uses a deterministic random number generator in the backend  
+			// this test uses a deterministic random number generator in the backend
 			chash prefix_hash;
 			key_image image;
 			vector<public_key> vpubs;
-			vector<const public_key *> pubs;
+			vector<const public_key*> pubs;
 			size_t pubs_count;
 			secret_key sec;
 			size_t sec_index;
@@ -459,7 +459,7 @@ int main(int argc, char *argv[])
 			chash prefix_hash;
 			key_image image;
 			vector<public_key> vpubs;
-			vector<const public_key *> pubs;
+			vector<const public_key*> pubs;
 			size_t pubs_count;
 			vector<signature> sigs;
 			bool expected, actual;

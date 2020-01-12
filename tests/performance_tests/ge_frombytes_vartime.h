@@ -62,13 +62,13 @@ class test_ge_frombytes_vartime : public multi_tx_test_base<2>
 		std::unordered_map<crypto::public_key, cryptonote::subaddress_index> subaddresses;
 		subaddresses[this->m_miners[this->real_source_idx].get_keys().m_account_address.m_spend_public_key] = {0, 0};
 
-		if(!cryptonote::construct_tx_and_get_tx_key(this->m_miners[this->real_source_idx].get_keys(), subaddresses, 
-			this->m_sources, destinations, cryptonote::account_public_address{}, nullptr, m_tx, 0, tx_key, additional_tx_keys, true, nullptr))
+		if(!cryptonote::construct_tx_and_get_tx_key(this->m_miners[this->real_source_idx].get_keys(), subaddresses,
+			   this->m_sources, destinations, cryptonote::account_public_address{}, nullptr, m_tx, 0, tx_key, additional_tx_keys, true, nullptr))
 		{
 			return false;
 		}
 
-		const cryptonote::txin_to_key &txin = boost::get<cryptonote::txin_to_key>(m_tx.vin[0]);
+		const cryptonote::txin_to_key& txin = boost::get<cryptonote::txin_to_key>(m_tx.vin[0]);
 		m_key = rct::ki2rct(txin.k_image);
 
 		return true;
@@ -77,7 +77,7 @@ class test_ge_frombytes_vartime : public multi_tx_test_base<2>
 	bool test()
 	{
 		ge_p3 unp;
-		return ge_frombytes_vartime(&unp, (const unsigned char *)&m_key) == 0;
+		return ge_frombytes_vartime(&unp, (const unsigned char*)&m_key) == 0;
 	}
 
   private:

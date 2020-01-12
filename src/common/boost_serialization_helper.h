@@ -55,7 +55,7 @@
 namespace tools
 {
 template <class t_object>
-bool serialize_obj_to_file(t_object &obj, const std::string &file_path)
+bool serialize_obj_to_file(t_object& obj, const std::string& file_path)
 {
 	GULPS_CAT_MAJOR("serialization_helper");
 	GULPS_TRY_ENTRY();
@@ -110,7 +110,7 @@ bool serialize_obj_to_file(t_object &obj, const std::string &file_path)
 }
 
 template <class t_object>
-bool unserialize_obj_from_file(t_object &obj, const std::string &file_path)
+bool unserialize_obj_from_file(t_object& obj, const std::string& file_path)
 {
 	GULPS_CAT_MAJOR("serialization_helper");
 	GULPS_TRY_ENTRY();
@@ -139,4 +139,4 @@ bool unserialize_obj_from_file(t_object &obj, const std::string &file_path)
 	return !data_file.fail();
 	GULPS_CATCH_ENTRY_L0("unserialize_obj_from_file", false);
 }
-}
+} // namespace tools

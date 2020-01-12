@@ -101,7 +101,7 @@ static inline uint64_t lo_dword(uint64_t val)
 	return val & 0xFFFFFFFF;
 }
 
-static inline uint64_t mul128(uint64_t multiplier, uint64_t multiplicand, uint64_t *product_hi)
+static inline uint64_t mul128(uint64_t multiplier, uint64_t multiplicand, uint64_t* product_hi)
 {
 	// multiplier   = ab = a * 2^32 + b
 	// multiplicand = cd = c * 2^32 + d
@@ -128,7 +128,7 @@ static inline uint64_t mul128(uint64_t multiplier, uint64_t multiplicand, uint64
 	return product_lo;
 }
 
-static inline uint64_t div_with_reminder(uint64_t dividend, uint32_t divisor, uint32_t *remainder)
+static inline uint64_t div_with_reminder(uint64_t dividend, uint32_t divisor, uint32_t* remainder)
 {
 	dividend |= ((uint64_t)*remainder) << 32;
 	*remainder = dividend % divisor;
@@ -136,7 +136,7 @@ static inline uint64_t div_with_reminder(uint64_t dividend, uint32_t divisor, ui
 }
 
 // Long division with 2^32 base
-static inline uint32_t div128_32(uint64_t dividend_hi, uint64_t dividend_lo, uint32_t divisor, uint64_t *quotient_hi, uint64_t *quotient_lo)
+static inline uint32_t div128_32(uint64_t dividend_hi, uint64_t dividend_lo, uint32_t divisor, uint64_t* quotient_hi, uint64_t* quotient_lo)
 {
 	uint64_t dividend_dwords[4];
 	uint32_t remainder = 0;
@@ -203,51 +203,51 @@ static inline uint64_t swap64(uint64_t x)
 #else
 #define UNUSED
 #endif
-static inline void mem_inplace_ident(void *mem UNUSED, size_t n UNUSED)
+static inline void mem_inplace_ident(void* mem UNUSED, size_t n UNUSED)
 {
 }
 #undef UNUSED
 
-static inline void mem_inplace_swap32(void *mem, size_t n)
+static inline void mem_inplace_swap32(void* mem, size_t n)
 {
 	size_t i;
 	for(i = 0; i < n; i++)
 	{
-		((uint32_t *)mem)[i] = swap32(((const uint32_t *)mem)[i]);
+		((uint32_t*)mem)[i] = swap32(((const uint32_t*)mem)[i]);
 	}
 }
-static inline void mem_inplace_swap64(void *mem, size_t n)
+static inline void mem_inplace_swap64(void* mem, size_t n)
 {
 	size_t i;
 	for(i = 0; i < n; i++)
 	{
-		((uint64_t *)mem)[i] = swap64(((const uint64_t *)mem)[i]);
+		((uint64_t*)mem)[i] = swap64(((const uint64_t*)mem)[i]);
 	}
 }
 
-static inline void memcpy_ident32(void *dst, const void *src, size_t n)
+static inline void memcpy_ident32(void* dst, const void* src, size_t n)
 {
 	memcpy(dst, src, 4 * n);
 }
-static inline void memcpy_ident64(void *dst, const void *src, size_t n)
+static inline void memcpy_ident64(void* dst, const void* src, size_t n)
 {
 	memcpy(dst, src, 8 * n);
 }
 
-static inline void memcpy_swap32(void *dst, const void *src, size_t n)
+static inline void memcpy_swap32(void* dst, const void* src, size_t n)
 {
 	size_t i;
 	for(i = 0; i < n; i++)
 	{
-		((uint32_t *)dst)[i] = swap32(((const uint32_t *)src)[i]);
+		((uint32_t*)dst)[i] = swap32(((const uint32_t*)src)[i]);
 	}
 }
-static inline void memcpy_swap64(void *dst, const void *src, size_t n)
+static inline void memcpy_swap64(void* dst, const void* src, size_t n)
 {
 	size_t i;
 	for(i = 0; i < n; i++)
 	{
-		((uint64_t *)dst)[i] = swap64(((const uint64_t *)src)[i]);
+		((uint64_t*)dst)[i] = swap64(((const uint64_t*)src)[i]);
 	}
 }
 

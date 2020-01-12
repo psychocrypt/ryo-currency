@@ -36,7 +36,7 @@ using namespace cryptonote;
 
 namespace
 {
-void do_pos_test(uint64_t expected, const std::string &str)
+void do_pos_test(uint64_t expected, const std::string& str)
 {
 	uint64_t val;
 	std::string number_str = str;
@@ -46,7 +46,7 @@ void do_pos_test(uint64_t expected, const std::string &str)
 	ASSERT_EQ(expected, val);
 }
 
-void do_neg_test(const std::string &str)
+void do_neg_test(const std::string& str)
 {
 	uint64_t val;
 	std::string number_str = str;
@@ -54,7 +54,7 @@ void do_neg_test(const std::string &str)
 	number_str.erase(std::remove(number_str.begin(), number_str.end(), '~'), number_str.end());
 	ASSERT_FALSE(parse_amount(val, number_str));
 }
-}
+} // namespace
 
 #define TEST_pos(expected, str)                \
 	TEST(parse_amount, handles_pos_##str)      \

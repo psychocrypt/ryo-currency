@@ -49,7 +49,8 @@ struct delegpt;
 /**
  * Iterator forward zones structure
  */
-struct iter_forwards {
+struct iter_forwards
+{
 	/** 
 	 * Zones are stored in this tree. Sort order is specially chosen.
 	 * first sorted on qclass. Then on dname in nsec-like order, so that
@@ -63,7 +64,8 @@ struct iter_forwards {
 /**
  * Iterator forward servers for a particular zone.
  */
-struct iter_forward_zone {
+struct iter_forward_zone
+{
 	/** redblacktree node, key is this structure: class and name */
 	rbnode_type node;
 	/** name */
@@ -125,7 +127,7 @@ struct delegpt* forwards_find(struct iter_forwards* fwd, uint8_t* qname,
  * @return: A delegation point if the query has to be forwarded to that list,
  *         otherwise null.
  */
-struct delegpt* forwards_lookup(struct iter_forwards* fwd, 
+struct delegpt* forwards_lookup(struct iter_forwards* fwd,
 	uint8_t* qname, uint16_t qclass);
 
 /**
@@ -134,7 +136,7 @@ struct delegpt* forwards_lookup(struct iter_forwards* fwd,
  * @param qclass: The qclass of the query.
  * @return: A delegation point if root forward exists, otherwise null.
  */
-struct delegpt* forwards_lookup_root(struct iter_forwards* fwd, 
+struct delegpt* forwards_lookup_root(struct iter_forwards* fwd,
 	uint16_t qclass);
 
 /**
@@ -164,7 +166,7 @@ int fwd_cmp(const void* k1, const void* k2);
  *	forward zone. malloced.
  * @return false on failure (out of memory);
  */
-int forwards_add_zone(struct iter_forwards* fwd, uint16_t c, 
+int forwards_add_zone(struct iter_forwards* fwd, uint16_t c,
 	struct delegpt* dp);
 
 /**

@@ -40,7 +40,6 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #include <string.h>
 #include <iostream>
 
@@ -65,11 +64,11 @@
 
 #endif
 
-extern "C" void* memwipe(void *src, size_t n);
+extern "C" void* memwipe(void* src, size_t n);
 
 struct prng_handle
 {
-#if defined( CRYPTO_TEST_ONLY_FIXED_PRNG)
+#if defined(CRYPTO_TEST_ONLY_FIXED_PRNG)
 	uint64_t count = 0;
 #elif defined(_WIN32)
 	HCRYPTPROV prov;
@@ -84,19 +83,19 @@ prng::~prng()
 		return;
 
 #if !defined(CRYPTO_TEST_ONLY_FIXED_PRNG)
-#	if defined(_WIN32)
+#if defined(_WIN32)
 	if(!CryptReleaseContext(hnd->prov, 0))
 	{
 		GULPS_ERROR("CryptReleaseContext");
 		std::abort();
 	}
-#	else
+#else
 	if(close(hnd->fd) < 0)
 	{
 		GULPS_ERROR("Exit Failure :: close /dev/urandom ");
 		std::abort();
 	}
-#	endif
+#endif
 #endif
 	delete hnd;
 }
@@ -120,7 +119,7 @@ void prng::start()
 		std::abort();
 	}
 #endif
-	uint64_t test[2] = { 0 };
+	uint64_t test[2] = {0};
 	generate_system_random_bytes(reinterpret_cast<uint8_t*>(test), sizeof(test));
 
 	if(test[0] == 0 && test[1] == 0)
@@ -143,7 +142,7 @@ void prng::generate_random(uint8_t* output, size_t size_bytes)
 	{
 		uint64_t buffer[5];
 		buffer[0] = 0;
-		generate_system_random_bytes(reinterpret_cast<uint8_t*>(buffer+1), sizeof(buffer) - sizeof(uint64_t));
+		generate_system_random_bytes(reinterpret_cast<uint8_t*>(buffer + 1), sizeof(buffer) - sizeof(uint64_t));
 
 		while(size_bytes > 200)
 		{

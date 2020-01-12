@@ -187,7 +187,8 @@ struct respip_addr_info;
 /** Maximum number of known edns options */
 #define MAX_KNOWN_EDNS_OPTS 256
 
-enum inplace_cb_list_type {
+enum inplace_cb_list_type
+{
 	/* Inplace callbacks for when a resolved reply is ready to be sent to the
 	 * front.*/
 	inplace_cb_reply = 0,
@@ -210,9 +211,9 @@ enum inplace_cb_list_type {
 	inplace_cb_types_total
 };
 
-
 /** Known edns option. Can be populated during modules' init. */
-struct edns_known_option {
+struct edns_known_option
+{
 	/** type of this edns option */
 	uint16_t opt_code;
 	/** whether the option needs to bypass the cache stage */
@@ -224,7 +225,8 @@ struct edns_known_option {
 /**
  * Inplace callback list of registered routines to be called.
  */
-struct inplace_cb {
+struct inplace_cb
+{
 	/** next in list */
 	struct inplace_cb* next;
 	/** Inplace callback routine */
@@ -252,7 +254,7 @@ struct inplace_cb {
  */
 typedef int inplace_cb_reply_func_type(struct query_info* qinfo,
 	struct module_qstate* qstate, struct reply_info* rep, int rcode,
-	struct edns_data* edns, struct edns_option** opt_list_out, 
+	struct edns_data* edns, struct edns_option** opt_list_out,
 	struct regional* region, int id, void* callback);
 
 /**
@@ -285,7 +287,7 @@ typedef int inplace_cb_query_func_type(struct query_info* qinfo, uint16_t flags,
  *	id: module id
  *	cb_args: argument passed when registering callback.
  */
-typedef int inplace_cb_edns_back_parsed_func_type(struct module_qstate* qstate, 
+typedef int inplace_cb_edns_back_parsed_func_type(struct module_qstate* qstate,
 	int id, void* cb_args);
 
 /**
@@ -304,7 +306,8 @@ typedef int inplace_cb_query_response_func_type(struct module_qstate* qstate,
  * Module environment.
  * Services and data provided to the module.
  */
-struct module_env {
+struct module_env
+{
 	/* --- data --- */
 	/** config file with config options */
 	struct config_file* cfg;
@@ -380,9 +383,9 @@ struct module_env {
 	 * @param newq: If the new subquery needs initialisation, it is 
 	 * 	returned, otherwise NULL is returned.
 	 * @return: false on error, true if success (and init may be needed).
-	 */ 
-	int (*attach_sub)(struct module_qstate* qstate, 
-		struct query_info* qinfo, uint16_t qflags, int prime, 
+	 */
+	int (*attach_sub)(struct module_qstate* qstate,
+		struct query_info* qinfo, uint16_t qflags, int prime,
 		int valrec, struct module_qstate** newq);
 
 	/**
@@ -411,8 +414,8 @@ struct module_env {
 	 * @param sub: The added mesh state, created if it did not exist already.
 	 * @return: false on error, true if success (and init may be needed).
 	 */
-	int (*add_sub)(struct module_qstate* qstate, 
-		struct query_info* qinfo, uint16_t qflags, int prime, 
+	int (*add_sub)(struct module_qstate* qstate,
+		struct query_info* qinfo, uint16_t qflags, int prime,
 		int valrec, struct module_qstate** newq,
 		struct mesh_state** sub);
 
@@ -438,7 +441,7 @@ struct module_env {
 	 * 	if qstate becomes dependent on name,type,class then a 
 	 * 	cycle is created.
 	 */
-	int (*detect_cycle)(struct module_qstate* qstate, 
+	int (*detect_cycle)(struct module_qstate* qstate,
 		struct query_info* qinfo, uint16_t flags, int prime,
 		int valrec);
 
@@ -511,7 +514,8 @@ struct module_env {
  * Modules may also have an internal state.
  * Modules are supposed to run to completion or until blocked.
  */
-enum module_ext_state {
+enum module_ext_state
+{
 	/** initial state - new query */
 	module_state_initial = 0,
 	/** waiting for reply to outgoing network query */
@@ -531,7 +535,8 @@ enum module_ext_state {
 /**
  * Events that happen to modules, that start or wakeup modules.
  */
-enum module_ev {
+enum module_ev
+{
 	/** new query */
 	module_event_new = 0,
 	/** query passed by other module */
@@ -552,7 +557,8 @@ enum module_ev {
  * Linked list of sockaddrs 
  * May be allocated such that only 'len' bytes of addr exist for the structure.
  */
-struct sock_list {
+struct sock_list
+{
 	/** next in list */
 	struct sock_list* next;
 	/** length of addr */
@@ -566,7 +572,8 @@ struct respip_action_info;
 /**
  * Module state, per query.
  */
-struct module_qstate {
+struct module_qstate
+{
 	/** which query is being answered: name, type, class */
 	struct query_info qinfo;
 	/** flags uint16 from query */
@@ -637,7 +644,8 @@ struct module_qstate {
 /** 
  * Module functionality block
  */
-struct module_func_block {
+struct module_func_block
+{
 	/** text string name of module */
 	const char* name;
 
@@ -677,7 +685,7 @@ struct module_func_block {
 	 *	  the service routine to make subrequest or send message
 	 *	  have been called.
 	 */
-	void (*operate)(struct module_qstate* qstate, enum module_ev event, 
+	void (*operate)(struct module_qstate* qstate, enum module_ev event,
 		int id, struct outbound_entry* outbound);
 
 	/**
@@ -759,8 +767,7 @@ int edns_register_option(uint16_t opt_code, int bypass_cache_stage,
  * @return true on success, false on failure (out of memory or trying to
  *	register after the environment is copied to the threads.)
  */
-int
-inplace_cb_register(void* cb, enum inplace_cb_list_type type, void* cbarg,
+int inplace_cb_register(void* cb, enum inplace_cb_list_type type, void* cbarg,
 	struct module_env* env, int id);
 
 /**
@@ -769,8 +776,7 @@ inplace_cb_register(void* cb, enum inplace_cb_list_type type, void* cbarg,
  * @param type: inplace callback type.
  * @param id: module id.
  */
-void
-inplace_cb_delete(struct module_env* env, enum inplace_cb_list_type type,
+void inplace_cb_delete(struct module_env* env, enum inplace_cb_list_type type,
 	int id);
 
 /**

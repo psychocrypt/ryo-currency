@@ -67,8 +67,12 @@ struct output_data
 	uint64_t index;
 	mutable bool coinbase;
 	mutable uint64_t height;
-	output_data(uint64_t a, uint64_t i, bool cb, uint64_t h) : amount(a), index(i), coinbase(cb), height(h) {}
-	bool operator==(const output_data &other) const { return other.amount == amount && other.index == index; }
+	output_data(uint64_t a, uint64_t i, bool cb, uint64_t h) :
+		amount(a),
+		index(i),
+		coinbase(cb),
+		height(h) {}
+	bool operator==(const output_data& other) const { return other.amount == amount && other.index == index; }
 	void info(bool c, uint64_t h) const
 	{
 		coinbase = c;
@@ -80,27 +84,30 @@ namespace std
 template <>
 struct hash<output_data>
 {
-	size_t operator()(const output_data &od) const
+	size_t operator()(const output_data& od) const
 	{
 		const uint64_t data[2] = {od.amount, od.index};
 		crypto::hash h;
 		crypto::cn_fast_hash(data, 2 * sizeof(uint64_t), h);
-		return reinterpret_cast<const std::size_t &>(h);
+		return reinterpret_cast<const std::size_t&>(h);
 	}
 };
-}
+} // namespace std
 
 struct reference
 {
 	uint64_t height;
 	uint64_t ring_size;
 	uint64_t position;
-	reference(uint64_t h, uint64_t rs, uint64_t p) : height(h), ring_size(rs), position(p) {}
+	reference(uint64_t h, uint64_t rs, uint64_t p) :
+		height(h),
+		ring_size(rs),
+		position(p) {}
 };
 
 gulps_log_level log_scr;
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 #ifdef WIN32
 	std::vector<char*> argptrs;
@@ -189,12 +196,12 @@ int main(int argc, char *argv[])
 	{
 		std::unique_ptr<gulps::gulps_output> out(new gulps::gulps_print_output(gulps::COLOR_WHITE, gulps::TEXT_ONLY));
 		out->add_filter([](const gulps::message& msg, bool printed, bool logged) -> bool {
-				if(msg.out != gulps::OUT_LOG_0 && msg.out != gulps::OUT_USER_0)
-					return false;
-				if(printed)
-					return false;
-				return log_scr.match_msg(msg);
-				});
+			if(msg.out != gulps::OUT_LOG_0 && msg.out != gulps::OUT_USER_0)
+				return false;
+			if(printed)
+				return false;
+			return log_scr.match_msg(msg);
+		});
 		gulps::inst().add_output(std::move(out));
 	}
 
@@ -235,24 +242,24 @@ int main(int argc, char *argv[])
 	std::unique_ptr<Blockchain> core_storage;
 	tx_memory_pool m_mempool(*core_storage);
 	core_storage.reset(new Blockchain(m_mempool));
-	BlockchainDB *db = new_db(db_type);
+	BlockchainDB* db = new_db(db_type);
 	if(db == NULL)
 	{
 		GULPS_LOG_ERROR("Attempted to use non-existent database type: ", db_type);
 		throw std::runtime_error("Attempting to use non-existent database type");
 	}
-	GULPS_PRINT("database: " , db_type);
+	GULPS_PRINT("database: ", db_type);
 
 	const std::string filename = input;
-	GULPS_PRINT("Loading blockchain from folder " , filename , " ...");
+	GULPS_PRINT("Loading blockchain from folder ", filename, " ...");
 
 	try
 	{
 		db->open(filename, DBF_RDONLY);
 	}
-	catch(const std::exception &e)
+	catch(const std::exception& e)
 	{
-		GULPS_ERROR("Error opening database: " , e.what());
+		GULPS_ERROR("Error opening database: ", e.what());
 		return 1;
 	}
 	r = core_storage->init(db, net_type);
@@ -266,13 +273,13 @@ int main(int argc, char *argv[])
 	std::unordered_map<output_data, std::list<reference>> outputs;
 	std::unordered_map<uint64_t, uint64_t> indices;
 
-	GULPS_PRINT("Reading blockchain from " , input);
-	core_storage->for_all_transactions([&](const crypto::hash &hash, const cryptonote::transaction &tx) -> bool {
+	GULPS_PRINT("Reading blockchain from ", input);
+	core_storage->for_all_transactions([&](const crypto::hash& hash, const cryptonote::transaction& tx) -> bool {
 		const bool coinbase = tx.vin.size() == 1 && tx.vin[0].type() == typeid(txin_gen);
 		const uint64_t height = core_storage->get_db().get_tx_block_height(hash);
 
 		// create new outputs
-		for(const auto &out : tx.vout)
+		for(const auto& out : tx.vout)
 		{
 			if(opt_rct_only && out.amount)
 				continue;
@@ -282,11 +289,11 @@ int main(int argc, char *argv[])
 			itb.first->first.info(coinbase, height);
 		}
 
-		for(const auto &in : tx.vin)
+		for(const auto& in : tx.vin)
 		{
 			if(in.type() != typeid(txin_to_key))
 				continue;
-			const auto &txin = boost::get<txin_to_key>(in);
+			const auto& txin = boost::get<txin_to_key>(in);
 			if(opt_rct_only && txin.amount != 0)
 				continue;
 
@@ -302,12 +309,12 @@ int main(int argc, char *argv[])
 
 	std::unordered_map<uint64_t, uint64_t> counts;
 	size_t total = 0;
-	for(const auto &out : outputs)
+	for(const auto& out : outputs)
 	{
 		counts[out.second.size()]++;
 		total++;
 	}
-	for(const auto &c : counts)
+	for(const auto& c : counts)
 	{
 		float percent = 100.f * c.second / total;
 		GULPSF_INFO("{} outputs used {} times ({}%)", c.second, c.first, percent);

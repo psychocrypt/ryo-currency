@@ -80,8 +80,6 @@
 
 #include "common/gulps.hpp"
 
-
-
 // ################################################################################################
 // local (TU local) headers
 // ################################################################################################
@@ -108,7 +106,7 @@ std::string to_string(t_connection_type type)
 class connection_basic_pimpl
 {
   public:
-	connection_basic_pimpl(const std::string &name);
+	connection_basic_pimpl(const std::string& name);
 
 	static int m_default_tos;
 
@@ -118,8 +116,8 @@ class connection_basic_pimpl
 	int m_peer_number; // e.g. for debug/stats
 };
 
-} // namespace
-} // namespace
+} // namespace net_utils
+} // namespace epee
 
 // ################################################################################################
 // The implementation part
@@ -134,7 +132,8 @@ namespace net_utils
 // connection_basic_pimpl
 // ================================================================================================
 
-connection_basic_pimpl::connection_basic_pimpl(const std::string &name) : m_throttle(name) {}
+connection_basic_pimpl::connection_basic_pimpl(const std::string& name) :
+	m_throttle(name) {}
 
 // ================================================================================================
 // connection_basic
@@ -144,13 +143,13 @@ connection_basic_pimpl::connection_basic_pimpl(const std::string &name) : m_thro
 int connection_basic_pimpl::m_default_tos;
 
 // methods:
-connection_basic::connection_basic(boost::asio::io_service &io_service, std::atomic<long> &ref_sock_count, std::atomic<long> &sock_number)
-	: mI(new connection_basic_pimpl("peer")),
-	  strand_(io_service),
-	  socket_(io_service),
-	  m_want_close_connection(false),
-	  m_was_shutdown(false),
-	  m_ref_sock_count(ref_sock_count)
+connection_basic::connection_basic(boost::asio::io_service& io_service, std::atomic<long>& ref_sock_count, std::atomic<long>& sock_number) :
+	mI(new connection_basic_pimpl("peer")),
+	strand_(io_service),
+	socket_(io_service),
+	m_want_close_connection(false),
+	m_was_shutdown(false),
+	m_ref_sock_count(ref_sock_count)
 {
 	++ref_sock_count;							  // increase the global counter
 	mI->m_peer_number = sock_number.fetch_add(1); // use, and increase the generated number
@@ -277,14 +276,14 @@ void connection_basic::set_start_time()
 	m_start_time = network_throttle_manager::get_global_throttle_out().get_time_seconds();
 }
 
-void connection_basic::do_send_handler_write(const void *ptr, size_t cb)
+void connection_basic::do_send_handler_write(const void* ptr, size_t cb)
 {
 	// No sleeping here; sleeping is done once and for all in connection<t_protocol_handler>::handle_write
-	GULPSF_LOG_L2("handler_write (direct) - before ASIO write, for packet={}" , cb);
+	GULPSF_LOG_L2("handler_write (direct) - before ASIO write, for packet={}", cb);
 	set_start_time();
 }
 
-void connection_basic::do_send_handler_write_from_queue(const boost::system::error_code &e, size_t cb, int q_len)
+void connection_basic::do_send_handler_write_from_queue(const boost::system::error_code& e, size_t cb, int q_len)
 {
 	// No sleeping here; sleeping is done once and for all in connection<t_protocol_handler>::handle_write
 	GULPSF_LOG_L2("handler_write (after write, from queue={}) - before ASIO write, for packet={} B (after sleep)", q_len, cb);
@@ -307,5 +306,5 @@ double connection_basic::get_sleep_time(size_t cb)
 	return t;
 }
 
-} // namespace
-} // namespace
+} // namespace net_utils
+} // namespace epee

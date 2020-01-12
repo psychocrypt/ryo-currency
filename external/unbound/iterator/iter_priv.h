@@ -52,7 +52,8 @@ struct rrset_parse;
 /**
  * Iterator priv structure
  */
-struct iter_priv {
+struct iter_priv
+{
 	/** regional for allocation */
 	struct regional* region;
 	/** 
@@ -99,7 +100,7 @@ int priv_apply_cfg(struct iter_priv* priv, struct config_file* cfg);
  * @param rrset: the rrset to examine, A or AAAA.
  * @return true if the rrset is bad and should be removed.
  */
-int priv_rrset_bad(struct iter_priv* priv, struct sldns_buffer* pkt, 
+int priv_rrset_bad(struct iter_priv* priv, struct sldns_buffer* pkt,
 	struct rrset_parse* rrset);
 
 /**

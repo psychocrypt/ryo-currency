@@ -49,7 +49,7 @@
 #include <memory>
 
 template <template <bool> class Archive>
-inline bool do_serialize(Archive<false> &ar, std::string &str)
+inline bool do_serialize(Archive<false>& ar, std::string& str)
 {
 	size_t size = 0;
 	ar.serialize_varint(size);
@@ -67,10 +67,10 @@ inline bool do_serialize(Archive<false> &ar, std::string &str)
 }
 
 template <template <bool> class Archive>
-inline bool do_serialize(Archive<true> &ar, std::string &str)
+inline bool do_serialize(Archive<true>& ar, std::string& str)
 {
 	size_t size = str.size();
 	ar.serialize_varint(size);
-	ar.serialize_blob(const_cast<std::string::value_type *>(str.c_str()), size);
+	ar.serialize_blob(const_cast<std::string::value_type*>(str.c_str()), size);
 	return true;
 }

@@ -33,4 +33,3 @@
 #define BOOST_FILESYSTEM_VERSION 3
 #define ENABLE_RELEASE_LOGGING
 #include "common/gulps.hpp"
-

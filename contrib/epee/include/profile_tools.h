@@ -59,17 +59,17 @@ namespace epee
 #define START_WAY_POINTS() uint64_t _____way_point_time = epee::misc_utils::get_tick_count();
 #define WAY_POINT(name)                                                            \
 	{                                                                              \
-		GULPS_CAT_MAJOR("epee_prof_tools"); \
+		GULPS_CAT_MAJOR("epee_prof_tools");                                        \
 		uint64_t delta = epee::misc_utils::get_tick_count() - _____way_point_time; \
-		GULPSF_LOG_L1("Way point {}: {}", name, delta);                             \
+		GULPSF_LOG_L1("Way point {}: {}", name, delta);                            \
 		_____way_point_time = misc_utils::get_tick_count();                        \
 	}
 #define WAY_POINT2(name, avrg_obj)                                                 \
 	{                                                                              \
 		uint64_t delta = epee::misc_utils::get_tick_count() - _____way_point_time; \
 		avrg_obj.push(delta);                                                      \
-		GULPS_CAT_MAJOR("epee_prof_tools"); \
-		GULPSF_LOG_L1("Way point {}: {}", name, delta);                             \
+		GULPS_CAT_MAJOR("epee_prof_tools");                                        \
+		GULPSF_LOG_L1("Way point {}: {}", name, delta);                            \
 		_____way_point_time = misc_utils::get_tick_count();                        \
 	}
 
@@ -87,24 +87,28 @@ namespace profile_tools
 {
 struct local_call_account
 {
-	local_call_account(const char *pstr) : m_count_of_call(0), m_summary_time_used(0), m_pname(pstr)
+	local_call_account(const char* pstr) :
+		m_count_of_call(0),
+		m_summary_time_used(0),
+		m_pname(pstr)
 	{
 	}
 	~local_call_account()
 	{
 		GULPS_CAT_MAJOR("epee_prof_tools");
-		GULPSF_INFO("PROFILE {}:av_time:\t{} sum_time:\t{} call_count:\t{}", m_pname , (m_count_of_call ? (m_summary_time_used / m_count_of_call) : 0) , m_summary_time_used , m_count_of_call);
+		GULPSF_INFO("PROFILE {}:av_time:\t{} sum_time:\t{} call_count:\t{}", m_pname, (m_count_of_call ? (m_summary_time_used / m_count_of_call) : 0), m_summary_time_used, m_count_of_call);
 	}
 
 	size_t m_count_of_call;
 	uint64_t m_summary_time_used;
-	const char *m_pname;
+	const char* m_pname;
 };
 
 struct call_frame
 {
 
-	call_frame(local_call_account &cc) : m_cc(cc)
+	call_frame(local_call_account& cc) :
+		m_cc(cc)
 	{
 		cc.m_count_of_call++;
 		m_call_time = boost::posix_time::microsec_clock::local_time();
@@ -125,10 +129,10 @@ struct call_frame
 	}
 
   private:
-	local_call_account &m_cc;
+	local_call_account& m_cc;
 	boost::posix_time::ptime m_call_time;
 };
-}
-}
+} // namespace profile_tools
+} // namespace epee
 
 #endif //_PROFILE_TOOLS_H_

@@ -64,17 +64,19 @@
  * pthread calls. They return 0 on success and an errno on error.
  * The errno is logged to the logfile with a descriptive comment.
  */
-#define LOCKRET(func) do {\
-	int lockret_err;		\
-	if( (lockret_err=(func)) != 0)		\
-		log_err("%s at %d could not " #func ": %s", \
-		__FILE__, __LINE__, strerror(lockret_err));	\
- 	} while(0)
+#define LOCKRET(func)                                       \
+	do                                                      \
+	{                                                       \
+		int lockret_err;                                    \
+		if((lockret_err = (func)) != 0)                     \
+			log_err("%s at %d could not " #func ": %s",     \
+				__FILE__, __LINE__, strerror(lockret_err)); \
+	} while(0)
 #endif
 
 /** DEBUG: use thread debug whenever possible */
 #if defined(HAVE_PTHREAD) && defined(HAVE_PTHREAD_SPINLOCK_T) && defined(ENABLE_LOCK_CHECKS)
-#  define USE_THREAD_DEBUG
+#define USE_THREAD_DEBUG
 #endif
 
 #ifdef USE_THREAD_DEBUG
@@ -82,12 +84,12 @@
 /* (some) checking; to detect races and deadlocks. */
 #include "testcode/checklocks.h"
 
-#else /* USE_THREAD_DEBUG */
+#else								   /* USE_THREAD_DEBUG */
 #define lock_protect(lock, area, size) /* nop */
-#define lock_unprotect(lock, area) /* nop */
-#define lock_get_mem(lock) (0) /* nothing */
-#define checklock_start() /* nop */
-#define checklock_stop() /* nop */
+#define lock_unprotect(lock, area)	 /* nop */
+#define lock_get_mem(lock) (0)		   /* nothing */
+#define checklock_start()			   /* nop */
+#define checklock_stop()			   /* nop */
 
 #ifdef HAVE_PTHREAD
 #include <pthread.h>
@@ -153,18 +155,25 @@ typedef pthread_t ub_thread_type;
 http://wiki.musl-libc.org/wiki/Functional_differences_from_glibc#Thread_stack_size
 This is not enough and cause segfault. Other linux distros have 2 Mb at least.
 Wrapper for set up thread stack size */
-#define PTHREADSTACKSIZE 2*1024*1024
-#define PTHREADCREATE(thr, stackrequired, func, arg) do {\
-	pthread_attr_t attr; \
-	size_t stacksize; \
-	LOCKRET(pthread_attr_init(&attr)); \
-	LOCKRET(pthread_attr_getstacksize(&attr, &stacksize)); \
-	if (stacksize < stackrequired) { \
-		LOCKRET(pthread_attr_setstacksize(&attr, stackrequired)); \
-		LOCKRET(pthread_create(thr, &attr, func, arg)); \
-		LOCKRET(pthread_attr_getstacksize(&attr, &stacksize)); \
-		verbose(VERB_ALGO, "Thread stack size set to %u", (unsigned)stacksize); \
-	} else {LOCKRET(pthread_create(thr, NULL, func, arg));} \
+#define PTHREADSTACKSIZE 2 * 1024 * 1024
+#define PTHREADCREATE(thr, stackrequired, func, arg)                                \
+	do                                                                              \
+	{                                                                               \
+		pthread_attr_t attr;                                                        \
+		size_t stacksize;                                                           \
+		LOCKRET(pthread_attr_init(&attr));                                          \
+		LOCKRET(pthread_attr_getstacksize(&attr, &stacksize));                      \
+		if(stacksize < stackrequired)                                               \
+		{                                                                           \
+			LOCKRET(pthread_attr_setstacksize(&attr, stackrequired));               \
+			LOCKRET(pthread_create(thr, &attr, func, arg));                         \
+			LOCKRET(pthread_attr_getstacksize(&attr, &stacksize));                  \
+			verbose(VERB_ALGO, "Thread stack size set to %u", (unsigned)stacksize); \
+		}                                                                           \
+		else                                                                        \
+		{                                                                           \
+			LOCKRET(pthread_create(thr, NULL, func, arg));                          \
+		}                                                                           \
 	} while(0)
 /** Use wrapper for set thread stack size on attributes. */
 #define ub_thread_create(thr, func, arg) PTHREADCREATE(thr, PTHREADSTACKSIZE, func, arg)
@@ -215,7 +224,6 @@ typedef thread_key_t ub_thread_key_type;
 #define ub_thread_key_set(key, v) LOCKRET(thr_setspecific(key, v))
 void* ub_thread_key_get(ub_thread_key_type key);
 
-
 #else /* we do not HAVE_SOLARIS_THREADS and no PTHREADS */
 /******************* WINDOWS THREADS ************************/
 #ifdef HAVE_WINDOWS_THREADS
@@ -259,25 +267,25 @@ void* ub_thread_key_get(ub_thread_key_type key);
 #define THREADS_DISABLED 1
 /** In case there is no thread support, define locks to do nothing */
 typedef int lock_rw_type;
-#define lock_rw_init(lock) /* nop */
-#define lock_rw_destroy(lock) /* nop */
-#define lock_rw_rdlock(lock) /* nop */
-#define lock_rw_wrlock(lock) /* nop */
-#define lock_rw_unlock(lock) /* nop */
+#define lock_rw_init(lock)		 /* nop */
+#define lock_rw_destroy(lock)	/* nop */
+#define lock_rw_rdlock(lock)	 /* nop */
+#define lock_rw_wrlock(lock)	 /* nop */
+#define lock_rw_unlock(lock)	 /* nop */
 
 /** define locks to do nothing */
 typedef int lock_basic_type;
-#define lock_basic_init(lock) /* nop */
+#define lock_basic_init(lock)	/* nop */
 #define lock_basic_destroy(lock) /* nop */
-#define lock_basic_lock(lock) /* nop */
-#define lock_basic_unlock(lock) /* nop */
+#define lock_basic_lock(lock)	/* nop */
+#define lock_basic_unlock(lock)  /* nop */
 
 /** define locks to do nothing */
 typedef int lock_quick_type;
-#define lock_quick_init(lock) /* nop */
+#define lock_quick_init(lock)	/* nop */
 #define lock_quick_destroy(lock) /* nop */
-#define lock_quick_lock(lock) /* nop */
-#define lock_quick_unlock(lock) /* nop */
+#define lock_quick_lock(lock)	/* nop */
+#define lock_quick_unlock(lock)  /* nop */
 
 /** Thread creation, threads do not exist */
 typedef pid_t ub_thread_type;

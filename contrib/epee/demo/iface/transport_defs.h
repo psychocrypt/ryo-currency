@@ -130,12 +130,12 @@ struct COMMAND_EXAMPLE_2
 //-------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------
 //in debug purpose
-bool operator!=(const some_test_subdata &a, const some_test_subdata &b)
+bool operator!=(const some_test_subdata& a, const some_test_subdata& b)
 {
 	return b.m_str != a.m_str;
 }
 
-bool operator==(const some_test_data &a, const some_test_data &b)
+bool operator==(const some_test_data& a, const some_test_data& b)
 {
 	if(b.m_str != a.m_str || b.m_uint64 != a.m_uint64 || b.m_uint32 != a.m_uint32 || b.m_uint16 != a.m_uint16 || b.m_uint8 != a.m_uint8 || b.m_int64 != a.m_int64 || b.m_int32 != a.m_int32 || b.m_int16 != a.m_int16 || b.m_int8 != a.m_int8 || b.m_double != a.m_double || b.m_bool != a.m_bool || b.m_list_of_str != a.m_list_of_str || b.m_list_of_uint64_t != a.m_list_of_uint64_t || b.m_list_of_uint32_t != a.m_list_of_uint32_t || b.m_list_of_uint16_t != a.m_list_of_uint16_t || b.m_list_of_uint8_t != a.m_list_of_uint8_t || b.m_list_of_int64_t != a.m_list_of_int64_t || b.m_list_of_int32_t != a.m_list_of_int32_t || b.m_list_of_int16_t != a.m_list_of_int16_t || b.m_list_of_int8_t != a.m_list_of_int8_t || b.m_list_of_double != a.m_list_of_double || b.m_list_of_bool != a.m_list_of_bool || b.m_subobj != a.m_subobj || b.m_list_of_self != a.m_list_of_self || b.m_storage_entry_int.which() != a.m_storage_entry_int.which() || b.m_storage_entry_string.which() != a.m_storage_entry_string.which())
 		return false;
@@ -187,4 +187,4 @@ inline some_test_data get_test_data()
 	s.m_storage_entry_string = epee::serialization::storage_entry(std::string("sdsvsdvs"));
 	return s;
 }
-}
+} // namespace demo

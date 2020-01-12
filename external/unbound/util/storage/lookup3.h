@@ -50,7 +50,7 @@
  * @param initval: the previous hash, or an arbitrary value
  * @return: hash value.
  */
-uint32_t hashword(const uint32_t *k, size_t length, uint32_t initval);
+uint32_t hashword(const uint32_t* k, size_t length, uint32_t initval);
 
 /**
  * Hash key data.
@@ -59,7 +59,7 @@ uint32_t hashword(const uint32_t *k, size_t length, uint32_t initval);
  * @param initval: the previous hash, or an arbitrary value
  * @return: hash value.
  */
-uint32_t hashlittle(const void *k, size_t length, uint32_t initval);
+uint32_t hashlittle(const void* k, size_t length, uint32_t initval);
 
 /**
  * Set the randomisation initial value, set this before threads start,

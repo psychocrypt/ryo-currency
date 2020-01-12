@@ -73,7 +73,7 @@ struct internal_base;
 struct internal_timer; /* A sub struct of the comm_timer super struct */
 
 /** callback from communication point function type */
-typedef int comm_point_callback_type(struct comm_point*, void*, int, 
+typedef int comm_point_callback_type(struct comm_point*, void*, int,
 	struct comm_reply*);
 
 /** to pass no_error to callback function */
@@ -81,7 +81,7 @@ typedef int comm_point_callback_type(struct comm_point*, void*, int,
 /** to pass closed connection to callback function */
 #define NETEVENT_CLOSED -1
 /** to pass timeout happened to callback function */
-#define NETEVENT_TIMEOUT -2 
+#define NETEVENT_TIMEOUT -2
 /** to pass fallback from capsforID to callback function; 0x20 failed */
 #define NETEVENT_CAPSFAIL -3
 /** to pass done transfer to callback function; http file is complete */
@@ -93,7 +93,8 @@ typedef int comm_point_callback_type(struct comm_point*, void*, int,
 /**
  * A communication point dispatcher. Thread specific.
  */
-struct comm_base {
+struct comm_base
+{
 	/** behind the scenes structure. with say libevent info. alloced */
 	struct internal_base* eb;
 	/** callback to stop listening on accept sockets,
@@ -109,7 +110,8 @@ struct comm_base {
 /**
  * Reply information for a communication point.
  */
-struct comm_reply {
+struct comm_reply
+{
 	/** the comm_point with fd to send reply on to. */
 	struct comm_point* c;
 	/** the address (for UDP based communication) */
@@ -122,7 +124,7 @@ struct comm_reply {
 #ifdef USE_DNSCRYPT
 	uint8_t client_nonce[crypto_box_HALF_NONCEBYTES];
 	uint8_t nmkey[crypto_box_BEFORENMBYTES];
-	const dnsccert *dnsc_cert;
+	const dnsccert* dnsc_cert;
 	int is_dnscrypted;
 #endif
 	/** the return source interface data */
@@ -136,8 +138,8 @@ struct comm_reply {
 		struct in_addr v4addr;
 #endif
 	}
-		/** variable with return source data */
-		pktinfo;
+	/** variable with return source data */
+	pktinfo;
 	/** max udp size for udp packets */
 	size_t max_udp_size;
 };
@@ -151,7 +153,8 @@ struct comm_reply {
  *    udp behind: called after readdone. No send after.
  *    tcp behind: write done, read done, then called. No send after.
  */
-struct comm_point {
+struct comm_point
+{
 	/** behind the scenes structure, with say libevent info. alloced. */
 	struct internal_event* ev;
 
@@ -190,7 +193,8 @@ struct comm_point {
 	/** the SSL object with rw bio (owned) or for commaccept ctx ref */
 	void* ssl;
 	/** handshake state for init and renegotiate */
-	enum {
+	enum
+	{
 		/** no handshake, it has been done */
 		comm_ssl_shake_none = 0,
 		/** ssl initial handshake wants to read */
@@ -221,11 +225,12 @@ struct comm_point {
 	struct dt_env* dtenv;
 
 	/** is this a UDP, TCP-accept or TCP socket. */
-	enum comm_point_type {
+	enum comm_point_type
+	{
 		/** UDP socket - handle datagrams. */
-		comm_udp, 
+		comm_udp,
 		/** TCP accept socket - only creates handlers if readable. */
-		comm_tcp_accept, 
+		comm_tcp_accept,
 		/** TCP handler socket - handle byteperbyte readwrite. */
 		comm_tcp,
 		/** HTTP handler socket */
@@ -234,9 +239,9 @@ struct comm_point {
 		comm_local,
 		/** raw - not DNS format - for pipe readers and writers */
 		comm_raw
-	} 
-		/** variable with type of socket, UDP,TCP-accept,TCP,pipe */
-		type;
+	}
+	/** variable with type of socket, UDP,TCP-accept,TCP,pipe */
+	type;
 
 	/* ---------- Behaviour ----------- */
 	/** if set the connection is NOT closed on delete. */
@@ -300,13 +305,14 @@ struct comm_point {
 	*/
 	comm_point_callback_type* callback;
 	/** argument to pass to callback. */
-	void *cb_arg;
+	void* cb_arg;
 };
 
 /**
  * Structure only for making timeout events.
  */
-struct comm_timer {
+struct comm_timer
+{
 	/** the internal event stuff (derived) */
 	struct internal_timer* ev_timer;
 
@@ -320,7 +326,8 @@ struct comm_timer {
 /**
  * Structure only for signal events.
  */
-struct comm_signal {
+struct comm_signal
+{
 	/** the communication base */
 	struct comm_base* base;
 
@@ -415,7 +422,7 @@ struct ub_event_base* comm_base_internal(struct comm_base* b);
  * Sets timeout to NULL. Turns off TCP options.
  */
 struct comm_point* comm_point_create_udp(struct comm_base* base,
-	int fd, struct sldns_buffer* buffer, 
+	int fd, struct sldns_buffer* buffer,
 	comm_point_callback_type* callback, void* callback_arg);
 
 /**
@@ -431,7 +438,7 @@ struct comm_point* comm_point_create_udp(struct comm_base* base,
  * Sets timeout to NULL. Turns off TCP options.
  */
 struct comm_point* comm_point_create_udp_ancil(struct comm_base* base,
-	int fd, struct sldns_buffer* buffer, 
+	int fd, struct sldns_buffer* buffer,
 	comm_point_callback_type* callback, void* callback_arg);
 
 /**
@@ -452,7 +459,7 @@ struct comm_point* comm_point_create_udp_ancil(struct comm_base* base,
  * Inits timeout to NULL. All handlers are on the free list.
  */
 struct comm_point* comm_point_create_tcp(struct comm_base* base,
-	int fd, int num, size_t bufsize, 
+	int fd, int num, size_t bufsize,
 	comm_point_callback_type* callback, void* callback_arg);
 
 /**
@@ -490,7 +497,7 @@ struct comm_point* comm_point_create_http_out(struct comm_base* base,
  * @return: the commpoint or NULL on error.
  */
 struct comm_point* comm_point_create_local(struct comm_base* base,
-	int fd, size_t bufsize, 
+	int fd, size_t bufsize,
 	comm_point_callback_type* callback, void* callback_arg);
 
 /**
@@ -503,7 +510,7 @@ struct comm_point* comm_point_create_local(struct comm_base* base,
  * @return: the commpoint or NULL on error.
  */
 struct comm_point* comm_point_create_raw(struct comm_base* base,
-	int fd, int writing, 
+	int fd, int writing,
 	comm_point_callback_type* callback, void* callback_arg);
 
 /**
@@ -581,7 +588,7 @@ size_t comm_point_get_mem(struct comm_point* c);
  * @param cb_arg: user callback argument.
  * @return: the new timer or NULL on error.
  */
-struct comm_timer* comm_timer_create(struct comm_base* base, 
+struct comm_timer* comm_timer_create(struct comm_base* base,
 	void (*cb)(void*), void* cb_arg);
 
 /**
@@ -651,7 +658,7 @@ void comm_signal_delete(struct comm_signal* comsig);
  *	if -1, error message has been printed if necessary, simply drop
  *	out of the reading handler.
  */
-int comm_point_perform_accept(struct comm_point* c, 
+int comm_point_perform_accept(struct comm_point* c,
 	struct sockaddr_storage* addr, socklen_t* addrlen);
 
 /**** internal routines ****/

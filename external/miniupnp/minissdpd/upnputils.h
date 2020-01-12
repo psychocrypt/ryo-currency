@@ -13,41 +13,38 @@
  * [ipv6]:port or ipv4:port
  * return the number of characters used (as snprintf)
  */
-int
-sockaddr_to_string(const struct sockaddr * addr, char * str, size_t size);
+int sockaddr_to_string(const struct sockaddr* addr, char* str, size_t size);
 
 /**
  * set the file description as non blocking
  * return 0 in case of failure, 1 in case of success
  */
-int
-set_non_blocking(int fd);
+int set_non_blocking(int fd);
 
 /**
  * get the LAN which the peer belongs to
  */
-struct lan_addr_s *
-get_lan_for_peer(const struct sockaddr * peer);
+struct lan_addr_s*
+get_lan_for_peer(const struct sockaddr* peer);
 
 /**
  * define portability macros
  */
 #if defined(__sun)
-static __inline size_t _sa_len(const struct sockaddr *addr)
+static __inline size_t _sa_len(const struct sockaddr* addr)
 {
-        if (addr->sa_family == AF_INET)
-                return (sizeof(struct sockaddr_in));
-        else if (addr->sa_family == AF_INET6)
-                return (sizeof(struct sockaddr_in6));
-        else
-                return (sizeof(struct sockaddr));
+	if(addr->sa_family == AF_INET)
+		return (sizeof(struct sockaddr_in));
+	else if(addr->sa_family == AF_INET6)
+		return (sizeof(struct sockaddr_in6));
+	else
+		return (sizeof(struct sockaddr));
 }
-# define SA_LEN(sa) (_sa_len(sa))
+#define SA_LEN(sa) (_sa_len(sa))
 #else
 #if !defined(SA_LEN)
-# define SA_LEN(sa) ((sa)->sa_len)
+#define SA_LEN(sa) ((sa)->sa_len)
 #endif
 #endif
 
 #endif
-
