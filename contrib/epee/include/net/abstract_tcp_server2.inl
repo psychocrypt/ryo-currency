@@ -819,7 +819,7 @@ catch(...)
 } // namespace net_utils
 //-----------------------------------------------------------------------------
 PUSH_WARNINGS
-DISABLE_GCC_WARNING(maybe - uninitialized)
+DISABLE_GCC_WARNING(maybe-uninitialized)
 template <class t_protocol_handler>
 bool boosted_tcp_server<t_protocol_handler>::init_server(const std::string port, const std::string& address)
 {
